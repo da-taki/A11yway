@@ -3,7 +3,10 @@
   "version": "prototype",
   "summary": {
     "total_pages_tested": 2,
+    "successful_pages": 2,
+    "failed_pages": 0,
     "total_issues": 11,
+    "total_task_blockers": 9,
     "counts_by_severity": {
       "high": 6,
       "medium": 5
@@ -41,6 +44,28 @@
         "skipped_heading_level": 1,
         "missing_video_captions": 1
       },
+      "high_severity_issues": [
+        {
+          "issue_type": "missing_form_label",
+          "message": "Form control is missing an accessible label",
+          "snippet": "<input type=\"text\" name=\"student_name\">"
+        },
+        {
+          "issue_type": "missing_form_label",
+          "message": "Form control is missing an accessible label",
+          "snippet": "<textarea name=\"accommodation_request\" rows=\"5\">"
+        },
+        {
+          "issue_type": "missing_button_name",
+          "message": "Button is missing an accessible name",
+          "snippet": "<button type=\"button\">"
+        },
+        {
+          "issue_type": "missing_video_captions",
+          "message": "Video is missing captions",
+          "snippet": "<video controls src=\"orientation.mp4\">"
+        }
+      ],
       "reports": {
         "json": "reports/batch_sample/scholarship_form.json",
         "markdown": "reports/batch_sample/scholarship_form.md"
@@ -66,6 +91,18 @@
         "missing_video_captions": 1,
         "missing_audio_transcript": 1
       },
+      "high_severity_issues": [
+        {
+          "issue_type": "missing_video_captions",
+          "message": "Video is missing captions",
+          "snippet": "<video controls src=\"lesson-overview.mp4\">"
+        },
+        {
+          "issue_type": "missing_audio_transcript",
+          "message": "Audio is missing a transcript",
+          "snippet": "<audio controls src=\"assignment-instructions.mp3\">"
+        }
+      ],
       "reports": {
         "json": "reports/batch_sample/learning_resources.json",
         "markdown": "reports/batch_sample/learning_resources.md"
@@ -77,5 +114,6 @@
     "It does not replace a full human accessibility audit.",
     "It does not yet perform browser-based interaction testing."
   ],
-  "csv_index_path": "reports/batch_sample/index.csv"
+  "csv_index_path": "reports/batch_sample/index.csv",
+  "evaluation_summary_path": "reports/batch_sample/evaluation_summary.md"
 }

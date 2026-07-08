@@ -43,7 +43,14 @@
         "name": "student_name",
         "identity": "name=\"student_name\""
       },
-      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
     },
     {
       "issue_type": "missing_form_label",
@@ -59,7 +66,14 @@
         "type": "text",
         "identity": "name=\"accommodation_request\""
       },
-      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
     },
     {
       "issue_type": "generic_link_text",
@@ -74,7 +88,14 @@
         "href": "/scholarships/help",
         "text": "click here"
       },
-      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\""
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\"",
+      "rule": {
+        "title": "Link text is too generic",
+        "category": "Interactive Elements",
+        "why_it_matters": "Students who navigate by a list of links hear 'click here' with no context and cannot tell links apart.",
+        "manual_review_notes": "Surrounding text may add context visually, but the link should still make sense on its own.",
+        "static_check_limitations": "The check only matches a small list of common generic phrases."
+      }
     },
     {
       "issue_type": "missing_button_name",
@@ -88,7 +109,14 @@
         "reason": "Button has no visible text, aria-label, title, or image alt text.",
         "type": "button"
       },
-      "suggested_fix": "Add clear button text or an aria-label that describes the button action."
+      "suggested_fix": "Add clear button text or an aria-label that describes the button action.",
+      "rule": {
+        "title": "Button missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "A button without a name is announced as just 'button' by screen readers, so students cannot tell what pressing it will do.",
+        "manual_review_notes": "Icon-only buttons may look meaningful visually but still need a programmatic name.",
+        "static_check_limitations": "Static HTML cannot see names added later by JavaScript or icon fonts."
+      }
     },
     {
       "issue_type": "missing_image_alt",
@@ -102,7 +130,14 @@
         "reason": "Image is missing useful alt text.",
         "src": "student-award.png"
       },
-      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation."
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
     },
     {
       "issue_type": "skipped_heading_level",
@@ -118,7 +153,14 @@
         "previous_level": 1,
         "level": 3
       },
-      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3."
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
     },
     {
       "issue_type": "missing_video_captions",
@@ -132,7 +174,14 @@
         "reason": "Video has no captions or subtitles track.",
         "src": "orientation.mp4"
       },
-      "suggested_fix": "Add captions or subtitles for education video content."
+      "suggested_fix": "Add captions or subtitles for education video content.",
+      "rule": {
+        "title": "Video missing captions",
+        "category": "Media",
+        "why_it_matters": "Deaf and hard-of-hearing students cannot access spoken lesson content without captions or subtitles.",
+        "manual_review_notes": "Captions may be provided by an embedded player or platform instead of a track element.",
+        "static_check_limitations": "The check only sees <track> elements; player-level or burned-in captions are invisible to static HTML."
+      }
     }
   ],
   "limitations": [

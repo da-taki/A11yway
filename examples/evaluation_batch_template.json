@@ -1,0 +1,23 @@
+[
+  {
+    "id": "organization_homepage",
+    "name": "[Organization Name] Homepage",
+    "source": "https://example.org",
+    "task": "access_learning_resources",
+    "notes": "Replace with the public page being reviewed."
+  },
+  {
+    "id": "student_registration_form",
+    "name": "[Organization Name] Student Registration Form",
+    "source": "https://example.org/register",
+    "task": "submit_scholarship_application",
+    "notes": "Use only public pages or pages where permission was granted."
+  },
+  {
+    "id": "learning_resources_page",
+    "name": "[Organization Name] Learning Resources",
+    "source": "https://example.org/resources",
+    "task": "access_learning_resources",
+    "notes": "Local HTML files also work, for example examples/sample_resource_page.html."
+  }
+]

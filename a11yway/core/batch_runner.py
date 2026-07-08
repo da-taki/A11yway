@@ -12,6 +12,7 @@ from a11yway.core.report_builder import (
     build_json_report,
     save_batch_index_markdown,
     save_batch_index_csv,
+    save_evaluation_summary_markdown,
     save_json_report,
     save_markdown_report,
 )
@@ -71,6 +72,7 @@ def run_batch(
                     "task_blocker_count": 0,
                     "counts_by_severity": {},
                     "counts_by_issue_type": {},
+                    "high_severity_issues": [],
                     "reports": {},
                 }
             )
@@ -98,6 +100,16 @@ def run_batch(
         save_json_report(report, json_path)
         save_markdown_report(report, markdown_path)
 
+        high_severity_issues = [
+            {
+                "issue_type": issue["issue_type"],
+                "message": issue["message"],
+                "snippet": issue["evidence"].get("snippet", ""),
+            }
+            for issue in report["issues"]
+            if issue["severity"] == "high"
+        ]
+
         source_summaries.append(
             {
                 "id": item_id,
@@ -111,6 +123,7 @@ def run_batch(
                 "task_blocker_count": len(task_blockers),
                 "counts_by_severity": report["summary"]["counts_by_severity"],
                 "counts_by_issue_type": report["summary"]["counts_by_issue_type"],
+                "high_severity_issues": high_severity_issues,
                 "reports": {
                     "json": json_path.as_posix(),
                     "markdown": markdown_path.as_posix(),
@@ -122,10 +135,17 @@ def run_batch(
     index_json_path = output_dir / "index.json"
     index_markdown_path = output_dir / "index.md"
     index_csv_path = Path(csv_path) if csv_path else output_dir / "index.csv"
+    evaluation_summary_path = output_dir / "evaluation_summary.md"
     index_report["csv_index_path"] = index_csv_path.as_posix()
+    index_report["evaluation_summary_path"] = evaluation_summary_path.as_posix()
     save_json_report(index_report, index_json_path)
     save_batch_index_markdown(index_report, index_markdown_path)
     save_batch_index_csv(index_report, index_csv_path)
+    save_evaluation_summary_markdown(
+        index_report,
+        evaluation_summary_path,
+        config_path=Path(config_path).as_posix(),
+    )
 
     return {
         "config_path": Path(config_path).as_posix(),
@@ -133,5 +153,6 @@ def run_batch(
         "index_json_path": index_json_path.as_posix(),
         "index_markdown_path": index_markdown_path.as_posix(),
         "csv_index_path": index_csv_path.as_posix(),
+        "evaluation_summary_path": evaluation_summary_path.as_posix(),
         "index": index_report,
     }

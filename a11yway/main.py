@@ -12,6 +12,7 @@ from a11yway.core.report_builder import (
     save_json_report,
     save_markdown_report,
 )
+from a11yway.core.rules import get_rule, list_rules
 from a11yway.core.source_loader import load_html_source
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 from a11yway.models.issue import AccessibilityIssue
@@ -142,13 +143,64 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="task_id_or_name",
         help="Optional task id or name from examples/sample_tasks.json.",
     )
+    parser.add_argument(
+        "--list-rules",
+        dest="list_rules",
+        action="store_true",
+        help="Print all available static issue types and exit without auditing.",
+    )
+    parser.add_argument(
+        "--rule",
+        dest="rule_issue_type",
+        help="Print detailed documentation for one issue type and exit.",
+    )
     return parser.parse_args(argv)
+
+
+def print_rule_list() -> None:
+    """Print a short listing of every registered static check."""
+    rules = list_rules()
+    print("A11yway static checks")
+    print(f"Rules registered: {len(rules)}")
+    for rule in rules:
+        print()
+        print(f"{rule['issue_type']}")
+        print(f"   Title: {rule['title']}")
+        print(f"   Category: {rule['category']}")
+        print(f"   Default severity: {rule['default_severity']}")
+
+
+def print_rule_details(issue_type: str) -> int:
+    """Print full documentation for one rule; return a CLI exit code."""
+    rule = get_rule(issue_type)
+    if rule is None:
+        print(f'Unknown rule: "{issue_type}".')
+        print("Use --list-rules to see all available issue types.")
+        return 1
+
+    print(f"Rule: {rule['issue_type']}")
+    print(f"Title: {rule['title']}")
+    print(f"Category: {rule['category']}")
+    print(f"Default severity: {rule['default_severity']}")
+    print(f"Why it matters: {rule['why_it_matters']}")
+    print(f"How to fix: {rule['how_to_fix']}")
+    print(f"Manual review notes: {rule['manual_review_notes']}")
+    print(f"Static check limitations: {rule['static_check_limitations']}")
+    print(f"Standard hint: {rule['standard_hint']}")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
+
+    if parsed_args.list_rules:
+        print_rule_list()
+        return 0
+
+    if parsed_args.rule_issue_type:
+        return print_rule_details(parsed_args.rule_issue_type)
 
     if parsed_args.batch_config:
         batch_result = run_batch(
@@ -165,6 +217,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Index JSON: {batch_result['index_json_path']}")
         print(f"Index Markdown: {batch_result['index_markdown_path']}")
         print(f"Index CSV: {batch_result['csv_index_path']}")
+        print(f"Evaluation summary: {batch_result['evaluation_summary_path']}")
         return 0
 
     if parsed_args.csv_output:
