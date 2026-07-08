@@ -1,0 +1,74 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "summary": {
+    "total_pages_tested": 2,
+    "total_issues": 11,
+    "counts_by_severity": {
+      "high": 6,
+      "medium": 5
+    },
+    "counts_by_issue_type": {
+      "missing_form_label": 2,
+      "generic_link_text": 2,
+      "missing_button_name": 1,
+      "missing_image_alt": 2,
+      "skipped_heading_level": 1,
+      "missing_video_captions": 2,
+      "missing_audio_transcript": 1
+    }
+  },
+  "sources": [
+    {
+      "id": "scholarship_form",
+      "name": "Student Scholarship Application",
+      "source": "examples/sample_form.html",
+      "task": "submit_scholarship_application",
+      "issue_count": 7,
+      "task_blocker_count": 5,
+      "counts_by_severity": {
+        "high": 4,
+        "medium": 3
+      },
+      "counts_by_issue_type": {
+        "missing_form_label": 2,
+        "generic_link_text": 1,
+        "missing_button_name": 1,
+        "missing_image_alt": 1,
+        "skipped_heading_level": 1,
+        "missing_video_captions": 1
+      },
+      "reports": {
+        "json": "reports/batch_sample/scholarship_form.json",
+        "markdown": "reports/batch_sample/scholarship_form.md"
+      }
+    },
+    {
+      "id": "learning_resources",
+      "name": "Learning Resources Page",
+      "source": "examples/sample_resource_page.html",
+      "task": "access_learning_resources",
+      "issue_count": 4,
+      "task_blocker_count": 4,
+      "counts_by_severity": {
+        "medium": 2,
+        "high": 2
+      },
+      "counts_by_issue_type": {
+        "generic_link_text": 1,
+        "missing_image_alt": 1,
+        "missing_video_captions": 1,
+        "missing_audio_transcript": 1
+      },
+      "reports": {
+        "json": "reports/batch_sample/learning_resources.json",
+        "markdown": "reports/batch_sample/learning_resources.md"
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ]
+}

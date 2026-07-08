@@ -21,6 +21,12 @@ def _count_by(items: list[str]) -> dict[str, int]:
     return counts
 
 
+def merge_counts(target: dict[str, int], source: dict[str, int]) -> None:
+    """Merge count dictionaries in place."""
+    for key, value in source.items():
+        target[key] = target.get(key, 0) + value
+
+
 def _format_evidence_for_json(evidence: str | dict) -> dict:
     """Return evidence as a JSON-ready object."""
     if isinstance(evidence, dict):
@@ -192,6 +198,89 @@ def save_markdown_report(report: dict, output_path: str | Path) -> None:
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_markdown_report(report), encoding="utf-8")
+
+
+def build_batch_index_report(items: list[dict]) -> dict:
+    """Build a JSON-ready index for a batch audit run."""
+    counts_by_severity: dict[str, int] = {}
+    counts_by_issue_type: dict[str, int] = {}
+
+    for item in items:
+        merge_counts(counts_by_severity, item.get("counts_by_severity", {}))
+        merge_counts(counts_by_issue_type, item.get("counts_by_issue_type", {}))
+
+    return {
+        "tool": "A11yway",
+        "version": "prototype",
+        "summary": {
+            "total_pages_tested": len(items),
+            "total_issues": sum(item.get("issue_count", 0) for item in items),
+            "counts_by_severity": counts_by_severity,
+            "counts_by_issue_type": counts_by_issue_type,
+        },
+        "sources": items,
+        "limitations": [
+            "This prototype only runs static HTML checks.",
+            "It does not replace a full human accessibility audit.",
+            "It does not yet perform browser-based interaction testing.",
+        ],
+    }
+
+
+def build_batch_index_markdown(index_report: dict) -> str:
+    """Build a readable Markdown index for a batch audit run."""
+    summary = index_report.get("summary", {})
+    lines = [
+        "# A11yway Batch Accessibility Index",
+        "",
+        "## Summary",
+        "",
+        f"- Total pages tested: {summary.get('total_pages_tested', 0)}",
+        f"- Total issues: {summary.get('total_issues', 0)}",
+        "",
+        "### Counts By Severity",
+        "",
+        *_format_count_items(summary.get("counts_by_severity", {})),
+        "",
+        "### Counts By Issue Type",
+        "",
+        *_format_count_items(summary.get("counts_by_issue_type", {})),
+        "",
+        "## Sources Tested",
+        "",
+        "| ID | Name | Source | Task | Issues | Task blockers | Reports |",
+        "| --- | --- | --- | --- | ---: | ---: | --- |",
+    ]
+
+    for item in index_report.get("sources", []):
+        reports = item.get("reports", {})
+        report_links = ", ".join(
+            f"{kind}: {path}" for kind, path in reports.items() if path
+        )
+        lines.append(
+            "| {id} | {name} | {source} | {task} | {issues} | {blockers} | {reports} |".format(
+                id=item.get("id", ""),
+                name=item.get("name", ""),
+                source=item.get("source", ""),
+                task=item.get("task", ""),
+                issues=item.get("issue_count", 0),
+                blockers=item.get("task_blocker_count", 0),
+                reports=report_links,
+            )
+        )
+
+    lines.extend(["", "## Limitations", ""])
+    lines.extend(f"- {limitation}" for limitation in index_report.get("limitations", []))
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def save_batch_index_markdown(index_report: dict, output_path: str | Path) -> None:
+    """Write a Markdown batch index, creating parent directories if needed."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(build_batch_index_markdown(index_report), encoding="utf-8")
 
 
 class ReportBuilder:

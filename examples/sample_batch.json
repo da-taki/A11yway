@@ -1,0 +1,14 @@
+[
+  {
+    "id": "scholarship_form",
+    "name": "Student Scholarship Application",
+    "source": "examples/sample_form.html",
+    "task": "submit_scholarship_application"
+  },
+  {
+    "id": "learning_resources",
+    "name": "Learning Resources Page",
+    "source": "examples/sample_resource_page.html",
+    "task": "access_learning_resources"
+  }
+]

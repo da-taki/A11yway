@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from a11yway.core.batch_runner import run_batch
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
@@ -100,6 +101,17 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="HTML file to analyze. Defaults to examples/sample_form.html.",
     )
     parser.add_argument(
+        "--batch",
+        dest="batch_config",
+        help="Optional batch config JSON file. When provided, single-file analysis is skipped.",
+    )
+    parser.add_argument(
+        "--out-dir",
+        dest="out_dir",
+        default="reports/batch",
+        help="Output directory for batch reports. Defaults to reports/batch.",
+    )
+    parser.add_argument(
         "--json",
         dest="json_output",
         help="Optional path where a structured JSON report should be written.",
@@ -121,6 +133,19 @@ def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
+
+    if parsed_args.batch_config:
+        batch_result = run_batch(parsed_args.batch_config, parsed_args.out_dir)
+        summary = batch_result["index"]["summary"]
+        print("A11yway batch static HTML accessibility audit")
+        print(f"Batch file: {batch_result['config_path']}")
+        print(f"Pages tested: {summary['total_pages_tested']}")
+        print(f"Total issues: {summary['total_issues']}")
+        print(f"Output directory: {batch_result['out_dir']}")
+        print(f"Index JSON: {batch_result['index_json_path']}")
+        print(f"Index Markdown: {batch_result['index_markdown_path']}")
+        return 0
+
     html_path = Path(parsed_args.html_path)
 
     if not html_path.exists():

@@ -1,0 +1,130 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_resource_page.html",
+  "summary": {
+    "issues_found": 4,
+    "counts_by_severity": {
+      "medium": 2,
+      "high": 2
+    },
+    "counts_by_issue_type": {
+      "generic_link_text": 1,
+      "missing_image_alt": 1,
+      "missing_video_captions": 1,
+      "missing_audio_transcript": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 14,
+        "snippet": "<a href=\"/resources/help\">learn more</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "/resources/help",
+        "text": "learn more"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\""
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 17,
+        "snippet": "<img src=\"resource-library.png\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "resource-library.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation."
+    },
+    {
+      "issue_type": "missing_video_captions",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Video is missing captions",
+      "evidence": {
+        "tag": "video",
+        "line": 20,
+        "snippet": "<video controls src=\"lesson-overview.mp4\">",
+        "reason": "Video has no captions or subtitles track.",
+        "src": "lesson-overview.mp4"
+      },
+      "suggested_fix": "Add captions or subtitles for education video content."
+    },
+    {
+      "issue_type": "missing_audio_transcript",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Audio is missing a transcript",
+      "evidence": {
+        "tag": "audio",
+        "line": 22,
+        "snippet": "<audio controls src=\"assignment-instructions.mp3\">",
+        "reason": "Audio element has no visible document text containing \"transcript\".",
+        "src": "assignment-instructions.mp3"
+      },
+      "suggested_fix": "Add a transcript near audio lessons or instructions."
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ],
+  "task": {
+    "id": "access_learning_resources",
+    "name": "Access learning resources",
+    "student_profile": "Hearing-impaired student",
+    "required_actions": [
+      "Find the resource section",
+      "Open scholarship guidelines",
+      "Understand instructions",
+      "Access video lesson"
+    ],
+    "likely_blockers": [
+      {
+        "issue_type": "generic_link_text",
+        "severity": "medium",
+        "message": "Link text is too generic",
+        "task_impact": "Link text may not clearly explain the destination or action."
+      },
+      {
+        "issue_type": "missing_image_alt",
+        "severity": "medium",
+        "message": "Image is missing useful alt text",
+        "task_impact": "Image content may be unavailable to students who need text alternatives."
+      },
+      {
+        "issue_type": "missing_video_captions",
+        "severity": "high",
+        "message": "Video is missing captions",
+        "task_impact": "Video content may be inaccessible to students who need captions."
+      },
+      {
+        "issue_type": "missing_audio_transcript",
+        "severity": "high",
+        "message": "Audio is missing a transcript",
+        "task_impact": "Audio content may be inaccessible to students who need a transcript."
+      }
+    ]
+  }
+}
