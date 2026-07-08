@@ -21,6 +21,13 @@ def _count_by(items: list[str]) -> dict[str, int]:
     return counts
 
 
+def _format_evidence_for_json(evidence: str | dict) -> dict:
+    """Return evidence as a JSON-ready object."""
+    if isinstance(evidence, dict):
+        return evidence
+    return {"description": evidence}
+
+
 def build_json_report(
     source_file: str,
     issues: list[AccessibilityIssue],
@@ -45,9 +52,7 @@ def build_json_report(
                 "severity": issue.severity,
                 "agent_name": issue.agent_name,
                 "message": issue.title,
-                "evidence": {
-                    "description": issue.evidence,
-                },
+                "evidence": _format_evidence_for_json(issue.evidence),
                 "suggested_fix": issue.suggested_fix,
             }
             for issue in issues

@@ -59,6 +59,8 @@ The current prototype runs a static HTML audit for form labels, link and button 
 
 Task mode explains which page barriers matter for a specific education workflow, such as submitting a scholarship form or accessing learning resources. This is the first step toward agentic accessibility testing, but it still uses deterministic static checks rather than real student simulation.
 
+Reports include structured evidence such as HTML snippets, tag attributes, reasons, and approximate line numbers when available.
+
 This is still not a full accessibility audit and does not replace testing with disabled users.
 
 ## Example Use Case

@@ -32,6 +32,17 @@ def issue_types_for(issues: list) -> set[str]:
     return {issue.issue_type for issue in issues}
 
 
+def evidence_text_for(issues: list) -> str:
+    """Return searchable text from string or structured issue evidence."""
+    parts = []
+    for issue in issues:
+        if isinstance(issue.evidence, dict):
+            parts.extend(str(value) for value in issue.evidence.values())
+        else:
+            parts.append(issue.evidence)
+    return " ".join(parts)
+
+
 def test_sample_agents_can_be_instantiated() -> None:
     """The initial student agents should be easy to construct."""
     agents = [
@@ -82,7 +93,7 @@ def test_unlabeled_input_is_flagged() -> None:
 
     assert len(issues) == 1
     assert issues[0].issue_type == "missing_form_label"
-    assert 'name="student_name"' in issues[0].evidence
+    assert issues[0].evidence["name"] == "student_name"
 
 
 def test_input_with_label_for_is_not_flagged() -> None:
@@ -136,7 +147,7 @@ def test_sample_form_returns_expected_missing_label_count() -> None:
 def test_sample_form_labeled_fields_are_not_flagged() -> None:
     """Properly labeled email and school controls should not be reported."""
     issues = analyze_html_file(Path("examples/sample_form.html"))
-    evidence = " ".join(issue.evidence for issue in issues)
+    evidence = evidence_text_for(issues)
 
     assert "student_email" not in evidence
     assert "school_name" not in evidence
@@ -145,7 +156,7 @@ def test_sample_form_labeled_fields_are_not_flagged() -> None:
 def test_sample_form_hidden_and_submit_fields_are_ignored() -> None:
     """Hidden and submit fields in the sample should not become issues."""
     issues = analyze_html_file(Path("examples/sample_form.html"))
-    evidence = " ".join(issue.evidence for issue in issues)
+    evidence = evidence_text_for(issues)
 
     assert "application_token" not in evidence
     assert "submit" not in evidence.lower()
@@ -233,6 +244,52 @@ def test_video_without_captions_is_flagged() -> None:
     assert "missing_video_captions" in issue_types_for(issues)
 
 
+def test_missing_form_label_evidence_includes_snippet() -> None:
+    """Missing label findings should include a useful HTML snippet."""
+    issues = analyze_html_forms('<form><input type="text" name="student_name"></form>')
+
+    evidence = issues[0].evidence
+    assert isinstance(evidence, dict)
+    assert "snippet" in evidence
+    assert "<input" in evidence["snippet"]
+
+
+def test_missing_form_label_evidence_includes_tag_and_name() -> None:
+    """Form evidence should include tag and identifying attributes when available."""
+    issues = analyze_html_forms('<form><input type="text" name="student_name"></form>')
+
+    evidence = issues[0].evidence
+    assert evidence["tag"] == "input"
+    assert evidence["name"] == "student_name"
+
+
+def test_generic_link_evidence_includes_text_and_href() -> None:
+    """Generic link evidence should include link text and destination."""
+    issues = analyze_interactive_names('<a href="/help">click here</a>')
+
+    evidence = issues[0].evidence
+    assert evidence["text"] == "click here"
+    assert evidence["href"] == "/help"
+
+
+def test_missing_image_alt_evidence_includes_src() -> None:
+    """Image alt evidence should include the image source when available."""
+    issues = analyze_images('<img src="award.png">')
+
+    evidence = issues[0].evidence
+    assert evidence["src"] == "award.png"
+
+
+def test_issue_evidence_includes_line_key_when_possible() -> None:
+    """Element evidence should include an approximate line number key."""
+    html = '<form>\n<input type="text" name="student_name">\n</form>'
+    issues = analyze_html_forms(html)
+
+    evidence = issues[0].evidence
+    assert "line" in evidence
+    assert evidence["line"] in {2, None}
+
+
 def test_static_analyzer_combines_checks() -> None:
     """The combined analyzer should return issue types from multiple checks."""
     html = '<html><body><h1>Page</h1><button></button><img src="x.png"></body></html>'
@@ -275,6 +332,17 @@ def test_json_report_includes_issue_counts() -> None:
     assert "counts_by_severity" in report["summary"]
     assert "counts_by_issue_type" in report["summary"]
     assert report["summary"]["counts_by_issue_type"]["missing_form_label"] == 2
+
+
+def test_json_report_preserves_structured_evidence_fields() -> None:
+    """JSON report issues should include structured evidence, not only text."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+    first_issue_evidence = report["issues"][0]["evidence"]
+
+    assert "snippet" in first_issue_evidence
+    assert "reason" in first_issue_evidence
+    assert "line" in first_issue_evidence
 
 
 def test_save_json_report_writes_valid_json(tmp_path: Path) -> None:

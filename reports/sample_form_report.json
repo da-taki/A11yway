@@ -35,7 +35,13 @@
       "agent_name": "Page Analyzer",
       "message": "Form control is missing an accessible label",
       "evidence": {
-        "description": "Found unlabeled <input> control with type=\"text\" and name=\"student_name\"."
+        "tag": "input",
+        "line": 36,
+        "snippet": "<input type=\"text\" name=\"student_name\">",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "student_name",
+        "identity": "name=\"student_name\""
       },
       "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
     },
@@ -45,7 +51,13 @@
       "agent_name": "Page Analyzer",
       "message": "Form control is missing an accessible label",
       "evidence": {
-        "description": "Found unlabeled <textarea> control with type=\"text\" and name=\"accommodation_request\"."
+        "tag": "textarea",
+        "line": 54,
+        "snippet": "<textarea name=\"accommodation_request\" rows=\"5\">",
+        "reason": "Form control has no accessible label.",
+        "name": "accommodation_request",
+        "type": "text",
+        "identity": "name=\"accommodation_request\""
       },
       "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
     },
@@ -55,7 +67,12 @@
       "agent_name": "Page Analyzer",
       "message": "Link text is too generic",
       "evidence": {
-        "description": "Found generic link text \"click here\" for href \"/scholarships/help\"."
+        "tag": "a",
+        "line": 21,
+        "snippet": "<a href=\"/scholarships/help\">click here</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "/scholarships/help",
+        "text": "click here"
       },
       "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\""
     },
@@ -65,7 +82,11 @@
       "agent_name": "Page Analyzer",
       "message": "Button is missing an accessible name",
       "evidence": {
-        "description": "Found a <button> without visible text, aria-label, title, or image alt text."
+        "tag": "button",
+        "line": 27,
+        "snippet": "<button type=\"button\">",
+        "reason": "Button has no visible text, aria-label, title, or image alt text.",
+        "type": "button"
       },
       "suggested_fix": "Add clear button text or an aria-label that describes the button action."
     },
@@ -75,7 +96,11 @@
       "agent_name": "Page Analyzer",
       "message": "Image is missing useful alt text",
       "evidence": {
-        "description": "Found <img src=\"student-award.png\"> without useful alt text."
+        "tag": "img",
+        "line": 24,
+        "snippet": "<img src=\"student-award.png\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "student-award.png"
       },
       "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation."
     },
@@ -85,7 +110,13 @@
       "agent_name": "Page Analyzer",
       "message": "Heading level is skipped",
       "evidence": {
-        "description": "Heading \"Application Details\" jumps from h1 to h3."
+        "tag": "h3",
+        "line": 16,
+        "snippet": "<h3>",
+        "reason": "Heading level jumps from h1 to h3.",
+        "text": "Application Details",
+        "previous_level": 1,
+        "level": 3
       },
       "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3."
     },
@@ -95,7 +126,11 @@
       "agent_name": "Page Analyzer",
       "message": "Video is missing captions",
       "evidence": {
-        "description": "Found a <video> element without a captions or subtitles track."
+        "tag": "video",
+        "line": 30,
+        "snippet": "<video controls src=\"orientation.mp4\">",
+        "reason": "Video has no captions or subtitles track.",
+        "src": "orientation.mp4"
       },
       "suggested_fix": "Add captions or subtitles for education video content."
     }
