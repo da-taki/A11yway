@@ -8,6 +8,7 @@ from a11yway.agents.hearing_agent import HearingAgent
 from a11yway.agents.keyboard_agent import KeyboardOnlyAgent
 from a11yway.agents.low_vision_agent import LowVisionAgent
 from a11yway.main import analyze_html_file, main
+from a11yway.core.batch_runner import load_batch_config, run_batch
 from a11yway.core.page_analyzer import (
     analyze_heading_structure,
     analyze_html_forms,
@@ -554,3 +555,72 @@ def test_cli_markdown_mode_writes_report(tmp_path: Path, capsys) -> None:
     assert exit_code == 0
     assert "Markdown report saved" in captured.out
     assert "# A11yway Accessibility Report" in output_path.read_text(encoding="utf-8")
+
+
+def test_sample_batch_config_loads_correctly() -> None:
+    """The sample batch config should load two audit items."""
+    items = load_batch_config("examples/sample_batch.json")
+
+    assert len(items) == 2
+    assert items[0]["id"] == "scholarship_form"
+    assert items[1]["source"] == "examples/sample_resource_page.html"
+
+
+def test_batch_runner_processes_sample_pages(tmp_path: Path) -> None:
+    """Batch runner should process both sample pages."""
+    result = run_batch("examples/sample_batch.json", tmp_path / "batch_sample")
+
+    assert result["index"]["summary"]["total_pages_tested"] == 2
+    assert len(result["index"]["sources"]) == 2
+
+
+def test_batch_runner_writes_per_page_reports(tmp_path: Path) -> None:
+    """Batch runner should create JSON and Markdown reports for each item."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    assert (out_dir / "scholarship_form.json").exists()
+    assert (out_dir / "scholarship_form.md").exists()
+    assert (out_dir / "learning_resources.json").exists()
+    assert (out_dir / "learning_resources.md").exists()
+
+
+def test_batch_index_json_contains_total_pages(tmp_path: Path) -> None:
+    """Batch index JSON should summarize the number of pages tested."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    index = json.loads((out_dir / "index.json").read_text(encoding="utf-8"))
+    assert index["summary"]["total_pages_tested"] == 2
+    assert index["summary"]["total_issues"] >= 2
+
+
+def test_batch_index_markdown_includes_sources_and_total(tmp_path: Path) -> None:
+    """Batch index Markdown should include source names and total issue count."""
+    out_dir = tmp_path / "batch_sample"
+    result = run_batch("examples/sample_batch.json", out_dir)
+
+    markdown = (out_dir / "index.md").read_text(encoding="utf-8")
+    assert "Student Scholarship Application" in markdown
+    assert "Learning Resources Page" in markdown
+    assert f"- Total issues: {result['index']['summary']['total_issues']}" in markdown
+
+
+def test_cli_batch_mode_writes_index(tmp_path: Path, capsys) -> None:
+    """CLI batch mode should write index reports."""
+    out_dir = tmp_path / "batch_sample"
+
+    exit_code = main(
+        [
+            "--batch",
+            "examples/sample_batch.json",
+            "--out-dir",
+            str(out_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Pages tested: 2" in captured.out
+    assert (out_dir / "index.json").exists()
+    assert (out_dir / "index.md").exists()

@@ -71,6 +71,16 @@ Reports include structured evidence such as HTML snippets, tag attributes, reaso
 
 This is still not a full accessibility audit and does not replace testing with disabled users.
 
+## Batch Evaluation
+
+Run a batch audit across multiple local sample pages:
+
+```bash
+python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
+```
+
+Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus an index report that summarizes pages tested, issue counts, and task blockers. This is useful for future outreach and evaluation work.
+
 ## Example Use Case
 
 A school wants to test whether students can submit a scholarship application form. A11yway runs several student agents against that task and reports problems such as missing form labels, confusing errors, weak focus indicators, or instructions that are only available in audio.
