@@ -1,0 +1,25 @@
+[
+  {
+    "title": "Submit a scholarship application form",
+    "url": "https://example.edu/scholarships/apply",
+    "goal": "Complete and submit the scholarship application form.",
+    "steps": [
+      "Open the scholarship application page.",
+      "Read the eligibility instructions.",
+      "Fill out required student and guardian fields.",
+      "Upload or attach any required document.",
+      "Submit the form and confirm success."
+    ]
+  },
+  {
+    "title": "Find and download homework PDF",
+    "url": "https://example.edu/classes/math/homework",
+    "goal": "Find the current homework PDF and download it.",
+    "steps": [
+      "Open the class homework page.",
+      "Find the latest homework resource.",
+      "Open or download the homework PDF.",
+      "Confirm the file is readable."
+    ]
+  }
+]
