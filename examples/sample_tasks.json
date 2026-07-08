@@ -1,25 +1,44 @@
 [
   {
-    "title": "Submit a scholarship application form",
-    "url": "https://example.edu/scholarships/apply",
-    "goal": "Complete and submit the scholarship application form.",
-    "steps": [
-      "Open the scholarship application page.",
-      "Read the eligibility instructions.",
-      "Fill out required student and guardian fields.",
-      "Upload or attach any required document.",
-      "Submit the form and confirm success."
+    "id": "submit_scholarship_application",
+    "name": "Submit scholarship application",
+    "description": "A student fills out and submits a scholarship application form.",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Read the page purpose",
+      "Enter name",
+      "Enter email",
+      "Choose school",
+      "Describe accommodation request",
+      "Submit the form"
+    ],
+    "relevant_issue_types": [
+      "missing_form_label",
+      "missing_button_name",
+      "missing_link_name",
+      "generic_link_text",
+      "missing_h1",
+      "skipped_heading_level"
     ]
   },
   {
-    "title": "Find and download homework PDF",
-    "url": "https://example.edu/classes/math/homework",
-    "goal": "Find the current homework PDF and download it.",
-    "steps": [
-      "Open the class homework page.",
-      "Find the latest homework resource.",
-      "Open or download the homework PDF.",
-      "Confirm the file is readable."
+    "id": "access_learning_resources",
+    "name": "Access learning resources",
+    "description": "A student finds instructions, opens a resource link, and accesses a video lesson.",
+    "student_profile": "Hearing-impaired student",
+    "required_actions": [
+      "Find the resource section",
+      "Open scholarship guidelines",
+      "Understand instructions",
+      "Access video lesson"
+    ],
+    "relevant_issue_types": [
+      "generic_link_text",
+      "missing_link_name",
+      "missing_video_captions",
+      "missing_audio_transcript",
+      "missing_image_alt",
+      "missing_page_title"
     ]
   }
 ]
