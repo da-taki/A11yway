@@ -15,6 +15,7 @@ from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
     build_json_report,
+    save_html_report,
     save_json_report,
     save_markdown_report,
 )
@@ -192,6 +193,22 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--markdown",
         dest="markdown_output",
         help="Optional path where a readable Markdown report should be written.",
+    )
+    parser.add_argument(
+        "--html",
+        dest="html_output",
+        help="Optional path where a self-contained HTML report should be written.",
+    )
+    parser.add_argument(
+        "--visual-proof",
+        dest="visual_proof_dir",
+        help="Optional directory for browser screenshot and focus overlay artifacts. Requires --browser.",
+    )
+    parser.add_argument(
+        "--html-reports",
+        dest="html_reports",
+        action="store_true",
+        help="In batch mode, write per-page HTML reports and browser visual proof when available.",
     )
     parser.add_argument(
         "--task",
@@ -403,6 +420,10 @@ def main(argv: list[str] | None = None) -> int:
         source = parsed_args.html_path if parsed_args.html_path != str(DEFAULT_HTML_PATH) else None
         return print_workflow_suggestions(parsed_args.suggest_tasks, source=source)
 
+    if parsed_args.visual_proof_dir and not parsed_args.browser:
+        print("Visual proof requires browser mode. Add --browser to the command.")
+        return 1
+
     if (parsed_args.execute_task or parsed_args.execute_tasks) and not parsed_args.browser:
         print("Task execution requires browser mode. Add --browser to the command.")
         return 1
@@ -420,6 +441,7 @@ def main(argv: list[str] | None = None) -> int:
             max_tabs=parsed_args.max_tabs,
             wait_ms=parsed_args.wait_ms,
             execute_tasks=parsed_args.execute_tasks,
+            html_reports=parsed_args.html_reports,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
@@ -433,6 +455,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Index Markdown: {batch_result['index_markdown_path']}")
         print(f"Index CSV: {batch_result['csv_index_path']}")
         print(f"Evaluation summary: {batch_result['evaluation_summary_path']}")
+        if parsed_args.html_reports:
+            print("HTML reports: enabled")
         if parsed_args.execute_tasks:
             print(f"Tasks executed: {summary.get('tasks_executed', 0)}")
             print(f"Tasks completed: {summary.get('tasks_completed', 0)}")
@@ -467,6 +491,7 @@ def main(argv: list[str] | None = None) -> int:
             source,
             max_tabs=parsed_args.max_tabs,
             wait_ms=parsed_args.wait_ms,
+            visual_proof_dir=parsed_args.visual_proof_dir,
         )
         issues = merge_browser_issues(issues, browser_result)
     browser_issue_total = len(issues)
@@ -505,7 +530,7 @@ def main(argv: list[str] | None = None) -> int:
         selected_task = execute_task_obj
         task_blockers = build_task_blockers(selected_task, issues)
 
-    if parsed_args.json_output or parsed_args.markdown_output:
+    if parsed_args.json_output or parsed_args.markdown_output or parsed_args.html_output:
         report = build_json_report(
             source,
             issues,
@@ -525,6 +550,11 @@ def main(argv: list[str] | None = None) -> int:
         save_markdown_report(report, parsed_args.markdown_output)
         print()
         print(f"Markdown report saved: {parsed_args.markdown_output}")
+
+    if parsed_args.html_output:
+        save_html_report(report, parsed_args.html_output)
+        print()
+        print(f"HTML report saved: {parsed_args.html_output}")
 
     return 0
 

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Accessibility Report</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }
+header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }
+header { background: #ffffff; border-bottom: 1px solid #d8deea; }
+section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }
+h1, h2, h3 { line-height: 1.2; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: #eef2f7; }
+code, pre { background: #eef2f7; }
+pre { overflow-x: auto; padding: 0.75rem; }
+.meta { color: #526071; }
+.issue { border-top: 4px solid #5067a3; }
+.high { border-top-color: #b42318; }
+.medium { border-top-color: #b86e00; }
+.low { border-top-color: #367a45; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Accessibility Report</h1>
+<p class="meta">Source: examples\sample_form.html</p>
+</header>
+<main>
+<section>
+<h2>Summary</h2>
+<p>Issues found: <strong>7</strong></p>
+<p>Agents used: Keyboard-only student</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility</p>
+<h3>Counts By Severity</h3>
+<ul><li><code>high</code>: 4</li><li><code>medium</code>: 3</li></ul>
+<h3>Counts By Issue Type</h3>
+<ul><li><code>missing_form_label</code>: 2</li><li><code>generic_link_text</code>: 1</li><li><code>missing_button_name</code>: 1</li><li><code>missing_image_alt</code>: 1</li><li><code>skipped_heading_level</code>: 1</li><li><code>missing_video_captions</code>: 1</li></ul>
+</section>
+<section>
+<h2>Source Metadata</h2>
+<table><tbody>
+<tr><th>Input</th><td>examples\sample_form.html</td></tr>
+<tr><th>Type</th><td>file</td></tr>
+<tr><th>Final URL</th><td></td></tr>
+<tr><th>Status code</th><td></td></tr>
+<tr><th>Content type</th><td>text/html</td></tr>
+</tbody></table>
+</section>
+<section>
+<h2>Issues Found</h2>
+<article class="issue high">
+<h3>1. Form control is missing an accessible label</h3>
+<p>Issue type: <code>missing_form_label</code></p>
+<p>Severity: high</p>
+<p>Rule: Form control missing accessible label</p>
+<p>Why it matters: Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.</p>
+<p>Suggested fix: Add a visible &lt;label&gt; connected with for/id. Use aria-label only when a visible label is not possible.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>input</td></tr><tr><th>name</th><td>student_name</td></tr><tr><th>line</th><td>36</td></tr><tr><th>reason</th><td>Form control has no accessible label.</td></tr></tbody></table><pre><code>&lt;input type=&quot;text&quot; name=&quot;student_name&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>2. Form control is missing an accessible label</h3>
+<p>Issue type: <code>missing_form_label</code></p>
+<p>Severity: high</p>
+<p>Rule: Form control missing accessible label</p>
+<p>Why it matters: Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.</p>
+<p>Suggested fix: Add a visible &lt;label&gt; connected with for/id. Use aria-label only when a visible label is not possible.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>textarea</td></tr><tr><th>name</th><td>accommodation_request</td></tr><tr><th>line</th><td>54</td></tr><tr><th>reason</th><td>Form control has no accessible label.</td></tr></tbody></table><pre><code>&lt;textarea name=&quot;accommodation_request&quot; rows=&quot;5&quot;&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>3. Link text is too generic</h3>
+<p>Issue type: <code>generic_link_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Link text is too generic</p>
+<p>Why it matters: Students who navigate by a list of links hear &#x27;click here&#x27; with no context and cannot tell links apart.</p>
+<p>Suggested fix: Use descriptive link text like &quot;Download scholarship guidelines&quot; instead of &quot;click here.&quot;</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>/scholarships/help</td></tr><tr><th>text</th><td>click here</td></tr><tr><th>line</th><td>21</td></tr><tr><th>reason</th><td>Link text is generic and does not explain the destination or action.</td></tr></tbody></table><pre><code>&lt;a href=&quot;/scholarships/help&quot;&gt;click here&lt;/a&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>4. Button is missing an accessible name</h3>
+<p>Issue type: <code>missing_button_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Button missing accessible name</p>
+<p>Why it matters: A button without a name is announced as just &#x27;button&#x27; by screen readers, so students cannot tell what pressing it will do.</p>
+<p>Suggested fix: Add clear button text or an aria-label that describes the button action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>button</td></tr><tr><th>line</th><td>27</td></tr><tr><th>reason</th><td>Button has no visible text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;button type=&quot;button&quot;&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>5. Image is missing useful alt text</h3>
+<p>Issue type: <code>missing_image_alt</code></p>
+<p>Severity: medium</p>
+<p>Rule: Image missing useful alt text</p>
+<p>Why it matters: Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.</p>
+<p>Suggested fix: Add alt text that describes the image purpose, or mark decorative images as presentation.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>img</td></tr><tr><th>src</th><td>student-award.png</td></tr><tr><th>line</th><td>24</td></tr><tr><th>reason</th><td>Image is missing useful alt text.</td></tr></tbody></table><pre><code>&lt;img src=&quot;student-award.png&quot;&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>6. Heading level is skipped</h3>
+<p>Issue type: <code>skipped_heading_level</code></p>
+<p>Severity: medium</p>
+<p>Rule: Heading level is skipped</p>
+<p>Why it matters: Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.</p>
+<p>Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h3</td></tr><tr><th>text</th><td>Application Details</td></tr><tr><th>line</th><td>16</td></tr><tr><th>reason</th><td>Heading level jumps from h1 to h3.</td></tr></tbody></table><pre><code>&lt;h3&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>7. Video is missing captions</h3>
+<p>Issue type: <code>missing_video_captions</code></p>
+<p>Severity: high</p>
+<p>Rule: Video missing captions</p>
+<p>Why it matters: Deaf and hard-of-hearing students cannot access spoken lesson content without captions or subtitles.</p>
+<p>Suggested fix: Add captions or subtitles for education video content.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>video</td></tr><tr><th>src</th><td>orientation.mp4</td></tr><tr><th>line</th><td>30</td></tr><tr><th>reason</th><td>Video has no captions or subtitles track.</td></tr></tbody></table><pre><code>&lt;video controls src=&quot;orientation.mp4&quot;&gt;</code></pre>
+</article>
+</section>
+<section>
+<h2>Limitations</h2>
+<ul><li>This prototype only runs static HTML checks.</li><li>It does not replace a full human accessibility audit.</li><li>It does not yet perform browser-based interaction testing.</li></ul>
+</section>
+</main>
+</body>
+</html>

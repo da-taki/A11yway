@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Focus Path Overlay</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+header { padding: 1rem 1.25rem; background: #ffffff; border-bottom: 1px solid #d8deea; }
+main { padding: 1rem; }
+.frame { position: relative; display: inline-block; background: #ffffff; box-shadow: 0 2px 16px rgba(23, 32, 51, 0.16); }
+.frame img { display: block; max-width: none; }
+.marker { position: absolute; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; border: 3px solid #ffffff; background: #b42318; color: #ffffff; font-weight: 700; font-size: 0.85rem; line-height: 1.6rem; text-align: center; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45); transform: translate(-50%, -50%); }
+.box { position: absolute; border: 3px solid #b42318; background: rgba(180, 35, 24, 0.08); pointer-events: none; }
+.legend { max-width: 54rem; margin: 0 0 1rem; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #d8deea; }
+.muted { color: #526071; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Focus Path Overlay</h1>
+<p>Source: examples/sample_task_execution_form_broken.html</p>
+</header>
+<main>
+<section class="legend" aria-labelledby="legend-title">
+<h2 id="legend-title">Legend</h2>
+<p>Marker numbers show the Tab order observed by A11yway during this browser run.</p>
+<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>
+<p class="muted">Viewport observed: 1280 x 720 CSS pixels.</p>
+</section>
+<div class="frame">
+<img src="page.png" alt="Full-page screenshot used for focus path overlay">
+<div class="box" style="left: 99.546875px; top: 131.875px; width: 177.0px; height: 21.0px;"></div>
+<div class="marker" style="left: 188.046875px; top: 142.375px;" title="Step 1 | input | Student name | student_name" aria-label="Step 1 | input | Student name | student_name">1</div>
+<div class="box" style="left: 50.21875px; top: 168.875px; width: 177.0px; height: 21.0px;"></div>
+<div class="marker" style="left: 138.71875px; top: 179.375px;" title="Step 2 | input | Email | email" aria-label="Step 2 | input | Email | email">2</div>
+<div class="box" style="left: 56.453125px; top: 205.875px; width: 160.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 136.453125px; top: 215.375px;" title="Step 3 | select | School | school" aria-label="Step 3 | select | School | school">3</div>
+<div class="box" style="left: 168.84375px; top: 240.875px; width: 168.0px; height: 66.0px;"></div>
+<div class="marker" style="left: 252.84375px; top: 273.875px;" title="Step 4 | textarea | Accommodation request | accommodation_request" aria-label="Step 4 | textarea | Accommodation request | accommodation_request">4</div>
+</div>
+</main>
+</body>
+</html>

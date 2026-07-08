@@ -3,6 +3,17 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Visual proof reports
+
+- Added self-contained HTML report export with `--html`.
+- Added browser screenshot and observed focus-path overlay generation with
+  `--visual-proof`.
+- Added visual proof metadata to JSON and Markdown/HTML reports.
+- Added batch HTML report support with `--html-reports`, including
+  `html_report` paths in batch index and CSV output.
+- Kept visual proof browser-optional and deterministic; no AI, OCR, PDF,
+  crawling, security testing, or image-processing dependencies were added.
+
 ## Unreleased - Workflow packs and AI scout configuration
 
 - Added `.env.example` for future optional AI scout configuration with

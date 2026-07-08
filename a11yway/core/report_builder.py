@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 from dataclasses import asdict
+from html import escape
 from pathlib import Path
 from typing import List
 
@@ -45,6 +46,27 @@ TASK_EXECUTION_LIMITATIONS = [
     "Task steps are deterministic scripts; a human may find a workaround the script does not try.",
     "Step results show keyboard operability, not full assistive technology behavior.",
 ]
+
+
+def _visual_proof_for_report(visual_proof: dict | None) -> dict | None:
+    """Return compact visual proof metadata suitable for JSON reports."""
+    if not visual_proof:
+        return None
+    if visual_proof.get("enabled") is False:
+        return {
+            "enabled": False,
+            "error": visual_proof.get("error"),
+        }
+    return {
+        "enabled": bool(visual_proof.get("enabled")),
+        "screenshot_path": visual_proof.get("screenshot_path"),
+        "focus_overlay_path": visual_proof.get("focus_overlay_path"),
+        "focus_points_count": visual_proof.get(
+            "focus_points_count", len(visual_proof.get("focus_points", []))
+        ),
+        "viewport": visual_proof.get("viewport", {}),
+        "limitations": visual_proof.get("limitations", []),
+    }
 
 
 def build_json_report(
@@ -126,6 +148,9 @@ def build_json_report(
             "focus_trace": browser_result.get("focus_trace", []),
             "limitations": list(BROWSER_MODE_LIMITATIONS),
         }
+        visual_proof = _visual_proof_for_report(browser_result.get("visual_proof"))
+        if visual_proof is not None:
+            report["visual_proof"] = visual_proof
 
     if task_execution is not None:
         report["task_execution"] = {
@@ -262,6 +287,29 @@ def build_markdown_report(report: dict) -> str:
             lines.extend(f"- {limitation}" for limitation in browser["limitations"])
             lines.append("")
 
+    visual_proof = report.get("visual_proof")
+    if visual_proof is not None:
+        lines.extend(["## Visual Proof", ""])
+        if visual_proof.get("enabled"):
+            lines.extend(
+                [
+                    f"- Screenshot path: {visual_proof.get('screenshot_path', '')}",
+                    f"- Focus path overlay path: {visual_proof.get('focus_overlay_path', '')}",
+                    f"- Focus points count: {visual_proof.get('focus_points_count', 0)}",
+                    "",
+                ]
+            )
+            for limitation in visual_proof.get("limitations", []):
+                lines.append(f"- {limitation}")
+            lines.append("")
+        else:
+            lines.extend(
+                [
+                    f"- Visual proof unavailable: {visual_proof.get('error', '')}",
+                    "",
+                ]
+            )
+
     execution = report.get("task_execution")
     if execution is not None:
         lines.extend(["## Task Execution", ""])
@@ -382,6 +430,281 @@ def save_markdown_report(report: dict, output_path: str | Path) -> None:
     path.write_text(build_markdown_report(report), encoding="utf-8")
 
 
+def _html_list(items: list[str]) -> str:
+    """Render a simple HTML list."""
+    if not items:
+        return "<p>None.</p>"
+    return "<ul>" + "".join(f"<li>{escape(str(item))}</li>" for item in items) + "</ul>"
+
+
+def _html_count_list(counts: dict) -> str:
+    """Render count dictionaries as an HTML list."""
+    if not counts:
+        return "<p>None.</p>"
+    return "<ul>" + "".join(
+        f"<li><code>{escape(str(key))}</code>: {value}</li>"
+        for key, value in counts.items()
+    ) + "</ul>"
+
+
+def _html_evidence(evidence: dict) -> str:
+    """Render structured evidence for the HTML report."""
+    rows = []
+    for key in ["tag", "id", "name", "href", "src", "text", "line", "step", "detected_in", "reason"]:
+        value = evidence.get(key)
+        if value not in [None, ""]:
+            rows.append(
+                f"<tr><th>{escape(str(key))}</th><td>{escape(str(value))}</td></tr>"
+            )
+    table = ""
+    if rows:
+        table = "<table><tbody>" + "".join(rows) + "</tbody></table>"
+
+    snippet = evidence.get("snippet")
+    if snippet:
+        table += f"<pre><code>{escape(str(snippet))}</code></pre>"
+    return table or "<p>No structured evidence available.</p>"
+
+
+def build_html_report(report: dict) -> str:
+    """Build a self-contained HTML report from a JSON-style report dict."""
+    summary = report.get("summary", {})
+    source = report.get("source", {})
+    source_label = source.get("input") or report.get("source_file", "")
+    lines = [
+        "<!doctype html>",
+        '<html lang="en">',
+        "<head>",
+        '<meta charset="utf-8">',
+        "<title>A11yway Accessibility Report</title>",
+        "<style>",
+        "body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }",
+        "header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }",
+        "header { background: #ffffff; border-bottom: 1px solid #d8deea; }",
+        "section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }",
+        "h1, h2, h3 { line-height: 1.2; }",
+        "table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }",
+        "th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }",
+        "th { background: #eef2f7; }",
+        "code, pre { background: #eef2f7; }",
+        "pre { overflow-x: auto; padding: 0.75rem; }",
+        ".meta { color: #526071; }",
+        ".issue { border-top: 4px solid #5067a3; }",
+        ".high { border-top-color: #b42318; }",
+        ".medium { border-top-color: #b86e00; }",
+        ".low { border-top-color: #367a45; }",
+        "</style>",
+        "</head>",
+        "<body>",
+        "<header>",
+        "<h1>A11yway Accessibility Report</h1>",
+        f'<p class="meta">Source: {escape(str(source_label))}</p>',
+        "</header>",
+        "<main>",
+        "<section>",
+        "<h2>Summary</h2>",
+        f"<p>Issues found: <strong>{summary.get('issues_found', 0)}</strong></p>",
+        f"<p>Agents used: {escape(', '.join(summary.get('agents_used', [])))}</p>",
+        f"<p>Checks run: {escape(', '.join(summary.get('checks_run', [])))}</p>",
+        "<h3>Counts By Severity</h3>",
+        _html_count_list(summary.get("counts_by_severity", {})),
+        "<h3>Counts By Issue Type</h3>",
+        _html_count_list(summary.get("counts_by_issue_type", {})),
+        "</section>",
+    ]
+
+    if source:
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Source Metadata</h2>",
+                "<table><tbody>",
+                f"<tr><th>Input</th><td>{escape(str(source.get('input') or ''))}</td></tr>",
+                f"<tr><th>Type</th><td>{escape(str(source.get('type') or ''))}</td></tr>",
+                f"<tr><th>Final URL</th><td>{escape(str(source.get('final_url') or ''))}</td></tr>",
+                f"<tr><th>Status code</th><td>{escape(str(source.get('status_code') or ''))}</td></tr>",
+                f"<tr><th>Content type</th><td>{escape(str(source.get('content_type') or ''))}</td></tr>",
+                "</tbody></table>",
+                "</section>",
+            ]
+        )
+
+    if report.get("analysis_modes"):
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Analysis Modes</h2>",
+                _html_list(report.get("analysis_modes", [])),
+                "</section>",
+            ]
+        )
+
+    task = report.get("task")
+    if task:
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Task Context</h2>",
+                f"<p>Task name: {escape(str(task.get('name', '')))}</p>",
+                f"<p>Student profile: {escape(str(task.get('student_profile', '')))}</p>",
+                "<h3>Required Actions</h3>",
+                _html_list(task.get("required_actions", [])),
+                "<h3>Likely Blockers</h3>",
+            ]
+        )
+        blockers = task.get("likely_blockers", [])
+        if blockers:
+            lines.append("<ul>")
+            for blocker in blockers:
+                lines.append(
+                    "<li>{message} <span class=\"meta\">({issue_type}, {severity})</span><br>{impact}</li>".format(
+                        message=escape(str(blocker.get("message", ""))),
+                        issue_type=escape(str(blocker.get("issue_type", ""))),
+                        severity=escape(str(blocker.get("severity", ""))),
+                        impact=escape(str(blocker.get("task_impact", ""))),
+                    )
+                )
+            lines.append("</ul>")
+        else:
+            lines.append("<p>None found for this task.</p>")
+        lines.append("</section>")
+
+    execution = report.get("task_execution")
+    if execution is not None:
+        lines.extend(["<section>", "<h2>Task Execution</h2>"])
+        if not execution.get("success"):
+            lines.append(
+                f"<p>Result: could not run ({escape(str(execution.get('error', '')))}).</p>"
+            )
+        else:
+            verdict = (
+                "COMPLETED with keyboard-only interaction"
+                if execution.get("completed")
+                else f"BLOCKED at step {execution.get('blocked_at_step', '')}"
+            )
+            lines.extend(
+                [
+                    f"<p>Task: {escape(str(execution.get('task_name', '')))}</p>",
+                    f"<p>Deterministic task execution result: <strong>{escape(verdict)}</strong></p>",
+                    f"<p>Steps passed: {execution.get('steps_passed', 0)} of {execution.get('steps_total', 0)}</p>",
+                    "<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Detail</th></tr></thead><tbody>",
+                ]
+            )
+            for step in execution.get("steps", []):
+                status = step.get("status", "")
+                if step.get("used_fallback"):
+                    status += " (fallback)"
+                lines.append(
+                    "<tr><td>{id}</td><td>{action}</td><td>{status}</td><td>{detail}</td></tr>".format(
+                        id=escape(str(step.get("id", ""))),
+                        action=escape(str(step.get("action", ""))),
+                        status=escape(str(status)),
+                        detail=escape(str(step.get("detail", ""))),
+                    )
+                )
+            lines.append("</tbody></table>")
+        lines.append(_html_list(execution.get("limitations", [])))
+        lines.append("</section>")
+
+    browser = report.get("browser")
+    if browser is not None:
+        trace = browser.get("focus_trace", [])
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Browser Interaction Trace</h2>",
+                f"<p>Browser audit success: {escape(str(browser.get('success', False)).lower())}</p>",
+            ]
+        )
+        if browser.get("error"):
+            lines.append(f"<p>Error: {escape(str(browser['error']))}</p>")
+        lines.append(f"<p>Focus trace length: {len(trace)}</p>")
+        if trace:
+            lines.append(
+                "<table><thead><tr><th>Step</th><th>Tag</th><th>Accessible name guess</th><th>ID/Name</th><th>Text/Href</th></tr></thead><tbody>"
+            )
+            for entry in trace[:20]:
+                lines.append(
+                    "<tr><td>{step}</td><td>{tag}</td><td>{name}</td><td>{id_name}</td><td>{text_href}</td></tr>".format(
+                        step=escape(str(entry.get("step", ""))),
+                        tag=escape(str(entry.get("tag", ""))),
+                        name=escape(str(entry.get("accessible_name_guess", ""))),
+                        id_name=escape(str(entry.get("id") or entry.get("name") or "")),
+                        text_href=escape(str(entry.get("text") or entry.get("href") or "")),
+                    )
+                )
+            lines.append("</tbody></table>")
+        lines.append(_html_list(browser.get("limitations", [])))
+        lines.append("</section>")
+
+    visual_proof = report.get("visual_proof")
+    if visual_proof is not None:
+        lines.extend(["<section>", "<h2>Visual Proof</h2>"])
+        if visual_proof.get("enabled"):
+            screenshot = visual_proof.get("screenshot_path", "")
+            overlay = visual_proof.get("focus_overlay_path", "")
+            lines.extend(
+                [
+                    "<p>Visual proof is an evidence aid for manual review. It is not accessibility certification.</p>",
+                    f'<p>Screenshot: <a href="{escape(str(screenshot), quote=True)}">{escape(str(screenshot))}</a></p>',
+                    f'<p>Observed focus path overlay: <a href="{escape(str(overlay), quote=True)}">{escape(str(overlay))}</a></p>',
+                    f"<p>Focus points count: {visual_proof.get('focus_points_count', 0)}</p>",
+                    _html_list(visual_proof.get("limitations", [])),
+                ]
+            )
+        else:
+            lines.append(
+                f"<p>Visual proof unavailable: {escape(str(visual_proof.get('error', '')))}</p>"
+            )
+        lines.append("</section>")
+
+    lines.extend(["<section>", "<h2>Issues Found</h2>"])
+    issues = report.get("issues", [])
+    if not issues:
+        lines.append("<p>No issues found by the current checks.</p>")
+    for index, issue in enumerate(issues, start=1):
+        rule = issue.get("rule", {})
+        severity = issue.get("severity", "")
+        lines.extend(
+            [
+                f'<article class="issue {escape(str(severity))}">',
+                f"<h3>{index}. {escape(str(issue.get('message', '')))}</h3>",
+                f"<p>Issue type: <code>{escape(str(issue.get('issue_type', '')))}</code></p>",
+                f"<p>Severity: {escape(str(severity))}</p>",
+            ]
+        )
+        if rule.get("title"):
+            lines.append(f"<p>Rule: {escape(str(rule['title']))}</p>")
+        if rule.get("why_it_matters"):
+            lines.append(f"<p>Why it matters: {escape(str(rule['why_it_matters']))}</p>")
+        if issue.get("suggested_fix"):
+            lines.append(f"<p>Suggested fix: {escape(str(issue['suggested_fix']))}</p>")
+        lines.append("<h4>Evidence</h4>")
+        lines.append(_html_evidence(issue.get("evidence", {})))
+        lines.append("</article>")
+    lines.append("</section>")
+
+    lines.extend(
+        [
+            "<section>",
+            "<h2>Limitations</h2>",
+            _html_list(report.get("limitations", [])),
+            "</section>",
+            "</main>",
+            "</body>",
+            "</html>",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def save_html_report(report: dict, output_path: str | Path) -> None:
+    """Write a self-contained HTML report, creating parent directories."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(build_html_report(report), encoding="utf-8")
+
+
 def build_batch_index_report(items: list[dict]) -> dict:
     """Build a JSON-ready index for a batch audit run."""
     counts_by_severity: dict[str, int] = {}
@@ -396,6 +719,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
     if any("browser" in item.get("analysis_modes", []) for item in items):
         analysis_modes = ["static", "browser"]
     executed = [item for item in items if item.get("task_execution_status")]
+    html_reports = [item for item in items if item.get("reports", {}).get("html")]
 
     return {
         "tool": "A11yway",
@@ -416,6 +740,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
             "tasks_blocked": sum(
                 1 for item in executed if item.get("task_execution_status") == "blocked"
             ),
+            "html_reports": len(html_reports),
             "counts_by_severity": counts_by_severity,
             "counts_by_issue_type": counts_by_issue_type,
         },
@@ -512,6 +837,7 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
         "issue_types",
         "json_report",
         "markdown_report",
+        "html_report",
         "error",
     ]
 
@@ -543,6 +869,7 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
                     "issue_types": ";".join(issue_type_counts.keys()),
                     "json_report": reports.get("json", ""),
                     "markdown_report": reports.get("markdown", ""),
+                    "html_report": reports.get("html", ""),
                     "error": item.get("error", ""),
                 }
             )
@@ -570,6 +897,7 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
         f"- Failed pages: {summary.get('failed_pages', 0)}",
         f"- Total issues: {summary.get('total_issues', 0)}",
         f"- Total task blockers: {summary.get('total_task_blockers', 0)}",
+        f"- HTML reports: {summary.get('html_reports', 0)}",
         "",
         "## Top Issue Types",
         "",
@@ -592,8 +920,8 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
             "",
             "## Sources With Most Issues",
             "",
-            "| Name | Source | Task | Issues | Blockers | Report |",
-            "| --- | --- | --- | ---: | ---: | --- |",
+            "| Name | Source | Task | Issues | Blockers | Report | HTML report |",
+            "| --- | --- | --- | ---: | ---: | --- | --- |",
         ]
     )
 
@@ -602,13 +930,14 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
     )
     for item in ranked_sources:
         lines.append(
-            "| {name} | {source} | {task} | {issues} | {blockers} | {report} |".format(
+            "| {name} | {source} | {task} | {issues} | {blockers} | {report} | {html_report} |".format(
                 name=item.get("name", ""),
                 source=item.get("source", ""),
                 task=item.get("task", ""),
                 issues=item.get("issue_count", 0),
                 blockers=item.get("task_blocker_count", 0),
                 report=item.get("reports", {}).get("markdown", ""),
+                html_report=item.get("reports", {}).get("html", ""),
             )
         )
 

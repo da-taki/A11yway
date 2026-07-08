@@ -9,12 +9,13 @@ source file/url
   -> source_loader
   -> static analyzer
   -> optional browser runner
+  -> optional visual proof collector
   -> optional task executor
   -> workflow packs
   -> optional future AI scout suggestions
   -> deterministic verification
   -> report builder
-  -> JSON / Markdown / CSV outputs
+  -> JSON / Markdown / HTML / CSV outputs
 ```
 
 In practice, deterministic verification is the center of the system. Static checks, browser checks, and task execution can produce confirmed findings. Workflow packs help reviewers choose what to test. A future AI scout layer may propose likely workflows or risks, but reports should clearly separate suggested risks from confirmed findings.
@@ -38,6 +39,12 @@ A small `html.parser`-based analyzer that runs heuristic checks on the raw HTML:
 ### Browser Runner - `a11yway/core/browser_runner.py` (Optional)
 
 Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace with estimated accessible names, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.
+
+### Visual Proof - `a11yway/core/visual_proof.py` (Optional)
+
+Only used when browser mode is active and visual proof is requested. The browser runner saves a full-page Playwright screenshot, records observed focus trace bounding boxes when available, and generates a focus-path HTML overlay with numbered Tab stops.
+
+Visual proof is an evidence aid, not accessibility certification. The overlay shows one observed browser focus path and does not represent every assistive technology experience.
 
 ### Task Runner - `a11yway/core/task_runner.py`
 
@@ -83,16 +90,20 @@ Single-page mode writes what you ask for:
 
 - `--json path.json` - structured report with summary, issues, rule metadata, evidence, optional task context, optional browser block
 - `--markdown path.md` - the same report rendered for human reviewers
+- `--html path.html` - a self-contained reviewer-friendly HTML report
 
 Batch mode writes into the output directory:
 
 - `<item_id>.json` / `<item_id>.md` - per-page reports
+- `<item_id>.html` - optional per-page HTML report when `--html-reports` is used
 - `index.json` - machine-readable batch summary and per-source stats
 - `index.md` - human-readable batch index
 - `index.csv` - spreadsheet-friendly benchmark row per source
 - `evaluation_summary.md` - reviewer-facing overview: top issue types, severity breakdown, high priority findings, recommended review process
 
 When task execution is enabled, per-page reports include a `task_execution` block. Batch index reports, the CSV index, and the evaluation summary include task execution status and step counts.
+
+When visual proof is enabled, reports include `visual_proof` metadata with screenshot and focus overlay paths. Image bytes are not embedded in JSON.
 
 ## Limitations
 
