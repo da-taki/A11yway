@@ -1,8 +1,8 @@
 # A11yway
 
-A11yway audits education web pages for accessibility barriers that block real student tasks — static HTML checks by default, with an optional headless-browser keyboard audit.
+A11yway audits education web pages for accessibility barriers that block real student tasks — static HTML checks by default, an optional headless-browser keyboard audit, and deterministic task execution that proves whether a keyboard-only student can finish a workflow.
 
-**Status: v0.2 prototype — open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review. Tests: 108 passing.
+**Status: v0.3 prototype — open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review. Tests: 131 passing.
 
 Instead of only scanning a page for technical rules, A11yway is built around student tasks: submitting a scholarship form, finding an assignment, accessing a video lesson. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
 
@@ -53,6 +53,37 @@ python -m a11yway.main examples/sample_dynamic_form.html --browser --markdown re
 ```
 
 Tune with `--max-tabs N` (default 40) and `--wait-ms N` (default 500). [examples/sample_dynamic_form.html](examples/sample_dynamic_form.html) shows the difference: its JavaScript-added unlabeled field and unnamed button produce zero static findings but four browser findings. If Playwright is missing, `--browser` prints setup instructions and exits; every static command keeps working without it.
+
+## Deterministic Task Execution
+
+Normal task mode maps static issues to likely blockers for a student
+workflow. Deterministic task execution goes one step further: with
+`--execute-task`, A11yway attempts a task's scripted steps in the browser
+using **keyboard-only interaction** — focus moves with Tab, text is typed,
+controls are activated with Enter — and reports whether the task passed,
+failed, or was blocked.
+
+```bash
+python -m a11yway.main examples/sample_task_execution_form.html --browser --execute-task submit_scholarship_application --json reports/task_execution_report.json --markdown reports/task_execution_report.md
+```
+
+The report states either `COMPLETED with keyboard-only interaction` or `BLOCKED at step <id>`, with a per-step table of evidence. The two sample forms show why this matters: [sample_task_execution_form.html](examples/sample_task_execution_form.html) completes all 11 steps, while [sample_task_execution_form_broken.html](examples/sample_task_execution_form_broken.html) passes every static check (all fields labeled) yet gets blocked at submit — its submit control is a click-only div a keyboard user can never reach.
+
+Batch execution works too:
+
+```bash
+python -m a11yway.main --batch examples/sample_task_execution_batch.json --out-dir reports/task_execution_batch --browser --execute-tasks
+```
+
+Steps are deterministic scripts defined per task in [examples/sample_tasks.json](examples/sample_tasks.json) (`browser_steps`); see [docs/RULES.md](docs/RULES.md) for the supported actions. This is the key difference from normal rule scanners: A11yway can report that a defined workflow did or did not complete under browser conditions.
+
+Task execution limitations:
+
+- It only covers steps declared in the task file.
+- It is not a full screen-reader simulation.
+- It does not replace disabled-user testing.
+- Browser mode requires Playwright and Chromium.
+- Use it only on public pages or pages you have permission to test.
 
 ## Batch Evaluation
 

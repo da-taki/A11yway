@@ -1,0 +1,263 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_task_execution_form_broken.html",
+  "summary": {
+    "issues_found": 1,
+    "counts_by_severity": {
+      "high": 1
+    },
+    "counts_by_issue_type": {
+      "task_step_blocked": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "task_step_blocked",
+      "severity": "high",
+      "agent_name": "Keyboard Task Runner",
+      "message": "Task step could not be completed with the keyboard",
+      "evidence": {
+        "detected_in": "browser_task_execution",
+        "step_id": "submit_form",
+        "action": "activate_by_role_or_text",
+        "reason": "No focusable button, link, or submit control matching the step target could be reached and activated with the keyboard.",
+        "target": "Submit application"
+      },
+      "suggested_fix": "",
+      "rule": {
+        "title": "Task step could not be completed with the keyboard",
+        "category": "Task Execution",
+        "why_it_matters": "A required step of a real education workflow failed under keyboard-only interaction, so a keyboard-only student is likely blocked from finishing the task.",
+        "manual_review_notes": "Repeat the step manually with a keyboard; timing or scripted focus can behave differently in a headless browser.",
+        "browser_check_limitations": "Steps are deterministic scripts; a human may find a workaround the script does not try."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "task": {
+    "id": "submit_scholarship_application",
+    "name": "Submit scholarship application",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Read the page purpose",
+      "Enter name",
+      "Enter email",
+      "Choose school",
+      "Describe accommodation request",
+      "Submit the form"
+    ],
+    "likely_blockers": []
+  },
+  "source": {
+    "input": "examples/sample_task_execution_form_broken.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_task_execution_form_broken.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "input",
+        "id": "student_name",
+        "name": "student_name",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Student name",
+        "is_visible": true
+      },
+      {
+        "step": 2,
+        "tag": "input",
+        "id": "email",
+        "name": "email",
+        "type": "email",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Email",
+        "is_visible": true
+      },
+      {
+        "step": 3,
+        "tag": "select",
+        "id": "school",
+        "name": "school",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a school Greenfield High School Riverside Academy",
+        "role": null,
+        "accessible_name_guess": "School",
+        "is_visible": true
+      },
+      {
+        "step": 4,
+        "tag": "textarea",
+        "id": "accommodation_request",
+        "name": "accommodation_request",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Accommodation request",
+        "is_visible": true
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  },
+  "task_execution": {
+    "task_id": "submit_scholarship_application",
+    "task_name": "Submit scholarship application",
+    "student_profile": "Keyboard-only student",
+    "success": true,
+    "error": null,
+    "completed": false,
+    "blocked_at_step": "submit_form",
+    "steps_total": 11,
+    "steps_passed": 9,
+    "steps": [
+      {
+        "id": "read_page_purpose",
+        "action": "expect_visible_text",
+        "target": "Student Scholarship Application",
+        "description": "Confirm the page purpose is visible.",
+        "status": "passed",
+        "detail": "Text is visible on the page.",
+        "used_fallback": false
+      },
+      {
+        "id": "focus_name",
+        "action": "focus_by_label_or_name",
+        "target": "Student name",
+        "description": "Move to the student name field.",
+        "status": "passed",
+        "detail": "Reached with the keyboard (tag: input).",
+        "used_fallback": false
+      },
+      {
+        "id": "type_name",
+        "action": "type_text",
+        "target": "",
+        "description": "Type a sample student name.",
+        "status": "passed",
+        "detail": "Typed with the keyboard.",
+        "used_fallback": false
+      },
+      {
+        "id": "focus_email",
+        "action": "focus_by_label_or_name",
+        "target": "Email",
+        "description": "Move to the email field.",
+        "status": "passed",
+        "detail": "Reached with the keyboard (tag: input).",
+        "used_fallback": false
+      },
+      {
+        "id": "type_email",
+        "action": "type_text",
+        "target": "",
+        "description": "Type a sample email.",
+        "status": "passed",
+        "detail": "Typed with the keyboard.",
+        "used_fallback": false
+      },
+      {
+        "id": "focus_school",
+        "action": "focus_by_label_or_name",
+        "target": "School",
+        "description": "Move to the school field.",
+        "status": "passed",
+        "detail": "Reached with the keyboard (tag: select).",
+        "used_fallback": false
+      },
+      {
+        "id": "select_first_option",
+        "action": "select_first_non_empty_option",
+        "target": "",
+        "description": "Choose a school option.",
+        "status": "passed",
+        "detail": "Selected option with ArrowDown (value: \"greenfield\").",
+        "used_fallback": false
+      },
+      {
+        "id": "focus_accommodation_request",
+        "action": "focus_by_label_or_name",
+        "target": "Accommodation request",
+        "description": "Move to the accommodation request field.",
+        "status": "passed",
+        "detail": "Reached with the keyboard (tag: textarea).",
+        "used_fallback": false
+      },
+      {
+        "id": "type_accommodation_request",
+        "action": "type_text",
+        "target": "",
+        "description": "Type a sample accommodation request.",
+        "status": "passed",
+        "detail": "Typed with the keyboard.",
+        "used_fallback": false
+      },
+      {
+        "id": "submit_form",
+        "action": "activate_by_role_or_text",
+        "target": "Submit application",
+        "description": "Submit the application.",
+        "status": "failed",
+        "detail": "No keyboard-activatable control matched this step.",
+        "used_fallback": false
+      },
+      {
+        "id": "confirm_submission",
+        "action": "wait_for_text",
+        "target": "Application received",
+        "description": "Confirm the form reports success.",
+        "status": "skipped",
+        "detail": "Skipped because an earlier step was blocked.",
+        "used_fallback": false
+      }
+    ],
+    "limitations": [
+      "Task steps are deterministic scripts; a human may find a workaround the script does not try.",
+      "Step results show keyboard operability, not full assistive technology behavior."
+    ]
+  }
+}

@@ -13,6 +13,9 @@ source file/url
   -> optional browser runner
        - keyboard focus traversal (Tab key trace)
        - rendered DOM re-check (static checks on page.content())
+  -> optional task executor
+       - deterministic browser steps from task.browser_steps
+       - keyboard-style typing, Tab focus, and Enter activation
   -> task mapping         (which findings block a student task)
   -> report builder       (rule enrichment, summaries)
   -> JSON / Markdown / CSV outputs
@@ -61,6 +64,16 @@ Loads education task scenarios (for example, submitting a scholarship
 application), filters findings down to the issue types relevant to a task,
 and turns them into "likely blocker" notes with task impact text.
 
+### Task executor - `a11yway/core/task_executor.py` (optional)
+
+Only used with `--browser --execute-task` or batch `--execute-tasks`.
+Attempts explicit `browser_steps` from a task definition using
+keyboard-style browser actions: Tab traversal, typed text, option
+selection, Enter activation, and visible-text assertions. It returns a
+pass, blocked, failed, or unavailable result with per-step evidence. It is
+deterministic browser automation, not AI, and it only tests the scripted
+workflow path.
+
 ### Rule registry — `a11yway/core/rules.py`
 
 One central dictionary documenting every issue type: title, category,
@@ -103,6 +116,10 @@ Batch mode writes into the output directory:
 - `index.csv` — spreadsheet-friendly benchmark row per source
 - `evaluation_summary.md` — reviewer-facing overview: top issue types,
   severity breakdown, high priority findings, recommended review process
+
+When task execution is enabled, per-page reports include a
+`task_execution` block. Batch index reports, the CSV index, and the
+evaluation summary include task execution status and step counts.
 
 ## Limitations
 

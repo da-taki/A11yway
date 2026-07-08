@@ -41,6 +41,11 @@ BROWSER_MODE_LIMITATIONS = [
     "Accessible names are estimated and require manual review.",
 ]
 
+TASK_EXECUTION_LIMITATIONS = [
+    "Task steps are deterministic scripts; a human may find a workaround the script does not try.",
+    "Step results show keyboard operability, not full assistive technology behavior.",
+]
+
 
 def build_json_report(
     source_file: str,
@@ -49,6 +54,7 @@ def build_json_report(
     task_blockers: list[dict] | None = None,
     source_metadata: dict | None = None,
     browser_result: dict | None = None,
+    task_execution: dict | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
     checks_run = list(STATIC_CHECKS_RUN)
@@ -119,6 +125,21 @@ def build_json_report(
             "checks_run": browser_result.get("checks_run", []),
             "focus_trace": browser_result.get("focus_trace", []),
             "limitations": list(BROWSER_MODE_LIMITATIONS),
+        }
+
+    if task_execution is not None:
+        report["task_execution"] = {
+            "task_id": task_execution.get("task_id"),
+            "task_name": task_execution.get("task_name"),
+            "student_profile": task_execution.get("student_profile"),
+            "success": task_execution.get("success", False),
+            "error": task_execution.get("error"),
+            "completed": task_execution.get("completed", False),
+            "blocked_at_step": task_execution.get("blocked_at_step"),
+            "steps_total": task_execution.get("steps_total", 0),
+            "steps_passed": task_execution.get("steps_passed", 0),
+            "steps": task_execution.get("steps", []),
+            "limitations": list(TASK_EXECUTION_LIMITATIONS),
         }
 
     return report
@@ -241,6 +262,51 @@ def build_markdown_report(report: dict) -> str:
             lines.extend(f"- {limitation}" for limitation in browser["limitations"])
             lines.append("")
 
+    execution = report.get("task_execution")
+    if execution is not None:
+        lines.extend(["## Task Execution", ""])
+        if not execution.get("success"):
+            lines.extend(
+                [
+                    f"- Task: {execution.get('task_name', '')}",
+                    f"- Result: could not run ({execution.get('error', '')})",
+                    "",
+                ]
+            )
+        else:
+            if execution.get("completed"):
+                verdict = "COMPLETED with keyboard-only interaction"
+            else:
+                verdict = f"BLOCKED at step `{execution.get('blocked_at_step', '')}`"
+            lines.extend(
+                [
+                    f"- Task: {execution.get('task_name', '')}",
+                    f"- Student profile: {execution.get('student_profile', '')}",
+                    f"- Result: {verdict}",
+                    f"- Steps passed: {execution.get('steps_passed', 0)} of {execution.get('steps_total', 0)}",
+                    "",
+                    "| Step | Action | Status | Detail |",
+                    "| --- | --- | --- | --- |",
+                ]
+            )
+            for step in execution.get("steps", []):
+                status = step.get("status", "")
+                if step.get("used_fallback"):
+                    status += " (fallback)"
+                lines.append(
+                    "| {id} | {action} | {status} | {detail} |".format(
+                        id=step.get("id", ""),
+                        action=step.get("action", ""),
+                        status=status,
+                        detail=step.get("detail", ""),
+                    )
+                )
+            lines.append("")
+        if execution.get("limitations"):
+            lines.extend(["### Task Execution Limitations", ""])
+            lines.extend(f"- {limitation}" for limitation in execution["limitations"])
+            lines.append("")
+
     task = report.get("task")
     if task:
         lines.extend(
@@ -329,6 +395,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
     analysis_modes = ["static"]
     if any("browser" in item.get("analysis_modes", []) for item in items):
         analysis_modes = ["static", "browser"]
+    executed = [item for item in items if item.get("task_execution_status")]
 
     return {
         "tool": "A11yway",
@@ -341,6 +408,13 @@ def build_batch_index_report(items: list[dict]) -> dict:
             "total_issues": sum(item.get("issue_count", 0) for item in items),
             "total_task_blockers": sum(
                 item.get("task_blocker_count", 0) for item in items
+            ),
+            "tasks_executed": len(executed),
+            "tasks_completed": sum(
+                1 for item in executed if item.get("task_execution_status") == "completed"
+            ),
+            "tasks_blocked": sum(
+                1 for item in executed if item.get("task_execution_status") == "blocked"
             ),
             "counts_by_severity": counts_by_severity,
             "counts_by_issue_type": counts_by_issue_type,
@@ -429,6 +503,9 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
         "task_blockers",
         "browser_status",
         "browser_issue_count",
+        "task_execution_status",
+        "task_steps_passed",
+        "task_steps_total",
         "high_count",
         "medium_count",
         "low_count",
@@ -457,6 +534,9 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
                     "task_blockers": item.get("task_blocker_count", 0),
                     "browser_status": item.get("browser_status", ""),
                     "browser_issue_count": item.get("browser_issue_count", 0),
+                    "task_execution_status": item.get("task_execution_status", ""),
+                    "task_steps_passed": item.get("task_steps_passed", ""),
+                    "task_steps_total": item.get("task_steps_total", ""),
                     "high_count": severity_counts.get("high", 0),
                     "medium_count": severity_counts.get("medium", 0),
                     "low_count": severity_counts.get("low", 0),
@@ -531,6 +611,30 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
                 report=item.get("reports", {}).get("markdown", ""),
             )
         )
+
+    executed_items = [item for item in sources if item.get("task_execution_status")]
+    if executed_items:
+        lines.extend(
+            [
+                "",
+                "## Task Execution Results",
+                "",
+                "Deterministic keyboard-only task attempts per page:",
+                "",
+                "| Name | Task | Result | Steps passed |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
+        for item in executed_items:
+            lines.append(
+                "| {name} | {task} | {result} | {passed} of {total} |".format(
+                    name=item.get("name", ""),
+                    task=item.get("task", ""),
+                    result=item.get("task_execution_status", ""),
+                    passed=item.get("task_steps_passed", 0),
+                    total=item.get("task_steps_total", 0),
+                )
+            )
 
     lines.extend(["", "## High Priority Findings", ""])
     found_high_priority = False

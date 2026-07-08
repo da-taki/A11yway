@@ -62,6 +62,40 @@ Browser mode limitations:
 - It does not crawl websites or log into private portals.
 - Use it only on public pages or pages you have permission to test.
 
+## Browser Task Execution Checks (optional)
+
+With `--browser --execute-task <task>` (or `--execute-tasks` in batch mode),
+A11yway attempts a task's `browser_steps` using keyboard-only interaction:
+focus moves with Tab, text is typed with the keyboard, and controls are
+activated with Enter. The report states whether the task COMPLETED or was
+BLOCKED, with per-step evidence. Steps are deterministic scripts defined in
+the task JSON; this is not AI and does not infer extra actions. Supported
+actions: `expect_visible_text`,
+`assert_visible_text`, `wait_for_text`, `focus_by_label_or_name`,
+`focus_by_selector`, `type_text`, `select_first_non_empty_option`,
+`activate_by_role_or_text`, `press_key`, `assert_url_contains`.
+
+These checks are produced when A11yway runs an explicit browser task
+scenario, such as completing a scholarship application form using
+keyboard-style steps. They provide evidence that one defined workflow did
+or did not complete under specific conditions. They do not prove every user
+can complete the task, and results still need human review.
+
+| Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
+| --- | --- | --- | --- | --- | --- |
+| `task_step_blocked` | Task Execution | high | A required task step failed under keyboard-only interaction | The student workflow is likely blocked at that step | Deterministic scripts; a human may find a workaround |
+| `task_control_not_keyboard_reachable` | Task Execution | high | A step only succeeded via programmatic focus, never via Tab | A real keyboard-only student would be stuck | The Tab search has a fixed press budget |
+| `task_expected_content_missing` | Task Execution | medium | Expected page text (purpose or confirmation) was not visible | Students may not know where they are or whether the task worked | Compares normalized visible text only |
+
+Task execution limitations:
+
+- Steps prove keyboard operability of one scripted path, not every way a
+  human might attempt the task.
+- Step results are evidence for reviewers, not a certification of the
+  whole workflow.
+- It is not a full screen-reader simulation and does not replace testing
+  with disabled users.
+
 ## Not Yet Covered
 
 These areas are out of scope for the current prototype:

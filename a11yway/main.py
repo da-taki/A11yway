@@ -20,6 +20,7 @@ from a11yway.core.report_builder import (
 )
 from a11yway.core.rules import get_rule, list_rules
 from a11yway.core.source_loader import load_html_source
+from a11yway.core.task_executor import run_task_execution
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.task import AccessibilityTask
@@ -109,6 +110,29 @@ def print_browser_summary(
     print(f"   Focus trace length: {len(browser_result.get('focus_trace', []))}")
 
 
+def print_task_execution_summary(task_execution: dict) -> None:
+    """Print the outcome of a deterministic keyboard task attempt."""
+    print()
+    print(f"Task execution: {task_execution.get('task_name', '')}")
+    if not task_execution.get("success"):
+        print(f"   Result: could not run ({task_execution.get('error')})")
+        return
+
+    if task_execution.get("completed"):
+        print("   Result: COMPLETED with keyboard-only interaction")
+    else:
+        print(f"   Result: BLOCKED at step {task_execution.get('blocked_at_step')}")
+    print(
+        f"   Steps passed: {task_execution.get('steps_passed', 0)} "
+        f"of {task_execution.get('steps_total', 0)}"
+    )
+    print(f"   Task execution issues: {len(task_execution.get('issues', []))}")
+    for step in task_execution.get("steps", []):
+        marker = {"passed": "+", "failed": "x", "skipped": "-"}.get(step.get("status"), "?")
+        fallback_note = " (fallback)" if step.get("used_fallback") else ""
+        print(f"   [{marker}] {step.get('id', '')}: {step.get('status', '')}{fallback_note}")
+
+
 def print_task_summary(task: AccessibilityTask, blockers: list[dict]) -> None:
     """Print task context and likely blockers for the static findings."""
     print()
@@ -174,6 +198,18 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="browser",
         action="store_true",
         help="Also run the optional keyboard interaction audit (requires Playwright).",
+    )
+    parser.add_argument(
+        "--execute-task",
+        dest="execute_task",
+        metavar="TASK",
+        help="Attempt a task's browser steps with keyboard-only interaction. Requires --browser.",
+    )
+    parser.add_argument(
+        "--execute-tasks",
+        dest="execute_tasks",
+        action="store_true",
+        help="In batch mode, execute browser steps for items whose task defines them. Requires --browser.",
     )
     parser.add_argument(
         "--max-tabs",
@@ -254,6 +290,10 @@ def main(argv: list[str] | None = None) -> int:
     if parsed_args.rule_issue_type:
         return print_rule_details(parsed_args.rule_issue_type)
 
+    if (parsed_args.execute_task or parsed_args.execute_tasks) and not parsed_args.browser:
+        print("Task execution requires browser mode. Add --browser to the command.")
+        return 1
+
     if parsed_args.browser and not is_playwright_available():
         print(PLAYWRIGHT_SETUP_MESSAGE)
         return 1
@@ -266,6 +306,7 @@ def main(argv: list[str] | None = None) -> int:
             browser=parsed_args.browser,
             max_tabs=parsed_args.max_tabs,
             wait_ms=parsed_args.wait_ms,
+            execute_tasks=parsed_args.execute_tasks,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
@@ -279,10 +320,25 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Index Markdown: {batch_result['index_markdown_path']}")
         print(f"Index CSV: {batch_result['csv_index_path']}")
         print(f"Evaluation summary: {batch_result['evaluation_summary_path']}")
+        if parsed_args.execute_tasks:
+            print(f"Tasks executed: {summary.get('tasks_executed', 0)}")
+            print(f"Tasks completed: {summary.get('tasks_completed', 0)}")
+            print(f"Tasks blocked: {summary.get('tasks_blocked', 0)}")
         return 0
 
     if parsed_args.csv_output:
         print("CSV export is currently only available in batch mode.")
+
+    execute_task_obj = None
+    if parsed_args.execute_task:
+        tasks = load_tasks(DEFAULT_TASKS_PATH)
+        execute_task_obj = find_task(tasks, parsed_args.execute_task)
+        if execute_task_obj is None:
+            print(f'Task not found: "{parsed_args.execute_task}". Use a task id or name from {DEFAULT_TASKS_PATH}.')
+            return 1
+        if not execute_task_obj.browser_steps:
+            print(f'Task "{execute_task_obj.id}" has no browser_steps defined, so it cannot be executed.')
+            return 1
 
     source = parsed_args.html_path
     issues, source_result = analyze_html_source(source)
@@ -300,11 +356,25 @@ def main(argv: list[str] | None = None) -> int:
             wait_ms=parsed_args.wait_ms,
         )
         issues = merge_browser_issues(issues, browser_result)
+    browser_issue_total = len(issues)
+
+    task_execution = None
+    if execute_task_obj is not None:
+        task_execution = run_task_execution(
+            source,
+            execute_task_obj,
+            max_tabs=parsed_args.max_tabs,
+            wait_ms=parsed_args.wait_ms,
+        )
+        issues = issues + list(task_execution["issues"])
 
     print_summary(source, issues)
 
     if browser_result is not None:
-        print_browser_summary(browser_result, static_issue_count, len(issues))
+        print_browser_summary(browser_result, static_issue_count, browser_issue_total)
+
+    if task_execution is not None:
+        print_task_execution_summary(task_execution)
 
     selected_task = None
     task_blockers: list[dict] = []
@@ -318,6 +388,10 @@ def main(argv: list[str] | None = None) -> int:
             print()
             print(f'Task not found: "{parsed_args.task_id_or_name}". Normal audit still completed.')
 
+    if selected_task is None and execute_task_obj is not None:
+        selected_task = execute_task_obj
+        task_blockers = build_task_blockers(selected_task, issues)
+
     if parsed_args.json_output or parsed_args.markdown_output:
         report = build_json_report(
             source,
@@ -326,6 +400,7 @@ def main(argv: list[str] | None = None) -> int:
             task_blockers=task_blockers,
             source_metadata=source_result,
             browser_result=browser_result,
+            task_execution=task_execution,
         )
 
     if parsed_args.json_output:

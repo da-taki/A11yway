@@ -1,0 +1,97 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "summary": {
+    "analysis_modes": [
+      "static",
+      "browser"
+    ],
+    "total_pages_tested": 2,
+    "successful_pages": 2,
+    "failed_pages": 0,
+    "total_issues": 1,
+    "total_task_blockers": 0,
+    "tasks_executed": 2,
+    "tasks_completed": 1,
+    "tasks_blocked": 1,
+    "counts_by_severity": {
+      "high": 1
+    },
+    "counts_by_issue_type": {
+      "task_step_blocked": 1
+    }
+  },
+  "sources": [
+    {
+      "id": "accessible_application_form",
+      "name": "Scholarship Form (keyboard accessible)",
+      "source": "examples/sample_task_execution_form.html",
+      "source_type": "file",
+      "task": "submit_scholarship_application",
+      "status": "passed",
+      "error": "",
+      "issue_count": 0,
+      "task_blocker_count": 0,
+      "counts_by_severity": {},
+      "counts_by_issue_type": {},
+      "high_severity_issues": [],
+      "analysis_modes": [
+        "static",
+        "browser"
+      ],
+      "browser_status": "passed",
+      "browser_issue_count": 0,
+      "task_execution_status": "completed",
+      "task_steps_passed": 11,
+      "task_steps_total": 11,
+      "reports": {
+        "json": "reports/task_execution_batch/accessible_application_form.json",
+        "markdown": "reports/task_execution_batch/accessible_application_form.md"
+      }
+    },
+    {
+      "id": "broken_application_form",
+      "name": "Scholarship Form (click-only submit)",
+      "source": "examples/sample_task_execution_form_broken.html",
+      "source_type": "file",
+      "task": "submit_scholarship_application",
+      "status": "passed",
+      "error": "",
+      "issue_count": 1,
+      "task_blocker_count": 0,
+      "counts_by_severity": {
+        "high": 1
+      },
+      "counts_by_issue_type": {
+        "task_step_blocked": 1
+      },
+      "high_severity_issues": [
+        {
+          "issue_type": "task_step_blocked",
+          "message": "Task step could not be completed with the keyboard",
+          "snippet": ""
+        }
+      ],
+      "analysis_modes": [
+        "static",
+        "browser"
+      ],
+      "browser_status": "passed",
+      "browser_issue_count": 0,
+      "task_execution_status": "blocked",
+      "task_steps_passed": 9,
+      "task_steps_total": 11,
+      "reports": {
+        "json": "reports/task_execution_batch/broken_application_form.json",
+        "markdown": "reports/task_execution_batch/broken_application_form.md"
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ],
+  "csv_index_path": "reports/task_execution_batch/index.csv",
+  "evaluation_summary_path": "reports/task_execution_batch/evaluation_summary.md"
+}

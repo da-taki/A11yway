@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Student Scholarship Application</title>
+</head>
+<body>
+  <h1>Student Scholarship Application</h1>
+  <p>
+    This fictional form looks fine to static checks: every field is
+    labeled. But the submit control is a click-only div, so a
+    keyboard-only student can fill the form and still never submit it.
+    A11yway task execution should report the task as blocked.
+  </p>
+
+  <form id="application_form" action="#" method="post">
+    <p>
+      <label for="student_name">Student name</label>
+      <input id="student_name" type="text" name="student_name">
+    </p>
+    <p>
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email">
+    </p>
+    <p>
+      <label for="school">School</label>
+      <select id="school" name="school">
+        <option value="">Choose a school</option>
+        <option value="greenfield">Greenfield High School</option>
+        <option value="riverside">Riverside Academy</option>
+      </select>
+    </p>
+    <p>
+      <label for="accommodation_request">Accommodation request</label>
+      <textarea id="accommodation_request" name="accommodation_request" rows="4"></textarea>
+    </p>
+    <!-- The barrier: a div is not focusable and cannot be activated
+         with Enter. Mouse users never notice; keyboard users are stuck. -->
+    <div class="submit_button" onclick="submitApplication()">Submit application</div>
+  </form>
+
+  <div id="confirmation" role="status"></div>
+
+  <script>
+    function submitApplication() {
+      document.getElementById("confirmation").textContent =
+        "Application received. We will contact you by email.";
+    }
+  </script>
+</body>
+</html>

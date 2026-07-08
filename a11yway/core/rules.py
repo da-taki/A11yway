@@ -415,6 +415,84 @@ RULES: dict[str, dict] = {
             "Related to visible focus and keyboard accessibility requirements."
         ),
     },
+    "task_step_blocked": {
+        "issue_type": "task_step_blocked",
+        "title": "Task step could not be completed with the keyboard",
+        "category": "Task Execution",
+        "default_severity": "high",
+        "why_it_matters": (
+            "A required step of a real education workflow failed under "
+            "keyboard-only interaction, so a keyboard-only student is likely "
+            "blocked from finishing the task."
+        ),
+        "how_to_fix": (
+            "Make every control in the workflow reachable and operable with "
+            "the keyboard, and check the step evidence for what failed."
+        ),
+        "manual_review_notes": (
+            "Repeat the step manually with a keyboard; timing or scripted "
+            "focus can behave differently in a headless browser."
+        ),
+        "browser_check_limitations": (
+            "Steps are deterministic scripts; a human may find a workaround "
+            "the script does not try."
+        ),
+        "standard_hint": (
+            "Related to keyboard accessibility requirements for interactive workflows."
+        ),
+    },
+    "task_control_not_keyboard_reachable": {
+        "issue_type": "task_control_not_keyboard_reachable",
+        "title": "Task control is not reachable with the keyboard",
+        "category": "Task Execution",
+        "default_severity": "high",
+        "why_it_matters": (
+            "The workflow could only continue by focusing the control "
+            "programmatically; a real keyboard-only student cannot do that "
+            "and would be stuck."
+        ),
+        "how_to_fix": (
+            "Ensure the control is a native focusable element or has a "
+            "proper tabindex, and that scripts do not skip it in Tab order."
+        ),
+        "manual_review_notes": (
+            "Tab through the page manually and confirm whether the control "
+            "is truly unreachable."
+        ),
+        "browser_check_limitations": (
+            "The Tab search has a fixed press budget and may miss controls "
+            "on very long pages."
+        ),
+        "standard_hint": (
+            "Related to keyboard accessibility and focus order requirements."
+        ),
+    },
+    "task_expected_content_missing": {
+        "issue_type": "task_expected_content_missing",
+        "title": "Expected task content is missing",
+        "category": "Task Execution",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Text the task expects (page purpose, instructions, or a success "
+            "confirmation) was not visible, so students may not know where "
+            "they are or whether the task worked."
+        ),
+        "how_to_fix": (
+            "Show clear visible text for the page purpose and for the result "
+            "of submitting a form."
+        ),
+        "manual_review_notes": (
+            "The expected text is defined by the task author; confirm the "
+            "wording still matches the live page."
+        ),
+        "browser_check_limitations": (
+            "The check compares normalized visible text only; content inside "
+            "images or drawn by unusual scripts is not seen."
+        ),
+        "standard_hint": (
+            "Related to clear labeling and status feedback accessibility requirements."
+        ),
+    },
 }
 
 

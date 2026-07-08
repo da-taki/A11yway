@@ -1,0 +1,14 @@
+[
+  {
+    "id": "accessible_application_form",
+    "name": "Scholarship Form (keyboard accessible)",
+    "source": "examples/sample_task_execution_form.html",
+    "task": "submit_scholarship_application"
+  },
+  {
+    "id": "broken_application_form",
+    "name": "Scholarship Form (click-only submit)",
+    "source": "examples/sample_task_execution_form_broken.html",
+    "task": "submit_scholarship_application"
+  }
+]
