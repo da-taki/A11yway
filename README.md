@@ -4,6 +4,27 @@ A11yway is an early pseudocode scaffold for an agentic accessibility testing too
 
 The idea is simple: instead of only scanning a page for technical accessibility rules, A11yway will eventually simulate how students with different accessibility needs complete real education tasks. Example tasks include finding an assignment, submitting a form, reading instructions, accessing a video, or downloading a resource.
 
+## v0.1 Prototype Features
+
+- Static HTML accessibility checks for local files and public URLs
+- Task-based education scenarios (for example, submitting a scholarship form)
+- Structured evidence: HTML snippets, reasons, and approximate line numbers
+- JSON and Markdown report export
+- Batch evaluation across multiple pages
+- CSV benchmark index for spreadsheets
+- Rule registry documenting every check (see [docs/RULES.md](docs/RULES.md))
+- Reviewer-friendly batch evaluation summary (`evaluation_summary.md`)
+
+Everything runs on the Python standard library — no external dependencies.
+
+### Limitations
+
+- Static HTML only; no browser automation yet
+- URL mode does not execute JavaScript
+- No full screen-reader simulation yet
+- No private or unauthorized testing — use public pages or pages with permission
+- Does not replace human accessibility review or testing with disabled users
+
 ## Why Education Accessibility Testing Matters
 
 Education websites often contain forms, documents, videos, assignments, portals, and deadlines. If any of those are inaccessible, students can be blocked from learning or from completing required school tasks.
@@ -67,6 +88,20 @@ python -m a11yway.main examples/sample_form.html --task submit_scholarship_appli
 
 If no file path is provided, the command tries `examples/sample_form.html`.
 
+List every static check with its category and default severity:
+
+```bash
+python -m a11yway.main --list-rules
+```
+
+Show full documentation for one rule:
+
+```bash
+python -m a11yway.main --rule missing_form_label
+```
+
+All checks are documented in [docs/RULES.md](docs/RULES.md), including what each rule detects, why it matters, and what static analysis cannot verify.
+
 The current prototype runs a static HTML audit for form labels, link and button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. The JSON export is meant to grow into future NGO and school review reports.
 
 Task mode explains which page barriers matter for a specific education workflow, such as submitting a scholarship form or accessing learning resources. This is the first step toward agentic accessibility testing, but it still uses deterministic static checks rather than real student simulation.
@@ -85,7 +120,13 @@ Run a batch audit across multiple local sample pages:
 python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
 ```
 
-Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus `index.json`, `index.md`, and `index.csv` summaries for tracking pages tested, issue counts, and task blockers. This is useful for future outreach and evaluation work.
+Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus `index.json`, `index.md`, and `index.csv` summaries for tracking pages tested, issue counts, and task blockers. It also writes `evaluation_summary.md`, a reviewer-friendly overview with top issue types, a severity breakdown, and high priority findings across the whole batch.
+
+To start your own review batch, copy [examples/evaluation_batch_template.json](examples/evaluation_batch_template.json), replace the placeholder names and URLs with the pages you have permission to review, then run:
+
+```bash
+python -m a11yway.main --batch examples/evaluation_batch_template.json --out-dir reports/my_review
+```
 
 You can also choose a CSV path:
 
