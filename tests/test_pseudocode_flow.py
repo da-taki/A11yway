@@ -17,7 +17,13 @@ from a11yway.core.page_analyzer import (
     analyze_media_accessibility,
     analyze_page_metadata,
 )
-from a11yway.core.report_builder import ReportBuilder, build_json_report, save_json_report
+from a11yway.core.report_builder import (
+    ReportBuilder,
+    build_json_report,
+    build_markdown_report,
+    save_json_report,
+    save_markdown_report,
+)
 from a11yway.core.task_runner import (
     TaskRunner,
     build_task_blockers,
@@ -443,6 +449,72 @@ def test_json_report_includes_task_data_when_task_is_provided() -> None:
     assert len(report["task"]["likely_blockers"]) == 5
 
 
+def test_build_markdown_report_returns_string() -> None:
+    """Markdown report builder should return a string."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+
+    markdown = build_markdown_report(report)
+
+    assert isinstance(markdown, str)
+
+
+def test_markdown_report_includes_summary_and_issue_types() -> None:
+    """Markdown should include the core report sections and issue type details."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+
+    markdown = build_markdown_report(report)
+
+    assert "# A11yway Accessibility Report" in markdown
+    assert "## Summary" in markdown
+    assert "Issues found: 7" in markdown
+    assert "missing_form_label" in markdown
+
+
+def test_markdown_report_includes_task_context() -> None:
+    """Markdown should include task context when task data exists."""
+    tasks = load_tasks("examples/sample_tasks.json")
+    task = find_task(tasks, "submit_scholarship_application")
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+
+    assert task is not None
+    report = build_json_report(
+        "examples/sample_form.html",
+        issues,
+        task=task,
+        task_blockers=build_task_blockers(task, issues),
+    )
+    markdown = build_markdown_report(report)
+
+    assert "## Task Context" in markdown
+    assert "Submit scholarship application" in markdown
+    assert "Likely Blockers" in markdown
+
+
+def test_markdown_report_includes_evidence_snippets() -> None:
+    """Markdown should show HTML evidence snippets in fenced code blocks."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+
+    markdown = build_markdown_report(report)
+
+    assert "```html" in markdown
+    assert '<input type="text" name="student_name">' in markdown
+
+
+def test_save_markdown_report_writes_file(tmp_path: Path) -> None:
+    """Markdown reports should be written to disk with parent directories created."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+    output_path = tmp_path / "reports" / "sample_form_report.md"
+
+    save_markdown_report(report, output_path)
+
+    markdown = output_path.read_text(encoding="utf-8")
+    assert "# A11yway Accessibility Report" in markdown
+
+
 def test_cli_default_sample_still_runs(capsys) -> None:
     """The no-argument CLI flow should still analyze the sample fixture."""
     exit_code = main([])
@@ -462,3 +534,23 @@ def test_cli_task_mode_runs(capsys) -> None:
     assert exit_code == 0
     assert "Task: Submit scholarship application" in captured.out
     assert "Likely blockers: 5" in captured.out
+
+
+def test_cli_markdown_mode_writes_report(tmp_path: Path, capsys) -> None:
+    """CLI should save Markdown reports without breaking task mode."""
+    output_path = tmp_path / "reports" / "sample_form_report.md"
+
+    exit_code = main(
+        [
+            "examples/sample_form.html",
+            "--task",
+            "submit_scholarship_application",
+            "--markdown",
+            str(output_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Markdown report saved" in captured.out
+    assert "# A11yway Accessibility Report" in output_path.read_text(encoding="utf-8")
