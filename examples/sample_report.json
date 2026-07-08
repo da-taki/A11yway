@@ -1,0 +1,32 @@
+{
+  "task": {
+    "title": "Submit a scholarship application form",
+    "url": "https://example.edu/scholarships/apply",
+    "goal": "Complete and submit the scholarship application form."
+  },
+  "agents_used": [
+    "Keyboard-only student",
+    "Low-vision student",
+    "Dyslexia/reading-difficulty student",
+    "Hearing-impaired student"
+  ],
+  "summary": "Sample placeholder report for a fictional education task.",
+  "issues": [
+    {
+      "title": "Keyboard form completion needs verification",
+      "issue_type": "keyboard_form_completion",
+      "severity": "medium",
+      "agent_name": "Keyboard-only student",
+      "evidence": "The task includes a form and should be tested using only Tab, Shift+Tab, Enter, Space, and arrow keys.",
+      "suggested_fix": "Ensure every field, button, and error message can be reached and used with the keyboard."
+    },
+    {
+      "title": "Plain-language review needed",
+      "issue_type": "plain_language_review",
+      "severity": "medium",
+      "agent_name": "Dyslexia/reading-difficulty student",
+      "evidence": "Application instructions may be difficult if presented as dense paragraphs.",
+      "suggested_fix": "Use short sentences, clear headings, bullet points, and direct error messages."
+    }
+  ]
+}
