@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, List
 
 from a11yway.agents.base_agent import BaseAccessibilityAgent
-from a11yway.core.page_analyzer import analyze_html_forms
+from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.task import AccessibilityTask
 
@@ -23,14 +23,14 @@ class KeyboardOnlyAgent(BaseAccessibilityAgent):
     ) -> List[AccessibilityIssue]:
         """Return keyboard accessibility findings.
 
-        Most checks are still pseudocode. Form label detection is a small real
-        check when raw HTML is provided in the page context.
+        Most behavior is still pseudocode. When raw HTML is provided, the agent
+        currently routes through the static page analyzer.
         """
         findings = []
 
         html = page_context.get("html")
         if isinstance(html, str):
-            findings.extend(analyze_html_forms(html))
+            findings.extend(analyze_html_static(html))
 
         # TODO: Check focus order by tabbing through all interactive elements.
         # TODO: Detect tab traps where focus cannot escape a component.

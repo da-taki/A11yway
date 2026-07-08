@@ -1,6 +1,7 @@
 # Sample Accessibility Task Report
 
-This is a fictional sample report. It is not the output of a working scanner yet.
+This is a fictional sample report. It reflects the kind of static HTML findings
+the current prototype can begin to produce, but it is not a complete audit.
 
 ## Site
 
@@ -58,6 +59,16 @@ Agent: Hearing-impaired student
 Evidence: The application page includes an intro video, but no captions or transcript are linked near the video.
 
 Suggested fix: Add synchronized captions and a text transcript that includes all spoken instructions.
+
+### 5. Link Text Is Too Generic
+
+Severity: Medium
+
+Agent: Page Analyzer
+
+Evidence: A help link uses the text "click here", which does not explain the destination when read out of context.
+
+Suggested fix: Use descriptive link text such as "Read scholarship application help".
 
 ## Retest Checklist
 
