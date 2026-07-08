@@ -43,7 +43,17 @@ EXPECTED_BROWSER_ISSUE_TYPES = {
     "browser_focus_on_hidden_element",
 }
 
-EXPECTED_ISSUE_TYPES = EXPECTED_STATIC_ISSUE_TYPES | EXPECTED_BROWSER_ISSUE_TYPES
+EXPECTED_TASK_EXECUTION_ISSUE_TYPES = {
+    "task_step_blocked",
+    "task_control_not_keyboard_reachable",
+    "task_expected_content_missing",
+}
+
+EXPECTED_ISSUE_TYPES = (
+    EXPECTED_STATIC_ISSUE_TYPES
+    | EXPECTED_BROWSER_ISSUE_TYPES
+    | EXPECTED_TASK_EXECUTION_ISSUE_TYPES
+)
 
 
 def test_rule_registry_covers_all_expected_issue_types() -> None:

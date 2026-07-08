@@ -22,6 +22,7 @@ from a11yway.core.report_builder import (
     save_markdown_report,
 )
 from a11yway.core.source_loader import load_html_source
+from a11yway.core.task_executor import run_task_execution
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 
 
@@ -53,12 +54,14 @@ def run_batch(
     browser: bool = False,
     max_tabs: int = 40,
     wait_ms: int = 500,
+    execute_tasks: bool = False,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
     When browser is True and Playwright is installed, each page also gets a
-    keyboard interaction audit; a browser failure on one page never stops
-    the rest of the batch.
+    keyboard interaction audit; with execute_tasks, items whose task defines
+    browser_steps also get a deterministic keyboard task attempt. A browser
+    failure on one page never stops the rest of the batch.
     """
     batch_items = load_batch_config(config_path)
     output_dir = Path(out_dir)
@@ -89,6 +92,9 @@ def run_batch(
                     "analysis_modes": ["static", "browser"] if browser else ["static"],
                     "browser_status": "",
                     "browser_issue_count": 0,
+                    "task_execution_status": "",
+                    "task_steps_passed": "",
+                    "task_steps_total": "",
                     "reports": {},
                 }
             )
@@ -119,6 +125,23 @@ def run_batch(
             if selected_task:
                 task_blockers = build_task_blockers(selected_task, issues)
 
+        task_execution = None
+        task_execution_status = ""
+        if execute_tasks and browser and selected_task and selected_task.browser_steps:
+            if not is_playwright_available():
+                task_execution_status = "unavailable"
+            else:
+                task_execution = run_task_execution(
+                    source, selected_task, max_tabs=max_tabs, wait_ms=wait_ms
+                )
+                if not task_execution["success"]:
+                    task_execution_status = "failed"
+                elif task_execution["completed"]:
+                    task_execution_status = "completed"
+                else:
+                    task_execution_status = "blocked"
+                issues = issues + list(task_execution["issues"])
+
         report = build_json_report(
             source,
             issues,
@@ -126,6 +149,7 @@ def run_batch(
             task_blockers=task_blockers,
             source_metadata=source_result,
             browser_result=browser_result,
+            task_execution=task_execution,
         )
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
@@ -159,6 +183,9 @@ def run_batch(
                 "analysis_modes": ["static", "browser"] if browser else ["static"],
                 "browser_status": browser_status,
                 "browser_issue_count": browser_issue_count,
+                "task_execution_status": task_execution_status,
+                "task_steps_passed": task_execution["steps_passed"] if task_execution else "",
+                "task_steps_total": task_execution["steps_total"] if task_execution else "",
                 "reports": {
                     "json": json_path.as_posix(),
                     "markdown": markdown_path.as_posix(),

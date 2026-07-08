@@ -19,6 +19,78 @@
       "generic_link_text",
       "missing_h1",
       "skipped_heading_level"
+    ],
+    "browser_steps": [
+      {
+        "id": "read_page_purpose",
+        "action": "expect_visible_text",
+        "target": "Student Scholarship Application",
+        "description": "Confirm the page purpose is visible."
+      },
+      {
+        "id": "focus_name",
+        "action": "focus_by_label_or_name",
+        "target": "Student name",
+        "fallback_selectors": ["input[name='student_name']", "#student_name"],
+        "description": "Move to the student name field."
+      },
+      {
+        "id": "type_name",
+        "action": "type_text",
+        "value": "Test Student",
+        "description": "Type a sample student name."
+      },
+      {
+        "id": "focus_email",
+        "action": "focus_by_label_or_name",
+        "target": "Email",
+        "fallback_selectors": ["input[name='email']", "#email"],
+        "description": "Move to the email field."
+      },
+      {
+        "id": "type_email",
+        "action": "type_text",
+        "value": "student@example.com",
+        "description": "Type a sample email."
+      },
+      {
+        "id": "focus_school",
+        "action": "focus_by_label_or_name",
+        "target": "School",
+        "fallback_selectors": ["select[name='school']", "#school"],
+        "description": "Move to the school field."
+      },
+      {
+        "id": "select_first_option",
+        "action": "select_first_non_empty_option",
+        "description": "Choose a school option."
+      },
+      {
+        "id": "focus_accommodation_request",
+        "action": "focus_by_label_or_name",
+        "target": "Accommodation request",
+        "fallback_selectors": ["textarea[name='accommodation_request']"],
+        "description": "Move to the accommodation request field."
+      },
+      {
+        "id": "type_accommodation_request",
+        "action": "type_text",
+        "value": "I need accessible digital materials.",
+        "description": "Type a sample accommodation request."
+      },
+      {
+        "id": "submit_form",
+        "action": "activate_by_role_or_text",
+        "target": "Submit application",
+        "fallback_selectors": ["button[type='submit']", "input[type='submit']"],
+        "description": "Submit the application."
+      },
+      {
+        "id": "confirm_submission",
+        "action": "wait_for_text",
+        "target": "Application received",
+        "description": "Confirm the form reports success."
+      }
     ]
   },
   {

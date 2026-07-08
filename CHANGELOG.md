@@ -3,6 +3,26 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## v0.3-deterministic-task-execution
+
+- Deterministic browser task execution (`--browser --execute-task`) for
+  tasks that define explicit `browser_steps`.
+- Keyboard-style task steps for visible-text checks, Tab-based focus,
+  text entry, select option changes, Enter activation, and confirmation
+  text.
+- Pass, blocked, failed, or unavailable task execution results with
+  per-step evidence in JSON and Markdown reports.
+- Batch task execution support (`--execute-tasks`) with status and step
+  counts in batch index, CSV, and evaluation summary outputs.
+- Three task execution rules: `task_step_blocked`,
+  `task_control_not_keyboard_reachable`, and
+  `task_expected_content_missing`.
+- Added accessible and intentionally broken scholarship form samples for
+  browser task execution checks.
+- Added tests for task schema loading, graceful browser-unavailable paths,
+  report output, rule registry coverage, and browser integration when
+  Playwright is available.
+
 ## v0.2-browser-audit
 
 - Optional browser interaction mode (`--browser`) using Playwright and

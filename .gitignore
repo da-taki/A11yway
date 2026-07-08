@@ -23,6 +23,9 @@ build/
 dist/
 *.egg-info/
 
+# Browser runtime noise
+debug.log
+
 # IDE files
 .idea/
 .vscode/

@@ -10,6 +10,9 @@
     "failed_pages": 0,
     "total_issues": 11,
     "total_task_blockers": 9,
+    "tasks_executed": 0,
+    "tasks_completed": 0,
+    "tasks_blocked": 0,
     "counts_by_severity": {
       "high": 6,
       "medium": 5
@@ -74,6 +77,9 @@
       ],
       "browser_status": "",
       "browser_issue_count": 0,
+      "task_execution_status": "",
+      "task_steps_passed": "",
+      "task_steps_total": "",
       "reports": {
         "json": "reports/batch_sample/scholarship_form.json",
         "markdown": "reports/batch_sample/scholarship_form.md"
@@ -116,6 +122,9 @@
       ],
       "browser_status": "",
       "browser_issue_count": 0,
+      "task_execution_status": "",
+      "task_steps_passed": "",
+      "task_steps_total": "",
       "reports": {
         "json": "reports/batch_sample/learning_resources.json",
         "markdown": "reports/batch_sample/learning_resources.md"
