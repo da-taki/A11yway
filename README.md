@@ -1,26 +1,41 @@
 # A11yway
 
-A11yway audits education web pages for accessibility barriers that block real student tasks — static HTML checks by default, an optional headless-browser keyboard audit, and deterministic task execution that proves whether a keyboard-only student can finish a workflow.
+A11yway audits essential web workflows for accessibility barriers that block real tasks. It began with education pages and now supports a broader public-interest accessibility stress-testing direction, with static HTML checks by default, an optional headless-browser keyboard audit, and deterministic task execution that proves whether a keyboard-only user can finish a declared workflow.
 
-**Status: v0.3 prototype — open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review. Tests: 131 passing.
+**Status: prototype, open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review.
 
-Instead of only scanning a page for technical rules, A11yway is built around student tasks: submitting a scholarship form, finding an assignment, accessing a video lesson. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
+Instead of only scanning a page for technical rules, A11yway is built around tasks: submitting a scholarship form, finding an assignment, accessing a video lesson, locating public services, or using a public AI product interface. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
+
+## Responsible Accessibility Stress Testing
+
+A11yway is expanding from education workflow testing into public-interest accessibility stress testing for essential digital workflows. The goal is to help reviewers test whether people can complete important public tasks, then report where access breaks with deterministic evidence.
+
+Example workflow areas include:
+
+- College applications
+- NGO services
+- Government information and service pages
+- AI/LLM product interfaces
+- Scholarships
+- Public resources
+
+A11yway does not do security testing, exploit testing, private data access, scraping behind login, or unauthorized testing. Use it only on public pages or pages where permission was granted.
 
 ## Quickstart: Static Mode
 
-Static mode needs only Python 3.10+ — no external dependencies.
+Static mode needs only Python 3.10+ and no external dependencies.
 
 ```bash
 python -m a11yway.main examples/sample_form.html
 ```
 
-Save reports, optionally in the context of a student task:
+Save reports, optionally in the context of a task:
 
 ```bash
 python -m a11yway.main examples/sample_form.html --task submit_scholarship_application --json reports/sample_form_report.json --markdown reports/sample_form_report.md
 ```
 
-Audit a public page (fetches the static HTML; no JavaScript, no crawling):
+Audit a public page by fetching the static HTML. URL mode does not execute JavaScript and does not crawl.
 
 ```bash
 python -m a11yway.main https://example.com --markdown reports/url_report.md
@@ -37,7 +52,7 @@ Static checks cover form labels, link/button names, image alt text, heading stru
 
 ## Quickstart: Browser Mode
 
-Real education portals build forms and buttons with JavaScript. Browser mode loads the page in headless Chromium, presses Tab repeatedly to trace where keyboard focus actually goes, and re-runs the static checks on the rendered DOM. It begins to answer: can a keyboard-only student actually move through this page?
+Real sites often build forms and buttons with JavaScript. Browser mode loads the page in headless Chromium, presses Tab repeatedly to trace where keyboard focus actually goes, and re-runs the static checks on the rendered DOM.
 
 Install the optional dependency:
 
@@ -56,18 +71,13 @@ Tune with `--max-tabs N` (default 40) and `--wait-ms N` (default 500). [examples
 
 ## Deterministic Task Execution
 
-Normal task mode maps static issues to likely blockers for a student
-workflow. Deterministic task execution goes one step further: with
-`--execute-task`, A11yway attempts a task's scripted steps in the browser
-using **keyboard-only interaction** — focus moves with Tab, text is typed,
-controls are activated with Enter — and reports whether the task passed,
-failed, or was blocked.
+Normal task mode maps static issues to likely blockers for a workflow. Deterministic task execution goes one step further: with `--execute-task`, A11yway attempts a task's scripted steps in the browser using **keyboard-only interaction**. Focus moves with Tab, text is typed, controls are activated with Enter, and the report states whether the task passed, failed, or was blocked.
 
 ```bash
 python -m a11yway.main examples/sample_task_execution_form.html --browser --execute-task submit_scholarship_application --json reports/task_execution_report.json --markdown reports/task_execution_report.md
 ```
 
-The report states either `COMPLETED with keyboard-only interaction` or `BLOCKED at step <id>`, with a per-step table of evidence. The two sample forms show why this matters: [sample_task_execution_form.html](examples/sample_task_execution_form.html) completes all 11 steps, while [sample_task_execution_form_broken.html](examples/sample_task_execution_form_broken.html) passes every static check (all fields labeled) yet gets blocked at submit — its submit control is a click-only div a keyboard user can never reach.
+The report states either `COMPLETED with keyboard-only interaction` or `BLOCKED at step <id>`, with a per-step table of evidence. The two sample forms show why this matters: [sample_task_execution_form.html](examples/sample_task_execution_form.html) completes all 11 steps, while [sample_task_execution_form_broken.html](examples/sample_task_execution_form_broken.html) passes every static check yet gets blocked at submit because its submit control is a click-only div a keyboard user can never reach.
 
 Batch execution works too:
 
@@ -85,6 +95,30 @@ Task execution limitations:
 - Browser mode requires Playwright and Chromium.
 - Use it only on public pages or pages you have permission to test.
 
+## Workflow Packs
+
+Workflow packs are deterministic task templates that help reviewers decide what to test on a page. They are not AI prompts, they do not automatically prove accessibility, and they do not replace deterministic verification.
+
+```bash
+python -m a11yway.main --list-packs
+python -m a11yway.main --show-pack ngo_services
+python -m a11yway.main --suggest-tasks ai_products
+```
+
+You can also provide a source while asking for suggestions:
+
+```bash
+python -m a11yway.main https://example.org --suggest-tasks ngo_services
+```
+
+This still only prints workflow templates. To confirm findings, add page-specific `browser_steps` and use deterministic static, browser, or task execution modes.
+
+## Optional AI Scout Configuration
+
+A11yway does not require AI keys. Deterministic audits work without any `.env` file.
+
+A future optional AI scout mode may use Groq or other providers to propose likely workflows and accessibility risks. The Groq key would live in a local `.env` copied from `.env.example`. AI scout suggestions should remain suggestions: deterministic checks and task execution are the source of confirmed findings in reports.
+
 ## Batch Evaluation
 
 Audit multiple pages in one run:
@@ -96,9 +130,9 @@ python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir repo
 
 Each batch writes per-page JSON/Markdown reports plus:
 
-- `index.json` / `index.md` — batch summary and per-source stats
-- `index.csv` — spreadsheet-friendly benchmark row per page
-- `evaluation_summary.md` — reviewer-facing overview: top issue types, severity breakdown, high priority findings with evidence
+- `index.json` / `index.md` - batch summary and per-source stats
+- `index.csv` - spreadsheet-friendly benchmark row per page
+- `evaluation_summary.md` - reviewer-facing overview: top issue types, severity breakdown, high priority findings with evidence
 
 Example generated output: [reports/batch_sample/evaluation_summary.md](reports/batch_sample/evaluation_summary.md) and [reports/dynamic_form_report.md](reports/dynamic_form_report.md) (from a real headless Chromium run).
 
@@ -118,20 +152,32 @@ Education sites carry forms, documents, videos, assignments, and deadlines. If a
 - Static checks are heuristics on HTML source; URL mode does not execute JavaScript.
 - Browser mode approximates keyboard interaction; accessible names are estimated and need manual review.
 - No full screen-reader simulation.
-- No crawling, no logins, no private or unauthorized testing — public pages or explicit permission only.
+- No crawling, no logins, no private or unauthorized testing. Public pages or explicit permission only.
 - Findings are hints for human reviewers. A11yway does not certify WCAG compliance and does not replace testing with disabled users.
+
+## Ethical Metrics
+
+Use honest, evidence-backed project metrics:
+
+- Audited X websites
+- Sent reports to Y organizations
+- Received feedback from Z organizations
+- Confirmed fixes on N websites
+
+Do not claim "I helped change X websites" unless fixes are confirmed.
 
 ## Documentation
 
-- [docs/RULES.md](docs/RULES.md) — every check: what it detects, why it matters, what it cannot verify
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how a page flows through the tool
-- [docs/ROADMAP.md](docs/ROADMAP.md) — what is planned, and what is deliberately not
-- [docs/RUN_FIRST_EVALUATION_BATCH.md](docs/RUN_FIRST_EVALUATION_BATCH.md) — running a responsible NGO/school review batch
-- [docs/outreach/EVALUATION_PROTOCOL.md](docs/outreach/EVALUATION_PROTOCOL.md) — evaluation protocol for reviewers
-- [docs/outreach/REVIEWER_GUIDE.md](docs/outreach/REVIEWER_GUIDE.md) — guide for accessibility reviewers
-- [CONTRIBUTING.md](CONTRIBUTING.md) — setup, tests, adding rules and sample pages
-- [CHANGELOG.md](CHANGELOG.md) — milestone history
+- [docs/RULES.md](docs/RULES.md) - every check: what it detects, why it matters, what it cannot verify
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - how a page flows through the tool
+- [docs/ROADMAP.md](docs/ROADMAP.md) - what is planned, and what is deliberately not
+- [docs/AI_SCOUT_DESIGN.md](docs/AI_SCOUT_DESIGN.md) - design notes for optional future AI scout mode
+- [docs/RUN_FIRST_EVALUATION_BATCH.md](docs/RUN_FIRST_EVALUATION_BATCH.md) - running a responsible NGO/school review batch
+- [docs/outreach/EVALUATION_PROTOCOL.md](docs/outreach/EVALUATION_PROTOCOL.md) - evaluation protocol for reviewers
+- [docs/outreach/REVIEWER_GUIDE.md](docs/outreach/REVIEWER_GUIDE.md) - guide for accessibility reviewers
+- [CONTRIBUTING.md](CONTRIBUTING.md) - setup, tests, adding rules and sample pages
+- [CHANGELOG.md](CHANGELOG.md) - milestone history
 
 ## Project Direction
 
-In this project, an "agent" is a small simulated student profile with a specific accessibility need. Today the checks are deterministic heuristics plus a basic keyboard traversal; the direction is richer task simulation (see the roadmap). The code is intentionally small and readable for student developers.
+In this project, an "agent" is a small simulated user profile with a specific accessibility need. Today the checks are deterministic heuristics plus browser task execution; future AI scout mode is design/config only and would propose workflows for deterministic verification, not confirm findings by itself. The code is intentionally small and readable for student developers.

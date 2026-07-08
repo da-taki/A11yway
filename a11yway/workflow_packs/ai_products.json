@@ -1,0 +1,193 @@
+{
+  "pack_id": "ai_products",
+  "name": "AI Products",
+  "description": "Workflow templates for reviewing public AI and LLM product interfaces with deterministic accessibility checks.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "open_chat_interface",
+      "name": "Open chat interface",
+      "description": "A visitor tries to reach the primary chat or prompt interface.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open product page",
+        "Find chat or try-now entry point",
+        "Reach prompt interface",
+        "Confirm focus moves into usable controls"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "accessibility_risks": [
+        "keyboard cannot reach prompt controls",
+        "sign-in/paywall modals trap focus",
+        "model selector inaccessible"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "send_prompt",
+      "name": "Send prompt",
+      "description": "A user tries to type a prompt and activate the send control.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Find chat input",
+        "Enter permitted test prompt",
+        "Find send control",
+        "Send prompt with keyboard interaction"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "accessibility_risks": [
+        "chat input missing label",
+        "keyboard cannot reach prompt controls",
+        "error messages vague"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "read_generated_response",
+      "name": "Read generated response",
+      "description": "A user tries to identify when a response is loading and read the generated answer.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Send permitted test prompt",
+        "Identify loading state",
+        "Find generated answer",
+        "Confirm response region is discoverable"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "browser_focus_not_moving",
+        "task_expected_content_missing",
+        "task_step_blocked"
+      ],
+      "accessibility_risks": [
+        "generated answer region not announced",
+        "loading state unclear",
+        "error messages vague"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "change_model_or_mode",
+      "name": "Change model or mode",
+      "description": "A user tries to find and operate a model, mode, or tool selector.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open controls or settings",
+        "Find model or mode selector",
+        "Change selection with keyboard interaction",
+        "Confirm selected mode is visible"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "accessibility_risks": [
+        "model selector inaccessible",
+        "keyboard cannot reach prompt controls",
+        "loading state unclear"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "upload_file",
+      "name": "Upload file",
+      "description": "A user tries to locate a file upload control and understand upload requirements.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Find upload or attachment control",
+        "Identify accepted file requirements",
+        "Reach file chooser control",
+        "Stop before uploading private files"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "accessibility_risks": [
+        "upload controls unclear",
+        "keyboard cannot reach prompt controls",
+        "error messages vague"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "copy_or_export_response",
+      "name": "Copy or export response",
+      "description": "A user tries to copy, download, or export a generated response.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Find generated response",
+        "Find copy or export control",
+        "Activate the control with keyboard interaction",
+        "Confirm the result or status message"
+      ],
+      "relevant_issue_types": [
+        "missing_button_name",
+        "generic_link_text",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_expected_content_missing"
+      ],
+      "accessibility_risks": [
+        "generated answer region not announced",
+        "keyboard cannot reach prompt controls",
+        "error messages vague"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "access_pricing_or_support",
+      "name": "Access pricing or support",
+      "description": "A visitor tries to find pricing, support, or account help information.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open product or support page",
+        "Find pricing or help link",
+        "Identify plan, support, or help details",
+        "Find contact or documentation path"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_button_name",
+        "task_expected_content_missing"
+      ],
+      "accessibility_risks": [
+        "sign-in/paywall modals trap focus",
+        "error messages vague",
+        "keyboard cannot reach prompt controls"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

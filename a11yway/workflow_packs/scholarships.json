@@ -1,0 +1,114 @@
+{
+  "pack_id": "scholarships",
+  "name": "Scholarships",
+  "description": "Workflow templates for reviewing scholarship requirement, form, upload, review, and support pages.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "find_scholarship_requirements",
+      "name": "Find scholarship requirements",
+      "description": "A student tries to find eligibility, documents, and deadlines for a scholarship.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open scholarship page",
+        "Find eligibility section",
+        "Identify deadline and required documents",
+        "Find next steps or support contact"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "fill_scholarship_form",
+      "name": "Fill scholarship form",
+      "description": "A student tries to complete a scholarship form with permitted test data.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open scholarship form",
+        "Identify required fields",
+        "Complete permitted test fields",
+        "Reach review or save step"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "upload_documents",
+      "name": "Upload documents",
+      "description": "A student tries to find and use document upload controls without exposing private files.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open document upload step",
+        "Find upload controls",
+        "Identify accepted file requirements",
+        "Reach upload review state"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "submit_or_reach_review_step",
+      "name": "Submit or reach review step",
+      "description": "A student tries to move through a permitted application flow until review or confirmation.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Complete permitted fields",
+        "Resolve validation messages",
+        "Find continue or review control",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "find_contact_for_help",
+      "name": "Find contact for help",
+      "description": "A student tries to locate support contact details for scholarship questions.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open scholarship information page",
+        "Find contact or help section",
+        "Identify email, phone, or form option",
+        "Find hours or response expectations"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

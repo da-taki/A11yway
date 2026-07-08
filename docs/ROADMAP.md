@@ -1,52 +1,69 @@
 # A11yway Roadmap
 
-This roadmap is practical, not a promise. Priorities will shift based on
-feedback from accessibility reviewers, NGOs, and schools.
+This roadmap is practical, not a promise. Priorities will shift based on feedback from accessibility reviewers, NGOs, schools, and public-interest partners.
 
-## Current: v0.3
+## Current Baseline
 
 - Static HTML checks for local files and public URLs
-- Optional browser mode: keyboard focus traversal and rendered DOM
-  re-checks in headless Chromium
+- Optional browser mode: keyboard focus traversal and rendered DOM re-checks in headless Chromium
 - Task-based education scenarios
 - Deterministic task execution for declared browser steps
 - JSON / Markdown / CSV reports, batch mode, evaluation summaries
 - Rule registry and documentation
-- 131 passing tests
+- Workflow packs for public-interest accessibility testing
 
-## Near-term
+## v0.4 - Workflow Packs
 
-- Playwright installation helper (detect missing browser, offer the exact
-  commands, maybe a `--setup-browser` convenience)
-- Better focus-trap detection (escape-key checks, modal cycling patterns,
-  fewer heuristic gaps)
-- Richer executable step types for task scenarios
-- Better keyboard-only reachability checks beyond the current Tab-search
-  heuristic
-- Visual focus path overlays for reviewer reports
-- Reviewer feedback ingestion (record confirmed/false-positive verdicts
-  next to findings and learn the tool's real precision)
-- Diff/re-audit mode to compare a page before and after fixes
-- Public benchmark runner (repeatable batch over a published page list
-  with tracked results over time)
-- More sample education pages (portals, assignment lists, video lessons,
-  common LMS-style markup)
+- Reusable workflow packs for education, NGO, government, college, AI product, scholarship, and public-resource sites
+- CLI commands to list packs, inspect one pack, and suggest deterministic task templates
+- Responsible-use notes for public pages and permission-based testing
+
+## v0.5 - Visual Proof
+
+- Screenshots
+- Focus-path overlays
+- Per-finding visual evidence
+- Self-contained HTML reports
+
+## v0.6 - Low-Vision Checks
+
+- Rendered color contrast
+- 200% zoom/reflow checks
+- Focus visibility checks
+
+## v0.7 - AI Scout Mode
+
+- Optional Groq/multi-model scout
+- Proposes likely workflows and risks
+- Deterministic executor verifies
+- AI suggestions are never treated as confirmed findings by default
+
+## v0.8 - Reviewer Verdicts
+
+- Confirmed
+- False positive
+- Missed issue
+- Fixed
+- Reviewer feedback dataset
+
+## v0.9 - Re-Audit Diff
+
+- Fixed issues
+- Remaining issues
+- New issues
+- Verified impact over time
 
 ## Later
 
-- PDF support (reading order, tags, alt text, form fields)
-- Authenticated testing with explicit written permission from the
-  organization
-- Screen-reader-assisted testing research (what can be honestly
-  approximated, what cannot)
-- LMS-specific adapters (Moodle, Google Classroom-style exports, and
-  similar education platforms)
+- PDF support for reading order, tags, alt text, and form fields
+- Authenticated testing only with explicit written permission from the organization
+- Screen-reader-assisted testing research: what can be honestly approximated and what cannot
+- LMS-specific adapters for education platforms
 - Mobile accessibility checks
 
-## Not planned yet
+## Not Planned
 
-- Security scanning of any kind
-- Crawling or testing private portals without permission
-- Automated WCAG certification — the tool produces reviewer hints, not
-  conformance claims
-- Replacing human accessibility audits or testing with disabled users
+- Security scanning
+- Private portal crawling without permission
+- Automated WCAG certification
+- Replacing human audits or testing with disabled users

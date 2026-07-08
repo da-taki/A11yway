@@ -3,6 +3,22 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Workflow packs and AI scout configuration
+
+- Added `.env.example` for future optional AI scout configuration with
+  Groq placeholders and responsible-use defaults.
+- Added deterministic workflow pack JSON templates for education, college
+  applications, NGO services, government services, AI products,
+  scholarships, and public resources.
+- Added workflow pack CLI commands: `--list-packs`, `--show-pack`, and
+  `--suggest-tasks`.
+- Expanded the public-interest accessibility stress-testing vision in the
+  README, roadmap, and architecture docs.
+- Added `docs/AI_SCOUT_DESIGN.md` describing optional future scout mode,
+  provider options, safety boundaries, and suggested-vs-confirmed output.
+- No actual AI calls, SDKs, external dependencies, crawling, or API key
+  requirements were added.
+
 ## v0.3-deterministic-task-execution
 
 - Deterministic browser task execution (`--browser --execute-task`) for
