@@ -1,6 +1,7 @@
 """Command-line entry point for the A11yway prototype."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -11,13 +12,26 @@ from a11yway.core.browser_runner import (
     merge_browser_issues,
     run_browser_audit,
 )
+from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
+from a11yway.core.report_diff import (
+    build_diff_markdown,
+    compare_reports,
+    save_diff_json,
+    save_diff_markdown,
+)
 from a11yway.core.report_builder import (
     build_json_report,
     save_html_report,
     save_json_report,
     save_markdown_report,
+)
+from a11yway.core.verdicts import (
+    apply_verdicts_to_report,
+    load_verdicts,
+    save_verdict_summary_markdown,
+    summarize_verdicts,
 )
 from a11yway.core.rules import get_rule, list_rules
 from a11yway.core.source_loader import load_html_source
@@ -114,6 +128,19 @@ def print_browser_summary(
     print(f"   Browser issues: {total_issue_count - static_issue_count}")
     print(f"   Total issues: {total_issue_count}")
     print(f"   Focus trace length: {len(browser_result.get('focus_trace', []))}")
+
+
+def print_low_vision_summary(low_vision_result: dict, total_issue_count: int) -> None:
+    """Print a short breakdown of low-vision browser checks."""
+    print()
+    print("Low-vision checks")
+    if not low_vision_result.get("success"):
+        print(f"   Status: failed ({low_vision_result.get('error')})")
+        return
+    print("   Status: passed")
+    print(f"   Low-vision issues: {len(low_vision_result.get('issues', []))}")
+    print(f"   Contrast samples: {len(low_vision_result.get('contrast_samples', []))}")
+    print(f"   Total issues: {total_issue_count}")
 
 
 def print_task_execution_summary(task_execution: dict) -> None:
@@ -222,6 +249,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Also run the optional keyboard interaction audit (requires Playwright).",
     )
     parser.add_argument(
+        "--low-vision",
+        dest="low_vision",
+        action="store_true",
+        help="Run optional browser-based low-vision checks. Requires --browser.",
+    )
+    parser.add_argument(
         "--execute-task",
         dest="execute_task",
         metavar="TASK",
@@ -275,6 +308,37 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="suggest_tasks",
         metavar="PACK_ID",
         help="Print workflow templates from a pack and exit.",
+    )
+    parser.add_argument(
+        "--apply-verdicts",
+        dest="apply_verdicts",
+        metavar="VERDICTS_JSON",
+        help="Apply reviewer verdicts to an A11yway JSON report.",
+    )
+    parser.add_argument(
+        "--to",
+        dest="verdict_report_json",
+        metavar="REPORT_JSON",
+        help="Input report JSON for --apply-verdicts.",
+    )
+    parser.add_argument(
+        "--out",
+        dest="verdict_output_json",
+        metavar="OUTPUT_JSON",
+        help="Output report JSON for --apply-verdicts.",
+    )
+    parser.add_argument(
+        "--summarize-verdicts",
+        dest="summarize_verdicts",
+        metavar="VERDICTS_JSON",
+        help="Write a Markdown summary for reviewer verdicts.",
+    )
+    parser.add_argument(
+        "--compare-reports",
+        dest="compare_reports",
+        nargs=2,
+        metavar=("OLD_REPORT", "NEW_REPORT"),
+        help="Compare two A11yway JSON reports for re-audit tracking.",
     )
     return parser.parse_args(argv)
 
@@ -397,6 +461,64 @@ def print_workflow_suggestions(pack_id: str, source: str | None = None) -> int:
     return 0
 
 
+def apply_verdicts_cli(verdicts_path: str | None, report_path: str | None, output_path: str | None) -> int:
+    """Apply reviewer verdicts from the CLI."""
+    if not verdicts_path or not report_path or not output_path:
+        print("--apply-verdicts requires --to REPORT_JSON and --out OUTPUT_JSON.")
+        return 1
+    report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    verdicts = load_verdicts(verdicts_path)
+    reviewed = apply_verdicts_to_report(report, verdicts)
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(reviewed, indent=2), encoding="utf-8")
+    summary = reviewed.get("review_summary", {})
+    print(f"Reviewed report saved: {output_path}")
+    print(f"Confirmed: {summary.get('confirmed', 0)}")
+    print(f"False positives: {summary.get('false_positive', 0)}")
+    print(f"Missed issues: {summary.get('missed_issue_count', 0)}")
+    return 0
+
+
+def summarize_verdicts_cli(verdicts_path: str | None, markdown_path: str | None) -> int:
+    """Summarize reviewer verdicts from the CLI."""
+    if not verdicts_path or not markdown_path:
+        print("--summarize-verdicts requires --markdown OUTPUT_MD.")
+        return 1
+    verdicts = load_verdicts(verdicts_path)
+    summary = summarize_verdicts(verdicts)
+    save_verdict_summary_markdown(summary, markdown_path)
+    counts = summary.get("counts", {})
+    print(f"Verdict summary saved: {markdown_path}")
+    print(f"Confirmed: {counts.get('confirmed', 0)}")
+    print(f"False positives: {counts.get('false_positive', 0)}")
+    print(f"Missed issues: {counts.get('missed_issue', 0)}")
+    return 0
+
+
+def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | None, json_path: str | None) -> int:
+    """Compare reports from the CLI."""
+    if not report_paths:
+        print("--compare-reports requires OLD_REPORT and NEW_REPORT.")
+        return 1
+    old_report = json.loads(Path(report_paths[0]).read_text(encoding="utf-8"))
+    new_report = json.loads(Path(report_paths[1]).read_text(encoding="utf-8"))
+    diff = compare_reports(old_report, new_report)
+    if json_path:
+        save_diff_json(diff, json_path)
+        print(f"Diff JSON saved: {json_path}")
+    if markdown_path:
+        save_diff_markdown(diff, markdown_path)
+        print(f"Diff Markdown saved: {markdown_path}")
+    if not json_path and not markdown_path:
+        print(build_diff_markdown(diff))
+    summary = diff.get("summary", {})
+    print(f"Fixed: {summary.get('fixed_count', 0)}")
+    print(f"Remaining: {summary.get('remaining_count', 0)}")
+    print(f"New: {summary.get('new_count', 0)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
     args = argv if argv is not None else sys.argv[1:]
@@ -408,6 +530,26 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.rule_issue_type:
         return print_rule_details(parsed_args.rule_issue_type)
+
+    if parsed_args.apply_verdicts:
+        return apply_verdicts_cli(
+            parsed_args.apply_verdicts,
+            parsed_args.verdict_report_json,
+            parsed_args.verdict_output_json,
+        )
+
+    if parsed_args.summarize_verdicts:
+        return summarize_verdicts_cli(
+            parsed_args.summarize_verdicts,
+            parsed_args.markdown_output,
+        )
+
+    if parsed_args.compare_reports:
+        return compare_reports_cli(
+            parsed_args.compare_reports,
+            parsed_args.markdown_output,
+            parsed_args.json_output,
+        )
 
     if parsed_args.list_packs:
         print_workflow_pack_list()
@@ -422,6 +564,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.visual_proof_dir and not parsed_args.browser:
         print("Visual proof requires browser mode. Add --browser to the command.")
+        return 1
+
+    if parsed_args.low_vision and not parsed_args.browser:
+        print("Low-vision checks require browser mode. Add --browser to the command.")
         return 1
 
     if (parsed_args.execute_task or parsed_args.execute_tasks) and not parsed_args.browser:
@@ -442,11 +588,14 @@ def main(argv: list[str] | None = None) -> int:
             wait_ms=parsed_args.wait_ms,
             execute_tasks=parsed_args.execute_tasks,
             html_reports=parsed_args.html_reports,
+            low_vision=parsed_args.low_vision,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
         if parsed_args.browser:
             print("Browser mode: enabled")
+        if parsed_args.low_vision:
+            print("Low-vision checks: enabled")
         print(f"Batch file: {batch_result['config_path']}")
         print(f"Pages tested: {summary['total_pages_tested']}")
         print(f"Total issues: {summary['total_issues']}")
@@ -485,6 +634,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     browser_result = None
+    low_vision_result = None
     static_issue_count = len(issues)
     if parsed_args.browser:
         browser_result = run_browser_audit(
@@ -495,6 +645,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         issues = merge_browser_issues(issues, browser_result)
     browser_issue_total = len(issues)
+    if parsed_args.low_vision:
+        low_vision_result = run_low_vision_audit_for_source(
+            source,
+            wait_ms=parsed_args.wait_ms,
+        )
+        issues = issues + list(low_vision_result.get("issues", []))
 
     task_execution = None
     if execute_task_obj is not None:
@@ -510,6 +666,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if browser_result is not None:
         print_browser_summary(browser_result, static_issue_count, browser_issue_total)
+
+    if low_vision_result is not None:
+        print_low_vision_summary(low_vision_result, len(issues))
 
     if task_execution is not None:
         print_task_execution_summary(task_execution)
@@ -539,6 +698,7 @@ def main(argv: list[str] | None = None) -> int:
             source_metadata=source_result,
             browser_result=browser_result,
             task_execution=task_execution,
+            low_vision_result=low_vision_result,
         )
 
     if parsed_args.json_output:

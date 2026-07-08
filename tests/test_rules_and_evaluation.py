@@ -49,10 +49,18 @@ EXPECTED_TASK_EXECUTION_ISSUE_TYPES = {
     "task_expected_content_missing",
 }
 
+EXPECTED_LOW_VISION_ISSUE_TYPES = {
+    "low_contrast_text",
+    "zoom_horizontal_overflow",
+    "zoom_fixed_width_content",
+    "focus_indicator_missing",
+}
+
 EXPECTED_ISSUE_TYPES = (
     EXPECTED_STATIC_ISSUE_TYPES
     | EXPECTED_BROWSER_ISSUE_TYPES
     | EXPECTED_TASK_EXECUTION_ISSUE_TYPES
+    | EXPECTED_LOW_VISION_ISSUE_TYPES
 )
 
 

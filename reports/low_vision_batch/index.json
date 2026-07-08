@@ -1,0 +1,100 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "summary": {
+    "analysis_modes": [
+      "static",
+      "browser",
+      "low_vision"
+    ],
+    "total_pages_tested": 1,
+    "successful_pages": 1,
+    "failed_pages": 0,
+    "total_issues": 7,
+    "total_task_blockers": 0,
+    "tasks_executed": 0,
+    "tasks_completed": 0,
+    "tasks_blocked": 0,
+    "html_reports": 1,
+    "low_vision_issues": 7,
+    "counts_by_severity": {
+      "high": 4,
+      "medium": 3
+    },
+    "counts_by_issue_type": {
+      "low_contrast_text": 2,
+      "zoom_horizontal_overflow": 1,
+      "zoom_fixed_width_content": 3,
+      "focus_indicator_missing": 1
+    }
+  },
+  "sources": [
+    {
+      "id": "low_vision_sample",
+      "name": "Low Vision Sample Page",
+      "source": "examples/sample_low_vision_page.html",
+      "source_type": "file",
+      "task": "",
+      "status": "passed",
+      "error": "",
+      "issue_count": 7,
+      "task_blocker_count": 0,
+      "counts_by_severity": {
+        "high": 4,
+        "medium": 3
+      },
+      "counts_by_issue_type": {
+        "low_contrast_text": 2,
+        "zoom_horizontal_overflow": 1,
+        "zoom_fixed_width_content": 3,
+        "focus_indicator_missing": 1
+      },
+      "high_severity_issues": [
+        {
+          "issue_type": "low_contrast_text",
+          "message": "Rendered text may have low contrast",
+          "snippet": ""
+        },
+        {
+          "issue_type": "low_contrast_text",
+          "message": "Rendered text may have low contrast",
+          "snippet": ""
+        },
+        {
+          "issue_type": "zoom_horizontal_overflow",
+          "message": "Page has horizontal overflow in a narrow viewport",
+          "snippet": ""
+        },
+        {
+          "issue_type": "focus_indicator_missing",
+          "message": "Focused element may not show a visible focus indicator",
+          "snippet": ""
+        }
+      ],
+      "analysis_modes": [
+        "static",
+        "browser",
+        "low_vision"
+      ],
+      "browser_status": "passed",
+      "browser_issue_count": 0,
+      "low_vision_status": "passed",
+      "low_vision_issue_count": 7,
+      "task_execution_status": "",
+      "task_steps_passed": "",
+      "task_steps_total": "",
+      "reports": {
+        "json": "reports/low_vision_batch/low_vision_sample.json",
+        "markdown": "reports/low_vision_batch/low_vision_sample.md",
+        "html": "reports/low_vision_batch/low_vision_sample.html"
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ],
+  "csv_index_path": "reports/low_vision_batch/index.csv",
+  "evaluation_summary_path": "reports/low_vision_batch/evaluation_summary.md"
+}

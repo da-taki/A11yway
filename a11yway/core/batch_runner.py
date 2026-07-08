@@ -11,6 +11,7 @@ from a11yway.core.browser_runner import (
     merge_browser_issues,
     run_browser_audit,
 )
+from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
     build_batch_index_report,
@@ -57,6 +58,7 @@ def run_batch(
     wait_ms: int = 500,
     execute_tasks: bool = False,
     html_reports: bool = False,
+    low_vision: bool = False,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
@@ -91,9 +93,15 @@ def run_batch(
                     "counts_by_severity": {},
                     "counts_by_issue_type": {},
                     "high_severity_issues": [],
-                    "analysis_modes": ["static", "browser"] if browser else ["static"],
+                    "analysis_modes": (
+                        ["static", "browser", "low_vision"]
+                        if browser and low_vision
+                        else ["static", "browser"] if browser else ["static"]
+                    ),
                     "browser_status": "",
                     "browser_issue_count": 0,
+                    "low_vision_status": "",
+                    "low_vision_issue_count": 0,
                     "task_execution_status": "",
                     "task_steps_passed": "",
                     "task_steps_total": "",
@@ -107,9 +115,14 @@ def run_batch(
         browser_result = None
         browser_status = ""
         browser_issue_count = 0
+        low_vision_result = None
+        low_vision_status = ""
+        low_vision_issue_count = 0
         if browser:
             if not is_playwright_available():
                 browser_status = "unavailable"
+                if low_vision:
+                    low_vision_status = "unavailable"
             else:
                 visual_proof_dir = (
                     output_dir / "visual" / item_id if html_reports else None
@@ -124,6 +137,16 @@ def run_batch(
                 issues = merge_browser_issues(issues, browser_result)
                 browser_issue_count = len(issues) - static_issue_count
                 browser_status = "passed" if browser_result["success"] else "failed"
+                if low_vision:
+                    low_vision_result = run_low_vision_audit_for_source(
+                        source,
+                        wait_ms=wait_ms,
+                    )
+                    low_vision_status = (
+                        "passed" if low_vision_result.get("success") else "failed"
+                    )
+                    low_vision_issue_count = len(low_vision_result.get("issues", []))
+                    issues = issues + list(low_vision_result.get("issues", []))
 
         selected_task = None
         task_blockers: list[dict] = []
@@ -158,6 +181,7 @@ def run_batch(
             source_metadata=source_result,
             browser_result=browser_result,
             task_execution=task_execution,
+            low_vision_result=low_vision_result,
         )
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
@@ -198,9 +222,15 @@ def run_batch(
                 "counts_by_severity": report["summary"]["counts_by_severity"],
                 "counts_by_issue_type": report["summary"]["counts_by_issue_type"],
                 "high_severity_issues": high_severity_issues,
-                "analysis_modes": ["static", "browser"] if browser else ["static"],
+                "analysis_modes": (
+                    ["static", "browser", "low_vision"]
+                    if browser and low_vision
+                    else ["static", "browser"] if browser else ["static"]
+                ),
                 "browser_status": browser_status,
                 "browser_issue_count": browser_issue_count,
+                "low_vision_status": low_vision_status,
+                "low_vision_issue_count": low_vision_issue_count,
                 "task_execution_status": task_execution_status,
                 "task_steps_passed": task_execution["steps_passed"] if task_execution else "",
                 "task_steps_total": task_execution["steps_total"] if task_execution else "",

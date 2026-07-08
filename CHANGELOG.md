@@ -3,6 +3,21 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Low-vision checks, reviewer verdicts, and re-audit diff tracking
+
+- Added optional browser-based low-vision checks with `--browser --low-vision`
+  for rendered contrast samples, reflow approximation, and focus visibility.
+- Added low-vision issue types and rule documentation:
+  `low_contrast_text`, `zoom_horizontal_overflow`,
+  `zoom_fixed_width_content`, and `focus_indicator_missing`.
+- Added reviewer verdict ingestion with `--apply-verdicts` and
+  `--summarize-verdicts`.
+- Added re-audit diff tracking with `--compare-reports`.
+- Added sample low-vision page/batch, sample verdicts, and generated
+  low-vision/verdict/diff reports.
+- Kept browser mode optional and avoided AI, OCR, PDF, crawling, security
+  testing, and heavy visual dependencies.
+
 ## Unreleased - Visual proof reports
 
 - Added self-contained HTML report export with `--html`.

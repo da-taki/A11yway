@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Accessibility Report</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }
+header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }
+header { background: #ffffff; border-bottom: 1px solid #d8deea; }
+section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }
+h1, h2, h3 { line-height: 1.2; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: #eef2f7; }
+code, pre { background: #eef2f7; }
+pre { overflow-x: auto; padding: 0.75rem; }
+.meta { color: #526071; }
+.issue { border-top: 4px solid #5067a3; }
+.high { border-top-color: #b42318; }
+.medium { border-top-color: #b86e00; }
+.low { border-top-color: #367a45; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Accessibility Report</h1>
+<p class="meta">Source: examples/sample_low_vision_page.html</p>
+</header>
+<main>
+<section>
+<h2>Summary</h2>
+<p>Issues found: <strong>7</strong></p>
+<p>Agents used: Keyboard-only student</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot, rendered_color_contrast, zoom_reflow_200, focus_visibility</p>
+<h3>Counts By Severity</h3>
+<ul><li><code>high</code>: 4</li><li><code>medium</code>: 3</li></ul>
+<h3>Counts By Issue Type</h3>
+<ul><li><code>low_contrast_text</code>: 2</li><li><code>zoom_horizontal_overflow</code>: 1</li><li><code>zoom_fixed_width_content</code>: 3</li><li><code>focus_indicator_missing</code>: 1</li></ul>
+</section>
+<section>
+<h2>Source Metadata</h2>
+<table><tbody>
+<tr><th>Input</th><td>examples/sample_low_vision_page.html</td></tr>
+<tr><th>Type</th><td>file</td></tr>
+<tr><th>Final URL</th><td></td></tr>
+<tr><th>Status code</th><td></td></tr>
+<tr><th>Content type</th><td>text/html</td></tr>
+</tbody></table>
+</section>
+<section>
+<h2>Analysis Modes</h2>
+<ul><li>static</li><li>browser</li><li>low_vision</li></ul>
+</section>
+<section>
+<h2>Browser Interaction Trace</h2>
+<p>Browser audit success: true</p>
+<p>Focus trace length: 3</p>
+<table><thead><tr><th>Step</th><th>Tag</th><th>Accessible name guess</th><th>ID/Name</th><th>Text/Href</th></tr></thead><tbody>
+<tr><td>1</td><td>a</td><td>Low contrast help link</td><td></td><td>Low contrast help link</td></tr>
+<tr><td>2</td><td>button</td><td>Button without visible focus</td><td></td><td>Button without visible focus</td></tr>
+<tr><td>3</td><td>a</td><td>Good visible focus link</td><td></td><td>Good visible focus link</td></tr>
+</tbody></table>
+<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li></ul>
+</section>
+<section>
+<h2>Low-Vision Checks</h2>
+<p>Status: passed</p>
+<p>Checks run: rendered_color_contrast, zoom_reflow_200, focus_visibility</p>
+<p>Contrast samples analyzed: 10</p>
+<table><tbody>
+<tr><th>Viewport width</th><td>640</td></tr>
+<tr><th>Document scroll width</th><td>1038</td></tr>
+<tr><th>Horizontal overflow amount</th><td>398</td></tr>
+<tr><th>Focus stops checked</th><td>3</td></tr>
+<tr><th>Focus indicator concerns</th><td>1</td></tr>
+</tbody></table>
+<ul><li>Low-vision checks use browser-computed styles and conservative heuristics.</li><li>Rendered color contrast checks do not prove full WCAG conformance.</li><li>Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.</li><li>Focus indicator detection may miss custom focus styles.</li></ul>
+</section>
+<section>
+<h2>Visual Proof</h2>
+<p>Visual proof is an evidence aid for manual review. It is not accessibility certification.</p>
+<p>Screenshot: <a href="reports/low_vision_batch/visual/low_vision_sample/page.png">reports/low_vision_batch/visual/low_vision_sample/page.png</a></p>
+<p>Observed focus path overlay: <a href="reports/low_vision_batch/visual/low_vision_sample/focus_path.html">reports/low_vision_batch/visual/low_vision_sample/focus_path.html</a></p>
+<p>Focus points count: 3</p>
+<ul><li>Focus overlay shows observed Tab stops in this browser run.</li><li>It does not represent every assistive technology experience.</li></ul>
+</section>
+<section>
+<h2>Issues Found</h2>
+<article class="issue high">
+<h3>1. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: high</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>p</td></tr><tr><th>text</th><td>This paragraph intentionally has low contrast for testing.</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>2. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: high</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Low contrast help link</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>3. Page has horizontal overflow in a narrow viewport</h3>
+<p>Issue type: <code>zoom_horizontal_overflow</code></p>
+<p>Severity: high</p>
+<p>Rule: Page has horizontal overflow under zoom/reflow stress</p>
+<p>Why it matters: Horizontal scrolling can make pages difficult or impossible to use for low-vision readers who zoom or use narrow viewports.</p>
+<p>Suggested fix: Use responsive layout, avoid fixed-width containers, and test reflow at high zoom.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>At a narrow viewport used to approximate 200% zoom/reflow stress, the document is wider than the viewport.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>4. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>main</td></tr><tr><th>text</th><td>Low Vision Sample Page This paragraph has readable contrast and responsive layou</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>5. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h1</td></tr><tr><th>text</th><td>Low Vision Sample Page</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>6. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>p</td></tr><tr><th>text</th><td>This paragraph has readable contrast and responsive layout.</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>7. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>button</td></tr><tr><th>text</th><td>Button without visible focus</td></tr><tr><th>step</th><td>2</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+</section>
+<section>
+<h2>Limitations</h2>
+<ul><li>This prototype runs static HTML checks plus a basic keyboard interaction audit.</li><li>It does not replace a full human accessibility audit.</li><li>Browser mode does not simulate a full screen reader, and accessible names are estimated.</li><li>Low-vision browser checks are conservative heuristics and require manual review.</li></ul>
+</section>
+</main>
+</body>
+</html>

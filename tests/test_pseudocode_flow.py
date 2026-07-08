@@ -707,6 +707,8 @@ def test_batch_csv_has_expected_headers(tmp_path: Path) -> None:
             "task_blockers",
             "browser_status",
             "browser_issue_count",
+            "low_vision_status",
+            "low_vision_issue_count",
             "task_execution_status",
             "task_steps_passed",
             "task_steps_total",

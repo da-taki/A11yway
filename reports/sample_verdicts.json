@@ -1,0 +1,25 @@
+{
+  "reviewer": {
+    "name": "Example Reviewer",
+    "organization": "Example Org",
+    "role": "Accessibility reviewer",
+    "permission_to_quote": false,
+    "permission_to_name_organization": false
+  },
+  "source_report": "reports/task_execution_report.json",
+  "verdicts": [],
+  "missed_issues": [
+    {
+      "issue_type": "unclear_error_message",
+      "severity": "medium",
+      "description": "The form error message appears only visually and may not be announced.",
+      "evidence": "Observed during manual review of a representative workflow."
+    }
+  ],
+  "overall_feedback": {
+    "accuracy_rating": 4,
+    "usefulness_rating": 5,
+    "clarity_rating": 4,
+    "would_use_again": true
+  }
+}

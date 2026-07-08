@@ -77,6 +77,7 @@ def build_json_report(
     source_metadata: dict | None = None,
     browser_result: dict | None = None,
     task_execution: dict | None = None,
+    low_vision_result: dict | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
     checks_run = list(STATIC_CHECKS_RUN)
@@ -92,6 +93,12 @@ def build_json_report(
             "It does not replace a full human accessibility audit.",
             "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
         ]
+    if low_vision_result is not None:
+        checks_run.extend(low_vision_result.get("checks_run", []))
+        if "Low-vision browser checks are conservative heuristics and require manual review." not in limitations:
+            limitations.append(
+                "Low-vision browser checks are conservative heuristics and require manual review."
+            )
 
     report = {
         "tool": "A11yway",
@@ -139,7 +146,10 @@ def build_json_report(
         }
 
     if browser_result is not None:
-        report["analysis_modes"] = ["static", "browser"]
+        analysis_modes = ["static", "browser"]
+        if low_vision_result is not None:
+            analysis_modes.append("low_vision")
+        report["analysis_modes"] = analysis_modes
         report["browser"] = {
             "success": browser_result.get("success", False),
             "error": browser_result.get("error"),
@@ -151,6 +161,19 @@ def build_json_report(
         visual_proof = _visual_proof_for_report(browser_result.get("visual_proof"))
         if visual_proof is not None:
             report["visual_proof"] = visual_proof
+
+    if low_vision_result is not None:
+        if "analysis_modes" not in report:
+            report["analysis_modes"] = ["static", "low_vision"]
+        report["low_vision"] = {
+            "success": low_vision_result.get("success", False),
+            "error": low_vision_result.get("error"),
+            "checks_run": low_vision_result.get("checks_run", []),
+            "contrast_sample_count": len(low_vision_result.get("contrast_samples", [])),
+            "zoom_reflow": low_vision_result.get("zoom_reflow", {}),
+            "focus_visibility": low_vision_result.get("focus_visibility", {}),
+            "limitations": low_vision_result.get("limitations", []),
+        }
 
     if task_execution is not None:
         report["task_execution"] = {
@@ -285,6 +308,32 @@ def build_markdown_report(report: dict) -> str:
         if browser.get("limitations"):
             lines.extend(["### Browser Limitations", ""])
             lines.extend(f"- {limitation}" for limitation in browser["limitations"])
+            lines.append("")
+
+    low_vision = report.get("low_vision")
+    if low_vision is not None:
+        zoom = low_vision.get("zoom_reflow", {})
+        focus = low_vision.get("focus_visibility", {})
+        lines.extend(
+            [
+                "## Low-Vision Checks",
+                "",
+                f"- Status: {'passed' if low_vision.get('success') else 'failed'}",
+                f"- Checks run: {', '.join(low_vision.get('checks_run', []))}",
+                f"- Contrast samples analyzed: {low_vision.get('contrast_sample_count', 0)}",
+                f"- Viewport width for reflow check: {zoom.get('viewport_width', '')}",
+                f"- Document scroll width: {zoom.get('document_scroll_width', '')}",
+                f"- Horizontal overflow amount: {zoom.get('overflow_amount', '')}",
+                f"- Focus stops checked: {focus.get('checked_count', 0)}",
+                f"- Focus indicator concerns: {focus.get('flagged_count', 0)}",
+                "",
+            ]
+        )
+        if low_vision.get("error"):
+            lines.extend([f"- Error: {low_vision['error']}", ""])
+        if low_vision.get("limitations"):
+            lines.extend(["### Low-Vision Limitations", ""])
+            lines.extend(f"- {limitation}" for limitation in low_vision["limitations"])
             lines.append("")
 
     visual_proof = report.get("visual_proof")
@@ -637,6 +686,31 @@ def build_html_report(report: dict) -> str:
         lines.append(_html_list(browser.get("limitations", [])))
         lines.append("</section>")
 
+    low_vision = report.get("low_vision")
+    if low_vision is not None:
+        zoom = low_vision.get("zoom_reflow", {})
+        focus = low_vision.get("focus_visibility", {})
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Low-Vision Checks</h2>",
+                f"<p>Status: {escape('passed' if low_vision.get('success') else 'failed')}</p>",
+                f"<p>Checks run: {escape(', '.join(low_vision.get('checks_run', [])))}</p>",
+                f"<p>Contrast samples analyzed: {low_vision.get('contrast_sample_count', 0)}</p>",
+                "<table><tbody>",
+                f"<tr><th>Viewport width</th><td>{escape(str(zoom.get('viewport_width', '')))}</td></tr>",
+                f"<tr><th>Document scroll width</th><td>{escape(str(zoom.get('document_scroll_width', '')))}</td></tr>",
+                f"<tr><th>Horizontal overflow amount</th><td>{escape(str(zoom.get('overflow_amount', '')))}</td></tr>",
+                f"<tr><th>Focus stops checked</th><td>{escape(str(focus.get('checked_count', 0)))}</td></tr>",
+                f"<tr><th>Focus indicator concerns</th><td>{escape(str(focus.get('flagged_count', 0)))}</td></tr>",
+                "</tbody></table>",
+            ]
+        )
+        if low_vision.get("error"):
+            lines.append(f"<p>Error: {escape(str(low_vision['error']))}</p>")
+        lines.append(_html_list(low_vision.get("limitations", [])))
+        lines.append("</section>")
+
     visual_proof = report.get("visual_proof")
     if visual_proof is not None:
         lines.extend(["<section>", "<h2>Visual Proof</h2>"])
@@ -718,6 +792,8 @@ def build_batch_index_report(items: list[dict]) -> dict:
     analysis_modes = ["static"]
     if any("browser" in item.get("analysis_modes", []) for item in items):
         analysis_modes = ["static", "browser"]
+    if any("low_vision" in item.get("analysis_modes", []) for item in items):
+        analysis_modes = [mode for mode in ["static", "browser", "low_vision"] if mode == "static" or any(mode in item.get("analysis_modes", []) for item in items)]
     executed = [item for item in items if item.get("task_execution_status")]
     html_reports = [item for item in items if item.get("reports", {}).get("html")]
 
@@ -741,6 +817,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
                 1 for item in executed if item.get("task_execution_status") == "blocked"
             ),
             "html_reports": len(html_reports),
+            "low_vision_issues": sum(item.get("low_vision_issue_count", 0) for item in items),
             "counts_by_severity": counts_by_severity,
             "counts_by_issue_type": counts_by_issue_type,
         },
@@ -828,6 +905,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
         "task_blockers",
         "browser_status",
         "browser_issue_count",
+        "low_vision_status",
+        "low_vision_issue_count",
         "task_execution_status",
         "task_steps_passed",
         "task_steps_total",
@@ -860,6 +939,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
                     "task_blockers": item.get("task_blocker_count", 0),
                     "browser_status": item.get("browser_status", ""),
                     "browser_issue_count": item.get("browser_issue_count", 0),
+                    "low_vision_status": item.get("low_vision_status", ""),
+                    "low_vision_issue_count": item.get("low_vision_issue_count", 0),
                     "task_execution_status": item.get("task_execution_status", ""),
                     "task_steps_passed": item.get("task_steps_passed", ""),
                     "task_steps_total": item.get("task_steps_total", ""),
@@ -898,6 +979,7 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
         f"- Total issues: {summary.get('total_issues', 0)}",
         f"- Total task blockers: {summary.get('total_task_blockers', 0)}",
         f"- HTML reports: {summary.get('html_reports', 0)}",
+        f"- Low-vision issues: {summary.get('low_vision_issues', 0)}",
         "",
         "## Top Issue Types",
         "",
