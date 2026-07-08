@@ -126,5 +126,12 @@
         "task_impact": "Audio content may be inaccessible to students who need a transcript."
       }
     ]
+  },
+  "source": {
+    "input": "examples/sample_resource_page.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
   }
 }

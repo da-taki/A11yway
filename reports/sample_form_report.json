@@ -184,5 +184,12 @@
         "task_impact": "Student may struggle to understand the page structure and task sections."
       }
     ]
+  },
+  "source": {
+    "input": "examples/sample_form.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
   }
 }

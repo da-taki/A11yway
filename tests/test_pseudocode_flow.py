@@ -1,7 +1,9 @@
 """Lightweight tests for the A11yway pseudocode scaffold."""
 
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
+import threading
 
 from a11yway.agents.dyslexia_agent import DyslexiaAgent
 from a11yway.agents.hearing_agent import HearingAgent
@@ -25,6 +27,7 @@ from a11yway.core.report_builder import (
     save_json_report,
     save_markdown_report,
 )
+from a11yway.core.source_loader import is_url, load_html_source
 from a11yway.core.task_runner import (
     TaskRunner,
     build_task_blockers,
@@ -48,6 +51,37 @@ def evidence_text_for(issues: list) -> str:
         else:
             parts.append(issue.evidence)
     return " ".join(parts)
+
+
+class _StaticHTMLHandler(BaseHTTPRequestHandler):
+    """Small local HTTP handler for URL loading tests."""
+
+    def do_GET(self) -> None:
+        """Serve one static HTML response."""
+        body = b'<!doctype html><html lang="en"><head><title>Test</title></head><body><h1>Test</h1></body></html>'
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, format: str, *args) -> None:
+        """Keep test output quiet."""
+        return
+
+
+def load_from_local_test_server() -> dict:
+    """Load HTML through a local standard-library HTTP server."""
+    server = HTTPServer(("127.0.0.1", 0), _StaticHTMLHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
+    try:
+        host, port = server.server_address
+        return load_html_source(f"http://{host}:{port}/")
+    finally:
+        server.shutdown()
+        thread.join(timeout=5)
 
 
 def test_sample_agents_can_be_instantiated() -> None:
@@ -134,6 +168,32 @@ def test_keyboard_agent_uses_html_form_analyzer() -> None:
 def test_sample_form_fixture_exists() -> None:
     """The CLI sample fixture should be present."""
     assert Path("examples/sample_form.html").exists()
+
+
+def test_is_url_detects_http_and_https() -> None:
+    """Only http and https sources should be treated as URLs."""
+    assert is_url("https://example.com")
+    assert is_url("http://example.com")
+    assert not is_url("examples/sample_form.html")
+
+
+def test_load_html_source_reads_local_file() -> None:
+    """Source loader should read local HTML fixtures."""
+    result = load_html_source("examples/sample_form.html")
+
+    assert result["source_type"] == "file"
+    assert result["error"] is None
+    assert "Student Scholarship Application" in result["html"]
+
+
+def test_load_html_source_reads_local_http_server() -> None:
+    """URL loading should work with a local standard-library HTTP server."""
+    result = load_from_local_test_server()
+
+    assert result["source_type"] == "url"
+    assert result["status_code"] == 200
+    assert result["error"] is None
+    assert "<h1>Test</h1>" in result["html"]
 
 
 def test_sample_form_returns_expected_missing_label_count() -> None:
@@ -450,6 +510,20 @@ def test_json_report_includes_task_data_when_task_is_provided() -> None:
     assert len(report["task"]["likely_blockers"]) == 5
 
 
+def test_json_report_includes_source_metadata() -> None:
+    """JSON reports should include optional source metadata."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    source_metadata = load_html_source("examples/sample_form.html")
+    report = build_json_report(
+        "examples/sample_form.html",
+        issues,
+        source_metadata=source_metadata,
+    )
+
+    assert report["source"]["input"] == "examples/sample_form.html"
+    assert report["source"]["type"] == "file"
+
+
 def test_build_markdown_report_returns_string() -> None:
     """Markdown report builder should return a string."""
     issues = analyze_html_file(Path("examples/sample_form.html"))
@@ -604,6 +678,39 @@ def test_batch_index_markdown_includes_sources_and_total(tmp_path: Path) -> None
     assert "Student Scholarship Application" in markdown
     assert "Learning Resources Page" in markdown
     assert f"- Total issues: {result['index']['summary']['total_issues']}" in markdown
+
+
+def test_batch_runner_continues_if_one_source_fails(tmp_path: Path) -> None:
+    """Batch mode should include failed sources in the index and continue."""
+    config_path = tmp_path / "batch_with_failure.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "id": "valid_page",
+                    "name": "Valid Page",
+                    "source": "examples/sample_form.html",
+                    "task": "submit_scholarship_application",
+                },
+                {
+                    "id": "missing_page",
+                    "name": "Missing Page",
+                    "source": str(tmp_path / "missing.html"),
+                    "task": "access_learning_resources",
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_batch(config_path, tmp_path / "batch_output")
+    sources = result["index"]["sources"]
+
+    assert result["index"]["summary"]["total_pages_tested"] == 2
+    assert sources[0]["status"] == "passed"
+    assert sources[1]["status"] == "failed"
+    assert sources[1]["issue_count"] == 0
+    assert sources[1]["error"]
 
 
 def test_cli_batch_mode_writes_index(tmp_path: Path, capsys) -> None:
