@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Accessibility Report</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }
+header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }
+header { background: #ffffff; border-bottom: 1px solid #d8deea; }
+section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }
+h1, h2, h3 { line-height: 1.2; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: #eef2f7; }
+code, pre { background: #eef2f7; }
+pre { overflow-x: auto; padding: 0.75rem; }
+.meta { color: #526071; }
+.issue { border-top: 4px solid #5067a3; }
+.high { border-top-color: #b42318; }
+.medium { border-top-color: #b86e00; }
+.low { border-top-color: #367a45; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Accessibility Report</h1>
+<p class="meta">Source: examples/sample_task_execution_form_broken.html</p>
+</header>
+<main>
+<section>
+<h2>Summary</h2>
+<p>Issues found: <strong>1</strong></p>
+<p>Agents used: Keyboard-only student</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot</p>
+<h3>Counts By Severity</h3>
+<ul><li><code>high</code>: 1</li></ul>
+<h3>Counts By Issue Type</h3>
+<ul><li><code>task_step_blocked</code>: 1</li></ul>
+</section>
+<section>
+<h2>Source Metadata</h2>
+<table><tbody>
+<tr><th>Input</th><td>examples/sample_task_execution_form_broken.html</td></tr>
+<tr><th>Type</th><td>file</td></tr>
+<tr><th>Final URL</th><td></td></tr>
+<tr><th>Status code</th><td></td></tr>
+<tr><th>Content type</th><td>text/html</td></tr>
+</tbody></table>
+</section>
+<section>
+<h2>Analysis Modes</h2>
+<ul><li>static</li><li>browser</li></ul>
+</section>
+<section>
+<h2>Task Context</h2>
+<p>Task name: Submit scholarship application</p>
+<p>Student profile: Keyboard-only student</p>
+<h3>Required Actions</h3>
+<ul><li>Read the page purpose</li><li>Enter name</li><li>Enter email</li><li>Choose school</li><li>Describe accommodation request</li><li>Submit the form</li></ul>
+<h3>Likely Blockers</h3>
+<p>None found for this task.</p>
+</section>
+<section>
+<h2>Task Execution</h2>
+<p>Task: Submit scholarship application</p>
+<p>Deterministic task execution result: <strong>BLOCKED at step submit_form</strong></p>
+<p>Steps passed: 9 of 11</p>
+<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Detail</th></tr></thead><tbody>
+<tr><td>read_page_purpose</td><td>expect_visible_text</td><td>passed</td><td>Text is visible on the page.</td></tr>
+<tr><td>focus_name</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: input).</td></tr>
+<tr><td>type_name</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
+<tr><td>focus_email</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: input).</td></tr>
+<tr><td>type_email</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
+<tr><td>focus_school</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: select).</td></tr>
+<tr><td>select_first_option</td><td>select_first_non_empty_option</td><td>passed</td><td>Selected option with ArrowDown (value: &quot;greenfield&quot;).</td></tr>
+<tr><td>focus_accommodation_request</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: textarea).</td></tr>
+<tr><td>type_accommodation_request</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
+<tr><td>submit_form</td><td>activate_by_role_or_text</td><td>failed</td><td>No keyboard-activatable control matched this step.</td></tr>
+<tr><td>confirm_submission</td><td>wait_for_text</td><td>skipped</td><td>Skipped because an earlier step was blocked.</td></tr>
+</tbody></table>
+<ul><li>Task steps are deterministic scripts; a human may find a workaround the script does not try.</li><li>Step results show keyboard operability, not full assistive technology behavior.</li></ul>
+</section>
+<section>
+<h2>Browser Interaction Trace</h2>
+<p>Browser audit success: true</p>
+<p>Focus trace length: 4</p>
+<table><thead><tr><th>Step</th><th>Tag</th><th>Accessible name guess</th><th>ID/Name</th><th>Text/Href</th></tr></thead><tbody>
+<tr><td>1</td><td>input</td><td>Student name</td><td>student_name</td><td></td></tr>
+<tr><td>2</td><td>input</td><td>Email</td><td>email</td><td></td></tr>
+<tr><td>3</td><td>select</td><td>School</td><td>school</td><td>Choose a school Greenfield High School Riverside Academy</td></tr>
+<tr><td>4</td><td>textarea</td><td>Accommodation request</td><td>accommodation_request</td><td></td></tr>
+</tbody></table>
+<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li></ul>
+</section>
+<section>
+<h2>Visual Proof</h2>
+<p>Visual proof is an evidence aid for manual review. It is not accessibility certification.</p>
+<p>Screenshot: <a href="reports/task_execution_batch/visual/broken_application_form/page.png">reports/task_execution_batch/visual/broken_application_form/page.png</a></p>
+<p>Observed focus path overlay: <a href="reports/task_execution_batch/visual/broken_application_form/focus_path.html">reports/task_execution_batch/visual/broken_application_form/focus_path.html</a></p>
+<p>Focus points count: 4</p>
+<ul><li>Focus overlay shows observed Tab stops in this browser run.</li><li>It does not represent every assistive technology experience.</li></ul>
+</section>
+<section>
+<h2>Issues Found</h2>
+<article class="issue high">
+<h3>1. Task step could not be completed with the keyboard</h3>
+<p>Issue type: <code>task_step_blocked</code></p>
+<p>Severity: high</p>
+<p>Rule: Task step could not be completed with the keyboard</p>
+<p>Why it matters: A required step of a real education workflow failed under keyboard-only interaction, so a keyboard-only student is likely blocked from finishing the task.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>detected_in</th><td>browser_task_execution</td></tr><tr><th>reason</th><td>No focusable button, link, or submit control matching the step target could be reached and activated with the keyboard.</td></tr></tbody></table>
+</article>
+</section>
+<section>
+<h2>Limitations</h2>
+<ul><li>This prototype runs static HTML checks plus a basic keyboard interaction audit.</li><li>It does not replace a full human accessibility audit.</li><li>Browser mode does not simulate a full screen reader, and accessible names are estimated.</li></ul>
+</section>
+</main>
+</body>
+</html>

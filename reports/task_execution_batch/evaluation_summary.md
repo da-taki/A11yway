@@ -8,6 +8,7 @@
 - Failed pages: 0
 - Total issues: 1
 - Total task blockers: 0
+- HTML reports: 2
 
 ## Top Issue Types
 
@@ -21,10 +22,10 @@
 
 ## Sources With Most Issues
 
-| Name | Source | Task | Issues | Blockers | Report |
-| --- | --- | --- | ---: | ---: | --- |
-| Scholarship Form (click-only submit) | examples/sample_task_execution_form_broken.html | submit_scholarship_application | 1 | 0 | reports/task_execution_batch/broken_application_form.md |
-| Scholarship Form (keyboard accessible) | examples/sample_task_execution_form.html | submit_scholarship_application | 0 | 0 | reports/task_execution_batch/accessible_application_form.md |
+| Name | Source | Task | Issues | Blockers | Report | HTML report |
+| --- | --- | --- | ---: | ---: | --- | --- |
+| Scholarship Form (click-only submit) | examples/sample_task_execution_form_broken.html | submit_scholarship_application | 1 | 0 | reports/task_execution_batch/broken_application_form.md | reports/task_execution_batch/broken_application_form.html |
+| Scholarship Form (keyboard accessible) | examples/sample_task_execution_form.html | submit_scholarship_application | 0 | 0 | reports/task_execution_batch/accessible_application_form.md | reports/task_execution_batch/accessible_application_form.html |
 
 ## Task Execution Results
 

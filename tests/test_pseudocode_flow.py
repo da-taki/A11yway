@@ -716,6 +716,7 @@ def test_batch_csv_has_expected_headers(tmp_path: Path) -> None:
             "issue_types",
             "json_report",
             "markdown_report",
+            "html_report",
             "error",
         ]
 

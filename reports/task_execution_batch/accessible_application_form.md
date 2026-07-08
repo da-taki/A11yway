@@ -38,6 +38,15 @@
 - Browser mode approximates keyboard interaction but does not simulate a full screen reader.
 - Accessible names are estimated and require manual review.
 
+## Visual Proof
+
+- Screenshot path: reports/task_execution_batch/visual/accessible_application_form/page.png
+- Focus path overlay path: reports/task_execution_batch/visual/accessible_application_form/focus_path.html
+- Focus points count: 5
+
+- Focus overlay shows observed Tab stops in this browser run.
+- It does not represent every assistive technology experience.
+
 ## Task Execution
 
 - Task: Submit scholarship application

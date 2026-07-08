@@ -19,8 +19,8 @@
 
 | ID | Name | Source | Task | Status | Issues | Task blockers | Reports | Error |
 | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| accessible_application_form | Scholarship Form (keyboard accessible) | examples/sample_task_execution_form.html | submit_scholarship_application | passed | 0 | 0 | json: reports/task_execution_batch/accessible_application_form.json, markdown: reports/task_execution_batch/accessible_application_form.md |  |
-| broken_application_form | Scholarship Form (click-only submit) | examples/sample_task_execution_form_broken.html | submit_scholarship_application | passed | 1 | 0 | json: reports/task_execution_batch/broken_application_form.json, markdown: reports/task_execution_batch/broken_application_form.md |  |
+| accessible_application_form | Scholarship Form (keyboard accessible) | examples/sample_task_execution_form.html | submit_scholarship_application | passed | 0 | 0 | json: reports/task_execution_batch/accessible_application_form.json, markdown: reports/task_execution_batch/accessible_application_form.md, html: reports/task_execution_batch/accessible_application_form.html |  |
+| broken_application_form | Scholarship Form (click-only submit) | examples/sample_task_execution_form_broken.html | submit_scholarship_application | passed | 1 | 0 | json: reports/task_execution_batch/broken_application_form.json, markdown: reports/task_execution_batch/broken_application_form.md, html: reports/task_execution_batch/broken_application_form.html |  |
 
 ## Limitations
 

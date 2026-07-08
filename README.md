@@ -113,6 +113,26 @@ python -m a11yway.main https://example.org --suggest-tasks ngo_services
 
 This still only prints workflow templates. To confirm findings, add page-specific `browser_steps` and use deterministic static, browser, or task execution modes.
 
+## Visual Proof Reports
+
+Visual proof uses Playwright screenshots plus an HTML/CSS focus overlay to show the observed keyboard Tab order. This is useful for non-technical reviewers because a numbered focus path or blocked control is often easier to understand than a raw HTML snippet.
+
+Visual proof depends on browser mode. It is an evidence aid for manual review, not a full screen-reader simulation, not WCAG certification, and not a replacement for human accessibility testing.
+
+```bash
+python -m a11yway.main examples/sample_task_execution_form.html --browser --execute-task submit_scholarship_application --visual-proof reports/visual_task_execution --html reports/task_execution_report.html
+
+python -m a11yway.main examples/sample_task_execution_form_broken.html --browser --execute-task submit_scholarship_application --visual-proof reports/visual_task_execution_broken --html reports/task_execution_broken_report.html
+```
+
+Batch HTML reports and per-page visual proof assets:
+
+```bash
+python -m a11yway.main --batch examples/sample_task_execution_batch.json --out-dir reports/task_execution_batch --browser --execute-tasks --html-reports
+```
+
+The focus overlay shows observed Tab stops from a single browser run. It does not represent every assistive technology experience.
+
 ## Optional AI Scout Configuration
 
 A11yway does not require AI keys. Deterministic audits work without any `.env` file.
@@ -132,6 +152,7 @@ Each batch writes per-page JSON/Markdown reports plus:
 
 - `index.json` / `index.md` - batch summary and per-source stats
 - `index.csv` - spreadsheet-friendly benchmark row per page
+- optional per-page `.html` reports with `--html-reports`
 - `evaluation_summary.md` - reviewer-facing overview: top issue types, severity breakdown, high priority findings with evidence
 
 Example generated output: [reports/batch_sample/evaluation_summary.md](reports/batch_sample/evaluation_summary.md) and [reports/dynamic_form_report.md](reports/dynamic_form_report.md) (from a real headless Chromium run).

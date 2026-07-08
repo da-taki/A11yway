@@ -97,7 +97,11 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Student name",
-        "is_visible": true
+        "is_visible": true,
+        "x": 99.546875,
+        "y": 131.875,
+        "width": 177,
+        "height": 21
       },
       {
         "step": 2,
@@ -110,7 +114,11 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Email",
-        "is_visible": true
+        "is_visible": true,
+        "x": 50.21875,
+        "y": 168.875,
+        "width": 177,
+        "height": 21
       },
       {
         "step": 3,
@@ -123,7 +131,11 @@
         "text": "Choose a school Greenfield High School Riverside Academy",
         "role": null,
         "accessible_name_guess": "School",
-        "is_visible": true
+        "is_visible": true,
+        "x": 56.453125,
+        "y": 205.875,
+        "width": 160,
+        "height": 19
       },
       {
         "step": 4,
@@ -136,12 +148,30 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Accommodation request",
-        "is_visible": true
+        "is_visible": true,
+        "x": 168.84375,
+        "y": 240.875,
+        "width": 168,
+        "height": 66
       }
     ],
     "limitations": [
       "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
       "Accessible names are estimated and require manual review."
+    ]
+  },
+  "visual_proof": {
+    "enabled": true,
+    "screenshot_path": "reports/task_execution_batch/visual/broken_application_form/page.png",
+    "focus_overlay_path": "reports/task_execution_batch/visual/broken_application_form/focus_path.html",
+    "focus_points_count": 4,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "limitations": [
+      "Focus overlay shows observed Tab stops in this browser run.",
+      "It does not represent every assistive technology experience."
     ]
   },
   "task_execution": {

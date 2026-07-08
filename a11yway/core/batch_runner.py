@@ -18,6 +18,7 @@ from a11yway.core.report_builder import (
     save_batch_index_markdown,
     save_batch_index_csv,
     save_evaluation_summary_markdown,
+    save_html_report,
     save_json_report,
     save_markdown_report,
 )
@@ -55,6 +56,7 @@ def run_batch(
     max_tabs: int = 40,
     wait_ms: int = 500,
     execute_tasks: bool = False,
+    html_reports: bool = False,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
@@ -109,8 +111,14 @@ def run_batch(
             if not is_playwright_available():
                 browser_status = "unavailable"
             else:
+                visual_proof_dir = (
+                    output_dir / "visual" / item_id if html_reports else None
+                )
                 browser_result = run_browser_audit(
-                    source, max_tabs=max_tabs, wait_ms=wait_ms
+                    source,
+                    max_tabs=max_tabs,
+                    wait_ms=wait_ms,
+                    visual_proof_dir=visual_proof_dir,
                 )
                 static_issue_count = len(issues)
                 issues = merge_browser_issues(issues, browser_result)
@@ -153,8 +161,11 @@ def run_batch(
         )
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
+        html_path = output_dir / f"{item_id}.html"
         save_json_report(report, json_path)
         save_markdown_report(report, markdown_path)
+        if html_reports:
+            save_html_report(report, html_path)
 
         high_severity_issues = [
             {
@@ -165,6 +176,13 @@ def run_batch(
             for issue in report["issues"]
             if issue["severity"] == "high"
         ]
+
+        reports = {
+            "json": json_path.as_posix(),
+            "markdown": markdown_path.as_posix(),
+        }
+        if html_reports:
+            reports["html"] = html_path.as_posix()
 
         source_summaries.append(
             {
@@ -186,10 +204,7 @@ def run_batch(
                 "task_execution_status": task_execution_status,
                 "task_steps_passed": task_execution["steps_passed"] if task_execution else "",
                 "task_steps_total": task_execution["steps_total"] if task_execution else "",
-                "reports": {
-                    "json": json_path.as_posix(),
-                    "markdown": markdown_path.as_posix(),
-                },
+                "reports": reports,
             }
         )
 

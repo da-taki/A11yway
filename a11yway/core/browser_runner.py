@@ -14,6 +14,10 @@ from typing import Any
 
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.source_loader import is_url
+from a11yway.core.visual_proof import (
+    build_visual_proof_metadata,
+    save_focus_overlay_html,
+)
 from a11yway.models.issue import AccessibilityIssue
 
 try:
@@ -100,7 +104,11 @@ _FOCUS_INFO_SCRIPT = r"""
     is_visible:
       (rect.width > 0 || rect.height > 0) &&
       style.visibility !== "hidden" &&
-      style.display !== "none"
+      style.display !== "none",
+    x: rect.x,
+    y: rect.y,
+    width: rect.width,
+    height: rect.height
   };
 }
 """
@@ -164,6 +172,10 @@ def _trace_entry(step: int, info: dict) -> dict:
         "role": info.get("role"),
         "accessible_name_guess": _accessible_name_guess(info),
         "is_visible": bool(info.get("is_visible")),
+        "x": info.get("x"),
+        "y": info.get("y"),
+        "width": info.get("width"),
+        "height": info.get("height"),
     }
 
 
@@ -365,7 +377,63 @@ def _short_error(error: Exception) -> str:
     return first_line[:300]
 
 
-def run_browser_audit(source: str, max_tabs: int = 40, wait_ms: int = 500) -> dict:
+def _focus_points_from_trace(trace: list[dict]) -> list[dict[str, Any]]:
+    """Return overlay-ready focus points from the browser trace."""
+    points: list[dict[str, Any]] = []
+    for entry in trace:
+        points.append(
+            {
+                "step": entry.get("step"),
+                "tag": entry.get("tag"),
+                "accessible_name_guess": entry.get("accessible_name_guess"),
+                "id": entry.get("id"),
+                "name": entry.get("name"),
+                "href": entry.get("href"),
+                "text": entry.get("text"),
+                "x": entry.get("x"),
+                "y": entry.get("y"),
+                "width": entry.get("width"),
+                "height": entry.get("height"),
+            }
+        )
+    return points
+
+
+def _collect_visual_proof(
+    page,
+    source: str,
+    output_dir: str | Path,
+    focus_trace: list[dict],
+) -> dict[str, Any]:
+    """Save screenshot and focus overlay files for a browser run."""
+    visual_dir = Path(output_dir)
+    visual_dir.mkdir(parents=True, exist_ok=True)
+    screenshot_path = visual_dir / "page.png"
+    overlay_path = visual_dir / "focus_path.html"
+    page.screenshot(path=str(screenshot_path), full_page=True)
+    focus_points = _focus_points_from_trace(focus_trace)
+    viewport = page.viewport_size or {}
+    save_focus_overlay_html(
+        screenshot_path,
+        focus_points,
+        overlay_path,
+        source=source,
+        viewport=viewport,
+    )
+    return build_visual_proof_metadata(
+        screenshot_path,
+        overlay_path,
+        focus_points,
+        viewport=viewport,
+    )
+
+
+def run_browser_audit(
+    source: str,
+    max_tabs: int = 40,
+    wait_ms: int = 500,
+    visual_proof_dir: str | Path | None = None,
+) -> dict:
     """Load a page in headless Chromium and run keyboard/DOM checks.
 
     Always returns a result dict; on any failure success is False and the
@@ -380,6 +448,7 @@ def run_browser_audit(source: str, max_tabs: int = 40, wait_ms: int = 500) -> di
         "checks_run": list(BROWSER_CHECKS_RUN),
         "focus_trace": [],
         "issues": [],
+        "visual_proof": None,
     }
 
     if not is_playwright_available():
@@ -399,6 +468,19 @@ def run_browser_audit(source: str, max_tabs: int = 40, wait_ms: int = 500) -> di
                 stats = page.evaluate(_PAGE_STATS_SCRIPT)
                 trace, interaction_issues = _run_keyboard_traversal(page, stats, max_tabs)
                 result["focus_trace"] = trace
+                if visual_proof_dir:
+                    try:
+                        result["visual_proof"] = _collect_visual_proof(
+                            page,
+                            source,
+                            visual_proof_dir,
+                            trace,
+                        )
+                    except Exception as error:  # noqa: BLE001 - visual proof must not break audit
+                        result["visual_proof"] = {
+                            "enabled": False,
+                            "error": _short_error(error),
+                        }
 
                 dom_issues = _rendered_dom_issues(page.content())
                 result["issues"] = interaction_issues + dom_issues

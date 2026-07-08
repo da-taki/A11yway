@@ -11,6 +11,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - JSON / Markdown / CSV reports, batch mode, evaluation summaries
 - Rule registry and documentation
 - Workflow packs for public-interest accessibility testing
+- Visual proof reports with screenshots, observed focus-path overlays, and HTML report export
 
 ## v0.4 - Workflow Packs
 
@@ -22,8 +23,14 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 
 - Screenshots
 - Focus-path overlays
-- Per-finding visual evidence
 - Self-contained HTML reports
+- Batch HTML report support
+
+## Future Visual Improvements
+
+- Per-finding cropped screenshots
+- Focus visibility checks
+- Contrast and zoom/reflow checks
 
 ## v0.6 - Low-Vision Checks
 

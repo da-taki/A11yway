@@ -14,6 +14,7 @@
     "tasks_executed": 2,
     "tasks_completed": 1,
     "tasks_blocked": 1,
+    "html_reports": 2,
     "counts_by_severity": {
       "high": 1
     },
@@ -46,7 +47,8 @@
       "task_steps_total": 11,
       "reports": {
         "json": "reports/task_execution_batch/accessible_application_form.json",
-        "markdown": "reports/task_execution_batch/accessible_application_form.md"
+        "markdown": "reports/task_execution_batch/accessible_application_form.md",
+        "html": "reports/task_execution_batch/accessible_application_form.html"
       }
     },
     {
@@ -83,7 +85,8 @@
       "task_steps_total": 11,
       "reports": {
         "json": "reports/task_execution_batch/broken_application_form.json",
-        "markdown": "reports/task_execution_batch/broken_application_form.md"
+        "markdown": "reports/task_execution_batch/broken_application_form.md",
+        "html": "reports/task_execution_batch/broken_application_form.html"
       }
     }
   ],
