@@ -1,0 +1,118 @@
+{
+  "pack_id": "ngo_services",
+  "name": "NGO Services",
+  "description": "Workflow templates for reviewing public NGO service, contact, volunteer, donation, and resource pages.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "find_services",
+      "name": "Find services",
+      "description": "A visitor tries to understand what services an organization offers and who can use them.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open services or programs page",
+        "Find service categories",
+        "Identify eligibility or location information",
+        "Find next steps for help"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "submit_contact_form",
+      "name": "Submit contact form",
+      "description": "A visitor tries to complete a public contact form and reach a review or confirmation step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open contact page",
+        "Find contact form",
+        "Complete required fields with test data",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "volunteer_signup",
+      "name": "Volunteer signup",
+      "description": "A prospective volunteer tries to find opportunities and reach the signup step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open volunteer page",
+        "Find opportunity details",
+        "Open signup form",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "donate_or_support",
+      "name": "Donate or support",
+      "description": "A supporter tries to understand donation options and reach a safe pre-payment step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open donation or support page",
+        "Find donation options",
+        "Identify fees, recurrence, or support details",
+        "Stop before real payment unless testing a local sample page"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "download_resource",
+      "name": "Download resource",
+      "description": "A visitor tries to locate and download a public document, guide, or toolkit.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open resources page",
+        "Find relevant resource",
+        "Identify file type or format",
+        "Download or open the resource"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "browser_focus_not_moving",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

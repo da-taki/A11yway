@@ -1,0 +1,115 @@
+{
+  "pack_id": "government_services",
+  "name": "Government Services",
+  "description": "Workflow templates for reviewing public government information, forms, support, and language access pages.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "find_eligibility_information",
+      "name": "Find eligibility information",
+      "description": "A resident tries to determine whether they may qualify for a public service or benefit.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open service information page",
+        "Find eligibility section",
+        "Identify documents or criteria",
+        "Find next steps or contact channel"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "download_public_form",
+      "name": "Download public form",
+      "description": "A resident tries to find and download a public service form.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open form or documents page",
+        "Find required form",
+        "Identify file type or instructions",
+        "Download or open the form"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "browser_focus_not_moving",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "submit_grievance_or_contact_form",
+      "name": "Submit grievance or contact form",
+      "description": "A resident tries to use a public grievance, feedback, or contact form with permitted test data.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open grievance or contact page",
+        "Find form fields",
+        "Complete permitted test fields",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "find_helpline_or_support",
+      "name": "Find helpline or support",
+      "description": "A resident tries to find official support channels, service hours, and emergency notes.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open support or contact page",
+        "Find helpline details",
+        "Identify hours or eligibility notes",
+        "Find alternative support channels"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "change_language_or_access_translation",
+      "name": "Change language or access translation",
+      "description": "A visitor tries to find a language selector or translated content.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open public service page",
+        "Find language or translation control",
+        "Change language or open translated resource",
+        "Confirm essential information remains available"
+      ],
+      "relevant_issue_types": [
+        "missing_button_name",
+        "missing_link_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

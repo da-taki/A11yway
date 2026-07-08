@@ -1,0 +1,118 @@
+{
+  "pack_id": "college_applications",
+  "name": "College Applications",
+  "description": "Workflow templates for reviewing public college application and admissions pages.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "find_application_deadline",
+      "name": "Find application deadline",
+      "description": "A student tries to find the deadline for an application or program.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open admissions or application page",
+        "Find deadlines section",
+        "Identify application deadline",
+        "Find requirements or next steps"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "start_application",
+      "name": "Start application",
+      "description": "A student tries to locate the application entry point and begin the process.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open admissions page",
+        "Find apply or start application link",
+        "Open the application page",
+        "Confirm the first application step is reachable"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "task_control_not_keyboard_reachable",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "upload_required_document",
+      "name": "Upload required document",
+      "description": "An applicant tries to find a document upload control and understand accepted requirements.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open document requirement step",
+        "Find upload control",
+        "Identify accepted file requirements",
+        "Reach upload review state without submitting real data"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "find_financial_aid_information",
+      "name": "Find financial aid information",
+      "description": "A student tries to find financial aid, fee waiver, or support information.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open admissions or costs page",
+        "Find financial aid section",
+        "Identify eligibility or steps",
+        "Find contact or help information"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "reach_application_confirmation",
+      "name": "Reach application confirmation",
+      "description": "An applicant tries to move through a sample or permitted flow until a review or confirmation page.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open application form",
+        "Complete permitted test fields",
+        "Navigate validation messages",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

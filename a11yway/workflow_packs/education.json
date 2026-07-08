@@ -1,0 +1,99 @@
+{
+  "pack_id": "education",
+  "name": "Education",
+  "description": "Workflow templates for reviewing public education pages and sample learning workflows.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "submit_assignment",
+      "name": "Submit assignment",
+      "description": "A student tries to find an assignment, complete required fields, and reach the submission step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open assignment page",
+        "Read assignment instructions",
+        "Find upload or response control",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "access_learning_resources",
+      "name": "Access learning resources",
+      "description": "A student tries to find and open course readings, documents, or resource links.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open course or resources page",
+        "Find resource list",
+        "Identify the needed resource",
+        "Open or download the resource"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "browser_focus_not_moving",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "watch_video_lesson",
+      "name": "Watch video lesson",
+      "description": "A student tries to start a lesson video and find captions or a transcript.",
+      "student_profiles": ["keyboard_only", "hearing_impaired", "cognitive_load"],
+      "required_actions": [
+        "Open lesson page",
+        "Find video player",
+        "Start or inspect the video",
+        "Find captions, subtitles, or transcript"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_video_captions",
+        "missing_audio_transcript",
+        "missing_button_name",
+        "browser_focused_control_missing_name",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "complete_student_form",
+      "name": "Complete student form",
+      "description": "A student tries to complete a school form and reach a review or confirmation step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open form page",
+        "Identify required fields",
+        "Complete text, select, and checkbox controls",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_form_label",
+        "missing_button_name",
+        "generic_link_text",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "pack_id": "public_resources",
+  "name": "Public Resources",
+  "description": "Workflow templates for reviewing public resource portals, downloads, media, support, and event signup pages.",
+  "responsible_use": [
+    "Use only public pages or pages where permission was granted.",
+    "Do not submit real personal data.",
+    "Stop before final submission/payment unless explicitly testing a local sample page."
+  ],
+  "workflows": [
+    {
+      "id": "find_resource",
+      "name": "Find resource",
+      "description": "A visitor tries to search or navigate to a specific public resource.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open resource portal",
+        "Find search or category navigation",
+        "Identify relevant resource",
+        "Open resource details"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "skipped_heading_level",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_form_label",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "download_resource",
+      "name": "Download resource",
+      "description": "A visitor tries to download or open a public document or file.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load"],
+      "required_actions": [
+        "Open resource details",
+        "Find download link",
+        "Identify file type or size",
+        "Download or open resource"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "generic_link_text",
+        "missing_link_name",
+        "missing_image_alt",
+        "browser_focus_not_moving",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "watch_or_read_resource",
+      "name": "Watch or read resource",
+      "description": "A visitor tries to use a media or text resource and find accessible alternatives.",
+      "student_profiles": ["keyboard_only", "low_vision", "hearing_impaired", "cognitive_load"],
+      "required_actions": [
+        "Open resource page",
+        "Find media or reading content",
+        "Start or inspect content",
+        "Find captions, transcript, or readable alternative"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_video_captions",
+        "missing_audio_transcript",
+        "missing_button_name",
+        "missing_image_alt",
+        "task_expected_content_missing"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "contact_support",
+      "name": "Contact support",
+      "description": "A visitor tries to find support information or complete a contact form.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open support or contact page",
+        "Find support options",
+        "Complete permitted test fields if a form exists",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_form_label",
+        "missing_button_name",
+        "browser_focus_not_moving",
+        "browser_focused_control_missing_name",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    },
+    {
+      "id": "sign_up_for_event",
+      "name": "Sign up for event",
+      "description": "A visitor tries to find event information and reach a signup review step.",
+      "student_profiles": ["keyboard_only", "low_vision", "cognitive_load", "motor_impaired"],
+      "required_actions": [
+        "Open event page",
+        "Find date, time, and location details",
+        "Open signup form",
+        "Reach review or confirmation step"
+      ],
+      "relevant_issue_types": [
+        "missing_h1",
+        "missing_form_label",
+        "missing_button_name",
+        "generic_link_text",
+        "browser_focus_not_moving",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "execution_notes": "Template only. Add browser_steps for a specific page before deterministic task execution."
+    }
+  ]
+}

@@ -22,6 +22,11 @@ from a11yway.core.rules import get_rule, list_rules
 from a11yway.core.source_loader import load_html_source
 from a11yway.core.task_executor import run_task_execution
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
+from a11yway.core.workflow_packs import (
+    list_workflow_packs,
+    load_workflow_pack,
+    suggest_workflows_from_pack,
+)
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.task import AccessibilityTask
 
@@ -236,6 +241,24 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="rule_issue_type",
         help="Print detailed documentation for one issue type and exit.",
     )
+    parser.add_argument(
+        "--list-packs",
+        dest="list_packs",
+        action="store_true",
+        help="Print available deterministic workflow packs and exit.",
+    )
+    parser.add_argument(
+        "--show-pack",
+        dest="show_pack",
+        metavar="PACK_ID",
+        help="Print details for one deterministic workflow pack and exit.",
+    )
+    parser.add_argument(
+        "--suggest-tasks",
+        dest="suggest_tasks",
+        metavar="PACK_ID",
+        help="Print workflow templates from a pack and exit.",
+    )
     return parser.parse_args(argv)
 
 
@@ -278,6 +301,85 @@ def print_rule_details(issue_type: str) -> int:
     return 0
 
 
+def print_workflow_pack_list() -> None:
+    """Print a compact listing of deterministic workflow packs."""
+    packs = list_workflow_packs()
+    print("A11yway workflow packs")
+    print(f"Packs available: {len(packs)}")
+    for pack in packs:
+        workflows = pack.get("workflows", [])
+        print()
+        print(f"{pack.get('pack_id', '')}")
+        print(f"   Name: {pack.get('name', '')}")
+        print(f"   Workflows: {len(workflows)}")
+        print(f"   Description: {pack.get('description', '')}")
+
+
+def print_workflow_pack_details(pack_id: str) -> int:
+    """Print responsible-use notes and workflow details for one pack."""
+    pack = load_workflow_pack(pack_id)
+    if pack is None:
+        print(f'Unknown workflow pack: "{pack_id}".')
+        print("Use --list-packs to see available workflow packs.")
+        return 1
+
+    print(f"Workflow pack: {pack.get('name', pack_id)}")
+    print(f"Pack id: {pack.get('pack_id', pack_id)}")
+    print(f"Description: {pack.get('description', '')}")
+
+    responsible_use = pack.get("responsible_use", [])
+    if responsible_use:
+        print()
+        print("Responsible use:")
+        for note in responsible_use:
+            print(f"   - {note}")
+
+    print()
+    print("Workflows:")
+    for workflow in pack.get("workflows", []):
+        print()
+        print(f"{workflow.get('id', '')}: {workflow.get('name', '')}")
+        print(f"   Description: {workflow.get('description', '')}")
+        print("   Required actions:")
+        for action in workflow.get("required_actions", []):
+            print(f"      - {action}")
+    return 0
+
+
+def print_workflow_suggestions(pack_id: str, source: str | None = None) -> int:
+    """Print workflow templates that can guide deterministic task planning."""
+    pack = load_workflow_pack(pack_id)
+    if pack is None:
+        print(f'Unknown workflow pack: "{pack_id}".')
+        print("Use --list-packs to see available workflow packs.")
+        return 1
+
+    workflows = suggest_workflows_from_pack(pack_id)
+    print(f"Workflow task templates: {pack.get('name', pack_id)}")
+    print("These are deterministic templates, not AI-generated tasks.")
+    print("Add page-specific browser_steps before deterministic task execution.")
+    if source:
+        print(f"Source provided: {source}")
+        print("The source can be audited separately with static, browser, or task mode.")
+
+    for workflow in workflows:
+        print()
+        print(f"{workflow.get('id', '')}: {workflow.get('name', '')}")
+        print(f"   Description: {workflow.get('description', '')}")
+        print("   Required actions:")
+        for action in workflow.get("required_actions", []):
+            print(f"      - {action}")
+        print("   Relevant issue types:")
+        for issue_type in workflow.get("relevant_issue_types", []):
+            print(f"      - {issue_type}")
+        risks = workflow.get("accessibility_risks", [])
+        if risks:
+            print("   Accessibility risks to review:")
+            for risk in risks:
+                print(f"      - {risk}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
     args = argv if argv is not None else sys.argv[1:]
@@ -289,6 +391,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.rule_issue_type:
         return print_rule_details(parsed_args.rule_issue_type)
+
+    if parsed_args.list_packs:
+        print_workflow_pack_list()
+        return 0
+
+    if parsed_args.show_pack:
+        return print_workflow_pack_details(parsed_args.show_pack)
+
+    if parsed_args.suggest_tasks:
+        source = parsed_args.html_path if parsed_args.html_path != str(DEFAULT_HTML_PATH) else None
+        return print_workflow_suggestions(parsed_args.suggest_tasks, source=source)
 
     if (parsed_args.execute_task or parsed_args.execute_tasks) and not parsed_args.browser:
         print("Task execution requires browser mode. Add --browser to the command.")
