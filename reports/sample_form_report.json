@@ -1,0 +1,40 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_form.html",
+  "summary": {
+    "issues_found": 2,
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "description": "Found unlabeled <input> control with type=\"text\" and name=\"student_name\"."
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+    },
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "description": "Found unlabeled <textarea> control with type=\"text\" and name=\"accommodation_request\"."
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+    }
+  ],
+  "limitations": [
+    "This prototype only checks basic HTML form labels.",
+    "It does not replace a full human accessibility audit."
+  ]
+}

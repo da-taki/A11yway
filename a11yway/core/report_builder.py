@@ -12,6 +12,46 @@ from a11yway.models.report import AccessibilityReport
 from a11yway.models.task import AccessibilityTask
 
 
+def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dict:
+    """Build the prototype JSON report shape for CLI exports."""
+    return {
+        "tool": "A11yway",
+        "version": "prototype",
+        "source_file": source_file,
+        "summary": {
+            "issues_found": len(issues),
+            "agents_used": ["Keyboard-only student"],
+            "checks_run": ["html_form_labels"],
+        },
+        "issues": [
+            {
+                "issue_type": issue.issue_type,
+                "severity": issue.severity,
+                "agent_name": issue.agent_name,
+                "message": issue.title,
+                "evidence": {
+                    "description": issue.evidence,
+                },
+                "suggested_fix": issue.suggested_fix,
+            }
+            for issue in issues
+        ],
+        "limitations": [
+            "This prototype only checks basic HTML form labels.",
+            "It does not replace a full human accessibility audit.",
+        ],
+    }
+
+
+def save_json_report(report: dict, output_path: str | Path) -> None:
+    """Write a prototype JSON report, creating parent directories if needed."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(report, file, indent=2)
+
+
 class ReportBuilder:
     """Converts agent findings into report objects and export formats."""
 
