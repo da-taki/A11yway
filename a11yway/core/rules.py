@@ -12,12 +12,15 @@ from a11yway.models.issue import AccessibilityIssue
 
 # Rule fields copied into per-issue report metadata. The how_to_fix text is
 # intentionally excluded because issues already carry a suggested_fix.
+# Static rules document static_check_limitations; browser rules document
+# browser_check_limitations. Only fields present on a rule are copied.
 REPORT_RULE_FIELDS = [
     "title",
     "category",
     "why_it_matters",
     "manual_review_notes",
     "static_check_limitations",
+    "browser_check_limitations",
 ]
 
 
@@ -287,6 +290,131 @@ RULES: dict[str, dict] = {
             "Related to text alternatives for prerecorded audio."
         ),
     },
+    "browser_no_focusable_elements": {
+        "issue_type": "browser_no_focusable_elements",
+        "title": "No keyboard focusable elements found",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "If nothing on the page can receive keyboard focus, students who "
+            "cannot use a mouse are completely blocked from interacting."
+        ),
+        "how_to_fix": (
+            "Use native links, buttons, and form controls, or add proper "
+            "tabindex and keyboard handlers to custom controls."
+        ),
+        "manual_review_notes": (
+            "Confirm with a real keyboard that Tab reaches the page controls; "
+            "some pages move focus with custom scripts."
+        ),
+        "browser_check_limitations": (
+            "The check counts common focusable selectors in headless Chromium "
+            "and may miss unusual custom widgets."
+        ),
+        "standard_hint": (
+            "Related to keyboard accessibility requirements for interactive content."
+        ),
+    },
+    "browser_focus_not_moving": {
+        "issue_type": "browser_focus_not_moving",
+        "title": "Keyboard focus does not move into the page",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "If pressing Tab never focuses page content, keyboard-only students "
+            "cannot start the task at all."
+        ),
+        "how_to_fix": (
+            "Check for scripts that cancel Tab key events or reset focus, and "
+            "make sure controls are reachable with the keyboard."
+        ),
+        "manual_review_notes": (
+            "Verify manually with a keyboard; timing or focus scripts can "
+            "behave differently in a headless browser."
+        ),
+        "browser_check_limitations": (
+            "Headless browser Tab behavior can differ slightly from a real "
+            "desktop browser session."
+        ),
+        "standard_hint": (
+            "Related to keyboard accessibility and no-keyboard-trap requirements."
+        ),
+    },
+    "browser_repeated_focus": {
+        "issue_type": "browser_repeated_focus",
+        "title": "Keyboard focus repeats on the same element",
+        "category": "Keyboard Interaction",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Focus that keeps returning to the same element suggests a keyboard "
+            "trap, which can strand students inside one control."
+        ),
+        "how_to_fix": (
+            "Review tabindex values and focus scripts so Tab moves through "
+            "every control in a sensible order."
+        ),
+        "manual_review_notes": (
+            "Some widgets (like editors) legitimately hold focus; confirm "
+            "whether the student can escape with standard keys."
+        ),
+        "browser_check_limitations": (
+            "The heuristic only watches repeated Tab stops and cannot prove a "
+            "real trap."
+        ),
+        "standard_hint": (
+            "Related to no-keyboard-trap accessibility requirements."
+        ),
+    },
+    "browser_focused_control_missing_name": {
+        "issue_type": "browser_focused_control_missing_name",
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "A keyboard user can reach the control, but without a name a screen "
+            "reader announces nothing useful about what it does."
+        ),
+        "how_to_fix": (
+            "Add a visible label, text content, or aria-label so students know "
+            "what the control does."
+        ),
+        "manual_review_notes": (
+            "The accessible name is estimated; confirm with browser dev tools "
+            "or a screen reader what is actually announced."
+        ),
+        "browser_check_limitations": (
+            "Accessible names are estimated from labels, text, and common "
+            "attributes, not from a full accessibility tree computation."
+        ),
+        "standard_hint": (
+            "Related to name/role/value accessibility requirements for controls."
+        ),
+    },
+    "browser_focus_on_hidden_element": {
+        "issue_type": "browser_focus_on_hidden_element",
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "When focus moves to an invisible element, keyboard users lose "
+            "track of where they are on the page."
+        ),
+        "how_to_fix": (
+            'Remove hidden elements from the Tab order with tabindex="-1" or '
+            "make them visible when focused."
+        ),
+        "manual_review_notes": (
+            "Check whether the element becomes visible on focus (like a skip "
+            "link); that pattern is fine."
+        ),
+        "browser_check_limitations": (
+            "Visibility is estimated from element size and CSS and may not "
+            "match what users actually see."
+        ),
+        "standard_hint": (
+            "Related to visible focus and keyboard accessibility requirements."
+        ),
+    },
 }
 
 
@@ -321,6 +449,8 @@ def enrich_issue_with_rule(issue: AccessibilityIssue | dict) -> dict:
 
     rule = get_rule(issue_dict.get("issue_type", ""))
     if rule:
-        issue_dict["rule"] = {field: rule[field] for field in REPORT_RULE_FIELDS}
+        issue_dict["rule"] = {
+            field: rule[field] for field in REPORT_RULE_FIELDS if field in rule
+        }
 
     return issue_dict

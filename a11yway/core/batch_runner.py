@@ -6,6 +6,11 @@ import json
 import re
 from pathlib import Path
 
+from a11yway.core.browser_runner import (
+    is_playwright_available,
+    merge_browser_issues,
+    run_browser_audit,
+)
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
     build_batch_index_report,
@@ -45,8 +50,16 @@ def run_batch(
     out_dir: str | Path = "reports/batch",
     tasks_path: str | Path = DEFAULT_TASKS_PATH,
     csv_path: str | Path | None = None,
+    browser: bool = False,
+    max_tabs: int = 40,
+    wait_ms: int = 500,
 ) -> dict:
-    """Run a static HTML batch audit and write per-page plus index reports."""
+    """Run a static HTML batch audit and write per-page plus index reports.
+
+    When browser is True and Playwright is installed, each page also gets a
+    keyboard interaction audit; a browser failure on one page never stops
+    the rest of the batch.
+    """
     batch_items = load_batch_config(config_path)
     output_dir = Path(out_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -73,12 +86,30 @@ def run_batch(
                     "counts_by_severity": {},
                     "counts_by_issue_type": {},
                     "high_severity_issues": [],
+                    "analysis_modes": ["static", "browser"] if browser else ["static"],
+                    "browser_status": "",
+                    "browser_issue_count": 0,
                     "reports": {},
                 }
             )
             continue
 
         issues = analyze_html_static(source_result["html"])
+
+        browser_result = None
+        browser_status = ""
+        browser_issue_count = 0
+        if browser:
+            if not is_playwright_available():
+                browser_status = "unavailable"
+            else:
+                browser_result = run_browser_audit(
+                    source, max_tabs=max_tabs, wait_ms=wait_ms
+                )
+                static_issue_count = len(issues)
+                issues = merge_browser_issues(issues, browser_result)
+                browser_issue_count = len(issues) - static_issue_count
+                browser_status = "passed" if browser_result["success"] else "failed"
 
         selected_task = None
         task_blockers: list[dict] = []
@@ -94,6 +125,7 @@ def run_batch(
             task=selected_task,
             task_blockers=task_blockers,
             source_metadata=source_result,
+            browser_result=browser_result,
         )
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
@@ -124,6 +156,9 @@ def run_batch(
                 "counts_by_severity": report["summary"]["counts_by_severity"],
                 "counts_by_issue_type": report["summary"]["counts_by_issue_type"],
                 "high_severity_issues": high_severity_issues,
+                "analysis_modes": ["static", "browser"] if browser else ["static"],
+                "browser_status": browser_status,
+                "browser_issue_count": browser_issue_count,
                 "reports": {
                     "json": json_path.as_posix(),
                     "markdown": markdown_path.as_posix(),

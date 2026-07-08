@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Course Enrollment Form</title>
+</head>
+<body>
+  <h1>Course Enrollment</h1>
+  <p>
+    This is a fictional education form for A11yway browser mode testing.
+    JavaScript adds more fields after the page loads, so static source
+    analysis alone cannot see everything a student will meet.
+  </p>
+
+  <form action="/enroll" method="post">
+    <label for="student_name">Student name</label>
+    <input id="student_name" type="text" name="student_name">
+
+    <button type="button" id="show_more_fields">Show more fields</button>
+
+    <div id="dynamic_area">
+      <!-- JavaScript inserts extra fields here after load. -->
+    </div>
+  </form>
+
+  <script>
+    window.addEventListener("load", function () {
+      var area = document.getElementById("dynamic_area");
+
+      // A JS-added input without any label: static source analysis misses
+      // this, but the browser DOM re-check should catch it.
+      var courseInput = document.createElement("input");
+      courseInput.type = "text";
+      courseInput.name = "preferred_course";
+      area.appendChild(courseInput);
+
+      // A JS-added button without an accessible name.
+      var mysteryButton = document.createElement("button");
+      mysteryButton.type = "button";
+      area.appendChild(mysteryButton);
+
+      // A good dynamically-added link with descriptive text.
+      var guidelinesLink = document.createElement("a");
+      guidelinesLink.href = "enrollment-guidelines.html";
+      guidelinesLink.textContent = "Read the enrollment guidelines";
+      area.appendChild(guidelinesLink);
+    });
+  </script>
+</body>
+</html>

@@ -2,6 +2,9 @@
   "tool": "A11yway",
   "version": "prototype",
   "summary": {
+    "analysis_modes": [
+      "static"
+    ],
     "total_pages_tested": 2,
     "successful_pages": 2,
     "failed_pages": 0,
@@ -66,6 +69,11 @@
           "snippet": "<video controls src=\"orientation.mp4\">"
         }
       ],
+      "analysis_modes": [
+        "static"
+      ],
+      "browser_status": "",
+      "browser_issue_count": 0,
       "reports": {
         "json": "reports/batch_sample/scholarship_form.json",
         "markdown": "reports/batch_sample/scholarship_form.md"
@@ -103,6 +111,11 @@
           "snippet": "<audio controls src=\"assignment-instructions.mp3\">"
         }
       ],
+      "analysis_modes": [
+        "static"
+      ],
+      "browser_status": "",
+      "browser_issue_count": 0,
       "reports": {
         "json": "reports/batch_sample/learning_resources.json",
         "markdown": "reports/batch_sample/learning_resources.md"

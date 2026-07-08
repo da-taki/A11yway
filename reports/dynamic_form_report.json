@@ -1,0 +1,216 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_dynamic_form.html",
+  "summary": {
+    "issues_found": 4,
+    "counts_by_severity": {
+      "high": 4
+    },
+    "counts_by_issue_type": {
+      "browser_focused_control_missing_name": 2,
+      "missing_form_label": 1,
+      "missing_button_name": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 3,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "input",
+        "name": "preferred_course",
+        "type": "text",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 4,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "button",
+        "type": "button",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "input",
+        "line": 21,
+        "snippet": "<input type=\"text\" name=\"preferred_course\">",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "preferred_course",
+        "identity": "name=\"preferred_course\"",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_button_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Button is missing an accessible name",
+      "evidence": {
+        "tag": "button",
+        "line": 21,
+        "snippet": "<button type=\"button\">",
+        "reason": "Button has no visible text, aria-label, title, or image alt text.",
+        "type": "button",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add clear button text or an aria-label that describes the button action.",
+      "rule": {
+        "title": "Button missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "A button without a name is announced as just 'button' by screen readers, so students cannot tell what pressing it will do.",
+        "manual_review_notes": "Icon-only buttons may look meaningful visually but still need a programmatic name.",
+        "static_check_limitations": "Static HTML cannot see names added later by JavaScript or icon fonts."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "source": {
+    "input": "examples/sample_dynamic_form.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_dynamic_form.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "input",
+        "id": "student_name",
+        "name": "student_name",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Student name",
+        "is_visible": true
+      },
+      {
+        "step": 2,
+        "tag": "button",
+        "id": "show_more_fields",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Show more fields",
+        "role": null,
+        "accessible_name_guess": "Show more fields",
+        "is_visible": true
+      },
+      {
+        "step": 3,
+        "tag": "input",
+        "id": null,
+        "name": "preferred_course",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 4,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 5,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "enrollment-guidelines.html",
+        "src": null,
+        "text": "Read the enrollment guidelines",
+        "role": null,
+        "accessible_name_guess": "Read the enrollment guidelines",
+        "is_visible": true
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  }
+}

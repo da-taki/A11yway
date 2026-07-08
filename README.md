@@ -14,8 +14,9 @@ The idea is simple: instead of only scanning a page for technical accessibility 
 - CSV benchmark index for spreadsheets
 - Rule registry documenting every check (see [docs/RULES.md](docs/RULES.md))
 - Reviewer-friendly batch evaluation summary (`evaluation_summary.md`)
+- Optional browser interaction mode: keyboard focus tracing and JavaScript-rendered DOM re-checks
 
-Everything runs on the Python standard library — no external dependencies.
+Static mode runs on the Python standard library — no external dependencies. Browser mode is opt-in and requires Playwright.
 
 ### Limitations
 
@@ -101,6 +102,42 @@ python -m a11yway.main --rule missing_form_label
 ```
 
 All checks are documented in [docs/RULES.md](docs/RULES.md), including what each rule detects, why it matters, and what static analysis cannot verify.
+
+## Browser Interaction Mode
+
+Static checks read the HTML source, but real education portals often build forms and buttons with JavaScript. Browser mode loads the page in headless Chromium, presses Tab repeatedly to trace where keyboard focus actually goes, and re-runs the static checks on the JavaScript-rendered DOM. This begins to answer the practical question: can a keyboard-only student actually move through this page?
+
+Browser mode is optional. Install its dependency first:
+
+```bash
+pip install -r requirements-browser.txt
+python -m playwright install chromium
+```
+
+Then add `--browser` to any audit:
+
+```bash
+python -m a11yway.main examples/sample_dynamic_form.html --browser --markdown reports/dynamic_form_report.md
+```
+
+Browser batch runs work the same way:
+
+```bash
+python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir reports/browser_batch_sample --browser
+```
+
+Tune the traversal with `--max-tabs N` (default 40) and `--wait-ms N` (default 500, time given to JavaScript after load). Reports gain a Browser Interaction Trace showing each Tab stop with its estimated accessible name. [examples/sample_dynamic_form.html](examples/sample_dynamic_form.html) demonstrates the difference: its JavaScript-added unlabeled field and unnamed button are invisible to static source analysis but caught in browser mode.
+
+Browser mode limitations:
+
+- It does not simulate a full screen reader.
+- Accessible names are estimated and require manual review.
+- It does not log into private portals.
+- It does not crawl websites.
+- It does not certify WCAG compliance.
+- Use it only on public pages or pages you have permission to test.
+
+If Playwright is not installed, `--browser` prints setup instructions and exits; all static commands keep working without it.
 
 The current prototype runs a static HTML audit for form labels, link and button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. The JSON export is meant to grow into future NGO and school review reports.
 
