@@ -6,7 +6,11 @@ from pathlib import Path
 
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
-from a11yway.core.report_builder import build_json_report, save_json_report
+from a11yway.core.report_builder import (
+    build_json_report,
+    save_json_report,
+    save_markdown_report,
+)
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.task import AccessibilityTask
@@ -101,6 +105,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Optional path where a structured JSON report should be written.",
     )
     parser.add_argument(
+        "--markdown",
+        dest="markdown_output",
+        help="Optional path where a readable Markdown report should be written.",
+    )
+    parser.add_argument(
         "--task",
         dest="task_id_or_name",
         help="Optional task id or name from examples/sample_tasks.json.",
@@ -133,16 +142,23 @@ def main(argv: list[str] | None = None) -> int:
             print()
             print(f'Task not found: "{parsed_args.task_id_or_name}". Normal audit still completed.')
 
-    if parsed_args.json_output:
+    if parsed_args.json_output or parsed_args.markdown_output:
         report = build_json_report(
             html_path.as_posix(),
             issues,
             task=selected_task,
             task_blockers=task_blockers,
         )
+
+    if parsed_args.json_output:
         save_json_report(report, parsed_args.json_output)
         print()
         print(f"JSON report saved: {parsed_args.json_output}")
+
+    if parsed_args.markdown_output:
+        save_markdown_report(report, parsed_args.markdown_output)
+        print()
+        print(f"Markdown report saved: {parsed_args.markdown_output}")
 
     return 0
 

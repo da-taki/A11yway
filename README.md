@@ -47,6 +47,12 @@ Save a structured JSON report:
 python -m a11yway.main examples/sample_form.html --json reports/sample_form_report.json
 ```
 
+Save a readable Markdown report:
+
+```bash
+python -m a11yway.main examples/sample_form.html --task submit_scholarship_application --markdown reports/sample_form_report.md
+```
+
 Run the audit in the context of a task:
 
 ```bash
@@ -58,6 +64,8 @@ If no file path is provided, the command tries `examples/sample_form.html`.
 The current prototype runs a static HTML audit for form labels, link and button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. The JSON export is meant to grow into future NGO and school review reports.
 
 Task mode explains which page barriers matter for a specific education workflow, such as submitting a scholarship form or accessing learning resources. This is the first step toward agentic accessibility testing, but it still uses deterministic static checks rather than real student simulation.
+
+Markdown export is meant for sharing readable reports with schools, NGOs, and accessibility reviewers.
 
 Reports include structured evidence such as HTML snippets, tag attributes, reasons, and approximate line numbers when available.
 

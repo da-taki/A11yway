@@ -3,6 +3,8 @@
 This is a fictional sample report. It reflects the kind of static HTML findings
 the current prototype can begin to produce, but it is not a complete audit.
 
+A generated Markdown example is available at `reports/sample_form_report.md`.
+
 ## Site
 
 Riverside Learning Portal

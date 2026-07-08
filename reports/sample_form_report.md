@@ -1,0 +1,186 @@
+# A11yway Accessibility Report
+
+## Summary
+
+- Source file: examples/sample_form.html
+- Issues found: 7
+- Agents used: Keyboard-only student
+- Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility
+
+### Counts By Severity
+
+- high: 4
+- medium: 3
+
+### Counts By Issue Type
+
+- missing_form_label: 2
+- generic_link_text: 1
+- missing_button_name: 1
+- missing_image_alt: 1
+- skipped_heading_level: 1
+- missing_video_captions: 1
+
+## Task Context
+
+- Task name: Submit scholarship application
+- Student profile: Keyboard-only student
+
+### Required Actions
+
+- Read the page purpose
+- Enter name
+- Enter email
+- Choose school
+- Describe accommodation request
+- Submit the form
+
+### Likely Blockers
+
+- Form control is missing an accessible label
+  - Issue type: missing_form_label
+  - Severity: high
+  - Task impact: Form control may be hard to understand or complete because it has no accessible label.
+- Form control is missing an accessible label
+  - Issue type: missing_form_label
+  - Severity: high
+  - Task impact: Form control may be hard to understand or complete because it has no accessible label.
+- Link text is too generic
+  - Issue type: generic_link_text
+  - Severity: medium
+  - Task impact: Link text may not clearly explain the destination or action.
+- Button is missing an accessible name
+  - Issue type: missing_button_name
+  - Severity: high
+  - Task impact: Student may not be able to identify what an unlabeled button does.
+- Heading level is skipped
+  - Issue type: skipped_heading_level
+  - Severity: medium
+  - Task impact: Student may struggle to understand the page structure and task sections.
+
+## Issues Found
+
+### 1. Form control is missing an accessible label
+
+- Issue type: missing_form_label
+- Severity: high
+- Suggested fix: Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.
+
+Evidence:
+
+- tag: input
+- name: student_name
+- line: 36
+- reason: Form control has no accessible label.
+
+```html
+<input type="text" name="student_name">
+```
+
+### 2. Form control is missing an accessible label
+
+- Issue type: missing_form_label
+- Severity: high
+- Suggested fix: Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.
+
+Evidence:
+
+- tag: textarea
+- name: accommodation_request
+- line: 54
+- reason: Form control has no accessible label.
+
+```html
+<textarea name="accommodation_request" rows="5">
+```
+
+### 3. Link text is too generic
+
+- Issue type: generic_link_text
+- Severity: medium
+- Suggested fix: Use descriptive link text like "Download scholarship guidelines" instead of "click here."
+
+Evidence:
+
+- tag: a
+- href: /scholarships/help
+- text: click here
+- line: 21
+- reason: Link text is generic and does not explain the destination or action.
+
+```html
+<a href="/scholarships/help">click here</a>
+```
+
+### 4. Button is missing an accessible name
+
+- Issue type: missing_button_name
+- Severity: high
+- Suggested fix: Add clear button text or an aria-label that describes the button action.
+
+Evidence:
+
+- tag: button
+- line: 27
+- reason: Button has no visible text, aria-label, title, or image alt text.
+
+```html
+<button type="button">
+```
+
+### 5. Image is missing useful alt text
+
+- Issue type: missing_image_alt
+- Severity: medium
+- Suggested fix: Add alt text that describes the image purpose, or mark decorative images as presentation.
+
+Evidence:
+
+- tag: img
+- src: student-award.png
+- line: 24
+- reason: Image is missing useful alt text.
+
+```html
+<img src="student-award.png">
+```
+
+### 6. Heading level is skipped
+
+- Issue type: skipped_heading_level
+- Severity: medium
+- Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.
+
+Evidence:
+
+- tag: h3
+- text: Application Details
+- line: 16
+- reason: Heading level jumps from h1 to h3.
+
+```html
+<h3>
+```
+
+### 7. Video is missing captions
+
+- Issue type: missing_video_captions
+- Severity: high
+- Suggested fix: Add captions or subtitles for education video content.
+
+Evidence:
+
+- tag: video
+- src: orientation.mp4
+- line: 30
+- reason: Video has no captions or subtitles track.
+
+```html
+<video controls src="orientation.mp4">
+```
+
+## Limitations
+
+- This prototype only runs static HTML checks.
+- It does not replace a full human accessibility audit.
+- It does not yet perform browser-based interaction testing.

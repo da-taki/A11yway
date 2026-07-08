@@ -60,6 +60,7 @@ def build_json_report(
         "limitations": [
             "This prototype only runs static HTML checks.",
             "It does not replace a full human accessibility audit.",
+            "It does not yet perform browser-based interaction testing.",
         ],
     }
 
@@ -82,6 +83,115 @@ def save_json_report(report: dict, output_path: str | Path) -> None:
 
     with path.open("w", encoding="utf-8") as file:
         json.dump(report, file, indent=2)
+
+
+def _format_count_items(counts: dict) -> list[str]:
+    """Format report count dictionaries for Markdown output."""
+    if not counts:
+        return ["- None"]
+    return [f"- {key}: {value}" for key, value in counts.items()]
+
+
+def _format_evidence_lines(evidence: dict) -> list[str]:
+    """Format structured evidence for Markdown output."""
+    lines = []
+    for key in ["tag", "id", "name", "href", "src", "text", "line", "reason"]:
+        value = evidence.get(key)
+        if value not in [None, ""]:
+            lines.append(f"- {key}: {value}")
+
+    snippet = evidence.get("snippet")
+    if snippet:
+        lines.extend(["", "```html", str(snippet), "```"])
+
+    return lines or ["- No structured evidence available."]
+
+
+def build_markdown_report(report: dict) -> str:
+    """Build a readable Markdown report from a JSON-style report dict."""
+    summary = report.get("summary", {})
+    lines = [
+        "# A11yway Accessibility Report",
+        "",
+        "## Summary",
+        "",
+        f"- Source file: {report.get('source_file', '')}",
+        f"- Issues found: {summary.get('issues_found', 0)}",
+        f"- Agents used: {', '.join(summary.get('agents_used', []))}",
+        f"- Checks run: {', '.join(summary.get('checks_run', []))}",
+        "",
+        "### Counts By Severity",
+        "",
+        *_format_count_items(summary.get("counts_by_severity", {})),
+        "",
+        "### Counts By Issue Type",
+        "",
+        *_format_count_items(summary.get("counts_by_issue_type", {})),
+        "",
+    ]
+
+    task = report.get("task")
+    if task:
+        lines.extend(
+            [
+                "## Task Context",
+                "",
+                f"- Task name: {task.get('name', '')}",
+                f"- Student profile: {task.get('student_profile', '')}",
+                "",
+                "### Required Actions",
+                "",
+            ]
+        )
+        lines.extend(f"- {action}" for action in task.get("required_actions", []))
+        lines.extend(["", "### Likely Blockers", ""])
+        blockers = task.get("likely_blockers", [])
+        if blockers:
+            for blocker in blockers:
+                lines.extend(
+                    [
+                        f"- {blocker.get('message', '')}",
+                        f"  - Issue type: {blocker.get('issue_type', '')}",
+                        f"  - Severity: {blocker.get('severity', '')}",
+                        f"  - Task impact: {blocker.get('task_impact', '')}",
+                    ]
+                )
+        else:
+            lines.append("- None found for this task.")
+        lines.append("")
+
+    lines.extend(["## Issues Found", ""])
+    issues = report.get("issues", [])
+    if not issues:
+        lines.append("No issues found by the current static checks.")
+    for index, issue in enumerate(issues, start=1):
+        lines.extend(
+            [
+                f"### {index}. {issue.get('message', '')}",
+                "",
+                f"- Issue type: {issue.get('issue_type', '')}",
+                f"- Severity: {issue.get('severity', '')}",
+                f"- Suggested fix: {issue.get('suggested_fix', '')}",
+                "",
+                "Evidence:",
+                "",
+            ]
+        )
+        lines.extend(_format_evidence_lines(issue.get("evidence", {})))
+        lines.append("")
+
+    lines.extend(["## Limitations", ""])
+    lines.extend(f"- {limitation}" for limitation in report.get("limitations", []))
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def save_markdown_report(report: dict, output_path: str | Path) -> None:
+    """Write a Markdown report, creating parent directories if needed."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(build_markdown_report(report), encoding="utf-8")
 
 
 class ReportBuilder:

@@ -137,7 +137,8 @@
   ],
   "limitations": [
     "This prototype only runs static HTML checks.",
-    "It does not replace a full human accessibility audit."
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
   ],
   "task": {
     "id": "submit_scholarship_application",
