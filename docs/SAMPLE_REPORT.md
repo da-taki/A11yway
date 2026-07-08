@@ -11,6 +11,19 @@ Riverside Learning Portal
 
 Submit a scholarship application form.
 
+## Task Context
+
+Student profile: Keyboard-only student.
+
+Required actions:
+
+- Read the page purpose.
+- Enter name.
+- Enter email.
+- Choose school.
+- Describe accommodation request.
+- Submit the form.
+
 ## Agents Used
 
 - Keyboard-only student.
@@ -69,6 +82,12 @@ Agent: Page Analyzer
 Evidence: A help link uses the text "click here", which does not explain the destination when read out of context.
 
 Suggested fix: Use descriptive link text such as "Read scholarship application help".
+
+## Likely Task Blockers
+
+- Form control may be hard to understand or complete because it has no accessible label.
+- Student may not be able to identify what an unlabeled button does.
+- Link text may not clearly explain the destination or action.
 
 ## Retest Checklist
 

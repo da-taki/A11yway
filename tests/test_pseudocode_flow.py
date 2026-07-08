@@ -18,7 +18,13 @@ from a11yway.core.page_analyzer import (
     analyze_page_metadata,
 )
 from a11yway.core.report_builder import ReportBuilder, build_json_report, save_json_report
-from a11yway.core.task_runner import TaskRunner
+from a11yway.core.task_runner import (
+    TaskRunner,
+    build_task_blockers,
+    filter_issues_for_task,
+    find_task,
+    load_tasks,
+)
 
 
 def issue_types_for(issues: list) -> set[str]:
@@ -49,7 +55,8 @@ def test_sample_task_can_be_loaded() -> None:
     tasks = runner.load_tasks(Path("examples/sample_tasks.json"))
 
     assert len(tasks) == 2
-    assert tasks[0].title == "Submit a scholarship application form"
+    assert tasks[0].id == "submit_scholarship_application"
+    assert tasks[0].name == "Submit scholarship application"
 
 
 def test_report_builder_returns_expected_structure() -> None:
@@ -283,6 +290,91 @@ def test_save_json_report_writes_valid_json(tmp_path: Path) -> None:
     assert saved_report["summary"]["issues_found"] == 7
 
 
+def test_sample_tasks_load_correctly() -> None:
+    """Task scenario helpers should load the sample task file."""
+    tasks = load_tasks("examples/sample_tasks.json")
+
+    assert len(tasks) == 2
+    assert tasks[0].student_profile == "Keyboard-only student"
+    assert "missing_form_label" in tasks[0].relevant_issue_types
+
+
+def test_find_task_by_id() -> None:
+    """A task should be found by exact id."""
+    tasks = load_tasks("examples/sample_tasks.json")
+
+    task = find_task(tasks, "submit_scholarship_application")
+
+    assert task is not None
+    assert task.name == "Submit scholarship application"
+
+
+def test_find_task_by_name_case_insensitively() -> None:
+    """A task should be found by case-insensitive name."""
+    tasks = load_tasks("examples/sample_tasks.json")
+
+    task = find_task(tasks, "submit scholarship APPLICATION")
+
+    assert task is not None
+    assert task.id == "submit_scholarship_application"
+
+
+def test_filter_issues_for_task_returns_relevant_issue_types() -> None:
+    """Task filtering should keep only task-relevant issue types."""
+    tasks = load_tasks("examples/sample_tasks.json")
+    task = find_task(tasks, "submit_scholarship_application")
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+
+    assert task is not None
+    filtered = filter_issues_for_task(task, issues)
+
+    assert issue_types_for(filtered) == {
+        "missing_form_label",
+        "missing_button_name",
+        "generic_link_text",
+        "skipped_heading_level",
+    }
+
+
+def test_task_blockers_are_generated_from_relevant_issues() -> None:
+    """Task blockers should be deterministic notes from relevant issues."""
+    tasks = load_tasks("examples/sample_tasks.json")
+    task = find_task(tasks, "submit_scholarship_application")
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+
+    assert task is not None
+    blockers = build_task_blockers(task, issues)
+
+    assert len(blockers) == 5
+    assert {blocker["issue_type"] for blocker in blockers} == {
+        "missing_form_label",
+        "missing_button_name",
+        "generic_link_text",
+        "skipped_heading_level",
+    }
+    assert all("task_impact" in blocker for blocker in blockers)
+
+
+def test_json_report_includes_task_data_when_task_is_provided() -> None:
+    """JSON reports should include task context when requested."""
+    tasks = load_tasks("examples/sample_tasks.json")
+    task = find_task(tasks, "submit_scholarship_application")
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+
+    assert task is not None
+    blockers = build_task_blockers(task, issues)
+    report = build_json_report(
+        "examples/sample_form.html",
+        issues,
+        task=task,
+        task_blockers=blockers,
+    )
+
+    assert report["task"]["id"] == "submit_scholarship_application"
+    assert report["task"]["student_profile"] == "Keyboard-only student"
+    assert len(report["task"]["likely_blockers"]) == 5
+
+
 def test_cli_default_sample_still_runs(capsys) -> None:
     """The no-argument CLI flow should still analyze the sample fixture."""
     exit_code = main([])
@@ -290,3 +382,15 @@ def test_cli_default_sample_still_runs(capsys) -> None:
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "Issues found: 7" in captured.out
+
+
+def test_cli_task_mode_runs(capsys) -> None:
+    """Task mode should print task context without breaking the audit."""
+    exit_code = main(
+        ["examples/sample_form.html", "--task", "submit_scholarship_application"]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Task: Submit scholarship application" in captured.out
+    assert "Likely blockers: 5" in captured.out

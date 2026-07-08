@@ -103,5 +103,50 @@
   "limitations": [
     "This prototype only runs static HTML checks.",
     "It does not replace a full human accessibility audit."
-  ]
+  ],
+  "task": {
+    "id": "submit_scholarship_application",
+    "name": "Submit scholarship application",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Read the page purpose",
+      "Enter name",
+      "Enter email",
+      "Choose school",
+      "Describe accommodation request",
+      "Submit the form"
+    ],
+    "likely_blockers": [
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "generic_link_text",
+        "severity": "medium",
+        "message": "Link text is too generic",
+        "task_impact": "Link text may not clearly explain the destination or action."
+      },
+      {
+        "issue_type": "missing_button_name",
+        "severity": "high",
+        "message": "Button is missing an accessible name",
+        "task_impact": "Student may not be able to identify what an unlabeled button does."
+      },
+      {
+        "issue_type": "skipped_heading_level",
+        "severity": "medium",
+        "message": "Heading level is skipped",
+        "task_impact": "Student may struggle to understand the page structure and task sections."
+      }
+    ]
+  }
 }

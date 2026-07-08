@@ -21,9 +21,14 @@ def _count_by(items: list[str]) -> dict[str, int]:
     return counts
 
 
-def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dict:
+def build_json_report(
+    source_file: str,
+    issues: list[AccessibilityIssue],
+    task: AccessibilityTask | None = None,
+    task_blockers: list[dict] | None = None,
+) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
-    return {
+    report = {
         "tool": "A11yway",
         "version": "prototype",
         "source_file": source_file,
@@ -52,6 +57,17 @@ def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dic
             "It does not replace a full human accessibility audit.",
         ],
     }
+
+    if task:
+        report["task"] = {
+            "id": task.id,
+            "name": task.name,
+            "student_profile": task.student_profile,
+            "required_actions": task.required_actions,
+            "likely_blockers": task_blockers or [],
+        }
+
+    return report
 
 
 def save_json_report(report: dict, output_path: str | Path) -> None:
