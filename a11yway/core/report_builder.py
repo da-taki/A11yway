@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 from dataclasses import asdict
 from pathlib import Path
@@ -261,6 +262,7 @@ def build_batch_index_markdown(index_report: dict) -> str:
         "",
         f"- Total pages tested: {summary.get('total_pages_tested', 0)}",
         f"- Total issues: {summary.get('total_issues', 0)}",
+        f"- CSV index: {index_report.get('csv_index_path', '')}",
         "",
         "### Counts By Severity",
         "",
@@ -307,6 +309,56 @@ def save_batch_index_markdown(index_report: dict, output_path: str | Path) -> No
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_batch_index_markdown(index_report), encoding="utf-8")
+
+
+def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
+    """Write a spreadsheet-friendly CSV index for a batch audit."""
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "id",
+        "name",
+        "source",
+        "source_type",
+        "task",
+        "status",
+        "issues_found",
+        "task_blockers",
+        "high_count",
+        "medium_count",
+        "low_count",
+        "issue_types",
+        "json_report",
+        "markdown_report",
+        "error",
+    ]
+
+    with path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        for item in index_report.get("sources", []):
+            severity_counts = item.get("counts_by_severity", {})
+            issue_type_counts = item.get("counts_by_issue_type", {})
+            reports = item.get("reports", {})
+            writer.writerow(
+                {
+                    "id": item.get("id", ""),
+                    "name": item.get("name", ""),
+                    "source": item.get("source", ""),
+                    "source_type": item.get("source_type", ""),
+                    "task": item.get("task", ""),
+                    "status": item.get("status", ""),
+                    "issues_found": item.get("issue_count", 0),
+                    "task_blockers": item.get("task_blocker_count", 0),
+                    "high_count": severity_counts.get("high", 0),
+                    "medium_count": severity_counts.get("medium", 0),
+                    "low_count": severity_counts.get("low", 0),
+                    "issue_types": ";".join(issue_type_counts.keys()),
+                    "json_report": reports.get("json", ""),
+                    "markdown_report": reports.get("markdown", ""),
+                    "error": item.get("error", ""),
+                }
+            )
 
 
 class ReportBuilder:

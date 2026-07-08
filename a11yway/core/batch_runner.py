@@ -11,6 +11,7 @@ from a11yway.core.report_builder import (
     build_batch_index_report,
     build_json_report,
     save_batch_index_markdown,
+    save_batch_index_csv,
     save_json_report,
     save_markdown_report,
 )
@@ -42,6 +43,7 @@ def run_batch(
     config_path: str | Path,
     out_dir: str | Path = "reports/batch",
     tasks_path: str | Path = DEFAULT_TASKS_PATH,
+    csv_path: str | Path | None = None,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports."""
     batch_items = load_batch_config(config_path)
@@ -119,13 +121,17 @@ def run_batch(
     index_report = build_batch_index_report(source_summaries)
     index_json_path = output_dir / "index.json"
     index_markdown_path = output_dir / "index.md"
+    index_csv_path = Path(csv_path) if csv_path else output_dir / "index.csv"
+    index_report["csv_index_path"] = index_csv_path.as_posix()
     save_json_report(index_report, index_json_path)
     save_batch_index_markdown(index_report, index_markdown_path)
+    save_batch_index_csv(index_report, index_csv_path)
 
     return {
         "config_path": Path(config_path).as_posix(),
         "out_dir": output_dir.as_posix(),
         "index_json_path": index_json_path.as_posix(),
         "index_markdown_path": index_markdown_path.as_posix(),
+        "csv_index_path": index_csv_path.as_posix(),
         "index": index_report,
     }

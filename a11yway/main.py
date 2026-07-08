@@ -123,6 +123,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Output directory for batch reports. Defaults to reports/batch.",
     )
     parser.add_argument(
+        "--csv",
+        dest="csv_output",
+        help="Optional CSV index path for batch mode. Defaults to out-dir/index.csv.",
+    )
+    parser.add_argument(
         "--json",
         dest="json_output",
         help="Optional path where a structured JSON report should be written.",
@@ -146,7 +151,11 @@ def main(argv: list[str] | None = None) -> int:
     parsed_args = parse_args(args)
 
     if parsed_args.batch_config:
-        batch_result = run_batch(parsed_args.batch_config, parsed_args.out_dir)
+        batch_result = run_batch(
+            parsed_args.batch_config,
+            parsed_args.out_dir,
+            csv_path=parsed_args.csv_output,
+        )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
         print(f"Batch file: {batch_result['config_path']}")
@@ -155,7 +164,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Output directory: {batch_result['out_dir']}")
         print(f"Index JSON: {batch_result['index_json_path']}")
         print(f"Index Markdown: {batch_result['index_markdown_path']}")
+        print(f"Index CSV: {batch_result['csv_index_path']}")
         return 0
+
+    if parsed_args.csv_output:
+        print("CSV export is currently only available in batch mode.")
 
     source = parsed_args.html_path
     issues, source_result = analyze_html_source(source)
