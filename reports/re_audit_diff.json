@@ -1,0 +1,39 @@
+{
+  "old_source": "examples/sample_task_execution_form_broken.html",
+  "new_source": "examples/sample_task_execution_form.html",
+  "summary": {
+    "old_issue_count": 1,
+    "new_issue_count": 0,
+    "fixed_count": 1,
+    "remaining_count": 0,
+    "new_count": 0,
+    "changed_severity_count": 0,
+    "net_issue_change": -1
+  },
+  "fixed": [
+    {
+      "fingerprint": "7c52ca729d98e5a1",
+      "issue_type": "task_step_blocked",
+      "severity": "high",
+      "message": "Task step could not be completed with the keyboard"
+    }
+  ],
+  "remaining": [],
+  "new": [],
+  "changed_severity": [],
+  "task_execution_changed": true,
+  "task_execution": {
+    "old": {
+      "status": "blocked",
+      "blocked_at_step": "submit_form",
+      "steps_passed": 9,
+      "steps_total": 11
+    },
+    "new": {
+      "status": "completed",
+      "blocked_at_step": null,
+      "steps_passed": 11,
+      "steps_total": 11
+    }
+  }
+}

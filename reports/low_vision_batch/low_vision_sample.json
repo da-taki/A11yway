@@ -1,0 +1,382 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_low_vision_page.html",
+  "summary": {
+    "issues_found": 7,
+    "counts_by_severity": {
+      "high": 4,
+      "medium": 3
+    },
+    "counts_by_issue_type": {
+      "low_contrast_text": 2,
+      "zoom_horizontal_overflow": 1,
+      "zoom_fixed_width_content": 3,
+      "focus_indicator_missing": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "This paragraph intentionally has low contrast for testing.",
+        "tag": "p",
+        "selector": "html > body > main > p.low-contrast",
+        "foreground_color": "rgb(184, 184, 184)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 1.98,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Low contrast help link",
+        "tag": "a",
+        "selector": "body > main > p > a.low-contrast-link",
+        "foreground_color": "rgb(159, 184, 214)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 2.04,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "zoom_horizontal_overflow",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Page has horizontal overflow in a narrow viewport",
+      "evidence": {
+        "viewport_width": 640,
+        "document_scroll_width": 1038,
+        "overflow_amount": 398,
+        "reason": "At a narrow viewport used to approximate 200% zoom/reflow stress, the document is wider than the viewport.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Use responsive layout, avoid fixed-width containers, and test reflow at high zoom.",
+      "rule": {
+        "title": "Page has horizontal overflow under zoom/reflow stress",
+        "category": "Low Vision",
+        "why_it_matters": "Horizontal scrolling can make pages difficult or impossible to use for low-vision readers who zoom or use narrow viewports.",
+        "manual_review_notes": "Check the page manually at 200% zoom and narrow widths; some overflow may be intentional for data tables.",
+        "browser_check_limitations": "This approximates reflow stress with a narrow viewport and does not prove full zoom/reflow compliance."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "main",
+        "id": "",
+        "class": "",
+        "width": 640,
+        "width_style": "592px",
+        "text": "Low Vision Sample Page This paragraph has readable contrast and responsive layou",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "h1",
+        "id": "",
+        "class": "",
+        "width": 592,
+        "width_style": "592px",
+        "text": "Low Vision Sample Page",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "p",
+        "id": "",
+        "class": "",
+        "width": 592,
+        "width_style": "592px",
+        "text": "This paragraph has readable contrast and responsive layout.",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 2,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "text": "Button without visible focus",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(0, 0, 0)",
+        "box_shadow": "none",
+        "border": "0px none rgb(0, 0, 0)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+    "Low-vision browser checks are conservative heuristics and require manual review."
+  ],
+  "source": {
+    "input": "examples/sample_low_vision_page.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser",
+    "low_vision"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_low_vision_page.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "#help",
+        "src": null,
+        "text": "Low contrast help link",
+        "role": null,
+        "accessible_name_guess": "Low contrast help link",
+        "is_visible": true,
+        "x": 224,
+        "y": 171.875,
+        "width": 153.859375,
+        "height": 17
+      },
+      {
+        "step": 2,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Button without visible focus",
+        "role": null,
+        "accessible_name_guess": "Button without visible focus",
+        "is_visible": true,
+        "x": 224,
+        "y": 274.875,
+        "width": 172.796875,
+        "height": 17
+      },
+      {
+        "step": 3,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "#next",
+        "src": null,
+        "text": "Good visible focus link",
+        "role": null,
+        "accessible_name_guess": "Good visible focus link",
+        "is_visible": true,
+        "x": 405.25,
+        "y": 274.875,
+        "width": 159.1875,
+        "height": 17
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  },
+  "visual_proof": {
+    "enabled": true,
+    "screenshot_path": "reports/low_vision_batch/visual/low_vision_sample/page.png",
+    "focus_overlay_path": "reports/low_vision_batch/visual/low_vision_sample/focus_path.html",
+    "focus_points_count": 3,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "limitations": [
+      "Focus overlay shows observed Tab stops in this browser run.",
+      "It does not represent every assistive technology experience."
+    ]
+  },
+  "low_vision": {
+    "success": true,
+    "error": null,
+    "checks_run": [
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ],
+    "contrast_sample_count": 10,
+    "zoom_reflow": {
+      "viewport_width": 640,
+      "document_scroll_width": 1038,
+      "overflow_amount": 398,
+      "wide_elements": [
+        {
+          "tag": "main",
+          "id": "",
+          "class_name": "",
+          "width": 640,
+          "width_style": "592px",
+          "position": "static",
+          "text": "Low Vision Sample Page This paragraph has readable contrast and responsive layou"
+        },
+        {
+          "tag": "h1",
+          "id": "",
+          "class_name": "",
+          "width": 592,
+          "width_style": "592px",
+          "position": "static",
+          "text": "Low Vision Sample Page"
+        },
+        {
+          "tag": "p",
+          "id": "",
+          "class_name": "",
+          "width": 592,
+          "width_style": "592px",
+          "position": "static",
+          "text": "This paragraph has readable contrast and responsive layout."
+        },
+        {
+          "tag": "p",
+          "id": "",
+          "class_name": "low-contrast",
+          "width": 592,
+          "width_style": "592px",
+          "position": "static",
+          "text": "This paragraph intentionally has low contrast for testing."
+        },
+        {
+          "tag": "p",
+          "id": "",
+          "class_name": "",
+          "width": 592,
+          "width_style": "592px",
+          "position": "static",
+          "text": "Low contrast help link"
+        }
+      ]
+    },
+    "focus_visibility": {
+      "checked_count": 3,
+      "flagged_count": 1
+    },
+    "limitations": [
+      "Low-vision checks use browser-computed styles and conservative heuristics.",
+      "Rendered color contrast checks do not prove full WCAG conformance.",
+      "Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.",
+      "Focus indicator detection may miss custom focus styles."
+    ]
+  }
+}

@@ -49,6 +49,16 @@ Mark a finding as a false positive if:
 
 Please include the issue number and a short explanation.
 
+Reviewer verdict files can mark findings as:
+
+- `confirmed`
+- `false_positive`
+- `needs_review`
+- `fixed`
+- `missed_issue`
+
+These verdicts help measure report accuracy. They should not be used to publicly name reviewers or organizations unless permission was granted.
+
 ## How To Report Missed Issues
 
 Report a missed issue if the page has an accessibility barrier that A11yway did not detect.
@@ -64,10 +74,9 @@ Useful details include:
 
 A11yway currently has important limits:
 
-- Static HTML only.
-- No JavaScript execution yet.
-- No full screen reader simulation yet.
-- No full keyboard interaction testing yet.
+- No full screen reader simulation.
 - No PDF support yet.
+- No crawling, no logins, and no private portal testing without permission.
+- Low-vision checks are browser heuristics, not certification.
 - No full WCAG certification.
 - No replacement for disabled-user testing or expert review.

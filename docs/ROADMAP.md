@@ -12,6 +12,9 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Rule registry and documentation
 - Workflow packs for public-interest accessibility testing
 - Visual proof reports with screenshots, observed focus-path overlays, and HTML report export
+- Low-vision browser checks for rendered contrast, reflow approximation, and focus visibility
+- Reviewer verdict ingestion for confirmed, false positive, fixed, and missed issues
+- Re-audit diff tracking for fixed, remaining, new, and task-execution changes
 
 ## v0.4 - Workflow Packs
 
@@ -29,7 +32,6 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 ## Future Visual Improvements
 
 - Per-finding cropped screenshots
-- Focus visibility checks
 - Contrast and zoom/reflow checks
 
 ## v0.6 - Low-Vision Checks
@@ -59,6 +61,13 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Remaining issues
 - New issues
 - Verified impact over time
+
+## Future Refinement
+
+- Per-finding cropped screenshots
+- More precise contrast sampling for gradients and image backgrounds
+- Reviewer verdict dashboards
+- Re-audit history across multiple runs
 
 ## Later
 

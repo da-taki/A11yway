@@ -9,11 +9,13 @@ source file/url
   -> source_loader
   -> static analyzer
   -> optional browser runner
+  -> optional low-vision browser checks
   -> optional visual proof collector
   -> optional task executor
   -> workflow packs
   -> optional future AI scout suggestions
   -> deterministic verification
+  -> optional reviewer verdicts / re-audit diff
   -> report builder
   -> JSON / Markdown / HTML / CSV outputs
 ```
@@ -46,6 +48,10 @@ Only used when browser mode is active and visual proof is requested. The browser
 
 Visual proof is an evidence aid, not accessibility certification. The overlay shows one observed browser focus path and does not represent every assistive technology experience.
 
+### Low-Vision Audit - `a11yway/core/low_vision_audit.py` (Optional)
+
+Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, approximates 200% zoom/reflow with a narrow viewport, and checks focused elements for obvious focus indicators. These checks are conservative heuristics and require manual review.
+
 ### Task Runner - `a11yway/core/task_runner.py`
 
 Loads task scenarios, filters findings down to the issue types relevant to a task, and turns them into "likely blocker" notes with task impact text.
@@ -61,6 +67,14 @@ Loads deterministic JSON workflow templates for education, college applications,
 ### Future AI Scout Layer (Optional)
 
 Future AI scout mode may propose likely workflows and accessibility risks. It should never mark a finding as confirmed by itself. Deterministic static, browser, or task checks must verify a finding before reports call it confirmed.
+
+### Reviewer Verdicts - `a11yway/core/verdicts.py`
+
+Applies human reviewer verdicts to existing JSON reports and summarizes feedback. Verdicts can mark findings as confirmed, false positive, needs review, fixed, or missed issue. Organization names and quotes should only be used when permission fields allow it.
+
+### Re-Audit Diff - `a11yway/core/report_diff.py`
+
+Compares two JSON reports by deterministic issue fingerprints and task execution status. The diff reports fixed, remaining, new, and changed-severity issues, plus blocked-to-completed task execution changes for impact tracking.
 
 ### Rule Registry - `a11yway/core/rules.py`
 
@@ -104,6 +118,10 @@ Batch mode writes into the output directory:
 When task execution is enabled, per-page reports include a `task_execution` block. Batch index reports, the CSV index, and the evaluation summary include task execution status and step counts.
 
 When visual proof is enabled, reports include `visual_proof` metadata with screenshot and focus overlay paths. Image bytes are not embedded in JSON.
+
+When low-vision checks are enabled, reports include a `low_vision` block with contrast sample counts, zoom/reflow data, focus visibility summary, and limitations.
+
+Verdict and re-audit outputs are separate JSON/Markdown artifacts so original audit reports are preserved unless the reviewer explicitly applies verdicts.
 
 ## Limitations
 

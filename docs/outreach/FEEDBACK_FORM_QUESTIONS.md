@@ -110,3 +110,16 @@ Permission to mention your organization as an evaluator?
 - Yes
 - No
 - Ask again later
+
+## Structured Verdicts
+
+For each finding you review, choose the closest verdict:
+
+- Confirmed
+- False positive
+- Needs review
+- Fixed
+
+For missed barriers, include the issue type if known, severity, description, and evidence.
+
+These responses may be summarized internally to measure accuracy and usefulness. Public quotes or organization names should only be used if permission was granted above.

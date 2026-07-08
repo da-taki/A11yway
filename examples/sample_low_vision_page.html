@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Low Vision Sample Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #172033;
+      background: #ffffff;
+    }
+    main {
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    .low-contrast {
+      color: #b8b8b8;
+      background: #ffffff;
+    }
+    .low-contrast-link {
+      color: #9fb8d6;
+      background: #ffffff;
+    }
+    .wide-panel {
+      width: 980px;
+      padding: 1rem;
+      border: 1px solid #ccd3df;
+      background: #f7f9fc;
+    }
+    .hidden-focus:focus {
+      outline: none;
+      box-shadow: none;
+      border: 0;
+    }
+    .good-focus:focus {
+      outline: 3px solid #0b5fff;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Low Vision Sample Page</h1>
+    <p>This paragraph has readable contrast and responsive layout.</p>
+    <p class="low-contrast">This paragraph intentionally has low contrast for testing.</p>
+    <p><a class="low-contrast-link" href="#help">Low contrast help link</a></p>
+    <div class="wide-panel">
+      This fixed-width panel intentionally causes horizontal overflow at narrow viewport widths.
+    </div>
+    <p>
+      <button class="hidden-focus" type="button">Button without visible focus</button>
+      <a class="good-focus" href="#next">Good visible focus link</a>
+    </p>
+    <section id="help">
+      <h2>Help</h2>
+      <p>Manual review is still recommended.</p>
+    </section>
+  </main>
+</body>
+</html>

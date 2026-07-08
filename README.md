@@ -133,6 +133,40 @@ python -m a11yway.main --batch examples/sample_task_execution_batch.json --out-d
 
 The focus overlay shows observed Tab stops from a single browser run. It does not represent every assistive technology experience.
 
+## Low-Vision Checks
+
+Low-vision checks run in browser mode and use computed styles to review rendered color contrast, a narrow-viewport reflow approximation, and visible keyboard focus indicators.
+
+```bash
+python -m a11yway.main examples/sample_low_vision_page.html --browser --low-vision --json reports/low_vision_report.json --markdown reports/low_vision_report.md --html reports/low_vision_report.html
+
+python -m a11yway.main --batch examples/sample_low_vision_batch.json --out-dir reports/low_vision_batch --browser --low-vision --html-reports
+```
+
+These checks are conservative browser observations. They do not prove full WCAG compliance, and manual review is still required, especially for custom focus styles, image backgrounds, gradients, and complex responsive layouts.
+
+## Reviewer Verdicts
+
+Reviewer verdicts let humans mark findings as `confirmed`, `false_positive`, `needs_review`, `fixed`, or `missed_issue`. This helps measure precision and usefulness before outreach claims are made.
+
+```bash
+python -m a11yway.main --apply-verdicts reports/sample_verdicts.json --to reports/task_execution_report.json --out reports/task_execution_report_reviewed.json
+
+python -m a11yway.main --summarize-verdicts reports/sample_verdicts.json --markdown reports/verdict_summary.md
+```
+
+Do not publicly name reviewers or organizations unless permission was granted in the verdict file.
+
+## Re-Audit Diff Tracking
+
+Re-audit diffs compare two A11yway JSON reports and show fixed, remaining, and new findings, plus task execution changes such as blocked-to-completed workflows.
+
+```bash
+python -m a11yway.main --compare-reports reports/task_execution_broken_report.json reports/task_execution_report.json --markdown reports/re_audit_diff.md --json reports/re_audit_diff.json
+```
+
+Use re-audits for honest impact metrics: fixed issues, remaining issues, new issues, and verified task improvements over time.
+
 ## Optional AI Scout Configuration
 
 A11yway does not require AI keys. Deterministic audits work without any `.env` file.
@@ -184,8 +218,9 @@ Use honest, evidence-backed project metrics:
 - Sent reports to Y organizations
 - Received feedback from Z organizations
 - Confirmed fixes on N websites
+- Re-audits showed A fixed, B remaining, and C new issues
 
-Do not claim "I helped change X websites" unless fixes are confirmed.
+Do not claim "I helped change X websites" unless fixes are verified by re-audit or reviewer confirmation.
 
 ## Documentation
 

@@ -493,6 +493,106 @@ RULES: dict[str, dict] = {
             "Related to clear labeling and status feedback accessibility requirements."
         ),
     },
+    "low_contrast_text": {
+        "issue_type": "low_contrast_text",
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Low-vision readers may not be able to read text when the computed "
+            "foreground and background colors are too similar."
+        ),
+        "how_to_fix": (
+            "Increase foreground/background contrast and verify the final design "
+            "with manual review."
+        ),
+        "manual_review_notes": (
+            "Confirm the sampled colors match what users actually see, especially "
+            "over gradients, images, and layered components."
+        ),
+        "browser_check_limitations": (
+            "The check samples browser-computed colors and does not prove full "
+            "WCAG color contrast compliance."
+        ),
+        "standard_hint": (
+            "Related to text contrast requirements; treat this as a conservative review hint."
+        ),
+    },
+    "zoom_horizontal_overflow": {
+        "issue_type": "zoom_horizontal_overflow",
+        "title": "Page has horizontal overflow under zoom/reflow stress",
+        "category": "Low Vision",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Horizontal scrolling can make pages difficult or impossible to use "
+            "for low-vision readers who zoom or use narrow viewports."
+        ),
+        "how_to_fix": (
+            "Use responsive layout, avoid fixed-width containers, and test reflow "
+            "at high zoom."
+        ),
+        "manual_review_notes": (
+            "Check the page manually at 200% zoom and narrow widths; some overflow "
+            "may be intentional for data tables."
+        ),
+        "browser_check_limitations": (
+            "This approximates reflow stress with a narrow viewport and does not "
+            "prove full zoom/reflow compliance."
+        ),
+        "standard_hint": (
+            "Related to reflow and resize text accessibility requirements."
+        ),
+    },
+    "zoom_fixed_width_content": {
+        "issue_type": "zoom_fixed_width_content",
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Large fixed-width elements can force horizontal scrolling and hide "
+            "content when users zoom or use narrow windows."
+        ),
+        "how_to_fix": (
+            "Replace fixed pixel widths with responsive constraints such as "
+            "max-width: 100% and flexible layouts."
+        ),
+        "manual_review_notes": (
+            "Confirm whether the wide element is essential and whether all content "
+            "remains reachable without two-dimensional scrolling."
+        ),
+        "browser_check_limitations": (
+            "The check flags obvious wide rendered elements and fixed pixel widths; "
+            "it may miss complex layout problems."
+        ),
+        "standard_hint": (
+            "Related to reflow and responsive layout accessibility requirements."
+        ),
+    },
+    "focus_indicator_missing": {
+        "issue_type": "focus_indicator_missing",
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "default_severity": "high",
+        "why_it_matters": (
+            "Keyboard users with low vision need a visible indicator to know "
+            "which control currently has focus."
+        ),
+        "how_to_fix": (
+            "Provide a clear :focus or :focus-visible style with visible outline, "
+            "border, or shadow."
+        ),
+        "manual_review_notes": (
+            "Manually tab through the page; some custom focus styles may be visible "
+            "but not detected by this heuristic."
+        ),
+        "browser_check_limitations": (
+            "Focus indicator detection checks computed outline, border, and shadow "
+            "heuristically and can miss custom visual treatments."
+        ),
+        "standard_hint": (
+            "Related to visible focus accessibility requirements."
+        ),
+    },
 }
 
 

@@ -75,3 +75,29 @@ Use `index.csv` as the starting point for a tracking sheet: add columns
 for date sent, response received, confirmed findings, false positives,
 and missed barriers the reviewer reported. This record is what turns the
 prototype into an evaluated tool.
+
+You can also store structured reviewer verdicts and summarize them:
+
+```bash
+python -m a11yway.main --summarize-verdicts reports/sample_verdicts.json --markdown reports/verdict_summary.md
+```
+
+## Step 8 - Re-audit after fixes
+
+When an organization makes changes, run A11yway again and compare the old
+and new JSON reports:
+
+```bash
+python -m a11yway.main --compare-reports reports/old_report.json reports/new_report.json --markdown reports/re_audit_diff.md --json reports/re_audit_diff.json
+```
+
+Use careful impact metrics:
+
+- Audited X websites
+- Sent reports to Y organizations
+- Received feedback from Z organizations
+- Confirmed fixes on N websites
+- Re-audits showed A fixed, B remaining, and C new issues
+
+Do not claim "helped change X websites" unless fixes are verified by
+re-audit or reviewer confirmation.
