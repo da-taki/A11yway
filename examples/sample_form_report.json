@@ -1,0 +1,9 @@
+{
+  "file": "examples/sample_form.html",
+  "summary": "Sample output for the current HTML form label prototype.",
+  "issues_found": 2,
+  "issue_types": [
+    "missing_form_label"
+  ],
+  "notes": "This is a sample fixture, not a complete accessibility audit."
+}

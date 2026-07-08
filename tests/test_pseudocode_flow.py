@@ -6,6 +6,7 @@ from a11yway.agents.dyslexia_agent import DyslexiaAgent
 from a11yway.agents.hearing_agent import HearingAgent
 from a11yway.agents.keyboard_agent import KeyboardOnlyAgent
 from a11yway.agents.low_vision_agent import LowVisionAgent
+from a11yway.main import analyze_html_file
 from a11yway.core.page_analyzer import analyze_html_forms
 from a11yway.core.report_builder import ReportBuilder
 from a11yway.core.task_runner import TaskRunner
@@ -89,3 +90,34 @@ def test_keyboard_agent_uses_html_form_analyzer() -> None:
     )
 
     assert any(issue.issue_type == "missing_form_label" for issue in findings)
+
+
+def test_sample_form_fixture_exists() -> None:
+    """The CLI sample fixture should be present."""
+    assert Path("examples/sample_form.html").exists()
+
+
+def test_sample_form_returns_expected_missing_label_count() -> None:
+    """The sample form should contain exactly two missing label issues."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+
+    assert len(issues) == 2
+    assert all(issue.issue_type == "missing_form_label" for issue in issues)
+
+
+def test_sample_form_labeled_fields_are_not_flagged() -> None:
+    """Properly labeled email and school controls should not be reported."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    evidence = " ".join(issue.evidence for issue in issues)
+
+    assert "student_email" not in evidence
+    assert "school_name" not in evidence
+
+
+def test_sample_form_hidden_and_submit_fields_are_ignored() -> None:
+    """Hidden and submit fields in the sample should not become issues."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    evidence = " ".join(issue.evidence for issue in issues)
+
+    assert "application_token" not in evidence
+    assert "submit" not in evidence.lower()

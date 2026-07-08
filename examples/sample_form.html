@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Student Scholarship Application</title>
+  </head>
+  <body>
+    <main>
+      <h1>Student Scholarship Application</h1>
+      <p>
+        Use this sample form to request scholarship support for the upcoming
+        school term. This file is only a fixture for the A11yway prototype.
+      </p>
+
+      <form action="/scholarship/apply" method="post">
+        <input type="hidden" name="application_token" value="sample-token">
+
+        <div>
+          <input type="text" name="student_name">
+        </div>
+
+        <div>
+          <label for="student_email">Student email</label>
+          <input id="student_email" type="email" name="student_email">
+        </div>
+
+        <div>
+          <label for="school_name">School</label>
+          <select id="school_name" name="school_name">
+            <option value="">Choose a school</option>
+            <option value="riverside">Riverside High School</option>
+            <option value="hillview">Hillview Community School</option>
+          </select>
+        </div>
+
+        <div>
+          <textarea name="accommodation_request" rows="5"></textarea>
+        </div>
+
+        <p>
+          Uploaded document note: students may attach proof of enrollment on
+          the full application portal.
+        </p>
+
+        <button type="submit">Submit application</button>
+      </form>
+    </main>
+  </body>
+</html>
