@@ -85,7 +85,13 @@ Run a batch audit across multiple local sample pages:
 python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
 ```
 
-Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus an index report that summarizes pages tested, issue counts, and task blockers. This is useful for future outreach and evaluation work.
+Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus `index.json`, `index.md`, and `index.csv` summaries for tracking pages tested, issue counts, and task blockers. This is useful for future outreach and evaluation work.
+
+You can also choose a CSV path:
+
+```bash
+python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample --csv reports/batch_sample/index.csv
+```
 
 URL mode fetches the exact static HTML page you provide. It does not execute JavaScript, does not crawl websites, and should be used responsibly on public pages or pages you have permission to test.
 

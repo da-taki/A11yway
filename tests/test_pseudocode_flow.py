@@ -1,6 +1,7 @@
 """Lightweight tests for the A11yway pseudocode scaffold."""
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import csv
 import json
 from pathlib import Path
 import threading
@@ -680,6 +681,85 @@ def test_batch_index_markdown_includes_sources_and_total(tmp_path: Path) -> None
     assert f"- Total issues: {result['index']['summary']['total_issues']}" in markdown
 
 
+def test_batch_run_creates_index_csv(tmp_path: Path) -> None:
+    """Batch runner should create a CSV index by default."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    assert (out_dir / "index.csv").exists()
+
+
+def test_batch_csv_has_expected_headers(tmp_path: Path) -> None:
+    """CSV index should include spreadsheet-friendly headers."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    with (out_dir / "index.csv").open("r", encoding="utf-8", newline="") as file:
+        reader = csv.DictReader(file)
+        assert reader.fieldnames == [
+            "id",
+            "name",
+            "source",
+            "source_type",
+            "task",
+            "status",
+            "issues_found",
+            "task_blockers",
+            "high_count",
+            "medium_count",
+            "low_count",
+            "issue_types",
+            "json_report",
+            "markdown_report",
+            "error",
+        ]
+
+
+def test_batch_csv_has_one_row_per_batch_item(tmp_path: Path) -> None:
+    """CSV index should have one data row for each batch item."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    with (out_dir / "index.csv").open("r", encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+
+    assert len(rows) == 2
+
+
+def test_batch_csv_includes_issue_counts(tmp_path: Path) -> None:
+    """CSV rows should include issue counts and severity counts."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    with (out_dir / "index.csv").open("r", encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+
+    assert rows[0]["issues_found"] == "7"
+    assert int(rows[0]["high_count"]) >= 1
+
+
+def test_batch_csv_includes_report_paths(tmp_path: Path) -> None:
+    """CSV rows should include JSON and Markdown report paths."""
+    out_dir = tmp_path / "batch_sample"
+    run_batch("examples/sample_batch.json", out_dir)
+
+    with (out_dir / "index.csv").open("r", encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+
+    assert rows[0]["json_report"].endswith("scholarship_form.json")
+    assert rows[0]["markdown_report"].endswith("scholarship_form.md")
+
+
+def test_batch_csv_override_path(tmp_path: Path) -> None:
+    """Batch runner should allow a custom CSV output path."""
+    out_dir = tmp_path / "batch_sample"
+    csv_path = tmp_path / "custom" / "benchmark.csv"
+    result = run_batch("examples/sample_batch.json", out_dir, csv_path=csv_path)
+
+    assert csv_path.exists()
+    assert result["csv_index_path"] == csv_path.as_posix()
+
+
 def test_batch_runner_continues_if_one_source_fails(tmp_path: Path) -> None:
     """Batch mode should include failed sources in the index and continue."""
     config_path = tmp_path / "batch_with_failure.json"
@@ -731,3 +811,26 @@ def test_cli_batch_mode_writes_index(tmp_path: Path, capsys) -> None:
     assert "Pages tested: 2" in captured.out
     assert (out_dir / "index.json").exists()
     assert (out_dir / "index.md").exists()
+    assert (out_dir / "index.csv").exists()
+
+
+def test_cli_batch_mode_accepts_csv_override(tmp_path: Path, capsys) -> None:
+    """CLI batch mode should accept --csv for a custom benchmark path."""
+    out_dir = tmp_path / "batch_sample"
+    csv_path = tmp_path / "custom" / "index.csv"
+
+    exit_code = main(
+        [
+            "--batch",
+            "examples/sample_batch.json",
+            "--out-dir",
+            str(out_dir),
+            "--csv",
+            str(csv_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "Index CSV:" in captured.out
+    assert csv_path.exists()

@@ -76,5 +76,6 @@
     "This prototype only runs static HTML checks.",
     "It does not replace a full human accessibility audit.",
     "It does not yet perform browser-based interaction testing."
-  ]
+  ],
+  "csv_index_path": "reports/batch_sample/index.csv"
 }

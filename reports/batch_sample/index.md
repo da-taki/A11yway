@@ -4,6 +4,7 @@
 
 - Total pages tested: 2
 - Total issues: 11
+- CSV index: reports/batch_sample/index.csv
 
 ### Counts By Severity
 
