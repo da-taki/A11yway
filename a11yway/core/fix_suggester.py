@@ -9,6 +9,11 @@ class FixSuggester:
     def __init__(self) -> None:
         self.fix_map = {
             "missing_label": "Add a visible label and connect it to the form field.",
+            "missing_form_label": (
+                "Add a visible <label> connected with for/id. Use aria-label only "
+                "when a visible label is not possible. Later, associate helper text "
+                "and error messages programmatically."
+            ),
             "low_contrast": "Increase text and control contrast so content is easier to read.",
             "missing_transcript": "Add a transcript near the audio or video lesson.",
             "captions_transcripts": "Provide synchronized captions and a full text transcript.",
