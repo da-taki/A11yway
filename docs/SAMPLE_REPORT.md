@@ -6,6 +6,9 @@ the current prototype can begin to produce, but it is not a complete audit.
 A generated Markdown example is available at `reports/sample_form_report.md`.
 Batch sample output is generated under `reports/batch_sample/`.
 
+URL reports include source metadata such as source type, final URL, status code,
+and content type when that information is available.
+
 ## Site
 
 Riverside Learning Portal

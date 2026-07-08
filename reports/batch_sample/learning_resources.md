@@ -2,7 +2,8 @@
 
 ## Summary
 
-- Source file: examples/sample_resource_page.html
+- Source: examples/sample_resource_page.html
+- Source type: file
 - Issues found: 4
 - Agents used: Keyboard-only student
 - Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility

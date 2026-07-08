@@ -23,7 +23,10 @@
       "id": "scholarship_form",
       "name": "Student Scholarship Application",
       "source": "examples/sample_form.html",
+      "source_type": "file",
       "task": "submit_scholarship_application",
+      "status": "passed",
+      "error": "",
       "issue_count": 7,
       "task_blocker_count": 5,
       "counts_by_severity": {
@@ -47,7 +50,10 @@
       "id": "learning_resources",
       "name": "Learning Resources Page",
       "source": "examples/sample_resource_page.html",
+      "source_type": "file",
       "task": "access_learning_resources",
+      "status": "passed",
+      "error": "",
       "issue_count": 4,
       "task_blocker_count": 4,
       "counts_by_severity": {

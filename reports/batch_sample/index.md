@@ -22,10 +22,10 @@
 
 ## Sources Tested
 
-| ID | Name | Source | Task | Issues | Task blockers | Reports |
-| --- | --- | --- | --- | ---: | ---: | --- |
-| scholarship_form | Student Scholarship Application | examples/sample_form.html | submit_scholarship_application | 7 | 5 | json: reports/batch_sample/scholarship_form.json, markdown: reports/batch_sample/scholarship_form.md |
-| learning_resources | Learning Resources Page | examples/sample_resource_page.html | access_learning_resources | 4 | 4 | json: reports/batch_sample/learning_resources.json, markdown: reports/batch_sample/learning_resources.md |
+| ID | Name | Source | Task | Status | Issues | Task blockers | Reports | Error |
+| --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
+| scholarship_form | Student Scholarship Application | examples/sample_form.html | submit_scholarship_application | passed | 7 | 5 | json: reports/batch_sample/scholarship_form.json, markdown: reports/batch_sample/scholarship_form.md |  |
+| learning_resources | Learning Resources Page | examples/sample_resource_page.html | access_learning_resources | passed | 4 | 4 | json: reports/batch_sample/learning_resources.json, markdown: reports/batch_sample/learning_resources.md |  |
 
 ## Limitations
 

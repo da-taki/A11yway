@@ -14,6 +14,7 @@ from a11yway.core.report_builder import (
     save_json_report,
     save_markdown_report,
 )
+from a11yway.core.source_loader import load_html_source
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 
 
@@ -51,9 +52,29 @@ def run_batch(
 
     for item in batch_items:
         item_id = safe_report_id(str(item.get("id", item.get("name", "report"))))
-        source_path = Path(str(item["source"]))
-        html = source_path.read_text(encoding="utf-8")
-        issues = analyze_html_static(html)
+        source = str(item["source"])
+        source_result = load_html_source(source)
+
+        if source_result["error"]:
+            source_summaries.append(
+                {
+                    "id": item_id,
+                    "name": item.get("name", item_id),
+                    "source": source,
+                    "source_type": source_result["source_type"],
+                    "task": item.get("task", ""),
+                    "status": "failed",
+                    "error": source_result["error"],
+                    "issue_count": 0,
+                    "task_blocker_count": 0,
+                    "counts_by_severity": {},
+                    "counts_by_issue_type": {},
+                    "reports": {},
+                }
+            )
+            continue
+
+        issues = analyze_html_static(source_result["html"])
 
         selected_task = None
         task_blockers: list[dict] = []
@@ -64,10 +85,11 @@ def run_batch(
                 task_blockers = build_task_blockers(selected_task, issues)
 
         report = build_json_report(
-            source_path.as_posix(),
+            source,
             issues,
             task=selected_task,
             task_blockers=task_blockers,
+            source_metadata=source_result,
         )
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
@@ -78,8 +100,11 @@ def run_batch(
             {
                 "id": item_id,
                 "name": item.get("name", item_id),
-                "source": source_path.as_posix(),
+                "source": source,
+                "source_type": source_result["source_type"],
                 "task": task_id_or_name or "",
+                "status": "passed",
+                "error": "",
                 "issue_count": report["summary"]["issues_found"],
                 "task_blocker_count": len(task_blockers),
                 "counts_by_severity": report["summary"]["counts_by_severity"],

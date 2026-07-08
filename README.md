@@ -53,6 +53,12 @@ Save a readable Markdown report:
 python -m a11yway.main examples/sample_form.html --task submit_scholarship_application --markdown reports/sample_form_report.md
 ```
 
+Audit a public static page:
+
+```bash
+python -m a11yway.main https://example.com --markdown reports/url_report.md
+```
+
 Run the audit in the context of a task:
 
 ```bash
@@ -80,6 +86,8 @@ python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batc
 ```
 
 Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus an index report that summarizes pages tested, issue counts, and task blockers. This is useful for future outreach and evaluation work.
+
+URL mode fetches the exact static HTML page you provide. It does not execute JavaScript, does not crawl websites, and should be used responsibly on public pages or pages you have permission to test.
 
 ## Example Use Case
 

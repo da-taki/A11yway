@@ -12,6 +12,7 @@ from a11yway.core.report_builder import (
     save_json_report,
     save_markdown_report,
 )
+from a11yway.core.source_loader import load_html_source
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.task import AccessibilityTask
@@ -21,9 +22,13 @@ DEFAULT_HTML_PATH = Path("examples/sample_form.html")
 DEFAULT_TASKS_PATH = Path("examples/sample_tasks.json")
 
 
-def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
-    """Read an HTML file and return static accessibility issues."""
-    html = path.read_text(encoding="utf-8")
+def analyze_html_source(source: str) -> tuple[list[AccessibilityIssue], dict]:
+    """Load a file or URL source and return static accessibility issues."""
+    source_result = load_html_source(source)
+    if source_result["error"]:
+        return [], source_result
+
+    html = source_result["html"]
     issues = analyze_html_static(html)
     fix_suggester = FixSuggester()
 
@@ -31,13 +36,19 @@ def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
         if not issue.suggested_fix:
             issue.suggested_fix = fix_suggester.suggest_fix(issue.issue_type)
 
+    return issues, source_result
+
+
+def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
+    """Read a local HTML file and return static accessibility issues."""
+    issues, _source_result = analyze_html_source(path.as_posix())
     return issues
 
 
-def print_summary(path: Path, issues: list[AccessibilityIssue]) -> None:
+def print_summary(source: str | Path, issues: list[AccessibilityIssue]) -> None:
     """Print a readable command-line summary."""
     print("A11yway static HTML accessibility audit")
-    print(f"File analyzed: {path}")
+    print(f"Source analyzed: {source}")
     print(f"Issues found: {len(issues)}")
 
     for index, issue in enumerate(issues, start=1):
@@ -146,14 +157,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Index Markdown: {batch_result['index_markdown_path']}")
         return 0
 
-    html_path = Path(parsed_args.html_path)
+    source = parsed_args.html_path
+    issues, source_result = analyze_html_source(source)
 
-    if not html_path.exists():
-        print(f"HTML file not found: {html_path}", file=sys.stderr)
+    if source_result["error"]:
+        print(f"Could not load HTML source: {source_result['error']}", file=sys.stderr)
         return 1
 
-    issues = analyze_html_file(html_path)
-    print_summary(html_path, issues)
+    print_summary(source, issues)
 
     selected_task = None
     task_blockers: list[dict] = []
@@ -169,10 +180,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.json_output or parsed_args.markdown_output:
         report = build_json_report(
-            html_path.as_posix(),
+            source,
             issues,
             task=selected_task,
             task_blockers=task_blockers,
+            source_metadata=source_result,
         )
 
     if parsed_args.json_output:

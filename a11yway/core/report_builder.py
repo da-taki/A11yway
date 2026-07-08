@@ -39,6 +39,7 @@ def build_json_report(
     issues: list[AccessibilityIssue],
     task: AccessibilityTask | None = None,
     task_blockers: list[dict] | None = None,
+    source_metadata: dict | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
     report = {
@@ -79,6 +80,15 @@ def build_json_report(
             "likely_blockers": task_blockers or [],
         }
 
+    if source_metadata:
+        report["source"] = {
+            "input": source_metadata.get("source"),
+            "type": source_metadata.get("source_type"),
+            "final_url": source_metadata.get("final_url"),
+            "status_code": source_metadata.get("status_code"),
+            "content_type": source_metadata.get("content_type"),
+        }
+
     return report
 
 
@@ -116,12 +126,15 @@ def _format_evidence_lines(evidence: dict) -> list[str]:
 def build_markdown_report(report: dict) -> str:
     """Build a readable Markdown report from a JSON-style report dict."""
     summary = report.get("summary", {})
+    source = report.get("source", {})
+    source_label = source.get("input") or report.get("source_file", "")
     lines = [
         "# A11yway Accessibility Report",
         "",
         "## Summary",
         "",
-        f"- Source file: {report.get('source_file', '')}",
+        f"- Source: {source_label}",
+        f"- Source type: {source.get('type', 'file')}",
         f"- Issues found: {summary.get('issues_found', 0)}",
         f"- Agents used: {', '.join(summary.get('agents_used', []))}",
         f"- Checks run: {', '.join(summary.get('checks_run', []))}",
@@ -135,6 +148,17 @@ def build_markdown_report(report: dict) -> str:
         *_format_count_items(summary.get("counts_by_issue_type", {})),
         "",
     ]
+    if source.get("final_url") or source.get("status_code"):
+        lines.extend(
+            [
+                "### Source Metadata",
+                "",
+                f"- Final URL: {source.get('final_url') or ''}",
+                f"- Status code: {source.get('status_code') or ''}",
+                f"- Content type: {source.get('content_type') or ''}",
+                "",
+            ]
+        )
 
     task = report.get("task")
     if task:
@@ -248,8 +272,8 @@ def build_batch_index_markdown(index_report: dict) -> str:
         "",
         "## Sources Tested",
         "",
-        "| ID | Name | Source | Task | Issues | Task blockers | Reports |",
-        "| --- | --- | --- | --- | ---: | ---: | --- |",
+        "| ID | Name | Source | Task | Status | Issues | Task blockers | Reports | Error |",
+        "| --- | --- | --- | --- | --- | ---: | ---: | --- | --- |",
     ]
 
     for item in index_report.get("sources", []):
@@ -258,14 +282,16 @@ def build_batch_index_markdown(index_report: dict) -> str:
             f"{kind}: {path}" for kind, path in reports.items() if path
         )
         lines.append(
-            "| {id} | {name} | {source} | {task} | {issues} | {blockers} | {reports} |".format(
+            "| {id} | {name} | {source} | {task} | {status} | {issues} | {blockers} | {reports} | {error} |".format(
                 id=item.get("id", ""),
                 name=item.get("name", ""),
                 source=item.get("source", ""),
                 task=item.get("task", ""),
+                status=item.get("status", "passed"),
                 issues=item.get("issue_count", 0),
                 blockers=item.get("task_blocker_count", 0),
                 reports=report_links,
+                error=item.get("error", ""),
             )
         )
 
