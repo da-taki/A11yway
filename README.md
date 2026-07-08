@@ -1,113 +1,45 @@
 # A11yway
 
-A11yway is an early pseudocode scaffold for an agentic accessibility testing tool focused on education websites, forms, PDFs, and learning portals.
+A11yway audits education web pages for accessibility barriers that block real student tasks — static HTML checks by default, with an optional headless-browser keyboard audit.
 
-The idea is simple: instead of only scanning a page for technical accessibility rules, A11yway will eventually simulate how students with different accessibility needs complete real education tasks. Example tasks include finding an assignment, submitting a form, reading instructions, accessing a video, or downloading a resource.
+**Status: v0.2 prototype — open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review. Tests: 108 passing.
 
-## v0.1 Prototype Features
+Instead of only scanning a page for technical rules, A11yway is built around student tasks: submitting a scholarship form, finding an assignment, accessing a video lesson. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
 
-- Static HTML accessibility checks for local files and public URLs
-- Task-based education scenarios (for example, submitting a scholarship form)
-- Structured evidence: HTML snippets, reasons, and approximate line numbers
-- JSON and Markdown report export
-- Batch evaluation across multiple pages
-- CSV benchmark index for spreadsheets
-- Rule registry documenting every check (see [docs/RULES.md](docs/RULES.md))
-- Reviewer-friendly batch evaluation summary (`evaluation_summary.md`)
-- Optional browser interaction mode: keyboard focus tracing and JavaScript-rendered DOM re-checks
+## Quickstart: Static Mode
 
-Static mode runs on the Python standard library — no external dependencies. Browser mode is opt-in and requires Playwright.
-
-### Limitations
-
-- Static HTML only; no browser automation yet
-- URL mode does not execute JavaScript
-- No full screen-reader simulation yet
-- No private or unauthorized testing — use public pages or pages with permission
-- Does not replace human accessibility review or testing with disabled users
-
-## Why Education Accessibility Testing Matters
-
-Education websites often contain forms, documents, videos, assignments, portals, and deadlines. If any of those are inaccessible, students can be blocked from learning or from completing required school tasks.
-
-Accessibility testing in education should answer practical questions:
-
-- Can a keyboard-only student complete the task?
-- Can a low-vision student read and use the page after zooming?
-- Are instructions clear for a student with reading difficulty?
-- Are captions or transcripts available for audio and video content?
-
-## What "Agentic Accessibility Testing" Means Here
-
-In this project, an agent is a small simulated student profile. Each agent has a specific accessibility need and tries to complete a task from that point of view.
-
-For this first draft, agents only contain placeholder logic and readable pseudocode. Later, they could use browser automation, PDF analysis, accessibility APIs, and human feedback to produce stronger results.
-
-## MVP Scope
-
-The first MVP should stay small:
-
-- Load a task description.
-- Run a few student accessibility agents.
-- Collect barriers found by each agent.
-- Suggest practical fixes.
-- Build a simple report.
-
-This scaffold does not include real AI integrations, browser automation, PDF parsing, or production APIs yet.
-
-## Try the Prototype
-
-Run the sample static HTML audit:
+Static mode needs only Python 3.10+ — no external dependencies.
 
 ```bash
 python -m a11yway.main examples/sample_form.html
 ```
 
-Save a structured JSON report:
+Save reports, optionally in the context of a student task:
 
 ```bash
-python -m a11yway.main examples/sample_form.html --json reports/sample_form_report.json
+python -m a11yway.main examples/sample_form.html --task submit_scholarship_application --json reports/sample_form_report.json --markdown reports/sample_form_report.md
 ```
 
-Save a readable Markdown report:
-
-```bash
-python -m a11yway.main examples/sample_form.html --task submit_scholarship_application --markdown reports/sample_form_report.md
-```
-
-Audit a public static page:
+Audit a public page (fetches the static HTML; no JavaScript, no crawling):
 
 ```bash
 python -m a11yway.main https://example.com --markdown reports/url_report.md
 ```
 
-Run the audit in the context of a task:
-
-```bash
-python -m a11yway.main examples/sample_form.html --task submit_scholarship_application
-```
-
-If no file path is provided, the command tries `examples/sample_form.html`.
-
-List every static check with its category and default severity:
+Explore the checks:
 
 ```bash
 python -m a11yway.main --list-rules
-```
-
-Show full documentation for one rule:
-
-```bash
 python -m a11yway.main --rule missing_form_label
 ```
 
-All checks are documented in [docs/RULES.md](docs/RULES.md), including what each rule detects, why it matters, and what static analysis cannot verify.
+Static checks cover form labels, link/button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. Every finding includes an evidence snippet, the reason, and an approximate line number.
 
-## Browser Interaction Mode
+## Quickstart: Browser Mode
 
-Static checks read the HTML source, but real education portals often build forms and buttons with JavaScript. Browser mode loads the page in headless Chromium, presses Tab repeatedly to trace where keyboard focus actually goes, and re-runs the static checks on the JavaScript-rendered DOM. This begins to answer the practical question: can a keyboard-only student actually move through this page?
+Real education portals build forms and buttons with JavaScript. Browser mode loads the page in headless Chromium, presses Tab repeatedly to trace where keyboard focus actually goes, and re-runs the static checks on the rendered DOM. It begins to answer: can a keyboard-only student actually move through this page?
 
-Browser mode is optional. Install its dependency first:
+Install the optional dependency:
 
 ```bash
 pip install -r requirements-browser.txt
@@ -120,72 +52,55 @@ Then add `--browser` to any audit:
 python -m a11yway.main examples/sample_dynamic_form.html --browser --markdown reports/dynamic_form_report.md
 ```
 
-Browser batch runs work the same way:
-
-```bash
-python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir reports/browser_batch_sample --browser
-```
-
-Tune the traversal with `--max-tabs N` (default 40) and `--wait-ms N` (default 500, time given to JavaScript after load). Reports gain a Browser Interaction Trace showing each Tab stop with its estimated accessible name. [examples/sample_dynamic_form.html](examples/sample_dynamic_form.html) demonstrates the difference: its JavaScript-added unlabeled field and unnamed button are invisible to static source analysis but caught in browser mode.
-
-Browser mode limitations:
-
-- It does not simulate a full screen reader.
-- Accessible names are estimated and require manual review.
-- It does not log into private portals.
-- It does not crawl websites.
-- It does not certify WCAG compliance.
-- Use it only on public pages or pages you have permission to test.
-
-If Playwright is not installed, `--browser` prints setup instructions and exits; all static commands keep working without it.
-
-The current prototype runs a static HTML audit for form labels, link and button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. The JSON export is meant to grow into future NGO and school review reports.
-
-Task mode explains which page barriers matter for a specific education workflow, such as submitting a scholarship form or accessing learning resources. This is the first step toward agentic accessibility testing, but it still uses deterministic static checks rather than real student simulation.
-
-Markdown export is meant for sharing readable reports with schools, NGOs, and accessibility reviewers.
-
-Reports include structured evidence such as HTML snippets, tag attributes, reasons, and approximate line numbers when available.
-
-This is still not a full accessibility audit and does not replace testing with disabled users.
+Tune with `--max-tabs N` (default 40) and `--wait-ms N` (default 500). [examples/sample_dynamic_form.html](examples/sample_dynamic_form.html) shows the difference: its JavaScript-added unlabeled field and unnamed button produce zero static findings but four browser findings. If Playwright is missing, `--browser` prints setup instructions and exits; every static command keeps working without it.
 
 ## Batch Evaluation
 
-Run a batch audit across multiple local sample pages:
+Audit multiple pages in one run:
 
 ```bash
 python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
+python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir reports/browser_batch_sample --browser
 ```
 
-Batch mode is meant for reviewing multiple school or NGO pages. It creates per-page JSON and Markdown reports, plus `index.json`, `index.md`, and `index.csv` summaries for tracking pages tested, issue counts, and task blockers. It also writes `evaluation_summary.md`, a reviewer-friendly overview with top issue types, a severity breakdown, and high priority findings across the whole batch.
+Each batch writes per-page JSON/Markdown reports plus:
 
-To start your own review batch, copy [examples/evaluation_batch_template.json](examples/evaluation_batch_template.json), replace the placeholder names and URLs with the pages you have permission to review, then run:
+- `index.json` / `index.md` — batch summary and per-source stats
+- `index.csv` — spreadsheet-friendly benchmark row per page
+- `evaluation_summary.md` — reviewer-facing overview: top issue types, severity breakdown, high priority findings with evidence
 
-```bash
-python -m a11yway.main --batch examples/evaluation_batch_template.json --out-dir reports/my_review
-```
+Example generated output: [reports/batch_sample/evaluation_summary.md](reports/batch_sample/evaluation_summary.md) and [reports/dynamic_form_report.md](reports/dynamic_form_report.md) (from a real headless Chromium run).
 
-You can also choose a CSV path:
+To start your own review batch, copy [examples/evaluation_batch_template.json](examples/evaluation_batch_template.json), replace the placeholders with pages you have permission to review, and follow [docs/RUN_FIRST_EVALUATION_BATCH.md](docs/RUN_FIRST_EVALUATION_BATCH.md).
 
-```bash
-python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample --csv reports/batch_sample/index.csv
-```
+## Why Education Accessibility Testing Matters
 
-URL mode fetches the exact static HTML page you provide. It does not execute JavaScript, does not crawl websites, and should be used responsibly on public pages or pages you have permission to test.
+Education sites carry forms, documents, videos, assignments, and deadlines. If any of those are inaccessible, students are blocked from learning or from completing required school tasks. Practical questions this project works toward answering:
 
-## Evaluation Materials
+- Can a keyboard-only student complete the task?
+- Can a low-vision student read and use the page after zooming?
+- Are instructions clear for a student with reading difficulty?
+- Are captions or transcripts available for audio and video content?
 
-Use these templates when sharing reports with schools, NGOs, or reviewers:
+## Limitations
 
-- [NGO report email template](docs/outreach/NGO_REPORT_EMAIL.md)
-- [Feedback form questions](docs/outreach/FEEDBACK_FORM_QUESTIONS.md)
-- [Evaluation protocol](docs/outreach/EVALUATION_PROTOCOL.md)
-- [Reviewer guide](docs/outreach/REVIEWER_GUIDE.md)
+- Static checks are heuristics on HTML source; URL mode does not execute JavaScript.
+- Browser mode approximates keyboard interaction; accessible names are estimated and need manual review.
+- No full screen-reader simulation.
+- No crawling, no logins, no private or unauthorized testing — public pages or explicit permission only.
+- Findings are hints for human reviewers. A11yway does not certify WCAG compliance and does not replace testing with disabled users.
 
-## Example Use Case
+## Documentation
 
-A school wants to test whether students can submit a scholarship application form. A11yway runs several student agents against that task and reports problems such as missing form labels, confusing errors, weak focus indicators, or instructions that are only available in audio.
+- [docs/RULES.md](docs/RULES.md) — every check: what it detects, why it matters, what it cannot verify
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how a page flows through the tool
+- [docs/ROADMAP.md](docs/ROADMAP.md) — what is planned, and what is deliberately not
+- [docs/RUN_FIRST_EVALUATION_BATCH.md](docs/RUN_FIRST_EVALUATION_BATCH.md) — running a responsible NGO/school review batch
+- [docs/outreach/EVALUATION_PROTOCOL.md](docs/outreach/EVALUATION_PROTOCOL.md) — evaluation protocol for reviewers
+- [docs/outreach/REVIEWER_GUIDE.md](docs/outreach/REVIEWER_GUIDE.md) — guide for accessibility reviewers
+- [CONTRIBUTING.md](CONTRIBUTING.md) — setup, tests, adding rules and sample pages
+- [CHANGELOG.md](CHANGELOG.md) — milestone history
 
-## Current Status
+## Project Direction
 
-This repository is currently a lightweight pseudocode scaffold. It is meant to be readable for a student developer and easy to grow into a Python, Flask, or FastAPI project later.
+In this project, an "agent" is a small simulated student profile with a specific accessibility need. Today the checks are deterministic heuristics plus a basic keyboard traversal; the direction is richer task simulation (see the roadmap). The code is intentionally small and readable for student developers.
