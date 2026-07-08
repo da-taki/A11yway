@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from a11yway.core.fix_suggester import FixSuggester
-from a11yway.core.page_analyzer import analyze_html_forms
+from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import build_json_report, save_json_report
 from a11yway.models.issue import AccessibilityIssue
 
@@ -14,9 +14,9 @@ DEFAULT_HTML_PATH = Path("examples/sample_form.html")
 
 
 def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
-    """Read an HTML file and return basic form label issues."""
+    """Read an HTML file and return static accessibility issues."""
     html = path.read_text(encoding="utf-8")
-    issues = analyze_html_forms(html)
+    issues = analyze_html_static(html)
     fix_suggester = FixSuggester()
 
     for issue in issues:
@@ -28,7 +28,7 @@ def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
 
 def print_summary(path: Path, issues: list[AccessibilityIssue]) -> None:
     """Print a readable command-line summary."""
-    print("A11yway HTML form label analysis")
+    print("A11yway static HTML accessibility audit")
     print(f"File analyzed: {path}")
     print(f"Issues found: {len(issues)}")
 
@@ -46,7 +46,7 @@ def print_summary(path: Path, issues: list[AccessibilityIssue]) -> None:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     """Parse CLI arguments for the current prototype."""
     parser = argparse.ArgumentParser(
-        description="Run A11yway's basic HTML form label check.",
+        description="Run A11yway's static HTML accessibility audit.",
     )
     parser.add_argument(
         "html_path",

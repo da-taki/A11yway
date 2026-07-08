@@ -35,7 +35,7 @@ This scaffold does not include real AI integrations, browser automation, PDF par
 
 ## Try the Prototype
 
-Run the sample HTML form check:
+Run the sample static HTML audit:
 
 ```bash
 python -m a11yway.main examples/sample_form.html
@@ -49,7 +49,9 @@ python -m a11yway.main examples/sample_form.html --json reports/sample_form_repo
 
 If no file path is provided, the command tries `examples/sample_form.html`.
 
-The current prototype only checks basic HTML form labels. It can flag common unlabeled `input`, `textarea`, and `select` controls, while ignoring hidden and submit inputs. The JSON export is meant to grow into future NGO and school review reports. This is the first real check, not a complete accessibility audit.
+The current prototype runs a static HTML audit for form labels, link and button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. The JSON export is meant to grow into future NGO and school review reports.
+
+This is still not a full accessibility audit and does not replace testing with disabled users.
 
 ## Example Use Case
 

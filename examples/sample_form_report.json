@@ -1,9 +1,14 @@
 {
   "file": "examples/sample_form.html",
-  "summary": "Sample output for the current HTML form label prototype.",
-  "issues_found": 2,
+  "summary": "Sample output for the current static HTML audit prototype.",
+  "issues_found": 7,
   "issue_types": [
-    "missing_form_label"
+    "missing_form_label",
+    "generic_link_text",
+    "missing_button_name",
+    "missing_image_alt",
+    "skipped_heading_level",
+    "missing_video_captions"
   ],
   "notes": "This is a sample fixture, not a complete accessibility audit."
 }

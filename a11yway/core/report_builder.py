@@ -10,6 +10,15 @@ from typing import List
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.report import AccessibilityReport
 from a11yway.models.task import AccessibilityTask
+from a11yway.core.page_analyzer import STATIC_CHECKS_RUN
+
+
+def _count_by(items: list[str]) -> dict[str, int]:
+    """Count string values while keeping the report builder dependency-free."""
+    counts: dict[str, int] = {}
+    for item in items:
+        counts[item] = counts.get(item, 0) + 1
+    return counts
 
 
 def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dict:
@@ -20,8 +29,10 @@ def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dic
         "source_file": source_file,
         "summary": {
             "issues_found": len(issues),
+            "counts_by_severity": _count_by([issue.severity for issue in issues]),
+            "counts_by_issue_type": _count_by([issue.issue_type for issue in issues]),
             "agents_used": ["Keyboard-only student"],
-            "checks_run": ["html_form_labels"],
+            "checks_run": STATIC_CHECKS_RUN,
         },
         "issues": [
             {
@@ -37,7 +48,7 @@ def build_json_report(source_file: str, issues: list[AccessibilityIssue]) -> dic
             for issue in issues
         ],
         "limitations": [
-            "This prototype only checks basic HTML form labels.",
+            "This prototype only runs static HTML checks.",
             "It does not replace a full human accessibility audit.",
         ],
     }
