@@ -36,14 +36,35 @@ def _format_evidence_for_json(evidence: str | dict) -> dict:
     return {"description": evidence}
 
 
+BROWSER_MODE_LIMITATIONS = [
+    "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+    "Accessible names are estimated and require manual review.",
+]
+
+
 def build_json_report(
     source_file: str,
     issues: list[AccessibilityIssue],
     task: AccessibilityTask | None = None,
     task_blockers: list[dict] | None = None,
     source_metadata: dict | None = None,
+    browser_result: dict | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
+    checks_run = list(STATIC_CHECKS_RUN)
+    limitations = [
+        "This prototype only runs static HTML checks.",
+        "It does not replace a full human accessibility audit.",
+        "It does not yet perform browser-based interaction testing.",
+    ]
+    if browser_result is not None:
+        checks_run.extend(browser_result.get("checks_run", []))
+        limitations = [
+            "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+            "It does not replace a full human accessibility audit.",
+            "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+        ]
+
     report = {
         "tool": "A11yway",
         "version": "prototype",
@@ -53,7 +74,7 @@ def build_json_report(
             "counts_by_severity": _count_by([issue.severity for issue in issues]),
             "counts_by_issue_type": _count_by([issue.issue_type for issue in issues]),
             "agents_used": ["Keyboard-only student"],
-            "checks_run": STATIC_CHECKS_RUN,
+            "checks_run": checks_run,
         },
         "issues": [
             enrich_issue_with_rule(
@@ -68,11 +89,7 @@ def build_json_report(
             )
             for issue in issues
         ],
-        "limitations": [
-            "This prototype only runs static HTML checks.",
-            "It does not replace a full human accessibility audit.",
-            "It does not yet perform browser-based interaction testing.",
-        ],
+        "limitations": limitations,
     }
 
     if task:
@@ -91,6 +108,17 @@ def build_json_report(
             "final_url": source_metadata.get("final_url"),
             "status_code": source_metadata.get("status_code"),
             "content_type": source_metadata.get("content_type"),
+        }
+
+    if browser_result is not None:
+        report["analysis_modes"] = ["static", "browser"]
+        report["browser"] = {
+            "success": browser_result.get("success", False),
+            "error": browser_result.get("error"),
+            "final_url": browser_result.get("final_url"),
+            "checks_run": browser_result.get("checks_run", []),
+            "focus_trace": browser_result.get("focus_trace", []),
+            "limitations": list(BROWSER_MODE_LIMITATIONS),
         }
 
     return report
@@ -115,7 +143,7 @@ def _format_count_items(counts: dict) -> list[str]:
 def _format_evidence_lines(evidence: dict) -> list[str]:
     """Format structured evidence for Markdown output."""
     lines = []
-    for key in ["tag", "id", "name", "href", "src", "text", "line", "reason"]:
+    for key in ["tag", "id", "name", "href", "src", "text", "line", "step", "detected_in", "reason"]:
         value = evidence.get(key)
         if value not in [None, ""]:
             lines.append(f"- {key}: {value}")
@@ -163,6 +191,55 @@ def build_markdown_report(report: dict) -> str:
                 "",
             ]
         )
+
+    browser = report.get("browser")
+    if browser is not None:
+        trace = browser.get("focus_trace", [])
+        lines.extend(
+            [
+                "## Browser Mode Summary",
+                "",
+                f"- Analysis modes: {', '.join(report.get('analysis_modes', []))}",
+                f"- Browser audit success: {str(browser.get('success', False)).lower()}",
+            ]
+        )
+        if browser.get("error"):
+            lines.append(f"- Error: {browser['error']}")
+        lines.extend(
+            [
+                f"- Checks run: {', '.join(browser.get('checks_run', []))}",
+                f"- Focus trace length: {len(trace)}",
+                "",
+            ]
+        )
+        if trace:
+            lines.extend(
+                [
+                    "## Browser Interaction Trace",
+                    "",
+                    "| Step | Tag | Accessible name guess | ID/Name | Text/Href |",
+                    "| ---: | --- | --- | --- | --- |",
+                ]
+            )
+            for entry in trace[:20]:
+                lines.append(
+                    "| {step} | {tag} | {name_guess} | {id_name} | {text_href} |".format(
+                        step=entry.get("step", ""),
+                        tag=entry.get("tag", ""),
+                        name_guess=entry.get("accessible_name_guess", ""),
+                        id_name=entry.get("id") or entry.get("name") or "",
+                        text_href=entry.get("text") or entry.get("href") or "",
+                    )
+                )
+            if len(trace) > 20:
+                lines.extend(
+                    ["", f"Trace truncated: showing the first 20 of {len(trace)} steps."]
+                )
+            lines.append("")
+        if browser.get("limitations"):
+            lines.extend(["### Browser Limitations", ""])
+            lines.extend(f"- {limitation}" for limitation in browser["limitations"])
+            lines.append("")
 
     task = report.get("task")
     if task:
@@ -219,6 +296,8 @@ def build_markdown_report(report: dict) -> str:
             lines.append(f"- Manual review: {rule['manual_review_notes']}")
         if rule.get("static_check_limitations"):
             lines.append(f"- Static check limitation: {rule['static_check_limitations']}")
+        if rule.get("browser_check_limitations"):
+            lines.append(f"- Browser check limitation: {rule['browser_check_limitations']}")
         lines.extend(["", "Evidence:", ""])
         lines.extend(_format_evidence_lines(issue.get("evidence", {})))
         lines.append("")
@@ -247,11 +326,15 @@ def build_batch_index_report(items: list[dict]) -> dict:
         merge_counts(counts_by_issue_type, item.get("counts_by_issue_type", {}))
 
     successful_pages = sum(1 for item in items if item.get("status") == "passed")
+    analysis_modes = ["static"]
+    if any("browser" in item.get("analysis_modes", []) for item in items):
+        analysis_modes = ["static", "browser"]
 
     return {
         "tool": "A11yway",
         "version": "prototype",
         "summary": {
+            "analysis_modes": analysis_modes,
             "total_pages_tested": len(items),
             "successful_pages": successful_pages,
             "failed_pages": len(items) - successful_pages,
@@ -344,6 +427,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
         "status",
         "issues_found",
         "task_blockers",
+        "browser_status",
+        "browser_issue_count",
         "high_count",
         "medium_count",
         "low_count",
@@ -370,6 +455,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
                     "status": item.get("status", ""),
                     "issues_found": item.get("issue_count", 0),
                     "task_blockers": item.get("task_blocker_count", 0),
+                    "browser_status": item.get("browser_status", ""),
+                    "browser_issue_count": item.get("browser_issue_count", 0),
                     "high_count": severity_counts.get("high", 0),
                     "medium_count": severity_counts.get("medium", 0),
                     "low_count": severity_counts.get("low", 0),

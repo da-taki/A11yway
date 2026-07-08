@@ -1,0 +1,482 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_form.html",
+  "summary": {
+    "issues_found": 11,
+    "counts_by_severity": {
+      "high": 8,
+      "medium": 3
+    },
+    "counts_by_issue_type": {
+      "missing_form_label": 2,
+      "generic_link_text": 1,
+      "missing_button_name": 1,
+      "missing_image_alt": 1,
+      "skipped_heading_level": 1,
+      "missing_video_captions": 2,
+      "browser_focused_control_missing_name": 3
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "input",
+        "line": 36,
+        "snippet": "<input type=\"text\" name=\"student_name\">",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "student_name",
+        "identity": "name=\"student_name\""
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "textarea",
+        "line": 54,
+        "snippet": "<textarea name=\"accommodation_request\" rows=\"5\">",
+        "reason": "Form control has no accessible label.",
+        "name": "accommodation_request",
+        "type": "text",
+        "identity": "name=\"accommodation_request\""
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
+    },
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 21,
+        "snippet": "<a href=\"/scholarships/help\">click here</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "/scholarships/help",
+        "text": "click here"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\"",
+      "rule": {
+        "title": "Link text is too generic",
+        "category": "Interactive Elements",
+        "why_it_matters": "Students who navigate by a list of links hear 'click here' with no context and cannot tell links apart.",
+        "manual_review_notes": "Surrounding text may add context visually, but the link should still make sense on its own.",
+        "static_check_limitations": "The check only matches a small list of common generic phrases."
+      }
+    },
+    {
+      "issue_type": "missing_button_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Button is missing an accessible name",
+      "evidence": {
+        "tag": "button",
+        "line": 27,
+        "snippet": "<button type=\"button\">",
+        "reason": "Button has no visible text, aria-label, title, or image alt text.",
+        "type": "button"
+      },
+      "suggested_fix": "Add clear button text or an aria-label that describes the button action.",
+      "rule": {
+        "title": "Button missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "A button without a name is announced as just 'button' by screen readers, so students cannot tell what pressing it will do.",
+        "manual_review_notes": "Icon-only buttons may look meaningful visually but still need a programmatic name.",
+        "static_check_limitations": "Static HTML cannot see names added later by JavaScript or icon fonts."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 24,
+        "snippet": "<img src=\"student-award.png\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "student-award.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h3",
+        "line": 16,
+        "snippet": "<h3>",
+        "reason": "Heading level jumps from h1 to h3.",
+        "text": "Application Details",
+        "previous_level": 1,
+        "level": 3
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
+    },
+    {
+      "issue_type": "missing_video_captions",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Video is missing captions",
+      "evidence": {
+        "tag": "video",
+        "line": 30,
+        "snippet": "<video controls src=\"orientation.mp4\">",
+        "reason": "Video has no captions or subtitles track.",
+        "src": "orientation.mp4"
+      },
+      "suggested_fix": "Add captions or subtitles for education video content.",
+      "rule": {
+        "title": "Video missing captions",
+        "category": "Media",
+        "why_it_matters": "Deaf and hard-of-hearing students cannot access spoken lesson content without captions or subtitles.",
+        "manual_review_notes": "Captions may be provided by an embedded player or platform instead of a track element.",
+        "static_check_limitations": "The check only sees <track> elements; player-level or burned-in captions are invisible to static HTML."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 3,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "button",
+        "type": "button",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 6,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "input",
+        "name": "student_name",
+        "type": "text",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 9,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "textarea",
+        "name": "accommodation_request",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "missing_video_captions",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Video is missing captions",
+      "evidence": {
+        "tag": "video",
+        "line": 28,
+        "snippet": "<video controls=\"\" src=\"orientation.mp4\">",
+        "reason": "Video has no captions or subtitles track.",
+        "src": "orientation.mp4",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add captions or subtitles for education video content.",
+      "rule": {
+        "title": "Video missing captions",
+        "category": "Media",
+        "why_it_matters": "Deaf and hard-of-hearing students cannot access spoken lesson content without captions or subtitles.",
+        "manual_review_notes": "Captions may be provided by an embedded player or platform instead of a track element.",
+        "static_check_limitations": "The check only sees <track> elements; player-level or burned-in captions are invisible to static HTML."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "task": {
+    "id": "submit_scholarship_application",
+    "name": "Submit scholarship application",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Read the page purpose",
+      "Enter name",
+      "Enter email",
+      "Choose school",
+      "Describe accommodation request",
+      "Submit the form"
+    ],
+    "likely_blockers": [
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "generic_link_text",
+        "severity": "medium",
+        "message": "Link text is too generic",
+        "task_impact": "Link text may not clearly explain the destination or action."
+      },
+      {
+        "issue_type": "missing_button_name",
+        "severity": "high",
+        "message": "Button is missing an accessible name",
+        "task_impact": "Student may not be able to identify what an unlabeled button does."
+      },
+      {
+        "issue_type": "skipped_heading_level",
+        "severity": "medium",
+        "message": "Heading level is skipped",
+        "task_impact": "Student may struggle to understand the page structure and task sections."
+      }
+    ]
+  },
+  "source": {
+    "input": "examples/sample_form.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_form.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "/scholarships/guidelines",
+        "src": null,
+        "text": "Download scholarship guidelines",
+        "role": null,
+        "accessible_name_guess": "Download scholarship guidelines",
+        "is_visible": true
+      },
+      {
+        "step": 2,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "/scholarships/help",
+        "src": null,
+        "text": "click here",
+        "role": null,
+        "accessible_name_guess": "click here",
+        "is_visible": true
+      },
+      {
+        "step": 3,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 4,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Save application draft",
+        "is_visible": true
+      },
+      {
+        "step": 5,
+        "tag": "video",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": null,
+        "src": "orientation.mp4",
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 6,
+        "tag": "input",
+        "id": null,
+        "name": "student_name",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 7,
+        "tag": "input",
+        "id": "student_email",
+        "name": "student_email",
+        "type": "email",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Student email",
+        "is_visible": true
+      },
+      {
+        "step": 8,
+        "tag": "select",
+        "id": "school_name",
+        "name": "school_name",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a school Riverside High School Hillview Community School",
+        "role": null,
+        "accessible_name_guess": "School",
+        "is_visible": true
+      },
+      {
+        "step": 9,
+        "tag": "textarea",
+        "id": null,
+        "name": "accommodation_request",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true
+      },
+      {
+        "step": 10,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "submit",
+        "href": null,
+        "src": null,
+        "text": "Submit application",
+        "role": null,
+        "accessible_name_guess": "Submit application",
+        "is_visible": true
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  }
+}

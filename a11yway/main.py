@@ -5,6 +5,12 @@ import sys
 from pathlib import Path
 
 from a11yway.core.batch_runner import run_batch
+from a11yway.core.browser_runner import (
+    PLAYWRIGHT_SETUP_MESSAGE,
+    is_playwright_available,
+    merge_browser_issues,
+    run_browser_audit,
+)
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
@@ -83,6 +89,26 @@ def format_evidence_for_cli(evidence: str | dict) -> str:
     return " | ".join(parts) if parts else str(evidence)
 
 
+def print_browser_summary(
+    browser_result: dict,
+    static_issue_count: int,
+    total_issue_count: int,
+) -> None:
+    """Print a short breakdown of the optional browser audit."""
+    print()
+    print("Browser interaction audit")
+    if not browser_result.get("success"):
+        print(f"   Status: failed ({browser_result.get('error')})")
+        print("   Static results above are still valid.")
+        return
+
+    print("   Status: passed")
+    print(f"   Static issues: {static_issue_count}")
+    print(f"   Browser issues: {total_issue_count - static_issue_count}")
+    print(f"   Total issues: {total_issue_count}")
+    print(f"   Focus trace length: {len(browser_result.get('focus_trace', []))}")
+
+
 def print_task_summary(task: AccessibilityTask, blockers: list[dict]) -> None:
     """Print task context and likely blockers for the static findings."""
     print()
@@ -144,6 +170,26 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Optional task id or name from examples/sample_tasks.json.",
     )
     parser.add_argument(
+        "--browser",
+        dest="browser",
+        action="store_true",
+        help="Also run the optional keyboard interaction audit (requires Playwright).",
+    )
+    parser.add_argument(
+        "--max-tabs",
+        dest="max_tabs",
+        type=int,
+        default=40,
+        help="Maximum Tab presses for the browser focus traversal. Defaults to 40.",
+    )
+    parser.add_argument(
+        "--wait-ms",
+        dest="wait_ms",
+        type=int,
+        default=500,
+        help="Milliseconds to wait for JavaScript after page load. Defaults to 500.",
+    )
+    parser.add_argument(
         "--list-rules",
         dest="list_rules",
         action="store_true",
@@ -179,14 +225,20 @@ def print_rule_details(issue_type: str) -> int:
         return 1
 
     print(f"Rule: {rule['issue_type']}")
-    print(f"Title: {rule['title']}")
-    print(f"Category: {rule['category']}")
-    print(f"Default severity: {rule['default_severity']}")
-    print(f"Why it matters: {rule['why_it_matters']}")
-    print(f"How to fix: {rule['how_to_fix']}")
-    print(f"Manual review notes: {rule['manual_review_notes']}")
-    print(f"Static check limitations: {rule['static_check_limitations']}")
-    print(f"Standard hint: {rule['standard_hint']}")
+    detail_fields = [
+        ("Title", "title"),
+        ("Category", "category"),
+        ("Default severity", "default_severity"),
+        ("Why it matters", "why_it_matters"),
+        ("How to fix", "how_to_fix"),
+        ("Manual review notes", "manual_review_notes"),
+        ("Static check limitations", "static_check_limitations"),
+        ("Browser check limitations", "browser_check_limitations"),
+        ("Standard hint", "standard_hint"),
+    ]
+    for label, key in detail_fields:
+        if key in rule:
+            print(f"{label}: {rule[key]}")
     return 0
 
 
@@ -202,14 +254,23 @@ def main(argv: list[str] | None = None) -> int:
     if parsed_args.rule_issue_type:
         return print_rule_details(parsed_args.rule_issue_type)
 
+    if parsed_args.browser and not is_playwright_available():
+        print(PLAYWRIGHT_SETUP_MESSAGE)
+        return 1
+
     if parsed_args.batch_config:
         batch_result = run_batch(
             parsed_args.batch_config,
             parsed_args.out_dir,
             csv_path=parsed_args.csv_output,
+            browser=parsed_args.browser,
+            max_tabs=parsed_args.max_tabs,
+            wait_ms=parsed_args.wait_ms,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
+        if parsed_args.browser:
+            print("Browser mode: enabled")
         print(f"Batch file: {batch_result['config_path']}")
         print(f"Pages tested: {summary['total_pages_tested']}")
         print(f"Total issues: {summary['total_issues']}")
@@ -230,7 +291,20 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Could not load HTML source: {source_result['error']}", file=sys.stderr)
         return 1
 
+    browser_result = None
+    static_issue_count = len(issues)
+    if parsed_args.browser:
+        browser_result = run_browser_audit(
+            source,
+            max_tabs=parsed_args.max_tabs,
+            wait_ms=parsed_args.wait_ms,
+        )
+        issues = merge_browser_issues(issues, browser_result)
+
     print_summary(source, issues)
+
+    if browser_result is not None:
+        print_browser_summary(browser_result, static_issue_count, len(issues))
 
     selected_task = None
     task_blockers: list[dict] = []
@@ -251,6 +325,7 @@ def main(argv: list[str] | None = None) -> int:
             task=selected_task,
             task_blockers=task_blockers,
             source_metadata=source_result,
+            browser_result=browser_result,
         )
 
     if parsed_args.json_output:

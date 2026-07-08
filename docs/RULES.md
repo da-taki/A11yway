@@ -1,14 +1,15 @@
-# A11yway Static Check Rules
+# A11yway Check Rules
 
-A11yway is a prototype. The checks below inspect static HTML with the Python
-standard library. They are useful for finding common, high-impact barriers on
-education pages, but they are not a complete accessibility audit and do not
+A11yway is a prototype. The static checks below inspect HTML with the Python
+standard library; the optional browser checks approximate keyboard navigation
+in headless Chromium. Both are useful for finding common, high-impact barriers
+on education pages, but they are not a complete accessibility audit and do not
 replace human review or testing with disabled users.
 
 Run `python -m a11yway.main --list-rules` for a quick listing, or
 `python -m a11yway.main --rule missing_form_label` for details on one rule.
 
-## Rule Overview
+## Static Rule Overview
 
 | Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
 | --- | --- | --- | --- | --- | --- |
@@ -39,13 +40,34 @@ The analyzer currently runs these check groups over the raw HTML:
 Findings include an evidence snippet, the reason the check fired, and an
 approximate source line number so reviewers can verify each result manually.
 
+## Browser Interaction Checks (optional)
+
+With `--browser` and Playwright installed, A11yway loads the page in headless
+Chromium, presses Tab repeatedly to trace keyboard focus, and re-runs the
+static checks on the JavaScript-rendered DOM. Rendered-DOM findings reuse the
+static issue types above with `detected_in: "browser_dom"` in their evidence.
+
+| Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
+| --- | --- | --- | --- | --- | --- |
+| `browser_no_focusable_elements` | Keyboard Interaction | high | Interactive-looking elements exist but nothing can receive keyboard focus | Keyboard-only students are completely blocked | Counts common focusable selectors; may miss unusual custom widgets |
+| `browser_focus_not_moving` | Keyboard Interaction | high | Pressing Tab never focuses page content despite focusable elements | Keyboard-only students cannot start the task | Headless Tab behavior can differ slightly from a real browser |
+| `browser_repeated_focus` | Keyboard Interaction | medium | The same element stays focused across several Tab presses | Suggests a keyboard trap that strands students | A heuristic; cannot prove a real trap |
+| `browser_focused_control_missing_name` | Keyboard Interaction | high | A focused link/button/form control has no estimated accessible name | Screen readers announce nothing useful about the control | Accessible names are estimated, not computed from the accessibility tree |
+| `browser_focus_on_hidden_element` | Keyboard Interaction | high | Focus lands on an element that appears invisible | Keyboard users lose track of where they are | Visibility is estimated from size and CSS |
+
+Browser mode limitations:
+
+- It approximates keyboard interaction; it does not simulate a full screen reader.
+- Accessible names are estimated and require manual review.
+- It does not crawl websites or log into private portals.
+- Use it only on public pages or pages you have permission to test.
+
 ## Not Yet Covered
 
-These areas are out of scope for the current static prototype:
+These areas are out of scope for the current prototype:
 
-- JavaScript-rendered UI (pages built or changed by scripts)
-- Real keyboard traversal and focus order testing
-- Full screen-reader simulation
+- Full screen-reader simulation (browser mode only estimates accessible names)
+- Complex keyboard interaction beyond Tab traversal (arrow keys, shortcuts, modals)
 - Authenticated portals and login-protected pages
 - PDFs and other documents
 - Mobile app accessibility
@@ -53,5 +75,5 @@ These areas are out of scope for the current static prototype:
 - Full WCAG certification — A11yway results are hints for human reviewers,
   not conformance claims
 
-If a page passes every current check, that only means these specific static
-checks found nothing. Manual review is still required.
+If a page passes every current check, that only means these specific checks
+found nothing. Manual review is still required.

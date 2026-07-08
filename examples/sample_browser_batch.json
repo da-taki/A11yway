@@ -1,0 +1,14 @@
+[
+  {
+    "id": "scholarship_form",
+    "name": "Student Scholarship Application",
+    "source": "examples/sample_form.html",
+    "task": "submit_scholarship_application"
+  },
+  {
+    "id": "dynamic_enrollment_form",
+    "name": "Course Enrollment Form (JavaScript)",
+    "source": "examples/sample_dynamic_form.html",
+    "task": "submit_scholarship_application"
+  }
+]

@@ -20,7 +20,7 @@ from a11yway.main import analyze_html_file, main
 from a11yway.models.issue import AccessibilityIssue
 
 
-EXPECTED_ISSUE_TYPES = {
+EXPECTED_STATIC_ISSUE_TYPES = {
     "missing_form_label",
     "missing_button_name",
     "missing_link_name",
@@ -34,6 +34,16 @@ EXPECTED_ISSUE_TYPES = {
     "missing_video_captions",
     "missing_audio_transcript",
 }
+
+EXPECTED_BROWSER_ISSUE_TYPES = {
+    "browser_no_focusable_elements",
+    "browser_focus_not_moving",
+    "browser_repeated_focus",
+    "browser_focused_control_missing_name",
+    "browser_focus_on_hidden_element",
+}
+
+EXPECTED_ISSUE_TYPES = EXPECTED_STATIC_ISSUE_TYPES | EXPECTED_BROWSER_ISSUE_TYPES
 
 
 def test_rule_registry_covers_all_expected_issue_types() -> None:
@@ -51,7 +61,6 @@ def test_every_rule_has_required_documentation_fields() -> None:
         "why_it_matters",
         "how_to_fix",
         "manual_review_notes",
-        "static_check_limitations",
         "standard_hint",
     }
 
@@ -59,6 +68,8 @@ def test_every_rule_has_required_documentation_fields() -> None:
         assert required_fields.issubset(rule), issue_type
         assert rule["issue_type"] == issue_type
         assert rule["default_severity"] in {"high", "medium", "low"}
+        # Static rules explain static limits; browser rules explain browser limits.
+        assert "static_check_limitations" in rule or "browser_check_limitations" in rule
 
 
 def test_get_rule_returns_known_rule() -> None:

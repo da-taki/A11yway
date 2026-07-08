@@ -1,0 +1,164 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "summary": {
+    "analysis_modes": [
+      "static",
+      "browser"
+    ],
+    "total_pages_tested": 2,
+    "successful_pages": 2,
+    "failed_pages": 0,
+    "total_issues": 15,
+    "total_task_blockers": 7,
+    "counts_by_severity": {
+      "high": 12,
+      "medium": 3
+    },
+    "counts_by_issue_type": {
+      "missing_form_label": 3,
+      "generic_link_text": 1,
+      "missing_button_name": 2,
+      "missing_image_alt": 1,
+      "skipped_heading_level": 1,
+      "missing_video_captions": 2,
+      "browser_focused_control_missing_name": 5
+    }
+  },
+  "sources": [
+    {
+      "id": "scholarship_form",
+      "name": "Student Scholarship Application",
+      "source": "examples/sample_form.html",
+      "source_type": "file",
+      "task": "submit_scholarship_application",
+      "status": "passed",
+      "error": "",
+      "issue_count": 11,
+      "task_blocker_count": 5,
+      "counts_by_severity": {
+        "high": 8,
+        "medium": 3
+      },
+      "counts_by_issue_type": {
+        "missing_form_label": 2,
+        "generic_link_text": 1,
+        "missing_button_name": 1,
+        "missing_image_alt": 1,
+        "skipped_heading_level": 1,
+        "missing_video_captions": 2,
+        "browser_focused_control_missing_name": 3
+      },
+      "high_severity_issues": [
+        {
+          "issue_type": "missing_form_label",
+          "message": "Form control is missing an accessible label",
+          "snippet": "<input type=\"text\" name=\"student_name\">"
+        },
+        {
+          "issue_type": "missing_form_label",
+          "message": "Form control is missing an accessible label",
+          "snippet": "<textarea name=\"accommodation_request\" rows=\"5\">"
+        },
+        {
+          "issue_type": "missing_button_name",
+          "message": "Button is missing an accessible name",
+          "snippet": "<button type=\"button\">"
+        },
+        {
+          "issue_type": "missing_video_captions",
+          "message": "Video is missing captions",
+          "snippet": "<video controls src=\"orientation.mp4\">"
+        },
+        {
+          "issue_type": "browser_focused_control_missing_name",
+          "message": "Focused control has no accessible name",
+          "snippet": ""
+        },
+        {
+          "issue_type": "browser_focused_control_missing_name",
+          "message": "Focused control has no accessible name",
+          "snippet": ""
+        },
+        {
+          "issue_type": "browser_focused_control_missing_name",
+          "message": "Focused control has no accessible name",
+          "snippet": ""
+        },
+        {
+          "issue_type": "missing_video_captions",
+          "message": "Video is missing captions",
+          "snippet": "<video controls=\"\" src=\"orientation.mp4\">"
+        }
+      ],
+      "analysis_modes": [
+        "static",
+        "browser"
+      ],
+      "browser_status": "passed",
+      "browser_issue_count": 4,
+      "reports": {
+        "json": "reports/browser_batch_sample/scholarship_form.json",
+        "markdown": "reports/browser_batch_sample/scholarship_form.md"
+      }
+    },
+    {
+      "id": "dynamic_enrollment_form",
+      "name": "Course Enrollment Form (JavaScript)",
+      "source": "examples/sample_dynamic_form.html",
+      "source_type": "file",
+      "task": "submit_scholarship_application",
+      "status": "passed",
+      "error": "",
+      "issue_count": 4,
+      "task_blocker_count": 2,
+      "counts_by_severity": {
+        "high": 4
+      },
+      "counts_by_issue_type": {
+        "browser_focused_control_missing_name": 2,
+        "missing_form_label": 1,
+        "missing_button_name": 1
+      },
+      "high_severity_issues": [
+        {
+          "issue_type": "browser_focused_control_missing_name",
+          "message": "Focused control has no accessible name",
+          "snippet": ""
+        },
+        {
+          "issue_type": "browser_focused_control_missing_name",
+          "message": "Focused control has no accessible name",
+          "snippet": ""
+        },
+        {
+          "issue_type": "missing_form_label",
+          "message": "Form control is missing an accessible label",
+          "snippet": "<input type=\"text\" name=\"preferred_course\">"
+        },
+        {
+          "issue_type": "missing_button_name",
+          "message": "Button is missing an accessible name",
+          "snippet": "<button type=\"button\">"
+        }
+      ],
+      "analysis_modes": [
+        "static",
+        "browser"
+      ],
+      "browser_status": "passed",
+      "browser_issue_count": 4,
+      "reports": {
+        "json": "reports/browser_batch_sample/dynamic_enrollment_form.json",
+        "markdown": "reports/browser_batch_sample/dynamic_enrollment_form.md"
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ],
+  "csv_index_path": "reports/browser_batch_sample/index.csv",
+  "evaluation_summary_path": "reports/browser_batch_sample/evaluation_summary.md"
+}
