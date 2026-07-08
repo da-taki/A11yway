@@ -41,9 +41,29 @@ def print_summary(path: Path, issues: list[AccessibilityIssue]) -> None:
         print(f"   Severity: {issue.severity}")
         print(f"   Type: {issue.issue_type}")
         print(f"   Message: {issue.title}")
-        print(f"   Evidence: {issue.evidence}")
+        print(f"   Evidence: {format_evidence_for_cli(issue.evidence)}")
         if issue.suggested_fix:
             print(f"   Suggested fix: {issue.suggested_fix}")
+
+
+def format_evidence_for_cli(evidence: str | dict) -> str:
+    """Format string or structured evidence for a compact CLI line."""
+    if isinstance(evidence, str):
+        return evidence
+
+    parts = []
+    snippet = evidence.get("snippet")
+    line = evidence.get("line")
+    reason = evidence.get("reason")
+
+    if snippet:
+        parts.append(str(snippet))
+    if line:
+        parts.append(f"line {line}")
+    if reason:
+        parts.append(str(reason))
+
+    return " | ".join(parts) if parts else str(evidence)
 
 
 def print_task_summary(task: AccessibilityTask, blockers: list[dict]) -> None:

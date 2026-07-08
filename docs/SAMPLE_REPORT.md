@@ -41,6 +41,19 @@ Agent: Keyboard-only student
 
 Evidence: The "Guardian income" input is announced only as "edit field" in the placeholder test notes. A keyboard user may not know what information is required.
 
+HTML evidence:
+
+```json
+{
+  "tag": "input",
+  "type": "text",
+  "name": "student_name",
+  "line": 36,
+  "snippet": "<input type=\"text\" name=\"student_name\">",
+  "reason": "Form control has no accessible label."
+}
+```
+
 Suggested fix: Add a visible text label connected to the input with the `for` and `id` attributes.
 
 ### 2. Focus Indicator Is Hard To See
@@ -80,6 +93,19 @@ Severity: Medium
 Agent: Page Analyzer
 
 Evidence: A help link uses the text "click here", which does not explain the destination when read out of context.
+
+HTML evidence:
+
+```json
+{
+  "tag": "a",
+  "href": "/scholarships/help",
+  "text": "click here",
+  "line": 21,
+  "snippet": "<a href=\"/scholarships/help\">click here</a>",
+  "reason": "Link text is generic and does not explain the destination or action."
+}
+```
 
 Suggested fix: Use descriptive link text such as "Read scholarship application help".
 

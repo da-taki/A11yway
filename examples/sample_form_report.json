@@ -1,14 +1,187 @@
 {
-  "file": "examples/sample_form.html",
-  "summary": "Sample output for the current static HTML audit prototype.",
-  "issues_found": 7,
-  "issue_types": [
-    "missing_form_label",
-    "generic_link_text",
-    "missing_button_name",
-    "missing_image_alt",
-    "skipped_heading_level",
-    "missing_video_captions"
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_form.html",
+  "summary": {
+    "issues_found": 7,
+    "counts_by_severity": {
+      "high": 4,
+      "medium": 3
+    },
+    "counts_by_issue_type": {
+      "missing_form_label": 2,
+      "generic_link_text": 1,
+      "missing_button_name": 1,
+      "missing_image_alt": 1,
+      "skipped_heading_level": 1,
+      "missing_video_captions": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "input",
+        "line": 36,
+        "snippet": "<input type=\"text\" name=\"student_name\">",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "student_name",
+        "identity": "name=\"student_name\""
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+    },
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "textarea",
+        "line": 54,
+        "snippet": "<textarea name=\"accommodation_request\" rows=\"5\">",
+        "reason": "Form control has no accessible label.",
+        "name": "accommodation_request",
+        "type": "text",
+        "identity": "name=\"accommodation_request\""
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible."
+    },
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 21,
+        "snippet": "<a href=\"/scholarships/help\">click here</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "/scholarships/help",
+        "text": "click here"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\""
+    },
+    {
+      "issue_type": "missing_button_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Button is missing an accessible name",
+      "evidence": {
+        "tag": "button",
+        "line": 27,
+        "snippet": "<button type=\"button\">",
+        "reason": "Button has no visible text, aria-label, title, or image alt text.",
+        "type": "button"
+      },
+      "suggested_fix": "Add clear button text or an aria-label that describes the button action."
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 24,
+        "snippet": "<img src=\"student-award.png\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "student-award.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation."
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h3",
+        "line": 16,
+        "snippet": "<h3>",
+        "reason": "Heading level jumps from h1 to h3.",
+        "text": "Application Details",
+        "previous_level": 1,
+        "level": 3
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3."
+    },
+    {
+      "issue_type": "missing_video_captions",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Video is missing captions",
+      "evidence": {
+        "tag": "video",
+        "line": 30,
+        "snippet": "<video controls src=\"orientation.mp4\">",
+        "reason": "Video has no captions or subtitles track.",
+        "src": "orientation.mp4"
+      },
+      "suggested_fix": "Add captions or subtitles for education video content."
+    }
   ],
-  "notes": "This is a sample fixture, not a complete accessibility audit."
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit."
+  ],
+  "task": {
+    "id": "submit_scholarship_application",
+    "name": "Submit scholarship application",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Read the page purpose",
+      "Enter name",
+      "Enter email",
+      "Choose school",
+      "Describe accommodation request",
+      "Submit the form"
+    ],
+    "likely_blockers": [
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "missing_form_label",
+        "severity": "high",
+        "message": "Form control is missing an accessible label",
+        "task_impact": "Form control may be hard to understand or complete because it has no accessible label."
+      },
+      {
+        "issue_type": "generic_link_text",
+        "severity": "medium",
+        "message": "Link text is too generic",
+        "task_impact": "Link text may not clearly explain the destination or action."
+      },
+      {
+        "issue_type": "missing_button_name",
+        "severity": "high",
+        "message": "Button is missing an accessible name",
+        "task_impact": "Student may not be able to identify what an unlabeled button does."
+      },
+      {
+        "issue_type": "skipped_heading_level",
+        "severity": "medium",
+        "message": "Heading level is skipped",
+        "task_impact": "Student may struggle to understand the page structure and task sections."
+      }
+    ]
+  }
 }
