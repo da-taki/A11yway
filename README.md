@@ -89,6 +89,15 @@ Batch mode is meant for reviewing multiple school or NGO pages. It creates per-p
 
 URL mode fetches the exact static HTML page you provide. It does not execute JavaScript, does not crawl websites, and should be used responsibly on public pages or pages you have permission to test.
 
+## Evaluation Materials
+
+Use these templates when sharing reports with schools, NGOs, or reviewers:
+
+- [NGO report email template](docs/outreach/NGO_REPORT_EMAIL.md)
+- [Feedback form questions](docs/outreach/FEEDBACK_FORM_QUESTIONS.md)
+- [Evaluation protocol](docs/outreach/EVALUATION_PROTOCOL.md)
+- [Reviewer guide](docs/outreach/REVIEWER_GUIDE.md)
+
 ## Example Use Case
 
 A school wants to test whether students can submit a scholarship application form. A11yway runs several student agents against that task and reports problems such as missing form labels, confusing errors, weak focus indicators, or instructions that are only available in audio.
