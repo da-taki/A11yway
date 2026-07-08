@@ -33,6 +33,18 @@ The first MVP should stay small:
 
 This scaffold does not include real AI integrations, browser automation, PDF parsing, or production APIs yet.
 
+## Try the Prototype
+
+Run the sample HTML form check:
+
+```bash
+python -m a11yway.main examples/sample_form.html
+```
+
+If no file path is provided, the command tries `examples/sample_form.html`.
+
+The current prototype only checks basic HTML form labels. It can flag common unlabeled `input`, `textarea`, and `select` controls, while ignoring hidden and submit inputs. This is the first real check, not a complete accessibility audit.
+
 ## Example Use Case
 
 A school wants to test whether students can submit a scholarship application form. A11yway runs several student agents against that task and reports problems such as missing form labels, confusing errors, weak focus indicators, or instructions that are only available in audio.
