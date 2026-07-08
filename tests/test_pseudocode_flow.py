@@ -1,5 +1,6 @@
 """Lightweight tests for the A11yway pseudocode scaffold."""
 
+import json
 from pathlib import Path
 
 from a11yway.agents.dyslexia_agent import DyslexiaAgent
@@ -8,7 +9,7 @@ from a11yway.agents.keyboard_agent import KeyboardOnlyAgent
 from a11yway.agents.low_vision_agent import LowVisionAgent
 from a11yway.main import analyze_html_file
 from a11yway.core.page_analyzer import analyze_html_forms
-from a11yway.core.report_builder import ReportBuilder
+from a11yway.core.report_builder import ReportBuilder, build_json_report, save_json_report
 from a11yway.core.task_runner import TaskRunner
 
 
@@ -121,3 +122,40 @@ def test_sample_form_hidden_and_submit_fields_are_ignored() -> None:
 
     assert "application_token" not in evidence
     assert "submit" not in evidence.lower()
+
+
+def test_build_json_report_returns_expected_top_level_keys() -> None:
+    """The CLI JSON report should have a stable prototype structure."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+
+    assert set(report) == {
+        "tool",
+        "version",
+        "source_file",
+        "summary",
+        "issues",
+        "limitations",
+    }
+
+
+def test_build_json_report_has_correct_issue_count() -> None:
+    """The report summary should match the issue list length."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+
+    assert report["summary"]["issues_found"] == 2
+    assert len(report["issues"]) == 2
+
+
+def test_save_json_report_writes_valid_json(tmp_path: Path) -> None:
+    """JSON reports should be written to disk with parent directories created."""
+    issues = analyze_html_file(Path("examples/sample_form.html"))
+    report = build_json_report("examples/sample_form.html", issues)
+    output_path = tmp_path / "reports" / "sample_form_report.json"
+
+    save_json_report(report, output_path)
+
+    saved_report = json.loads(output_path.read_text(encoding="utf-8"))
+    assert saved_report["tool"] == "A11yway"
+    assert saved_report["summary"]["issues_found"] == 2

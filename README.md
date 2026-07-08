@@ -41,9 +41,15 @@ Run the sample HTML form check:
 python -m a11yway.main examples/sample_form.html
 ```
 
+Save a structured JSON report:
+
+```bash
+python -m a11yway.main examples/sample_form.html --json reports/sample_form_report.json
+```
+
 If no file path is provided, the command tries `examples/sample_form.html`.
 
-The current prototype only checks basic HTML form labels. It can flag common unlabeled `input`, `textarea`, and `select` controls, while ignoring hidden and submit inputs. This is the first real check, not a complete accessibility audit.
+The current prototype only checks basic HTML form labels. It can flag common unlabeled `input`, `textarea`, and `select` controls, while ignoring hidden and submit inputs. The JSON export is meant to grow into future NGO and school review reports. This is the first real check, not a complete accessibility audit.
 
 ## Example Use Case
 
