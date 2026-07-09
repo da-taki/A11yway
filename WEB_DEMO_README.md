@@ -85,7 +85,7 @@ The included `render.yaml` uses Docker because browser mode needs Playwright/Chr
 The Docker service starts:
 
 ```bash
-gunicorn a11yway.web_app:app --bind 0.0.0.0:10000
+gunicorn a11yway.web_app:app --bind 0.0.0.0:$PORT
 ```
 
 If the deployment plan cannot run browser mode reliably, set:

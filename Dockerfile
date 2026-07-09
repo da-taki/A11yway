@@ -11,4 +11,4 @@ ENV HOST=0.0.0.0
 ENV PORT=10000
 EXPOSE 10000
 
-CMD ["gunicorn", "a11yway.web_app:app", "--bind", "0.0.0.0:10000"]
+CMD ["sh", "-c", "gunicorn a11yway.web_app:app --bind 0.0.0.0:${PORT:-10000}"]
