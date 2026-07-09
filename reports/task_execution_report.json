@@ -17,7 +17,8 @@
       "page_metadata",
       "media_accessibility",
       "keyboard_focus_traversal",
-      "browser_dom_snapshot"
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
     ]
   },
   "issues": [],
@@ -57,7 +58,8 @@
     "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_task_execution_form.html",
     "checks_run": [
       "keyboard_focus_traversal",
-      "browser_dom_snapshot"
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
     ],
     "focus_trace": [
       {
@@ -71,7 +73,18 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Student name",
-        "is_visible": true
+        "is_visible": true,
+        "x": 99.546875,
+        "y": 113.875,
+        "width": 177,
+        "height": 21,
+        "announce": {
+          "role": "textbox",
+          "name": "Student name",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "textbox, \"Student name\""
       },
       {
         "step": 2,
@@ -84,7 +97,18 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Email",
-        "is_visible": true
+        "is_visible": true,
+        "x": 50.21875,
+        "y": 150.875,
+        "width": 177,
+        "height": 21,
+        "announce": {
+          "role": "textbox",
+          "name": "Email",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "textbox, \"Email\""
       },
       {
         "step": 3,
@@ -97,7 +121,20 @@
         "text": "Choose a school Greenfield High School Riverside Academy",
         "role": null,
         "accessible_name_guess": "School",
-        "is_visible": true
+        "is_visible": true,
+        "x": 56.453125,
+        "y": 187.875,
+        "width": 160,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "School",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"School\", collapsed"
       },
       {
         "step": 4,
@@ -110,7 +147,18 @@
         "text": "",
         "role": null,
         "accessible_name_guess": "Accommodation request",
-        "is_visible": true
+        "is_visible": true,
+        "x": 168.84375,
+        "y": 222.875,
+        "width": 168,
+        "height": 66,
+        "announce": {
+          "role": "textbox",
+          "name": "Accommodation request",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "textbox, \"Accommodation request\""
       },
       {
         "step": 5,
@@ -123,12 +171,74 @@
         "text": "Submit application",
         "role": null,
         "accessible_name_guess": "Submit application",
-        "is_visible": true
+        "is_visible": true,
+        "x": 8,
+        "y": 308.875,
+        "width": 124.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Submit application",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Submit application\""
       }
     ],
     "limitations": [
       "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
-      "Accessible names are estimated and require manual review."
+      "Accessible names are estimated and require manual review.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ],
+    "announce_transcript": [
+      {
+        "step": 1,
+        "announcement": "textbox, \"Student name\"",
+        "role": "textbox",
+        "name": "Student name",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 2,
+        "announcement": "textbox, \"Email\"",
+        "role": "textbox",
+        "name": "Email",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 3,
+        "announcement": "combobox, \"School\", collapsed",
+        "role": "combobox",
+        "name": "School",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 4,
+        "announcement": "textbox, \"Accommodation request\"",
+        "role": "textbox",
+        "name": "Accommodation request",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 5,
+        "announcement": "button, \"Submit application\"",
+        "role": "button",
+        "name": "Submit application",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      }
     ]
   },
   "task_execution": {
@@ -149,7 +259,8 @@
         "description": "Confirm the page purpose is visible.",
         "status": "passed",
         "detail": "Text is visible on the page.",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": null
       },
       {
         "id": "focus_name",
@@ -158,7 +269,8 @@
         "description": "Move to the student name field.",
         "status": "passed",
         "detail": "Reached with the keyboard (tag: input).",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Student name\""
       },
       {
         "id": "type_name",
@@ -167,7 +279,8 @@
         "description": "Type a sample student name.",
         "status": "passed",
         "detail": "Typed with the keyboard.",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Student name\""
       },
       {
         "id": "focus_email",
@@ -176,7 +289,8 @@
         "description": "Move to the email field.",
         "status": "passed",
         "detail": "Reached with the keyboard (tag: input).",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Email\""
       },
       {
         "id": "type_email",
@@ -185,7 +299,8 @@
         "description": "Type a sample email.",
         "status": "passed",
         "detail": "Typed with the keyboard.",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Email\""
       },
       {
         "id": "focus_school",
@@ -194,7 +309,8 @@
         "description": "Move to the school field.",
         "status": "passed",
         "detail": "Reached with the keyboard (tag: select).",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "combobox, \"School\", collapsed"
       },
       {
         "id": "select_first_option",
@@ -203,7 +319,8 @@
         "description": "Choose a school option.",
         "status": "passed",
         "detail": "Selected option with ArrowDown (value: \"greenfield\").",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "combobox, \"School\", collapsed"
       },
       {
         "id": "focus_accommodation_request",
@@ -212,7 +329,8 @@
         "description": "Move to the accommodation request field.",
         "status": "passed",
         "detail": "Reached with the keyboard (tag: textarea).",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Accommodation request\""
       },
       {
         "id": "type_accommodation_request",
@@ -221,7 +339,8 @@
         "description": "Type a sample accommodation request.",
         "status": "passed",
         "detail": "Typed with the keyboard.",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "textbox, \"Accommodation request\""
       },
       {
         "id": "submit_form",
@@ -230,7 +349,8 @@
         "description": "Submit the application.",
         "status": "passed",
         "detail": "Activated with Enter (tag: button).",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "button, \"Submit application\""
       },
       {
         "id": "confirm_submission",
@@ -239,12 +359,16 @@
         "description": "Confirm the form reports success.",
         "status": "passed",
         "detail": "Text appeared on the page.",
-        "used_fallback": false
+        "used_fallback": false,
+        "announced": "button, \"Submit application\""
       }
     ],
+    "announce_available": true,
     "limitations": [
       "Task steps are deterministic scripts; a human may find a workaround the script does not try.",
-      "Step results show keyboard operability, not full assistive technology behavior."
+      "Step results show keyboard operability, not full assistive technology behavior.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
     ]
   }
 }

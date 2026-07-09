@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Accessibility Report</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }
+header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }
+header { background: #ffffff; border-bottom: 1px solid #d8deea; }
+section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }
+h1, h2, h3 { line-height: 1.2; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: #eef2f7; }
+code, pre { background: #eef2f7; }
+pre { overflow-x: auto; padding: 0.75rem; }
+.meta { color: #526071; }
+.issue { border-top: 4px solid #5067a3; }
+.high { border-top-color: #b42318; }
+.medium { border-top-color: #b86e00; }
+.low { border-top-color: #367a45; }
+.announce-unnamed { color: #b42318; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Accessibility Report</h1>
+<p class="meta">Source: examples/sample_announce_transcript_broken.html</p>
+</header>
+<main>
+<section>
+<h2>Summary</h2>
+<p>Issues found: <strong>8</strong></p>
+<p>Agents used: Keyboard-only student</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot, accessibility_tree_announce</p>
+<h3>Counts By Severity</h3>
+<ul><li><code>high</code>: 8</li></ul>
+<h3>Counts By Issue Type</h3>
+<ul><li><code>missing_form_label</code>: 2</li><li><code>missing_link_name</code>: 1</li><li><code>missing_button_name</code>: 1</li><li><code>missing_image_alt</code>: 1</li><li><code>unnamed_focus_stop</code>: 3</li></ul>
+</section>
+<section>
+<h2>Source Metadata</h2>
+<table><tbody>
+<tr><th>Input</th><td>examples/sample_announce_transcript_broken.html</td></tr>
+<tr><th>Type</th><td>file</td></tr>
+<tr><th>Final URL</th><td></td></tr>
+<tr><th>Status code</th><td></td></tr>
+<tr><th>Content type</th><td>text/html</td></tr>
+</tbody></table>
+</section>
+<section>
+<h2>Analysis Modes</h2>
+<ul><li>static</li><li>browser</li></ul>
+</section>
+<section>
+<h2>Browser Interaction Trace</h2>
+<p>Browser audit success: true</p>
+<p>Focus trace length: 5</p>
+<table><thead><tr><th>Step</th><th>Tag</th><th>Accessible name guess</th><th>ID/Name</th><th>Text/Href</th></tr></thead><tbody>
+<tr><td>1</td><td>a</td><td></td><td></td><td>library-rules.html</td></tr>
+<tr><td>2</td><td>input</td><td></td><td>full_name</td><td></td></tr>
+<tr><td>3</td><td>select</td><td>Grade level</td><td>grade_level</td><td>Choose a grade Grade 9 Grade 10</td></tr>
+<tr><td>4</td><td>button</td><td></td><td></td><td></td></tr>
+<tr><td>5</td><td>button</td><td>Sign up for a library card</td><td></td><td>Sign up for a library card</td></tr>
+</tbody></table>
+<h3>Announce Transcript</h3>
+<p>What Chromium's computed accessibility tree exposes at each observed focus stop. This approximates what a screen reader would announce; real screen readers can differ.</p>
+<ol>
+<li class="announce-unnamed">link, (no accessible name) (finding: unnamed focus stop)</li>
+<li class="announce-unnamed">textbox, (no accessible name), required (finding: unnamed focus stop)</li>
+<li>combobox, &quot;Grade level&quot;, collapsed</li>
+<li class="announce-unnamed">button, (no accessible name), collapsed (finding: unnamed focus stop)</li>
+<li>button, &quot;Sign up for a library card&quot;</li>
+</ol>
+<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li><li>The announce transcript comes from Chromium&#x27;s computed accessibility tree in one browser run.</li><li>Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently.</li></ul>
+</section>
+<section>
+<h2>Visual Proof</h2>
+<p>Visual proof is an evidence aid for manual review. It is not accessibility certification.</p>
+<p>Screenshot: <a href="reports/visual_announce_transcript_broken/page.png">reports/visual_announce_transcript_broken/page.png</a></p>
+<p>Observed focus path overlay: <a href="reports/visual_announce_transcript_broken/focus_path.html">reports/visual_announce_transcript_broken/focus_path.html</a></p>
+<p>Focus points count: 5</p>
+<ul><li>Focus overlay shows observed Tab stops in this browser run.</li><li>It does not represent every assistive technology experience.</li></ul>
+</section>
+<section>
+<h2>Issues Found</h2>
+<article class="issue high">
+<h3>1. Form control is missing an accessible label</h3>
+<p>Issue type: <code>missing_form_label</code></p>
+<p>Severity: high</p>
+<p>Rule: Form control missing accessible label</p>
+<p>Why it matters: Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.</p>
+<p>Suggested fix: Add a visible &lt;label&gt; connected with for/id. Use aria-label only when a visible label is not possible.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>input</td></tr><tr><th>name</th><td>full_name</td></tr><tr><th>line</th><td>25</td></tr><tr><th>reason</th><td>Form control has no accessible label.</td></tr></tbody></table><pre><code>&lt;input type=&quot;text&quot; name=&quot;full_name&quot; required&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>2. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>library-rules.html</td></tr><tr><th>line</th><td>21</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a href=&quot;library-rules.html&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>3. Button is missing an accessible name</h3>
+<p>Issue type: <code>missing_button_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Button missing accessible name</p>
+<p>Why it matters: A button without a name is announced as just &#x27;button&#x27; by screen readers, so students cannot tell what pressing it will do.</p>
+<p>Suggested fix: Add clear button text or an aria-label that describes the button action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>button</td></tr><tr><th>line</th><td>35</td></tr><tr><th>reason</th><td>Button has no visible text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;button type=&quot;button&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;hours_details&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>4. Image is missing useful alt text</h3>
+<p>Issue type: <code>missing_image_alt</code></p>
+<p>Severity: high</p>
+<p>Rule: Image missing useful alt text</p>
+<p>Why it matters: Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.</p>
+<p>Suggested fix: Add alt text that describes the image purpose, or mark decorative images as presentation.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>img</td></tr><tr><th>src</th><td>rules-icon.png</td></tr><tr><th>line</th><td>21</td></tr><tr><th>reason</th><td>Image is missing useful alt text.</td></tr></tbody></table><pre><code>&lt;img src=&quot;rules-icon.png&quot; alt=&quot;&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>5. Focus stop announces no accessible name</h3>
+<p>Issue type: <code>unnamed_focus_stop</code></p>
+<p>Severity: high</p>
+<p>Rule: Focus stop announces no accessible name</p>
+<p>Why it matters: Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.</p>
+<p>Suggested fix: Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>library-rules.html</td></tr><tr><th>step</th><td>1</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>6. Focus stop announces no accessible name</h3>
+<p>Issue type: <code>unnamed_focus_stop</code></p>
+<p>Severity: high</p>
+<p>Rule: Focus stop announces no accessible name</p>
+<p>Why it matters: Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.</p>
+<p>Suggested fix: Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>input</td></tr><tr><th>name</th><td>full_name</td></tr><tr><th>step</th><td>2</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>7. Focus stop announces no accessible name</h3>
+<p>Issue type: <code>unnamed_focus_stop</code></p>
+<p>Severity: high</p>
+<p>Rule: Focus stop announces no accessible name</p>
+<p>Why it matters: Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.</p>
+<p>Suggested fix: Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>button</td></tr><tr><th>step</th><td>4</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>Chromium&#x27;s accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>8. Form control is missing an accessible label</h3>
+<p>Issue type: <code>missing_form_label</code></p>
+<p>Severity: high</p>
+<p>Rule: Form control missing accessible label</p>
+<p>Why it matters: Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.</p>
+<p>Suggested fix: Add a visible &lt;label&gt; connected with for/id. Use aria-label only when a visible label is not possible.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>input</td></tr><tr><th>name</th><td>full_name</td></tr><tr><th>line</th><td>23</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Form control has no accessible label.</td></tr></tbody></table><pre><code>&lt;input type=&quot;text&quot; name=&quot;full_name&quot; required=&quot;&quot; style=&quot;&quot;&gt;</code></pre>
+</article>
+</section>
+<section>
+<h2>Limitations</h2>
+<ul><li>This prototype runs static HTML checks plus a basic keyboard interaction audit.</li><li>It does not replace a full human accessibility audit.</li><li>Browser mode does not simulate a full screen reader, and accessible names are estimated.</li></ul>
+</section>
+</main>
+</body>
+</html>

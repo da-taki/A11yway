@@ -3,6 +3,31 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Accessibility-tree announce transcript
+
+- Browser mode now resolves every observed focus stop against Chromium's
+  computed accessibility tree (over the Chrome DevTools Protocol) and
+  records the computed role, accessible name, and states (disabled,
+  required, invalid, checked, expanded).
+- Reports gain a numbered announce transcript, for example
+  `3. button, (no accessible name)` or `7. textbox, "Full name", required`,
+  in Markdown, JSON, and HTML reports, in per-step task execution tables
+  (Announced column), and in the visual proof overlay legend and marker
+  hover text.
+- Added the `unnamed_focus_stop` rule (severity high): a focus stop whose
+  computed accessible name is empty. When tree data is available it
+  supersedes the heuristic `browser_focused_control_missing_name` check
+  for the same element; the heuristic remains as a fallback.
+- Added paired samples `examples/sample_announce_transcript.html` and
+  `examples/sample_announce_transcript_broken.html`, plus a test suite
+  (`tests/test_announce_transcript.py`) with real-browser integration
+  tests that skip when Playwright is unavailable.
+- Announce capture degrades gracefully: any CDP failure yields
+  "announcement unavailable" instead of a crash or invented finding, and
+  static mode is untouched. Documented that the transcript is one Chromium
+  run's computed tree, not a real screen reader (NVDA, JAWS, and VoiceOver
+  can differ).
+
 ## Unreleased - Malformed-HTML hardening and optional axe-core scan
 
 - Hardened the static HTML parser against real-world tag soup: an end tag

@@ -13,6 +13,11 @@ from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.report import AccessibilityReport
 from a11yway.models.task import AccessibilityTask
 from a11yway.core.ai_scout import build_ai_scout_markdown
+from a11yway.core.announce import (
+    ANNOUNCE_LIMITATIONS,
+    build_announce_transcript,
+    trace_has_announce_data,
+)
 from a11yway.core.page_analyzer import STATIC_CHECKS_RUN
 from a11yway.core.rules import enrich_issue_with_rule
 
@@ -152,14 +157,21 @@ def build_json_report(
         if low_vision_result is not None:
             analysis_modes.append("low_vision")
         report["analysis_modes"] = analysis_modes
+        focus_trace = browser_result.get("focus_trace", [])
+        browser_limitations = list(BROWSER_MODE_LIMITATIONS)
         report["browser"] = {
             "success": browser_result.get("success", False),
             "error": browser_result.get("error"),
             "final_url": browser_result.get("final_url"),
             "checks_run": browser_result.get("checks_run", []),
-            "focus_trace": browser_result.get("focus_trace", []),
-            "limitations": list(BROWSER_MODE_LIMITATIONS),
+            "focus_trace": focus_trace,
+            "limitations": browser_limitations,
         }
+        if trace_has_announce_data(focus_trace):
+            report["browser"]["announce_transcript"] = build_announce_transcript(
+                focus_trace
+            )
+            browser_limitations.extend(ANNOUNCE_LIMITATIONS)
         if browser_result.get("axe") is not None:
             report["browser"]["axe"] = browser_result["axe"]
         visual_proof = _visual_proof_for_report(browser_result.get("visual_proof"))
@@ -191,8 +203,11 @@ def build_json_report(
             "steps_total": task_execution.get("steps_total", 0),
             "steps_passed": task_execution.get("steps_passed", 0),
             "steps": task_execution.get("steps", []),
+            "announce_available": task_execution.get("announce_available", False),
             "limitations": list(TASK_EXECUTION_LIMITATIONS),
         }
+        if task_execution.get("announce_available"):
+            report["task_execution"]["limitations"].extend(ANNOUNCE_LIMITATIONS)
 
     if ai_scout_result is not None:
         report["ai_scout"] = ai_scout_result
@@ -312,6 +327,22 @@ def build_markdown_report(report: dict) -> str:
                     ["", f"Trace truncated: showing the first 20 of {len(trace)} steps."]
                 )
             lines.append("")
+        transcript = browser.get("announce_transcript", [])
+        if transcript:
+            lines.extend(
+                [
+                    "## Announce Transcript",
+                    "",
+                    "What Chromium's computed accessibility tree exposes at each "
+                    "observed focus stop. This approximates what a screen reader "
+                    "would announce; real screen readers can differ.",
+                    "",
+                ]
+            )
+            for entry in transcript:
+                marker = " <- finding: unnamed focus stop" if entry.get("unnamed") else ""
+                lines.append(f"{entry.get('step')}. {entry.get('announcement')}{marker}")
+            lines.append("")
         axe = browser.get("axe")
         if axe is not None:
             lines.extend(
@@ -427,8 +458,8 @@ def build_markdown_report(report: dict) -> str:
                     f"- Result: {verdict}",
                     f"- Steps passed: {execution.get('steps_passed', 0)} of {execution.get('steps_total', 0)}",
                     "",
-                    "| Step | Action | Status | Detail |",
-                    "| --- | --- | --- | --- |",
+                    "| Step | Action | Status | Announced | Detail |",
+                    "| --- | --- | --- | --- | --- |",
                 ]
             )
             for step in execution.get("steps", []):
@@ -436,10 +467,11 @@ def build_markdown_report(report: dict) -> str:
                 if step.get("used_fallback"):
                     status += " (fallback)"
                 lines.append(
-                    "| {id} | {action} | {status} | {detail} |".format(
+                    "| {id} | {action} | {status} | {announced} | {detail} |".format(
                         id=step.get("id", ""),
                         action=step.get("action", ""),
                         status=status,
+                        announced=step.get("announced") or "",
                         detail=step.get("detail", ""),
                     )
                 )
@@ -591,6 +623,7 @@ def build_html_report(report: dict) -> str:
         ".high { border-top-color: #b42318; }",
         ".medium { border-top-color: #b86e00; }",
         ".low { border-top-color: #367a45; }",
+        ".announce-unnamed { color: #b42318; font-weight: 600; }",
         "</style>",
         "</head>",
         "<body>",
@@ -685,7 +718,7 @@ def build_html_report(report: dict) -> str:
                     f"<p>Task: {escape(str(execution.get('task_name', '')))}</p>",
                     f"<p>Deterministic task execution result: <strong>{escape(verdict)}</strong></p>",
                     f"<p>Steps passed: {execution.get('steps_passed', 0)} of {execution.get('steps_total', 0)}</p>",
-                    "<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Detail</th></tr></thead><tbody>",
+                    "<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Announced</th><th>Detail</th></tr></thead><tbody>",
                 ]
             )
             for step in execution.get("steps", []):
@@ -693,10 +726,11 @@ def build_html_report(report: dict) -> str:
                 if step.get("used_fallback"):
                     status += " (fallback)"
                 lines.append(
-                    "<tr><td>{id}</td><td>{action}</td><td>{status}</td><td>{detail}</td></tr>".format(
+                    "<tr><td>{id}</td><td>{action}</td><td>{status}</td><td>{announced}</td><td>{detail}</td></tr>".format(
                         id=escape(str(step.get("id", ""))),
                         action=escape(str(step.get("action", ""))),
                         status=escape(str(status)),
+                        announced=escape(str(step.get("announced") or "")),
                         detail=escape(str(step.get("detail", ""))),
                     )
                 )
@@ -732,6 +766,27 @@ def build_html_report(report: dict) -> str:
                     )
                 )
             lines.append("</tbody></table>")
+        transcript = browser.get("announce_transcript", [])
+        if transcript:
+            lines.extend(
+                [
+                    "<h3>Announce Transcript</h3>",
+                    "<p>What Chromium's computed accessibility tree exposes at each "
+                    "observed focus stop. This approximates what a screen reader "
+                    "would announce; real screen readers can differ.</p>",
+                    "<ol>",
+                ]
+            )
+            for entry in transcript:
+                announcement = escape(str(entry.get("announcement", "")))
+                if entry.get("unnamed"):
+                    lines.append(
+                        f'<li class="announce-unnamed">{announcement} '
+                        "(finding: unnamed focus stop)</li>"
+                    )
+                else:
+                    lines.append(f"<li>{announcement}</li>")
+            lines.append("</ol>")
         axe = browser.get("axe")
         if axe is not None:
             lines.extend(

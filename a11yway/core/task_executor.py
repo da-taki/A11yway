@@ -15,6 +15,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from a11yway.core.announce import (
+    capture_focused_announcement,
+    format_announcement,
+    open_announce_session,
+)
 from a11yway.core.browser_runner import (
     _FOCUS_INFO_SCRIPT,
     _accessible_name_guess,
@@ -121,9 +126,10 @@ def _execution_issue(
 class _StepRunner:
     """Runs one task's browser steps on an open Playwright page."""
 
-    def __init__(self, page, max_tabs: int) -> None:
+    def __init__(self, page, max_tabs: int, announce_session=None) -> None:
         self.page = page
         self.max_tabs = max_tabs
+        self.announce_session = announce_session
         self.issues: list[AccessibilityIssue] = []
 
     def focus_info(self) -> dict:
@@ -183,6 +189,7 @@ class _StepRunner:
             "status": "failed",
             "detail": "",
             "used_fallback": False,
+            "announced": None,
         }
 
         handler = {
@@ -203,7 +210,20 @@ class _StepRunner:
             return result
 
         handler(step, result)
+        result["announced"] = self._announced_after_step()
         return result
+
+    def _announced_after_step(self) -> str | None:
+        """Return what the accessibility tree announces for the element
+        focused when the step finished, or None when unavailable."""
+        try:
+            info = self.focus_info()
+        except Exception:  # noqa: BLE001 - announce data must never fail a step
+            return None
+        if info.get("is_body"):
+            return None
+        announce = capture_focused_announcement(self.announce_session)
+        return format_announcement(announce) if announce else None
 
     def _do_expect_visible_text(self, step: dict, result: dict) -> None:
         target = step.get("target", "")
@@ -421,6 +441,7 @@ def run_task_execution(
         "steps_passed": 0,
         "steps": [],
         "issues": [],
+        "announce_available": False,
     }
 
     if not task.browser_steps:
@@ -440,7 +461,11 @@ def run_task_execution(
                 page.goto(url, timeout=30000)
                 page.wait_for_timeout(wait_ms)
 
-                runner = _StepRunner(page, max_tabs=max_tabs)
+                announce_session = open_announce_session(page)
+                result["announce_available"] = announce_session is not None
+                runner = _StepRunner(
+                    page, max_tabs=max_tabs, announce_session=announce_session
+                )
                 blocked = False
                 for step in task.browser_steps:
                     if blocked:
@@ -453,6 +478,7 @@ def run_task_execution(
                                 "status": "skipped",
                                 "detail": "Skipped because an earlier step was blocked.",
                                 "used_fallback": False,
+                                "announced": None,
                             }
                         )
                         continue

@@ -41,6 +41,7 @@ EXPECTED_BROWSER_ISSUE_TYPES = {
     "browser_repeated_focus",
     "browser_focused_control_missing_name",
     "browser_focus_on_hidden_element",
+    "unnamed_focus_stop",
 }
 
 EXPECTED_TASK_EXECUTION_ISSUE_TYPES = {

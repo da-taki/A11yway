@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Library Card Signup</title>
+</head>
+<body>
+  <h1>Library Card Signup</h1>
+  <p>
+    This is a fictional education form for A11yway announce transcript
+    testing. Every control has a computed accessible name, and several
+    controls carry states (required, checked, collapsed) so the transcript
+    shows what Chromium's accessibility tree announces at each Tab stop.
+  </p>
+
+  <a href="library-rules.html">Read the library rules</a>
+
+  <form action="/signup" method="post">
+    <label for="full_name">Full name</label>
+    <input id="full_name" type="text" name="full_name" required>
+
+    <label for="grade_level">Grade level</label>
+    <select id="grade_level" name="grade_level">
+      <option value="">Choose a grade</option>
+      <option value="9">Grade 9</option>
+      <option value="10">Grade 10</option>
+    </select>
+
+    <input id="newsletter" type="checkbox" name="newsletter" checked>
+    <label for="newsletter">Send me the monthly reading list</label>
+
+    <button type="button" aria-expanded="false" aria-controls="hours_details">
+      Show opening hours
+    </button>
+    <div id="hours_details" hidden>
+      <p>Open Monday to Friday, 8:00 to 16:00.</p>
+    </div>
+
+    <button type="submit">Sign up for a library card</button>
+  </form>
+</body>
+</html>

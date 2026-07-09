@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Library Card Signup</title>
+  <style>
+    .icon { display: inline-block; width: 1em; height: 1em; background: #444; }
+  </style>
+</head>
+<body>
+  <h1>Library Card Signup</h1>
+  <p>
+    This is the broken twin of sample_announce_transcript.html. A keyboard
+    user can still Tab to every control, but three of the focus stops have
+    an empty computed accessible name, so a screen reader announces a bare
+    role and nothing else. Browser mode flags each of them as an
+    unnamed_focus_stop finding in the announce transcript.
+  </p>
+
+  <!-- Link whose only content is an image with empty alt: no computed name. -->
+  <a href="library-rules.html"><img src="rules-icon.png" alt=""></a>
+
+  <form action="/signup" method="post">
+    <!-- Text input with no label, aria-label, or title: no computed name. -->
+    <input type="text" name="full_name" required>
+
+    <label for="grade_level">Grade level</label>
+    <select id="grade_level" name="grade_level">
+      <option value="">Choose a grade</option>
+      <option value="9">Grade 9</option>
+      <option value="10">Grade 10</option>
+    </select>
+
+    <!-- Icon-only button with no text or aria-label: no computed name. -->
+    <button type="button" aria-expanded="false" aria-controls="hours_details">
+      <span class="icon"></span>
+    </button>
+    <div id="hours_details" hidden>
+      <p>Open Monday to Friday, 8:00 to 16:00.</p>
+    </div>
+
+    <button type="submit">Sign up for a library card</button>
+  </form>
+</body>
+</html>

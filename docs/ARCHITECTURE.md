@@ -40,7 +40,11 @@ A small `html.parser`-based analyzer that runs heuristic checks on the raw HTML:
 
 ### Browser Runner - `a11yway/core/browser_runner.py` (Optional)
 
-Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace with estimated accessible names, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.
+Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Each focus stop is also resolved against Chromium's computed accessibility tree (see the announce module below); when tree data is unavailable, accessible names fall back to estimates. Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.
+
+### Announce Transcript - `a11yway/core/announce.py` (Optional)
+
+Used by browser mode and task execution. Opens a Chrome DevTools Protocol session and, for each focused element, resolves the specific node (activeElement to backendNodeId to partial AX tree) to read the computed role, accessible name, and states (disabled, required, invalid, checked, expanded). Reports render this as a numbered announce transcript, and focus stops with an empty computed name become `unnamed_focus_stop` findings. Every capture degrades to "announcement unavailable" on failure. This is one Chromium run's computed tree, not a screen reader simulation.
 
 ### Visual Proof - `a11yway/core/visual_proof.py` (Optional)
 
@@ -126,7 +130,7 @@ Verdict and re-audit outputs are separate JSON/Markdown artifacts so original au
 ## Limitations
 
 - Static checks are heuristics on HTML source; they cannot judge visual design, alt-text quality, or anything rendered only by JavaScript.
-- Browser mode estimates accessible names from labels, text, and common attributes; it does not compute the real accessibility tree.
+- Browser mode reads roles, names, and states from Chromium's computed accessibility tree when available and falls back to estimates otherwise; either way it reflects one browser engine, not a real screen reader.
 - There is no full screen-reader simulation.
 - There is no crawling and no authenticated portal testing; audits run on exactly the public page you provide, or a page you have permission to test.
 - Results are hints for human reviewers, not WCAG conformance claims.

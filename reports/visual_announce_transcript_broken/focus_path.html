@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Focus Path Overlay</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+header { padding: 1rem 1.25rem; background: #ffffff; border-bottom: 1px solid #d8deea; }
+main { padding: 1rem; }
+.frame { position: relative; display: inline-block; background: #ffffff; box-shadow: 0 2px 16px rgba(23, 32, 51, 0.16); }
+.frame img { display: block; max-width: none; }
+.marker { position: absolute; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; border: 3px solid #ffffff; background: #b42318; color: #ffffff; font-weight: 700; font-size: 0.85rem; line-height: 1.6rem; text-align: center; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45); transform: translate(-50%, -50%); }
+.box { position: absolute; border: 3px solid #b42318; background: rgba(180, 35, 24, 0.08); pointer-events: none; }
+.legend { max-width: 54rem; margin: 0 0 1rem; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #d8deea; }
+.muted { color: #526071; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Focus Path Overlay</h1>
+<p>Source: examples/sample_announce_transcript_broken.html</p>
+</header>
+<main>
+<section class="legend" aria-labelledby="legend-title">
+<h2 id="legend-title">Legend</h2>
+<p>Marker numbers show the Tab order observed by A11yway during this browser run. Hover a marker to see its announced role and name.</p>
+<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>
+<p class="muted">Viewport observed: 1280 x 720 CSS pixels.</p>
+<h3>Announce Transcript</h3>
+<p class="muted">Computed by Chromium's accessibility tree for each numbered focus stop. Real screen readers (NVDA, JAWS, VoiceOver) can announce things differently.</p>
+<ol>
+<li>link, (no accessible name)</li>
+<li>textbox, (no accessible name), required</li>
+<li>combobox, &quot;Grade level&quot;, collapsed</li>
+<li>button, (no accessible name), collapsed</li>
+<li>button, &quot;Sign up for a library card&quot;</li>
+</ol>
+</section>
+<div class="frame">
+<img src="page.png" alt="Full-page screenshot used for focus path overlay">
+<div class="marker" style="left: 8.0px; top: 131.875px;" title="Step 1 | link, (no accessible name) | a" aria-label="Step 1 | link, (no accessible name) | a">1</div>
+<div class="box" style="left: 8.0px; top: 151.203125px; width: 177.0px; height: 21.0px;"></div>
+<div class="marker" style="left: 96.5px; top: 161.703125px;" title="Step 2 | textbox, (no accessible name), required | input | full_name" aria-label="Step 2 | textbox, (no accessible name), required | input | full_name">2</div>
+<div class="box" style="left: 267.1875px; top: 152.203125px; width: 117.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 325.6875px; top: 161.703125px;" title="Step 3 | combobox, &quot;Grade level&quot;, collapsed | select | Grade level | grade_level" aria-label="Step 3 | combobox, &quot;Grade level&quot;, collapsed | select | Grade level | grade_level">3</div>
+<div class="box" style="left: 388.1875px; top: 149.875px; width: 29.328125px; height: 22.328125px;"></div>
+<div class="marker" style="left: 402.8515625px; top: 161.0390625px;" title="Step 4 | button, (no accessible name), collapsed | button" aria-label="Step 4 | button, (no accessible name), collapsed | button">4</div>
+<div class="box" style="left: 421.515625px; top: 151.203125px; width: 161.21875px; height: 21.0px;"></div>
+<div class="marker" style="left: 502.125px; top: 161.703125px;" title="Step 5 | button, &quot;Sign up for a library card&quot; | button | Sign up for a library card" aria-label="Step 5 | button, &quot;Sign up for a library card&quot; | button | Sign up for a library card">5</div>
+</div>
+</main>
+</body>
+</html>
