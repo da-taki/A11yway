@@ -13,6 +13,7 @@ degrades gracefully when it is missing.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from a11yway.core.announce import (
@@ -485,16 +486,45 @@ class _StepRunner:
         return True
 
 
+# Viewport-sized recording keeps video files small enough for evidence.
+_VIDEO_SIZE = {"width": 1280, "height": 720}
+_VIDEO_FILENAME = "task_execution.webm"
+
+
+def _video_caption(task: AccessibilityTask, source: str) -> str:
+    """Build the caption stating what run the recording shows."""
+    return (
+        f'Keyboard-only task execution of "{task.name}" on {source} in one '
+        "headless Chromium run. An evidence aid for human reviewers, not "
+        "accessibility certification."
+    )
+
+
+def _finalize_video(video_handle, video_dir: str | Path) -> dict[str, Any]:
+    """Move the finished recording to a stable name and return metadata."""
+    raw_path = Path(video_handle.path())
+    final_path = Path(video_dir) / _VIDEO_FILENAME
+    if raw_path.resolve() != final_path.resolve():
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+        if final_path.exists():
+            final_path.unlink()
+        raw_path.rename(final_path)
+    return {"enabled": True, "path": final_path.as_posix()}
+
+
 def run_task_execution(
     source: str,
     task: AccessibilityTask,
     max_tabs: int = 40,
     wait_ms: int = 500,
+    video_dir: str | Path | None = None,
 ) -> dict:
     """Attempt a task's browser steps and return step-by-step evidence.
 
     Always returns a result dict; on any environment failure success is
-    False with an error message so batch mode can keep going.
+    False with an error message so batch mode can keep going. With
+    video_dir set, the browser session is recorded and the video saved
+    there; recording failures never break the task run.
     """
     result: dict[str, Any] = {
         "mode": "browser_task_execution",
@@ -512,6 +542,7 @@ def run_task_execution(
         "steps": [],
         "issues": [],
         "announce_available": False,
+        "video": None,
     }
 
     if not task.browser_steps:
@@ -522,12 +553,30 @@ def run_task_execution(
         result["error"] = "Playwright is not installed."
         return result
 
+    video_handle = None
     try:
         url = source_to_browser_url(source)
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
+            context = None
             try:
-                page = browser.new_page()
+                if video_dir is not None:
+                    try:
+                        context = browser.new_context(
+                            record_video_dir=str(video_dir),
+                            record_video_size=dict(_VIDEO_SIZE),
+                            viewport=dict(_VIDEO_SIZE),
+                        )
+                        page = context.new_page()
+                        video_handle = page.video
+                    except Exception as error:  # noqa: BLE001 - recording is optional
+                        result["video"] = {
+                            "enabled": False,
+                            "error": str(error).strip().splitlines()[0][:300],
+                        }
+                        context = None
+                if context is None:
+                    page = browser.new_page()
                 page.goto(url, timeout=30000)
                 page.wait_for_timeout(wait_ms)
 
@@ -568,6 +617,23 @@ def run_task_execution(
                 result["completed"] = not blocked
                 result["success"] = True
             finally:
+                if context is not None:
+                    try:
+                        context.close()  # finalizes the video file
+                    except Exception:  # noqa: BLE001 - cleanup only
+                        pass
+                if video_handle is not None and video_dir is not None:
+                    # The video path is only readable while Playwright is
+                    # still running, so finalize before the browser closes.
+                    try:
+                        video = _finalize_video(video_handle, video_dir)
+                        video["caption"] = _video_caption(task, source)
+                        result["video"] = video
+                    except Exception as error:  # noqa: BLE001 - recording is optional
+                        result["video"] = {
+                            "enabled": False,
+                            "error": str(error).strip().splitlines()[0][:300],
+                        }
                 browser.close()
     except Exception as error:  # noqa: BLE001 - batch mode must survive any browser failure
         message = str(error).strip().splitlines()

@@ -216,6 +216,20 @@ python -m a11yway.main --batch examples/sample_task_execution_batch.json --out-d
 
 The focus overlay shows observed Tab stops from a single browser run. It does not represent every assistive technology experience.
 
+### Video Proof
+
+When `--visual-proof` is used together with `--execute-task`, adding `--video` (off by default) also records the browser session with Playwright's video recording. The recording is saved as `task_execution.webm` alongside the visual proof assets and linked from the HTML report with a caption stating what run it shows.
+
+```bash
+python -m a11yway.main examples/sample_task_execution_form.html --browser --execute-task submit_scholarship_application --visual-proof reports/visual_task_execution --video --html reports/task_execution_report.html
+```
+
+Video proof limitations:
+
+- The video shows one headless Chromium run of the scripted task; it is an evidence aid for human reviewers, not accessibility certification.
+- Recording is viewport-sized (1280x720) to keep file sizes reasonable.
+- If recording cannot start, the task execution still runs and the report states that the video is unavailable. Without Playwright, `--video` degrades with setup instructions like every other browser feature.
+
 ## Low-Vision Checks
 
 Low-vision checks run in browser mode and use computed styles to review rendered color contrast, zoom reflow at 200% and 400%, and visible keyboard focus indicators.

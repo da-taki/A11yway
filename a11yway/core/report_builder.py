@@ -209,6 +209,15 @@ def build_json_report(
         }
         if task_execution.get("announce_available"):
             report["task_execution"]["limitations"].extend(ANNOUNCE_LIMITATIONS)
+        video = task_execution.get("video") or {}
+        if video:
+            if "visual_proof" not in report:
+                report["visual_proof"] = {"enabled": False}
+            if video.get("enabled"):
+                report["visual_proof"]["video_path"] = video.get("path")
+                report["visual_proof"]["video_caption"] = video.get("caption")
+            else:
+                report["visual_proof"]["video_error"] = video.get("error")
 
     if ai_scout_result is not None:
         report["ai_scout"] = ai_scout_result
@@ -482,6 +491,21 @@ def build_markdown_report(report: dict) -> str:
             lines.extend(
                 [
                     f"- Visual proof unavailable: {visual_proof.get('error', '')}",
+                    "",
+                ]
+            )
+        if visual_proof.get("video_path"):
+            lines.extend(
+                [
+                    f"- Task execution video: {visual_proof['video_path']}",
+                    f"- Video caption: {visual_proof.get('video_caption', '')}",
+                    "",
+                ]
+            )
+        elif visual_proof.get("video_error"):
+            lines.extend(
+                [
+                    f"- Task execution video unavailable: {visual_proof['video_error']}",
                     "",
                 ]
             )
@@ -939,6 +963,19 @@ def build_html_report(report: dict) -> str:
         else:
             lines.append(
                 f"<p>Visual proof unavailable: {escape(str(visual_proof.get('error', '')))}</p>"
+            )
+        if visual_proof.get("video_path"):
+            video_path = str(visual_proof["video_path"])
+            lines.extend(
+                [
+                    "<h3>Task Execution Video</h3>",
+                    f'<p><a href="{escape(video_path, quote=True)}">{escape(video_path)}</a></p>',
+                    f'<p class="meta">{escape(str(visual_proof.get("video_caption", "")))}</p>',
+                ]
+            )
+        elif visual_proof.get("video_error"):
+            lines.append(
+                f"<p>Task execution video unavailable: {escape(str(visual_proof['video_error']))}</p>"
             )
         lines.append("</section>")
 

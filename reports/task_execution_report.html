@@ -19,19 +19,20 @@ pre { overflow-x: auto; padding: 0.75rem; }
 .high { border-top-color: #b42318; }
 .medium { border-top-color: #b86e00; }
 .low { border-top-color: #367a45; }
+.announce-unnamed { color: #b42318; font-weight: 600; }
 </style>
 </head>
 <body>
 <header>
 <h1>A11yway Accessibility Report</h1>
-<p class="meta">Source: examples\sample_task_execution_form.html</p>
+<p class="meta">Source: examples/sample_task_execution_form.html</p>
 </header>
 <main>
 <section>
 <h2>Summary</h2>
 <p>Issues found: <strong>0</strong></p>
 <p>Agents used: Keyboard-only student</p>
-<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, indic_language_checks, keyboard_focus_traversal, browser_dom_snapshot, accessibility_tree_announce</p>
 <h3>Counts By Severity</h3>
 <p>None.</p>
 <h3>Counts By Issue Type</h3>
@@ -40,7 +41,7 @@ pre { overflow-x: auto; padding: 0.75rem; }
 <section>
 <h2>Source Metadata</h2>
 <table><tbody>
-<tr><th>Input</th><td>examples\sample_task_execution_form.html</td></tr>
+<tr><th>Input</th><td>examples/sample_task_execution_form.html</td></tr>
 <tr><th>Type</th><td>file</td></tr>
 <tr><th>Final URL</th><td></td></tr>
 <tr><th>Status code</th><td></td></tr>
@@ -65,20 +66,20 @@ pre { overflow-x: auto; padding: 0.75rem; }
 <p>Task: Submit scholarship application</p>
 <p>Deterministic task execution result: <strong>COMPLETED with keyboard-only interaction</strong></p>
 <p>Steps passed: 11 of 11</p>
-<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Detail</th></tr></thead><tbody>
-<tr><td>read_page_purpose</td><td>expect_visible_text</td><td>passed</td><td>Text is visible on the page.</td></tr>
-<tr><td>focus_name</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: input).</td></tr>
-<tr><td>type_name</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
-<tr><td>focus_email</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: input).</td></tr>
-<tr><td>type_email</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
-<tr><td>focus_school</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: select).</td></tr>
-<tr><td>select_first_option</td><td>select_first_non_empty_option</td><td>passed</td><td>Selected option with ArrowDown (value: &quot;greenfield&quot;).</td></tr>
-<tr><td>focus_accommodation_request</td><td>focus_by_label_or_name</td><td>passed</td><td>Reached with the keyboard (tag: textarea).</td></tr>
-<tr><td>type_accommodation_request</td><td>type_text</td><td>passed</td><td>Typed with the keyboard.</td></tr>
-<tr><td>submit_form</td><td>activate_by_role_or_text</td><td>passed</td><td>Activated with Enter (tag: button).</td></tr>
-<tr><td>confirm_submission</td><td>wait_for_text</td><td>passed</td><td>Text appeared on the page.</td></tr>
+<table><thead><tr><th>Step</th><th>Action</th><th>Status</th><th>Announced</th><th>Detail</th></tr></thead><tbody>
+<tr><td>read_page_purpose</td><td>expect_visible_text</td><td>passed</td><td></td><td>Text is visible on the page.</td></tr>
+<tr><td>focus_name</td><td>focus_by_label_or_name</td><td>passed</td><td>textbox, &quot;Student name&quot;</td><td>Reached with the keyboard (tag: input).</td></tr>
+<tr><td>type_name</td><td>type_text</td><td>passed</td><td>textbox, &quot;Student name&quot;</td><td>Typed with the keyboard.</td></tr>
+<tr><td>focus_email</td><td>focus_by_label_or_name</td><td>passed</td><td>textbox, &quot;Email&quot;</td><td>Reached with the keyboard (tag: input).</td></tr>
+<tr><td>type_email</td><td>type_text</td><td>passed</td><td>textbox, &quot;Email&quot;</td><td>Typed with the keyboard.</td></tr>
+<tr><td>focus_school</td><td>focus_by_label_or_name</td><td>passed</td><td>combobox, &quot;School&quot;, collapsed</td><td>Reached with the keyboard (tag: select).</td></tr>
+<tr><td>select_first_option</td><td>select_first_non_empty_option</td><td>passed</td><td>combobox, &quot;School&quot;, collapsed</td><td>Selected option with ArrowDown (value: &quot;greenfield&quot;).</td></tr>
+<tr><td>focus_accommodation_request</td><td>focus_by_label_or_name</td><td>passed</td><td>textbox, &quot;Accommodation request&quot;</td><td>Reached with the keyboard (tag: textarea).</td></tr>
+<tr><td>type_accommodation_request</td><td>type_text</td><td>passed</td><td>textbox, &quot;Accommodation request&quot;</td><td>Typed with the keyboard.</td></tr>
+<tr><td>submit_form</td><td>activate_by_role_or_text</td><td>passed</td><td>button, &quot;Submit application&quot;</td><td>Activated with Enter (tag: button).</td></tr>
+<tr><td>confirm_submission</td><td>wait_for_text</td><td>passed</td><td>button, &quot;Submit application&quot;</td><td>Text appeared on the page.</td></tr>
 </tbody></table>
-<ul><li>Task steps are deterministic scripts; a human may find a workaround the script does not try.</li><li>Step results show keyboard operability, not full assistive technology behavior.</li></ul>
+<ul><li>Task steps are deterministic scripts; a human may find a workaround the script does not try.</li><li>Step results show keyboard operability, not full assistive technology behavior.</li><li>The announce transcript comes from Chromium&#x27;s computed accessibility tree in one browser run.</li><li>Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently.</li></ul>
 </section>
 <section>
 <h2>Browser Interaction Trace</h2>
@@ -91,7 +92,16 @@ pre { overflow-x: auto; padding: 0.75rem; }
 <tr><td>4</td><td>textarea</td><td>Accommodation request</td><td>accommodation_request</td><td></td></tr>
 <tr><td>5</td><td>button</td><td>Submit application</td><td></td><td>Submit application</td></tr>
 </tbody></table>
-<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li></ul>
+<h3>Announce Transcript</h3>
+<p>What Chromium's computed accessibility tree exposes at each observed focus stop. This approximates what a screen reader would announce; real screen readers can differ.</p>
+<ol>
+<li>textbox, &quot;Student name&quot;</li>
+<li>textbox, &quot;Email&quot;</li>
+<li>combobox, &quot;School&quot;, collapsed</li>
+<li>textbox, &quot;Accommodation request&quot;</li>
+<li>button, &quot;Submit application&quot;</li>
+</ol>
+<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li><li>The announce transcript comes from Chromium&#x27;s computed accessibility tree in one browser run.</li><li>Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently.</li></ul>
 </section>
 <section>
 <h2>Visual Proof</h2>
@@ -100,6 +110,9 @@ pre { overflow-x: auto; padding: 0.75rem; }
 <p>Observed focus path overlay: <a href="reports/visual_task_execution/focus_path.html">reports/visual_task_execution/focus_path.html</a></p>
 <p>Focus points count: 5</p>
 <ul><li>Focus overlay shows observed Tab stops in this browser run.</li><li>It does not represent every assistive technology experience.</li></ul>
+<h3>Task Execution Video</h3>
+<p><a href="reports/visual_task_execution/task_execution.webm">reports/visual_task_execution/task_execution.webm</a></p>
+<p class="meta">Keyboard-only task execution of &quot;Submit scholarship application&quot; on examples/sample_task_execution_form.html in one headless Chromium run. An evidence aid for human reviewers, not accessibility certification.</p>
 </section>
 <section>
 <h2>Issues Found</h2>

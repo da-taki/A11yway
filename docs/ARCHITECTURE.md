@@ -56,6 +56,8 @@ Only used when browser mode is active and visual proof is requested. The browser
 
 Visual proof is an evidence aid, not accessibility certification. The overlay shows one observed browser focus path and does not represent every assistive technology experience.
 
+With `--video`, a task execution run is also recorded (viewport-sized, via Playwright's video recording) and saved as `task_execution.webm` next to the visual proof assets; the HTML report links it with a caption stating what run it shows.
+
 ### Low-Vision Audit - `a11yway/core/low_vision_audit.py` (Optional)
 
 Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, runs zoom reflow passes at 200% and 400% (laid out at the equivalent CSS widths browser zoom produces, including the WCAG 1.4.10 reference of 320 px) detecting horizontal scrolling, clipped content, and overlapping controls, and checks focused elements for obvious focus indicators. These checks are conservative and require manual review.
