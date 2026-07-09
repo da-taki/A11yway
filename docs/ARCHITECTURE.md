@@ -94,6 +94,10 @@ Reports should distinguish:
 - Deterministic findings from static/browser/task execution
 - Reviewer-confirmed findings from human review
 
+### CI Output - `a11yway/core/ci_output.py`
+
+Used with `--ci`, `--sarif`, and `--junit`. Maps audit outcomes onto exit codes (0 clean, 1 findings at or above the `--fail-severity` threshold, 2 blocked task with `--fail-on-blocked`, 3 tool or setup error), renders findings as SARIF 2.1.0 for inline GitHub annotations, and renders task execution steps as JUnit XML test cases. Standard library only; a batch run is handled as a list of reports.
+
 ### Batch Runner - `a11yway/core/batch_runner.py`
 
 Loads a batch config (a JSON list of sources with optional tasks), runs the audit for each item, keeps going when one item fails, and writes all per-page and index artifacts to the output directory.

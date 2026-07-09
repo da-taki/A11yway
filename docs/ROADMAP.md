@@ -17,6 +17,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Re-audit diff tracking for fixed, remaining, new, and task-execution changes
 - Announce transcript from Chromium's computed accessibility tree (roles, names, states) with unnamed focus stop findings
 - Keyboard trap and focus-loop detection from the observed focus trace, including trap-blocked task execution verdicts
+- CI mode with meaningful exit codes, SARIF 2.1.0 and JUnit XML export, and an example GitHub Actions task regression workflow
 
 ## v0.4 - Workflow Packs
 

@@ -139,6 +139,29 @@ Task execution limitations:
 - Browser mode requires Playwright and Chromium.
 - Use it only on public pages or pages you have permission to test.
 
+## CI Mode
+
+CI mode makes A11yway usable as a pipeline gate. `--ci` turns audit outcomes into meaningful exit codes and works with static mode, `--browser`, `--execute-task`, and batch mode:
+
+- `0`: no findings at or above the threshold and no blocked tasks
+- `1`: findings at or above the threshold (default: high)
+- `2`: a task execution was blocked (with `--fail-on-blocked`)
+- `3`: tool or setup error (missing Playwright, unreadable source, browser failure)
+
+```bash
+python -m a11yway.main examples/sample_task_execution_form.html --browser --execute-task submit_scholarship_application --ci --fail-on-blocked --sarif reports/ci_sample.sarif --junit reports/ci_sample_junit.xml
+```
+
+`--fail-severity {high,medium,low}` sets the lowest severity that fails the run. `--fail-on-blocked` makes a blocked task exit with code 2; without it, a blocked task still fails through its high-severity findings, but with exit code 1. `--sarif PATH` writes findings as SARIF 2.1.0 (high=error, medium=warning, low=note, with rule descriptions and file/line locations where available) so they render inline on GitHub. `--junit PATH` writes task execution steps as JUnit XML test cases, where a blocked step is a failure carrying the evidence as its message. In batch mode, SARIF and JUnit aggregate all items into one file.
+
+A ready-to-copy GitHub Actions workflow lives at [.github/workflows/a11yway-example.yml](.github/workflows/a11yway-example.yml). It demonstrates a task regression check: the build fails if a declared workflow becomes keyboard-blocked. It triggers only on `workflow_dispatch`, so it is a template to copy, not a check that runs on this repository.
+
+CI mode limitations:
+
+- Exit codes reflect A11yway's deterministic checks only; a green build is not WCAG conformance and does not replace human review.
+- SARIF line numbers are the approximate lines from static evidence; browser findings usually carry no line and map to the page URI as a whole.
+- JUnit output only covers declared task steps; pages without task execution produce an empty test suite.
+
 ## Workflow Packs
 
 Workflow packs are deterministic task templates that help reviewers decide what to test on a page. They are not AI prompts, they do not automatically prove accessibility, and they do not replace deterministic verification.

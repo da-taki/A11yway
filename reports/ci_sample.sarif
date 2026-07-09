@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "A11yway",
+          "version": "prototype",
+          "informationUri": "https://github.com/da-taki/A11yway",
+          "rules": []
+        }
+      },
+      "results": []
+    }
+  ]
+}
