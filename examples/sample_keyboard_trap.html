@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Course Survey</title>
+  <style>
+    .overlay { border: 2px solid #444; padding: 1rem; max-width: 24rem; }
+  </style>
+</head>
+<body>
+  <h1>Course Survey</h1>
+  <p>
+    This is a fictional education page for A11yway keyboard trap testing.
+    The feedback dialog below swallows the Tab key and cycles focus among
+    its own three controls forever, so a keyboard-only student can never
+    reach the survey form after it. Compare with
+    sample_keyboard_trap_fixed.html, where Tab moves on normally.
+  </p>
+
+  <div class="overlay" role="dialog" aria-label="Quick feedback" id="feedback_dialog">
+    <h2>Quick feedback</h2>
+    <label for="rating">How was the last lesson?</label>
+    <select id="rating" name="rating">
+      <option value="">Choose a rating</option>
+      <option value="good">Good</option>
+      <option value="okay">Okay</option>
+    </select>
+    <button type="button" id="send_feedback">Send feedback</button>
+    <button type="button" id="dismiss_feedback">Dismiss</button>
+  </div>
+
+  <form action="/survey" method="post">
+    <h2>Course survey</h2>
+    <label for="favorite_topic">Favorite topic this term</label>
+    <input id="favorite_topic" type="text" name="favorite_topic">
+
+    <label for="comments">Comments</label>
+    <textarea id="comments" name="comments"></textarea>
+
+    <button type="submit">Submit survey</button>
+  </form>
+
+  <script>
+    // A broken focus trap: it intercepts Tab and cycles focus among the
+    // dialog controls, but never releases focus and offers no way out.
+    (function () {
+      var dialog = document.getElementById("feedback_dialog");
+      var controls = [
+        document.getElementById("rating"),
+        document.getElementById("send_feedback"),
+        document.getElementById("dismiss_feedback")
+      ];
+      document.addEventListener("keydown", function (event) {
+        if (event.key !== "Tab") return;
+        event.preventDefault();
+        var index = controls.indexOf(document.activeElement);
+        var next = event.shiftKey ? index - 1 : index + 1;
+        if (next >= controls.length) next = 0;
+        if (next < 0) next = controls.length - 1;
+        controls[next].focus();
+      });
+    })();
+  </script>
+</body>
+</html>

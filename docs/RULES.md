@@ -63,6 +63,8 @@ heuristic only runs as a fallback when tree data cannot be captured.
 | `browser_focused_control_missing_name` | Keyboard Interaction | high | A focused link/button/form control has no estimated accessible name | Screen readers announce nothing useful about the control | Heuristic fallback; only used when accessibility tree data is unavailable for the element |
 | `browser_focus_on_hidden_element` | Keyboard Interaction | high | Focus lands on an element that appears invisible | Keyboard users lose track of where they are | Visibility is estimated from size and CSS |
 | `unnamed_focus_stop` | Keyboard Interaction | high | Chromium's accessibility tree computed an empty accessible name for a focus stop | A screen reader user hears at most a bare role and cannot tell what the element does | One Chromium run's computed tree, not a screen reader; NVDA, JAWS, and VoiceOver can differ |
+| `keyboard_trap` | Keyboard Interaction | high | Tab cycles through the same subset of elements (confirmed twice, never passing the body) while other focusable elements are never reached | Keyboard-only users are stuck and cannot finish anything beyond the loop (WCAG 2.1.2 No Keyboard Trap) | Observed Tab behavior in one Chromium run; cannot verify custom escape mechanisms such as Escape handlers or shortcuts |
+| `focus_lost` | Keyboard Interaction | medium | Tab lands on the document body repeatedly and focus never returns to page content | Keyboard users lose their place and cannot continue | One headless Chromium run; a single body pass between last and first element is normal and not flagged |
 
 Browser mode limitations:
 
@@ -124,6 +126,10 @@ can complete the task, and results still need human review.
 | `task_step_blocked` | Task Execution | high | A required task step failed under keyboard-only interaction | The student workflow is likely blocked at that step | Deterministic scripts; a human may find a workaround |
 | `task_control_not_keyboard_reachable` | Task Execution | high | A step only succeeded via programmatic focus, never via Tab | A real keyboard-only student would be stuck | The Tab search has a fixed press budget |
 | `task_expected_content_missing` | Task Execution | medium | Expected page text (purpose or confirmation) was not visible | Students may not know where they are or whether the task worked | Compares normalized visible text only |
+
+When a step's control sits beyond a confirmed focus loop, the task result
+says `BLOCKED at step <id> (reason: keyboard_trap)` and a `keyboard_trap`
+finding identifies the looping elements.
 
 Task execution limitations:
 

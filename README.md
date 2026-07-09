@@ -97,6 +97,22 @@ Announce transcript limitations:
 - It reflects one run in one browser engine.
 - When accessibility tree data cannot be captured, transcript entries say "announcement unavailable" and A11yway falls back to its older estimated-name heuristic instead of guessing.
 
+## Keyboard Trap and Focus-Loop Detection
+
+Browser mode analyzes the observed focus trace for two failure patterns related to WCAG 2.1.2 (No Keyboard Trap). A `keyboard_trap` finding (severity high) fires when Tab keeps cycling through the same subset of elements, confirmed over at least two full cycles that never pass through the document body, while other focusable elements are never reached. A `focus_lost` finding fires when Tab lands on the document body repeatedly and focus never returns to page content. Evidence includes the looping element sequence and the count of unreached focusable elements.
+
+```bash
+python -m a11yway.main examples/sample_keyboard_trap.html --browser --markdown reports/keyboard_trap_report.md
+```
+
+During task execution, a step whose control sits beyond a focus loop is reported as `BLOCKED at step <id> (reason: keyboard_trap)` with the looping elements identified. The paired samples show the difference: [examples/sample_keyboard_trap.html](examples/sample_keyboard_trap.html) has a feedback dialog that swallows Tab and strands the survey form behind it, while [examples/sample_keyboard_trap_fixed.html](examples/sample_keyboard_trap_fixed.html) lets focus move through the whole page.
+
+Keyboard trap detection limitations:
+
+- Detection is based on observed Tab behavior in one Chromium run. It cannot verify custom escape mechanisms (Escape handlers, arrow keys, documented shortcuts), so a flagged widget may still offer a way out that Tab-only traversal cannot see.
+- The count of unreached elements is an estimate from visible focusable elements and needs manual confirmation.
+- A trap that only appears after specific user actions (for example, opening a menu) is not detected unless a task step triggers it.
+
 ## Deterministic Task Execution
 
 Normal task mode maps static issues to likely blockers for a workflow. Deterministic task execution goes one step further: with `--execute-task`, A11yway attempts a task's scripted steps in the browser using **keyboard-only interaction**. Focus moves with Tab, text is typed, controls are activated with Enter, and the report states whether the task passed, failed, or was blocked.

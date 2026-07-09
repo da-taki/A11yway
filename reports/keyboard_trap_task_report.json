@@ -1,0 +1,1566 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_keyboard_trap.html",
+  "summary": {
+    "issues_found": 2,
+    "counts_by_severity": {
+      "high": 2
+    },
+    "counts_by_issue_type": {
+      "keyboard_trap": 2
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "keyboard_trap",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus is trapped in a loop",
+      "evidence": {
+        "reason": "Tab keeps cycling through the same 3 element(s) without passing through the rest of the page; about 3 focusable element(s) were never reached within 40 Tab presses.",
+        "loop_sequence": "button#send_feedback -> button#dismiss_feedback -> select#rating",
+        "loop_length": 3,
+        "unreached_focusable_count": 3,
+        "tab_presses": 40,
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Let Tab move past the widget, or provide a standard way out, such as closing a modal with Escape and returning focus. Related to WCAG 2.1.2 No Keyboard Trap.",
+      "rule": {
+        "title": "Keyboard focus is trapped in a loop",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "Tab kept cycling through the same subset of elements without ever reaching the rest of the page, so a keyboard-only user is stuck and cannot finish anything beyond the loop.",
+        "manual_review_notes": "Confirm the loop by hand and check for documented escape mechanisms (Escape, arrow keys, custom shortcuts) that Tab-only traversal cannot see.",
+        "browser_check_limitations": "Based on observed Tab behavior in one Chromium run. It cannot verify custom escape mechanisms, and the count of unreached elements is an estimate from visible focusable elements."
+      }
+    },
+    {
+      "issue_type": "keyboard_trap",
+      "severity": "high",
+      "agent_name": "Keyboard Task Runner",
+      "message": "Keyboard focus is trapped in a loop",
+      "evidence": {
+        "detected_in": "browser_task_execution",
+        "step_id": "focus_favorite_topic",
+        "action": "focus_by_label_or_name",
+        "reason": "While searching for this step's control, Tab kept cycling through the same elements without passing through the rest of the page.",
+        "target": "Favorite topic",
+        "loop_sequence": "button#send_feedback -> button#dismiss_feedback -> select#rating",
+        "loop_length": 3,
+        "tab_presses": 40
+      },
+      "suggested_fix": "",
+      "rule": {
+        "title": "Keyboard focus is trapped in a loop",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "Tab kept cycling through the same subset of elements without ever reaching the rest of the page, so a keyboard-only user is stuck and cannot finish anything beyond the loop.",
+        "manual_review_notes": "Confirm the loop by hand and check for documented escape mechanisms (Escape, arrow keys, custom shortcuts) that Tab-only traversal cannot see.",
+        "browser_check_limitations": "Based on observed Tab behavior in one Chromium run. It cannot verify custom escape mechanisms, and the count of unreached elements is an estimate from visible focusable elements."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "task": {
+    "id": "fill_course_survey",
+    "name": "Fill the course survey",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Reach the survey form",
+      "Enter a favorite topic",
+      "Submit the survey"
+    ],
+    "likely_blockers": [
+      {
+        "issue_type": "keyboard_trap",
+        "severity": "high",
+        "message": "Keyboard focus is trapped in a loop",
+        "task_impact": "This issue may make the task harder to complete."
+      },
+      {
+        "issue_type": "keyboard_trap",
+        "severity": "high",
+        "message": "Keyboard focus is trapped in a loop",
+        "task_impact": "This issue may make the task harder to complete."
+      }
+    ]
+  },
+  "source": {
+    "input": "examples/sample_keyboard_trap.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_keyboard_trap.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 2,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 3,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 4,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 5,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 6,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 7,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 8,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 9,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 10,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 11,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 12,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 13,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 14,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 15,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 16,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 17,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 18,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 19,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 20,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 21,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 22,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 23,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 24,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 25,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 26,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 27,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 28,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 29,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 30,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 31,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 32,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 33,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 34,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 35,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 36,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 37,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      },
+      {
+        "step": 38,
+        "tag": "button",
+        "id": "send_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Send feedback",
+        "role": null,
+        "accessible_name_guess": "Send feedback",
+        "is_visible": true,
+        "x": 26,
+        "y": 235.6875,
+        "width": 104.9375,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Send feedback",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Send feedback\""
+      },
+      {
+        "step": 39,
+        "tag": "button",
+        "id": "dismiss_feedback",
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Dismiss",
+        "role": null,
+        "accessible_name_guess": "Dismiss",
+        "is_visible": true,
+        "x": 134.9375,
+        "y": 235.6875,
+        "width": 62.65625,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Dismiss",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Dismiss\""
+      },
+      {
+        "step": 40,
+        "tag": "select",
+        "id": "rating",
+        "name": "rating",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a rating Good Okay",
+        "role": null,
+        "accessible_name_guess": "How was the last lesson?",
+        "is_visible": true,
+        "x": 190.859375,
+        "y": 216.6875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "How was the last lesson?",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"How was the last lesson?\", collapsed"
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ],
+    "announce_transcript": [
+      {
+        "step": 1,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 2,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 3,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 4,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 5,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 6,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 7,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 8,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 9,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 10,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 11,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 12,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 13,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 14,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 15,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 16,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 17,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 18,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 19,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 20,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 21,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 22,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 23,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 24,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 25,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 26,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 27,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 28,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 29,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 30,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 31,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 32,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 33,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 34,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 35,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 36,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 37,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 38,
+        "announcement": "button, \"Send feedback\"",
+        "role": "button",
+        "name": "Send feedback",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 39,
+        "announcement": "button, \"Dismiss\"",
+        "role": "button",
+        "name": "Dismiss",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 40,
+        "announcement": "combobox, \"How was the last lesson?\", collapsed",
+        "role": "combobox",
+        "name": "How was the last lesson?",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      }
+    ]
+  },
+  "task_execution": {
+    "task_id": "fill_course_survey",
+    "task_name": "Fill the course survey",
+    "student_profile": "Keyboard-only student",
+    "success": true,
+    "error": null,
+    "completed": false,
+    "blocked_at_step": "focus_favorite_topic",
+    "blocked_reason": "keyboard_trap",
+    "steps_total": 3,
+    "steps_passed": 0,
+    "steps": [
+      {
+        "id": "focus_favorite_topic",
+        "action": "focus_by_label_or_name",
+        "target": "Favorite topic",
+        "description": "Move to the favorite topic field.",
+        "status": "failed",
+        "detail": "Focus loops through button#send_feedback -> button#dismiss_feedback -> select#rating and never reaches this control.",
+        "used_fallback": false,
+        "announced": "combobox, \"How was the last lesson?\", collapsed",
+        "blocked_reason": "keyboard_trap"
+      },
+      {
+        "id": "type_favorite_topic",
+        "action": "type_text",
+        "target": "",
+        "description": "Type an answer.",
+        "status": "skipped",
+        "detail": "Skipped because an earlier step was blocked.",
+        "used_fallback": false,
+        "announced": null,
+        "blocked_reason": null
+      },
+      {
+        "id": "submit_survey",
+        "action": "activate_by_role_or_text",
+        "target": "Submit survey",
+        "description": "Submit the survey with the keyboard.",
+        "status": "skipped",
+        "detail": "Skipped because an earlier step was blocked.",
+        "used_fallback": false,
+        "announced": null,
+        "blocked_reason": null
+      }
+    ],
+    "announce_available": true,
+    "limitations": [
+      "Task steps are deterministic scripts; a human may find a workaround the script does not try.",
+      "Step results show keyboard operability, not full assistive technology behavior.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ]
+  }
+}

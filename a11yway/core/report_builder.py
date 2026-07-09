@@ -200,6 +200,7 @@ def build_json_report(
             "error": task_execution.get("error"),
             "completed": task_execution.get("completed", False),
             "blocked_at_step": task_execution.get("blocked_at_step"),
+            "blocked_reason": task_execution.get("blocked_reason"),
             "steps_total": task_execution.get("steps_total", 0),
             "steps_passed": task_execution.get("steps_passed", 0),
             "steps": task_execution.get("steps", []),
@@ -231,10 +232,31 @@ def _format_count_items(counts: dict) -> list[str]:
     return [f"- {key}: {value}" for key, value in counts.items()]
 
 
+_EVIDENCE_KEYS = [
+    "tag",
+    "id",
+    "name",
+    "href",
+    "src",
+    "text",
+    "line",
+    "step",
+    "detected_in",
+    "announced_role",
+    "announcement",
+    "loop_sequence",
+    "loop_length",
+    "unreached_focusable_count",
+    "tab_presses",
+    "body_streak",
+    "reason",
+]
+
+
 def _format_evidence_lines(evidence: dict) -> list[str]:
     """Format structured evidence for Markdown output."""
     lines = []
-    for key in ["tag", "id", "name", "href", "src", "text", "line", "step", "detected_in", "reason"]:
+    for key in _EVIDENCE_KEYS:
         value = evidence.get(key)
         if value not in [None, ""]:
             lines.append(f"- {key}: {value}")
@@ -451,6 +473,8 @@ def build_markdown_report(report: dict) -> str:
                 verdict = "COMPLETED with keyboard-only interaction"
             else:
                 verdict = f"BLOCKED at step `{execution.get('blocked_at_step', '')}`"
+                if execution.get("blocked_reason"):
+                    verdict += f" (reason: {execution['blocked_reason']})"
             lines.extend(
                 [
                     f"- Task: {execution.get('task_name', '')}",
@@ -580,7 +604,7 @@ def _html_count_list(counts: dict) -> str:
 def _html_evidence(evidence: dict) -> str:
     """Render structured evidence for the HTML report."""
     rows = []
-    for key in ["tag", "id", "name", "href", "src", "text", "line", "step", "detected_in", "reason"]:
+    for key in _EVIDENCE_KEYS:
         value = evidence.get(key)
         if value not in [None, ""]:
             rows.append(
@@ -713,6 +737,8 @@ def build_html_report(report: dict) -> str:
                 if execution.get("completed")
                 else f"BLOCKED at step {execution.get('blocked_at_step', '')}"
             )
+            if not execution.get("completed") and execution.get("blocked_reason"):
+                verdict += f" (reason: {execution['blocked_reason']})"
             lines.extend(
                 [
                     f"<p>Task: {escape(str(execution.get('task_name', '')))}</p>",

@@ -42,6 +42,8 @@ EXPECTED_BROWSER_ISSUE_TYPES = {
     "browser_focused_control_missing_name",
     "browser_focus_on_hidden_element",
     "unnamed_focus_stop",
+    "keyboard_trap",
+    "focus_lost",
 }
 
 EXPECTED_TASK_EXECUTION_ISSUE_TYPES = {
