@@ -160,6 +160,8 @@ def build_json_report(
             "focus_trace": browser_result.get("focus_trace", []),
             "limitations": list(BROWSER_MODE_LIMITATIONS),
         }
+        if browser_result.get("axe") is not None:
+            report["browser"]["axe"] = browser_result["axe"]
         visual_proof = _visual_proof_for_report(browser_result.get("visual_proof"))
         if visual_proof is not None:
             report["visual_proof"] = visual_proof
@@ -310,6 +312,44 @@ def build_markdown_report(report: dict) -> str:
                     ["", f"Trace truncated: showing the first 20 of {len(trace)} steps."]
                 )
             lines.append("")
+        axe = browser.get("axe")
+        if axe is not None:
+            lines.extend(
+                [
+                    "### Axe-core Scan",
+                    "",
+                    f"- Scan success: {str(axe.get('success', False)).lower()}",
+                ]
+            )
+            if axe.get("error"):
+                lines.append(f"- Error: {axe['error']}")
+            if axe.get("axe_version"):
+                lines.append(f"- axe-core version: {axe['axe_version']}")
+            lines.extend(
+                [
+                    f"- Rules violated: {axe.get('violation_rule_count', 0)}",
+                    f"- Findings reported: {axe.get('issue_count', 0)}",
+                    "",
+                ]
+            )
+            violations = axe.get("violations", [])
+            if violations:
+                lines.extend(
+                    [
+                        "| Rule | Impact | Elements | Help |",
+                        "| --- | --- | ---: | --- |",
+                    ]
+                )
+                for violation in violations:
+                    lines.append(
+                        "| {rule} | {impact} | {nodes} | {help} |".format(
+                            rule=violation.get("rule", ""),
+                            impact=violation.get("impact", ""),
+                            nodes=violation.get("node_count", 0),
+                            help=violation.get("help", ""),
+                        )
+                    )
+                lines.append("")
         if browser.get("limitations"):
             lines.extend(["### Browser Limitations", ""])
             lines.extend(f"- {limitation}" for limitation in browser["limitations"])
@@ -692,6 +732,37 @@ def build_html_report(report: dict) -> str:
                     )
                 )
             lines.append("</tbody></table>")
+        axe = browser.get("axe")
+        if axe is not None:
+            lines.extend(
+                [
+                    "<h3>Axe-core Scan</h3>",
+                    f"<p>Scan success: {escape(str(axe.get('success', False)).lower())}</p>",
+                ]
+            )
+            if axe.get("error"):
+                lines.append(f"<p>Error: {escape(str(axe['error']))}</p>")
+            lines.append(
+                "<p>Rules violated: {rules}. Findings reported: {findings}.</p>".format(
+                    rules=escape(str(axe.get("violation_rule_count", 0))),
+                    findings=escape(str(axe.get("issue_count", 0))),
+                )
+            )
+            violations = axe.get("violations", [])
+            if violations:
+                lines.append(
+                    "<table><thead><tr><th>Rule</th><th>Impact</th><th>Elements</th><th>Help</th></tr></thead><tbody>"
+                )
+                for violation in violations:
+                    lines.append(
+                        "<tr><td>{rule}</td><td>{impact}</td><td>{nodes}</td><td>{help}</td></tr>".format(
+                            rule=escape(str(violation.get("rule", ""))),
+                            impact=escape(str(violation.get("impact", ""))),
+                            nodes=escape(str(violation.get("node_count", 0))),
+                            help=escape(str(violation.get("help", ""))),
+                        )
+                    )
+                lines.append("</tbody></table>")
         lines.append(_html_list(browser.get("limitations", [])))
         lines.append("</section>")
 

@@ -61,6 +61,7 @@ def run_batch(
     html_reports: bool = False,
     low_vision: bool = False,
     ai_scout: bool = False,
+    axe: bool = False,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
@@ -135,6 +136,7 @@ def run_batch(
                     max_tabs=max_tabs,
                     wait_ms=wait_ms,
                     visual_proof_dir=visual_proof_dir,
+                    include_axe=axe,
                 )
                 static_issue_count = len(issues)
                 issues = merge_browser_issues(issues, browser_result)

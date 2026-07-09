@@ -17,6 +17,18 @@ from a11yway.models.issue import AccessibilityIssue
 
 IGNORED_INPUT_TYPES = {"hidden", "submit", "button", "reset"}
 GENERIC_LINK_TEXT = {"click here", "here", "read more", "more", "link", "learn more"}
+
+# Tags browsers close implicitly when a new tag of the same name starts.
+# Real pages often omit these end tags; without this rule one unclosed
+# <label> or <a> would wrap the rest of the document and hide findings.
+IMPLICITLY_CLOSED_TAGS = {
+    "a", "button", "label", "select", "textarea", "option",
+    "p", "li", "td", "th", "tr",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+}
+
+# Elements whose raw text browsers never render as page content.
+NON_RENDERED_TEXT_TAGS = {"script", "style", "template"}
 STATIC_CHECKS_RUN = [
     "html_form_labels",
     "interactive_names",
@@ -65,6 +77,11 @@ class _StaticHTMLParser(HTMLParser):
         tag_name = tag.lower()
         attrs_dict = {name.lower(): value or "" for name, value in attrs}
 
+        if tag_name in IMPLICITLY_CLOSED_TAGS and any(
+            item.tag == tag_name for item in self._open_elements
+        ):
+            self.handle_endtag(tag_name)
+
         if tag_name == "html":
             self.html_attrs = attrs_dict
 
@@ -107,12 +124,20 @@ class _StaticHTMLParser(HTMLParser):
 
         for index in range(len(self._open_elements) - 1, -1, -1):
             if self._open_elements[index].tag == tag_name:
-                element = self._open_elements.pop(index)
-                if tag_name == "title":
-                    self.title_text = element.text
+                # Elements above the match never got an end tag; browsers
+                # close them here too, so drop them instead of letting them
+                # wrap the rest of the document.
+                closed = self._open_elements[index:]
+                del self._open_elements[index:]
+                for element in closed:
+                    if element.tag == "title" and not self.title_text:
+                        self.title_text = element.text
                 return
 
     def handle_data(self, data: str) -> None:
+        if any(item.tag in NON_RENDERED_TEXT_TAGS for item in self._open_elements):
+            return
+
         normalized = normalize_text(data)
         if not normalized:
             return
@@ -121,6 +146,14 @@ class _StaticHTMLParser(HTMLParser):
 
         for element in self._open_elements:
             element.text_parts.append(normalized)
+
+    def close(self) -> None:
+        super().close()
+        if not self.title_text:
+            for element in self._open_elements:
+                if element.tag == "title":
+                    self.title_text = element.text
+                    break
 
     @property
     def document_text(self) -> str:
@@ -134,10 +167,17 @@ def normalize_text(value: str) -> str:
 
 
 def _parse_html(html: str) -> _StaticHTMLParser:
-    """Parse HTML into a small reusable snapshot."""
+    """Parse HTML into a small reusable snapshot.
+
+    Severely malformed markup must never crash a static audit, so any
+    parser error keeps whatever was parsed before the failure.
+    """
     parser = _StaticHTMLParser(html)
-    parser.feed(html)
-    parser.close()
+    try:
+        parser.feed(html)
+        parser.close()
+    except Exception:  # noqa: BLE001 - degrade to partial results, never crash
+        pass
     return parser
 
 

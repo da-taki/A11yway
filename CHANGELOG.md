@@ -3,6 +3,26 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Malformed-HTML hardening and optional axe-core scan
+
+- Hardened the static HTML parser against real-world tag soup: an end tag
+  now also closes unclosed children (an unclosed `<label>` or `<a>` can no
+  longer wrap the rest of the document and hide findings), non-nestable
+  tags like `a`, `button`, `label`, `p`, and `li` implicitly close a
+  previous unclosed instance the way browsers repair them, script/style
+  text no longer counts as visible content or accessible names, an
+  unclosed `<title>` still counts as a page title, and parser failures
+  degrade to partial results instead of crashing an audit.
+- Added a malformed-HTML regression test suite
+  (`tests/test_malformed_html.py`).
+- Added an optional axe-core rule scan to browser mode with `--axe`, in
+  single audits and batch mode. Axe findings map onto A11yway severities,
+  carry element snippets and Deque University help links, and reports gain
+  an "Axe-core Scan" summary section.
+- axe-core is bundled through the optional `axe-playwright-python` package
+  in `requirements-browser.txt`; no network access is needed at audit time
+  and every static or browser command keeps working without it.
+
 ## Unreleased - Low-vision checks, reviewer verdicts, and re-audit diff tracking
 
 - Added optional browser-based low-vision checks with `--browser --low-vision`
