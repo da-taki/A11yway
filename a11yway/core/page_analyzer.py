@@ -12,6 +12,7 @@ from html import escape
 from html.parser import HTMLParser
 from typing import Any
 
+from a11yway.core.indic_checks import analyze_indic_language
 from a11yway.models.issue import AccessibilityIssue
 
 
@@ -36,6 +37,7 @@ STATIC_CHECKS_RUN = [
     "heading_structure",
     "page_metadata",
     "media_accessibility",
+    "indic_language_checks",
 ]
 
 
@@ -624,6 +626,7 @@ def analyze_html_static(html: str) -> list[AccessibilityIssue]:
         analyze_heading_structure,
         analyze_page_metadata,
         analyze_media_accessibility,
+        analyze_indic_language,
     ]:
         issues.extend(check(html))
 

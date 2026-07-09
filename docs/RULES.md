@@ -40,6 +40,28 @@ The analyzer currently runs these check groups over the raw HTML:
 Findings include an evidence snippet, the reason the check fired, and an
 approximate source line number so reviewers can verify each result manually.
 
+## Indic-Language Checks (static)
+
+These checks run in every static analysis with no browser or external
+dependency. They detect Indic-script text through Unicode ranges
+(Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada,
+Malayalam) and compare it against the declared language markup, because
+text-to-speech picks its voice from the lang attribute.
+
+| Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
+| --- | --- | --- | --- | --- | --- |
+| `missing_lang_indic` | Language | high | Indic-script text whose effective lang is missing or non-matching (e.g. Gurmukhi under `lang="en"`) | TTS reads the text with the wrong voice, producing garbled speech | Unicode-range heuristic; languages sharing a script cannot be told apart, and transliterated text is invisible to it |
+| `lang_mismatch` | Language | high | An element's own lang attribute contradicts the dominant script of its text (e.g. `lang="ta"` over Devanagari) | A wrong declaration is worse than none; screen readers pick the wrong voice | Only fires when the script itself contradicts the declaration |
+| `mixed_script_element` | Language | medium | One text node mixing several Latin words with Indic text and no lang boundary | Speech engines cannot switch voices mid-node and commonly garble one language | Conservative heuristic: ignores numbers, short acronyms, and single loanwords; may flag intentional bilingual lines |
+
+Indic-language limitations:
+
+- Script detection is a heuristic on Unicode ranges, not language
+  identification.
+- Transliterated text (Hindi written in Latin script) cannot be detected.
+- The right lang value for a shared script (Hindi vs Marathi) needs a
+  human decision.
+
 ## Browser Interaction Checks (optional)
 
 With `--browser` and Playwright installed, A11yway loads the page in headless

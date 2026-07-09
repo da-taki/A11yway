@@ -48,7 +48,23 @@ python -m a11yway.main --list-rules
 python -m a11yway.main --rule missing_form_label
 ```
 
-Static checks cover form labels, link/button names, image alt text, heading structure, page title/language, and basic media captions/transcripts. Every finding includes an evidence snippet, the reason, and an approximate line number.
+Static checks cover form labels, link/button names, image alt text, heading structure, page title/language, basic media captions/transcripts, and Indic-language markup. Every finding includes an evidence snippet, the reason, and an approximate line number.
+
+## Indic-Language Checks
+
+Text-to-speech and screen readers pick a voice from the declared language, so Indian-language content with missing or wrong lang markup is commonly read as garbled English. A static rule pack (no browser needed) detects Indic-script text via Unicode ranges (Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada, Malayalam) and reports three problems: `missing_lang_indic` when Indic text sits under a missing or non-matching effective lang (for example Gurmukhi under `lang="en"`), `lang_mismatch` when an element's own lang attribute contradicts its dominant script (for example `lang="ta"` over Devanagari), and `mixed_script_element` when one text node mixes several Latin words with Indic text and no lang boundary.
+
+```bash
+python -m a11yway.main examples/sample_indic_page.html --markdown reports/indic_page_report.md
+```
+
+The paired samples show the difference: [examples/sample_indic_page.html](examples/sample_indic_page.html) seeds all three problems, while [examples/sample_indic_page_clean.html](examples/sample_indic_page_clean.html) tags every language block correctly and passes.
+
+Indic-language check limitations:
+
+- Script detection is a Unicode-range heuristic, not language identification. Languages sharing a script (Hindi and Marathi both use Devanagari) cannot be told apart, so the right lang value needs a human decision.
+- Transliterated text (Hindi written in Latin script) cannot be detected at all.
+- The mixed-script check is deliberately conservative: it ignores numbers, short acronyms, and single loanwords, so it may miss subtler mixes and can flag intentional bilingual lines.
 
 ## Quickstart: Browser Mode
 

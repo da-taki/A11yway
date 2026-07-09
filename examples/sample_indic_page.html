@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scholarship Notice</title>
+</head>
+<body>
+  <h1>Scholarship Notice</h1>
+  <p>
+    This is a fictional education page for A11yway Indic-language checks.
+    It seeds four markup problems: Devanagari and Gurmukhi paragraphs that
+    inherit lang="en", a Tamil declaration over Devanagari text, and one
+    paragraph mixing English and Hindi in a single text node. Compare with
+    sample_indic_page_clean.html.
+  </p>
+
+  <!-- Devanagari text inheriting lang="en": missing_lang_indic. -->
+  <p>छात्रवृत्ति के लिए आवेदन की अंतिम तिथि 15 अगस्त है।</p>
+
+  <!-- Gurmukhi text inheriting lang="en": missing_lang_indic. -->
+  <p>ਵਜ਼ੀਫ਼ੇ ਲਈ ਅਰਜ਼ੀ ਦੀ ਆਖਰੀ ਮਿਤੀ 15 ਅਗਸਤ ਹੈ।</p>
+
+  <!-- Declared Tamil over Devanagari text: lang_mismatch. -->
+  <p lang="ta">आवेदन पत्र स्कूल कार्यालय से प्राप्त करें।</p>
+
+  <!-- English and Hindi mixed in one text node: mixed_script_element. -->
+  <p lang="hi">Please bring your income certificate क्योंकि यह आवेदन के लिए आवश्यक है।</p>
+</body>
+</html>

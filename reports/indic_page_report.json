@@ -1,0 +1,131 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_indic_page.html",
+  "summary": {
+    "issues_found": 4,
+    "counts_by_severity": {
+      "high": 3,
+      "medium": 1
+    },
+    "counts_by_issue_type": {
+      "missing_lang_indic": 2,
+      "lang_mismatch": 1,
+      "mixed_script_element": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "indic_language_checks"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_lang_indic",
+      "severity": "high",
+      "agent_name": "Indic Language Checker",
+      "message": "Indic-script text lacks a matching lang attribute",
+      "evidence": {
+        "snippet": "\u091b\u093e\u0924\u094d\u0930\u0935\u0943\u0924\u094d\u0924\u093f \u0915\u0947 \u0932\u093f\u090f \u0906\u0935\u0947\u0926\u0928 \u0915\u0940 \u0905\u0902\u0924\u093f\u092e \u0924\u093f\u0925\u093f 15 \u0905\u0917\u0938\u094d\u0924 \u0939\u0948\u0964",
+        "tag": "p",
+        "line": 18,
+        "reason": "Devanagari text inherits lang=\"en\", which does not match the script, so text-to-speech reads it with the wrong voice.",
+        "effective_lang": "en",
+        "detected_script": "Devanagari"
+      },
+      "suggested_fix": "Add a lang attribute matching the text's language (for example lang=\"pa\" for Gurmukhi) on the element or a fitting ancestor.",
+      "rule": {
+        "title": "Indic-script text lacks a matching lang attribute",
+        "category": "Language",
+        "why_it_matters": "Text-to-speech picks a voice from the declared language, so Devanagari, Gurmukhi, Tamil, or other Indic-script text under a missing or non-matching lang is read as garbled English.",
+        "manual_review_notes": "Confirm the actual language: several languages share a script (Hindi and Marathi both use Devanagari), so the right lang value needs a human decision.",
+        "static_check_limitations": "Script detection uses Unicode ranges and is a heuristic. Transliterated text (Hindi written in Latin letters) cannot be detected at all."
+      }
+    },
+    {
+      "issue_type": "missing_lang_indic",
+      "severity": "high",
+      "agent_name": "Indic Language Checker",
+      "message": "Indic-script text lacks a matching lang attribute",
+      "evidence": {
+        "snippet": "\u0a35\u0a1c\u0a3c\u0a40\u0a2b\u0a3c\u0a47 \u0a32\u0a08 \u0a05\u0a30\u0a1c\u0a3c\u0a40 \u0a26\u0a40 \u0a06\u0a16\u0a30\u0a40 \u0a2e\u0a3f\u0a24\u0a40 15 \u0a05\u0a17\u0a38\u0a24 \u0a39\u0a48\u0964",
+        "tag": "p",
+        "line": 21,
+        "reason": "Gurmukhi text inherits lang=\"en\", which does not match the script, so text-to-speech reads it with the wrong voice.",
+        "effective_lang": "en",
+        "detected_script": "Gurmukhi"
+      },
+      "suggested_fix": "Add a lang attribute matching the text's language (for example lang=\"pa\" for Gurmukhi) on the element or a fitting ancestor.",
+      "rule": {
+        "title": "Indic-script text lacks a matching lang attribute",
+        "category": "Language",
+        "why_it_matters": "Text-to-speech picks a voice from the declared language, so Devanagari, Gurmukhi, Tamil, or other Indic-script text under a missing or non-matching lang is read as garbled English.",
+        "manual_review_notes": "Confirm the actual language: several languages share a script (Hindi and Marathi both use Devanagari), so the right lang value needs a human decision.",
+        "static_check_limitations": "Script detection uses Unicode ranges and is a heuristic. Transliterated text (Hindi written in Latin letters) cannot be detected at all."
+      }
+    },
+    {
+      "issue_type": "lang_mismatch",
+      "severity": "high",
+      "agent_name": "Indic Language Checker",
+      "message": "Declared lang contradicts the text's script",
+      "evidence": {
+        "snippet": "\u0906\u0935\u0947\u0926\u0928 \u092a\u0924\u094d\u0930 \u0938\u094d\u0915\u0942\u0932 \u0915\u093e\u0930\u094d\u092f\u093e\u0932\u092f \u0938\u0947 \u092a\u094d\u0930\u093e\u092a\u094d\u0924 \u0915\u0930\u0947\u0902\u0964",
+        "tag": "p",
+        "line": 24,
+        "reason": "The element declares lang=\"ta\" but its text is dominantly Devanagari script, so a screen reader picks the wrong voice.",
+        "declared_lang": "ta",
+        "detected_script": "Devanagari"
+      },
+      "suggested_fix": "Correct the lang attribute to match the language actually written in the element.",
+      "rule": {
+        "title": "Declared lang contradicts the text's script",
+        "category": "Language",
+        "why_it_matters": "A lang attribute promising one language over text written in a different script makes screen readers pick the wrong voice, which is worse than no declaration at all.",
+        "manual_review_notes": "Languages sharing a script cannot be told apart here; the check only fires when the script itself contradicts the declaration.",
+        "static_check_limitations": "Script detection uses Unicode ranges and cannot judge transliterated or romanized text."
+      }
+    },
+    {
+      "issue_type": "mixed_script_element",
+      "severity": "medium",
+      "agent_name": "Indic Language Checker",
+      "message": "Latin and Indic scripts mix without a lang boundary",
+      "evidence": {
+        "snippet": "Please bring your income certificate \u0915\u094d\u092f\u094b\u0902\u0915\u093f \u092f\u0939 \u0906\u0935\u0947\u0926\u0928 \u0915\u0947 \u0932\u093f\u090f \u0906\u0935\u0936\u094d\u092f\u0915 \u0939\u0948\u0964",
+        "tag": "p",
+        "line": 27,
+        "reason": "One text node mixes Devanagari text with 5 Latin words and no lang-tagged boundary, which commonly garbles text-to-speech.",
+        "detected_script": "Devanagari",
+        "latin_word_count": 5
+      },
+      "suggested_fix": "Wrap each language's text in an element with the matching lang attribute so speech engines can switch voices.",
+      "rule": {
+        "title": "Latin and Indic scripts mix without a lang boundary",
+        "category": "Language",
+        "why_it_matters": "When one text run mixes scripts without lang-tagged boundaries, speech engines cannot switch voices and commonly garble one of the languages.",
+        "manual_review_notes": "Short mixes are often fine; the check already ignores numbers, short acronyms, and single loanwords, but listen with a real screen reader to confirm impact.",
+        "static_check_limitations": "A conservative heuristic: it requires several Latin words next to Indic text in one text node and may miss subtler mixes or flag intentional bilingual lines."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype only runs static HTML checks.",
+    "It does not replace a full human accessibility audit.",
+    "It does not yet perform browser-based interaction testing."
+  ],
+  "source": {
+    "input": "examples/sample_indic_page.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  }
+}

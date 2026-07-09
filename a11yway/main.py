@@ -602,8 +602,24 @@ def load_batch_item_reports(items: list[dict]) -> list[dict]:
     return reports
 
 
+def _make_console_safe() -> None:
+    """Keep console output from crashing on limited encodings.
+
+    Windows consoles often use legacy code pages that cannot show Indic
+    or other non-Latin scripts. Report files are always written as UTF-8;
+    this only makes the console summary replace unprintable characters
+    instead of raising UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
+    _make_console_safe()
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
 

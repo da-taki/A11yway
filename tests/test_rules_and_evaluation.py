@@ -33,6 +33,9 @@ EXPECTED_STATIC_ISSUE_TYPES = {
     "missing_html_lang",
     "missing_video_captions",
     "missing_audio_transcript",
+    "missing_lang_indic",
+    "mixed_script_element",
+    "lang_mismatch",
 }
 
 EXPECTED_BROWSER_ISSUE_TYPES = {
