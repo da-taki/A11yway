@@ -6,7 +6,7 @@
 - Source type: file
 - Issues found: 0
 - Agents used: Keyboard-only student
-- Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot
+- Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot, accessibility_tree_announce
 
 ### Counts By Severity
 
@@ -20,7 +20,7 @@
 
 - Analysis modes: static, browser
 - Browser audit success: true
-- Checks run: keyboard_focus_traversal, browser_dom_snapshot
+- Checks run: keyboard_focus_traversal, browser_dom_snapshot, accessibility_tree_announce
 - Focus trace length: 5
 
 ## Browser Interaction Trace
@@ -33,10 +33,22 @@
 | 4 | textarea | Accommodation request | accommodation_request |  |
 | 5 | button | Submit application |  | Submit application |
 
+## Announce Transcript
+
+What Chromium's computed accessibility tree exposes at each observed focus stop. This approximates what a screen reader would announce; real screen readers can differ.
+
+1. textbox, "Student name"
+2. textbox, "Email"
+3. combobox, "School", collapsed
+4. textbox, "Accommodation request"
+5. button, "Submit application"
+
 ### Browser Limitations
 
 - Browser mode approximates keyboard interaction but does not simulate a full screen reader.
 - Accessible names are estimated and require manual review.
+- The announce transcript comes from Chromium's computed accessibility tree in one browser run.
+- Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently.
 
 ## Task Execution
 
@@ -45,24 +57,26 @@
 - Result: COMPLETED with keyboard-only interaction
 - Steps passed: 11 of 11
 
-| Step | Action | Status | Detail |
-| --- | --- | --- | --- |
-| read_page_purpose | expect_visible_text | passed | Text is visible on the page. |
-| focus_name | focus_by_label_or_name | passed | Reached with the keyboard (tag: input). |
-| type_name | type_text | passed | Typed with the keyboard. |
-| focus_email | focus_by_label_or_name | passed | Reached with the keyboard (tag: input). |
-| type_email | type_text | passed | Typed with the keyboard. |
-| focus_school | focus_by_label_or_name | passed | Reached with the keyboard (tag: select). |
-| select_first_option | select_first_non_empty_option | passed | Selected option with ArrowDown (value: "greenfield"). |
-| focus_accommodation_request | focus_by_label_or_name | passed | Reached with the keyboard (tag: textarea). |
-| type_accommodation_request | type_text | passed | Typed with the keyboard. |
-| submit_form | activate_by_role_or_text | passed | Activated with Enter (tag: button). |
-| confirm_submission | wait_for_text | passed | Text appeared on the page. |
+| Step | Action | Status | Announced | Detail |
+| --- | --- | --- | --- | --- |
+| read_page_purpose | expect_visible_text | passed |  | Text is visible on the page. |
+| focus_name | focus_by_label_or_name | passed | textbox, "Student name" | Reached with the keyboard (tag: input). |
+| type_name | type_text | passed | textbox, "Student name" | Typed with the keyboard. |
+| focus_email | focus_by_label_or_name | passed | textbox, "Email" | Reached with the keyboard (tag: input). |
+| type_email | type_text | passed | textbox, "Email" | Typed with the keyboard. |
+| focus_school | focus_by_label_or_name | passed | combobox, "School", collapsed | Reached with the keyboard (tag: select). |
+| select_first_option | select_first_non_empty_option | passed | combobox, "School", collapsed | Selected option with ArrowDown (value: "greenfield"). |
+| focus_accommodation_request | focus_by_label_or_name | passed | textbox, "Accommodation request" | Reached with the keyboard (tag: textarea). |
+| type_accommodation_request | type_text | passed | textbox, "Accommodation request" | Typed with the keyboard. |
+| submit_form | activate_by_role_or_text | passed | button, "Submit application" | Activated with Enter (tag: button). |
+| confirm_submission | wait_for_text | passed | button, "Submit application" | Text appeared on the page. |
 
 ### Task Execution Limitations
 
 - Task steps are deterministic scripts; a human may find a workaround the script does not try.
 - Step results show keyboard operability, not full assistive technology behavior.
+- The announce transcript comes from Chromium's computed accessibility tree in one browser run.
+- Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently.
 
 ## Task Context
 

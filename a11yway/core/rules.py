@@ -415,6 +415,36 @@ RULES: dict[str, dict] = {
             "Related to visible focus and keyboard accessibility requirements."
         ),
     },
+    "unnamed_focus_stop": {
+        "issue_type": "unnamed_focus_stop",
+        "title": "Focus stop announces no accessible name",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "Chromium's accessibility tree computed an empty accessible name "
+            "for this focus stop, so a screen reader user hears at most a role "
+            "and cannot tell what the element is or does."
+        ),
+        "how_to_fix": (
+            "Add a visible label, text content, alt text, or aria-label so "
+            "the browser computes a usable accessible name for the element."
+        ),
+        "manual_review_notes": (
+            "Confirm with a real screen reader. When this finding is present, "
+            "the heuristic browser_focused_control_missing_name check is "
+            "skipped for the same element, since the computed tree is the "
+            "stronger evidence."
+        ),
+        "browser_check_limitations": (
+            "Based on Chromium's computed accessibility tree in one browser "
+            "run. It is not a screen reader simulation; NVDA, JAWS, and "
+            "VoiceOver apply their own rules and other browsers can differ."
+        ),
+        "standard_hint": (
+            "Related to name, role, and value accessibility requirements for "
+            "user interface components."
+        ),
+    },
     "task_step_blocked": {
         "issue_type": "task_step_blocked",
         "title": "Task step could not be completed with the keyboard",

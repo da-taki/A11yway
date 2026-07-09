@@ -30,12 +30,12 @@ Run `python -m a11yway.main --list-rules` for a quick listing, or
 
 The analyzer currently runs these check groups over the raw HTML:
 
-- **Form labels** — form controls must have a programmatic label.
-- **Interactive names** — links and buttons need clear accessible names.
-- **Image alt text** — images need useful alternatives or a decorative marker.
-- **Heading structure** — one h1, no skipped levels.
-- **Page metadata** — page title and document language.
-- **Media accessibility** — captions tracks for video, transcripts for audio.
+- **Form labels**: form controls must have a programmatic label.
+- **Interactive names**: links and buttons need clear accessible names.
+- **Image alt text**: images need useful alternatives or a decorative marker.
+- **Heading structure**: one h1, no skipped levels.
+- **Page metadata**: page title and document language.
+- **Media accessibility**: captions tracks for video, transcripts for audio.
 
 Findings include an evidence snippet, the reason the check fired, and an
 approximate source line number so reviewers can verify each result manually.
@@ -47,18 +47,31 @@ Chromium, presses Tab repeatedly to trace keyboard focus, and re-runs the
 static checks on the JavaScript-rendered DOM. Rendered-DOM findings reuse the
 static issue types above with `detected_in: "browser_dom"` in their evidence.
 
+At each focus stop, A11yway also asks Chromium's computed accessibility tree
+(over the Chrome DevTools Protocol) for the element's role, accessible name,
+and states (disabled, required, invalid, checked, expanded), and renders the
+result as a numbered announce transcript in every report format. When the
+tree is available for an element, `unnamed_focus_stop` supersedes the older
+heuristic `browser_focused_control_missing_name` check for that element; the
+heuristic only runs as a fallback when tree data cannot be captured.
+
 | Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
 | --- | --- | --- | --- | --- | --- |
 | `browser_no_focusable_elements` | Keyboard Interaction | high | Interactive-looking elements exist but nothing can receive keyboard focus | Keyboard-only students are completely blocked | Counts common focusable selectors; may miss unusual custom widgets |
 | `browser_focus_not_moving` | Keyboard Interaction | high | Pressing Tab never focuses page content despite focusable elements | Keyboard-only students cannot start the task | Headless Tab behavior can differ slightly from a real browser |
 | `browser_repeated_focus` | Keyboard Interaction | medium | The same element stays focused across several Tab presses | Suggests a keyboard trap that strands students | A heuristic; cannot prove a real trap |
-| `browser_focused_control_missing_name` | Keyboard Interaction | high | A focused link/button/form control has no estimated accessible name | Screen readers announce nothing useful about the control | Accessible names are estimated, not computed from the accessibility tree |
+| `browser_focused_control_missing_name` | Keyboard Interaction | high | A focused link/button/form control has no estimated accessible name | Screen readers announce nothing useful about the control | Heuristic fallback; only used when accessibility tree data is unavailable for the element |
 | `browser_focus_on_hidden_element` | Keyboard Interaction | high | Focus lands on an element that appears invisible | Keyboard users lose track of where they are | Visibility is estimated from size and CSS |
+| `unnamed_focus_stop` | Keyboard Interaction | high | Chromium's accessibility tree computed an empty accessible name for a focus stop | A screen reader user hears at most a bare role and cannot tell what the element does | One Chromium run's computed tree, not a screen reader; NVDA, JAWS, and VoiceOver can differ |
 
 Browser mode limitations:
 
 - It approximates keyboard interaction; it does not simulate a full screen reader.
-- Accessible names are estimated and require manual review.
+- The announce transcript is Chromium's computed accessibility tree from one
+  browser run; real screen readers (NVDA, JAWS, VoiceOver) apply their own
+  rules and can announce things differently.
+- When accessibility tree data cannot be captured, accessible names fall
+  back to estimates and require manual review.
 - It does not crawl websites or log into private portals.
 - Use it only on public pages or pages you have permission to test.
 
@@ -96,6 +109,10 @@ actions: `expect_visible_text`,
 `focus_by_selector`, `type_text`, `select_first_non_empty_option`,
 `activate_by_role_or_text`, `press_key`, `assert_url_contains`.
 
+When accessibility tree data is available, each step also records what the
+focused element announces (computed role, name, and states) in an Announced
+column, so reviewers can see the screen reader context per step.
+
 These checks are produced when A11yway runs an explicit browser task
 scenario, such as completing a scholarship application form using
 keyboard-style steps. They provide evidence that one defined workflow did
@@ -126,7 +143,7 @@ These areas are out of scope for the current prototype:
 - Authenticated portals and login-protected pages
 - PDFs and other documents
 - Mobile app accessibility
-- Full WCAG certification — A11yway results are hints for human reviewers,
+- Full WCAG certification: A11yway results are hints for human reviewers,
   not conformance claims
 
 If a page passes every current check, that only means these specific checks

@@ -1,0 +1,441 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_announce_transcript_broken.html",
+  "summary": {
+    "issues_found": 8,
+    "counts_by_severity": {
+      "high": 8
+    },
+    "counts_by_issue_type": {
+      "missing_form_label": 2,
+      "missing_link_name": 1,
+      "missing_button_name": 1,
+      "missing_image_alt": 1,
+      "unnamed_focus_stop": 3
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "input",
+        "line": 25,
+        "snippet": "<input type=\"text\" name=\"full_name\" required>",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "full_name",
+        "identity": "name=\"full_name\""
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 21,
+        "snippet": "<a href=\"library-rules.html\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "library-rules.html"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_button_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Button is missing an accessible name",
+      "evidence": {
+        "tag": "button",
+        "line": 35,
+        "snippet": "<button type=\"button\" aria-expanded=\"false\" aria-controls=\"hours_details\">",
+        "reason": "Button has no visible text, aria-label, title, or image alt text.",
+        "type": "button"
+      },
+      "suggested_fix": "Add clear button text or an aria-label that describes the button action.",
+      "rule": {
+        "title": "Button missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "A button without a name is announced as just 'button' by screen readers, so students cannot tell what pressing it will do.",
+        "manual_review_notes": "Icon-only buttons may look meaningful visually but still need a programmatic name.",
+        "static_check_limitations": "Static HTML cannot see names added later by JavaScript or icon fonts."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 21,
+        "snippet": "<img src=\"rules-icon.png\" alt=\"\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "rules-icon.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "unnamed_focus_stop",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focus stop announces no accessible name",
+      "evidence": {
+        "step": 1,
+        "reason": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.",
+        "tag": "a",
+        "href": "library-rules.html",
+        "announced_role": "link",
+        "announcement": "link, (no accessible name)",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.",
+      "rule": {
+        "title": "Focus stop announces no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.",
+        "manual_review_notes": "Confirm with a real screen reader. When this finding is present, the heuristic browser_focused_control_missing_name check is skipped for the same element, since the computed tree is the stronger evidence.",
+        "browser_check_limitations": "Based on Chromium's computed accessibility tree in one browser run. It is not a screen reader simulation; NVDA, JAWS, and VoiceOver apply their own rules and other browsers can differ."
+      }
+    },
+    {
+      "issue_type": "unnamed_focus_stop",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focus stop announces no accessible name",
+      "evidence": {
+        "step": 2,
+        "reason": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.",
+        "tag": "input",
+        "name": "full_name",
+        "type": "text",
+        "announced_role": "textbox",
+        "announcement": "textbox, (no accessible name), required",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.",
+      "rule": {
+        "title": "Focus stop announces no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.",
+        "manual_review_notes": "Confirm with a real screen reader. When this finding is present, the heuristic browser_focused_control_missing_name check is skipped for the same element, since the computed tree is the stronger evidence.",
+        "browser_check_limitations": "Based on Chromium's computed accessibility tree in one browser run. It is not a screen reader simulation; NVDA, JAWS, and VoiceOver apply their own rules and other browsers can differ."
+      }
+    },
+    {
+      "issue_type": "unnamed_focus_stop",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focus stop announces no accessible name",
+      "evidence": {
+        "step": 4,
+        "reason": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader announces nothing useful about it.",
+        "tag": "button",
+        "type": "button",
+        "announced_role": "button",
+        "announcement": "button, (no accessible name), collapsed",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, alt text, or aria-label so the browser computes a usable accessible name for this element.",
+      "rule": {
+        "title": "Focus stop announces no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "Chromium's accessibility tree computed an empty accessible name for this focus stop, so a screen reader user hears at most a role and cannot tell what the element is or does.",
+        "manual_review_notes": "Confirm with a real screen reader. When this finding is present, the heuristic browser_focused_control_missing_name check is skipped for the same element, since the computed tree is the stronger evidence.",
+        "browser_check_limitations": "Based on Chromium's computed accessibility tree in one browser run. It is not a screen reader simulation; NVDA, JAWS, and VoiceOver apply their own rules and other browsers can differ."
+      }
+    },
+    {
+      "issue_type": "missing_form_label",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Form control is missing an accessible label",
+      "evidence": {
+        "tag": "input",
+        "line": 23,
+        "snippet": "<input type=\"text\" name=\"full_name\" required=\"\" style=\"\">",
+        "reason": "Form control has no accessible label.",
+        "type": "text",
+        "name": "full_name",
+        "identity": "name=\"full_name\"",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add a visible <label> connected with for/id. Use aria-label only when a visible label is not possible.",
+      "rule": {
+        "title": "Form control missing accessible label",
+        "category": "Forms",
+        "why_it_matters": "Students using keyboard navigation, assistive technology, or simplified layouts may not know what information the field expects.",
+        "manual_review_notes": "Check whether the visual design already implies the label but fails programmatically.",
+        "static_check_limitations": "Static HTML cannot always confirm labels created dynamically by JavaScript."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "source": {
+    "input": "examples/sample_announce_transcript_broken.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_announce_transcript_broken.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "library-rules.html",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true,
+        "x": 8,
+        "y": 131.875,
+        "width": 0,
+        "height": 17,
+        "announce": {
+          "role": "link",
+          "name": "",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "link, (no accessible name)"
+      },
+      {
+        "step": 2,
+        "tag": "input",
+        "id": null,
+        "name": "full_name",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true,
+        "x": 8,
+        "y": 151.203125,
+        "width": 177,
+        "height": 21,
+        "announce": {
+          "role": "textbox",
+          "name": "",
+          "states": [
+            "required"
+          ],
+          "ignored": false
+        },
+        "announcement": "textbox, (no accessible name), required"
+      },
+      {
+        "step": 3,
+        "tag": "select",
+        "id": "grade_level",
+        "name": "grade_level",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a grade Grade 9 Grade 10",
+        "role": null,
+        "accessible_name_guess": "Grade level",
+        "is_visible": true,
+        "x": 267.1875,
+        "y": 152.203125,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "Grade level",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"Grade level\", collapsed"
+      },
+      {
+        "step": 4,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true,
+        "x": 388.1875,
+        "y": 149.875,
+        "width": 29.328125,
+        "height": 22.328125,
+        "announce": {
+          "role": "button",
+          "name": "",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "button, (no accessible name), collapsed"
+      },
+      {
+        "step": 5,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "submit",
+        "href": null,
+        "src": null,
+        "text": "Sign up for a library card",
+        "role": null,
+        "accessible_name_guess": "Sign up for a library card",
+        "is_visible": true,
+        "x": 421.515625,
+        "y": 151.203125,
+        "width": 161.21875,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Sign up for a library card",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Sign up for a library card\""
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ],
+    "announce_transcript": [
+      {
+        "step": 1,
+        "announcement": "link, (no accessible name)",
+        "role": "link",
+        "name": "",
+        "states": [],
+        "available": true,
+        "unnamed": true
+      },
+      {
+        "step": 2,
+        "announcement": "textbox, (no accessible name), required",
+        "role": "textbox",
+        "name": "",
+        "states": [
+          "required"
+        ],
+        "available": true,
+        "unnamed": true
+      },
+      {
+        "step": 3,
+        "announcement": "combobox, \"Grade level\", collapsed",
+        "role": "combobox",
+        "name": "Grade level",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 4,
+        "announcement": "button, (no accessible name), collapsed",
+        "role": "button",
+        "name": "",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": true
+      },
+      {
+        "step": 5,
+        "announcement": "button, \"Sign up for a library card\"",
+        "role": "button",
+        "name": "Sign up for a library card",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      }
+    ]
+  },
+  "visual_proof": {
+    "enabled": true,
+    "screenshot_path": "reports/visual_announce_transcript_broken/page.png",
+    "focus_overlay_path": "reports/visual_announce_transcript_broken/focus_path.html",
+    "focus_points_count": 5,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "limitations": [
+      "Focus overlay shows observed Tab stops in this browser run.",
+      "It does not represent every assistive technology experience."
+    ]
+  }
+}

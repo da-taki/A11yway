@@ -1,0 +1,275 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_announce_transcript.html",
+  "summary": {
+    "issues_found": 0,
+    "counts_by_severity": {},
+    "counts_by_issue_type": {},
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ]
+  },
+  "issues": [],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated."
+  ],
+  "source": {
+    "input": "examples/sample_announce_transcript.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_announce_transcript.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "library-rules.html",
+        "src": null,
+        "text": "Read the library rules",
+        "role": null,
+        "accessible_name_guess": "Read the library rules",
+        "is_visible": true,
+        "x": 8,
+        "y": 131.875,
+        "width": 138.171875,
+        "height": 17,
+        "announce": {
+          "role": "link",
+          "name": "Read the library rules",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "link, \"Read the library rules\""
+      },
+      {
+        "step": 2,
+        "tag": "input",
+        "id": "full_name",
+        "name": "full_name",
+        "type": "text",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Full name",
+        "is_visible": true,
+        "x": 76.4375,
+        "y": 150.875,
+        "width": 177,
+        "height": 21,
+        "announce": {
+          "role": "textbox",
+          "name": "Full name",
+          "states": [
+            "required"
+          ],
+          "ignored": false
+        },
+        "announcement": "textbox, \"Full name\", required"
+      },
+      {
+        "step": 3,
+        "tag": "select",
+        "id": "grade_level",
+        "name": "grade_level",
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Choose a grade Grade 9 Grade 10",
+        "role": null,
+        "accessible_name_guess": "Grade level",
+        "is_visible": true,
+        "x": 335.625,
+        "y": 151.875,
+        "width": 117,
+        "height": 19,
+        "announce": {
+          "role": "combobox",
+          "name": "Grade level",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "combobox, \"Grade level\", collapsed"
+      },
+      {
+        "step": 4,
+        "tag": "input",
+        "id": "newsletter",
+        "name": "newsletter",
+        "type": "checkbox",
+        "href": null,
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Send me the monthly reading list",
+        "is_visible": true,
+        "x": 460.625,
+        "y": 152.875,
+        "width": 13,
+        "height": 13,
+        "announce": {
+          "role": "checkbox",
+          "name": "Send me the monthly reading list",
+          "states": [
+            "checked"
+          ],
+          "ignored": false
+        },
+        "announcement": "checkbox, \"Send me the monthly reading list\", checked"
+      },
+      {
+        "step": 5,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Show opening hours",
+        "role": null,
+        "accessible_name_guess": "Show opening hours",
+        "is_visible": true,
+        "x": 696.59375,
+        "y": 150.875,
+        "width": 137.546875,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Show opening hours",
+          "states": [
+            "collapsed"
+          ],
+          "ignored": false
+        },
+        "announcement": "button, \"Show opening hours\", collapsed"
+      },
+      {
+        "step": 6,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "submit",
+        "href": null,
+        "src": null,
+        "text": "Sign up for a library card",
+        "role": null,
+        "accessible_name_guess": "Sign up for a library card",
+        "is_visible": true,
+        "x": 838.140625,
+        "y": 150.875,
+        "width": 161.21875,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Sign up for a library card",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Sign up for a library card\""
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ],
+    "announce_transcript": [
+      {
+        "step": 1,
+        "announcement": "link, \"Read the library rules\"",
+        "role": "link",
+        "name": "Read the library rules",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 2,
+        "announcement": "textbox, \"Full name\", required",
+        "role": "textbox",
+        "name": "Full name",
+        "states": [
+          "required"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 3,
+        "announcement": "combobox, \"Grade level\", collapsed",
+        "role": "combobox",
+        "name": "Grade level",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 4,
+        "announcement": "checkbox, \"Send me the monthly reading list\", checked",
+        "role": "checkbox",
+        "name": "Send me the monthly reading list",
+        "states": [
+          "checked"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 5,
+        "announcement": "button, \"Show opening hours\", collapsed",
+        "role": "button",
+        "name": "Show opening hours",
+        "states": [
+          "collapsed"
+        ],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 6,
+        "announcement": "button, \"Sign up for a library card\"",
+        "role": "button",
+        "name": "Sign up for a library card",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      }
+    ]
+  }
+}

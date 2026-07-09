@@ -12,6 +12,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from a11yway.core.announce import (
+    ANNOUNCE_CHECK_NAME,
+    capture_focused_announcement,
+    format_announcement,
+    is_unnamed_announcement,
+    open_announce_session,
+)
 from a11yway.core.axe_runner import AXE_CHECK_NAME, run_axe_scan
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.source_loader import is_url
@@ -210,7 +217,12 @@ def _element_evidence_from_entry(entry: dict, reason: str) -> dict[str, Any]:
     return evidence
 
 
-def _run_keyboard_traversal(page, stats: dict, max_tabs: int) -> tuple[list[dict], list[AccessibilityIssue]]:
+def _run_keyboard_traversal(
+    page,
+    stats: dict,
+    max_tabs: int,
+    announce_session=None,
+) -> tuple[list[dict], list[AccessibilityIssue]]:
     """Press Tab repeatedly and collect a focus trace plus interaction issues."""
     trace: list[dict] = []
     issues: list[AccessibilityIssue] = []
@@ -262,6 +274,9 @@ def _run_keyboard_traversal(page, stats: dict, max_tabs: int) -> tuple[list[dict
             break  # Focus wrapped around to the first element again.
 
         entry = _trace_entry(len(trace) + 1, info)
+        announce = capture_focused_announcement(announce_session)
+        entry["announce"] = announce
+        entry["announcement"] = format_announcement(announce) if announce else None
         signatures.append(signature)
         trace.append(entry)
 
@@ -310,9 +325,39 @@ def _run_keyboard_traversal(page, stats: dict, max_tabs: int) -> tuple[list[dict
         )
 
     flagged_missing_name: set[tuple] = set()
+    flagged_unnamed: set[tuple] = set()
     flagged_hidden: set[tuple] = set()
     for entry, signature in zip(trace, signatures):
-        if (
+        announce = entry.get("announce")
+        if announce is not None:
+            # The computed accessibility tree is available for this stop, so
+            # it supersedes the heuristic name guess below.
+            if is_unnamed_announcement(announce) and signature not in flagged_unnamed:
+                flagged_unnamed.add(signature)
+                evidence = _element_evidence_from_entry(
+                    entry,
+                    "Chromium's accessibility tree computed an empty accessible "
+                    "name for this focus stop, so a screen reader announces "
+                    "nothing useful about it.",
+                )
+                evidence["announced_role"] = announce.get("role")
+                evidence["announcement"] = entry.get("announcement")
+                if announce.get("ignored"):
+                    evidence["ax_ignored"] = True
+                issues.append(
+                    _browser_issue(
+                        title="Focus stop announces no accessible name",
+                        issue_type="unnamed_focus_stop",
+                        severity="high",
+                        evidence=evidence,
+                        suggested_fix=(
+                            "Add a visible label, text content, alt text, or "
+                            "aria-label so the browser computes a usable "
+                            "accessible name for this element."
+                        ),
+                    )
+                )
+        elif (
             entry["tag"] in CONTROL_TAGS
             and not entry["accessible_name_guess"]
             and signature not in flagged_missing_name
@@ -387,6 +432,7 @@ def _focus_points_from_trace(trace: list[dict]) -> list[dict[str, Any]]:
                 "step": entry.get("step"),
                 "tag": entry.get("tag"),
                 "accessible_name_guess": entry.get("accessible_name_guess"),
+                "announcement": entry.get("announcement"),
                 "id": entry.get("id"),
                 "name": entry.get("name"),
                 "href": entry.get("href"),
@@ -470,7 +516,12 @@ def run_browser_audit(
                 result["final_url"] = page.url
 
                 stats = page.evaluate(_PAGE_STATS_SCRIPT)
-                trace, interaction_issues = _run_keyboard_traversal(page, stats, max_tabs)
+                announce_session = open_announce_session(page)
+                if announce_session is not None:
+                    result["checks_run"].append(ANNOUNCE_CHECK_NAME)
+                trace, interaction_issues = _run_keyboard_traversal(
+                    page, stats, max_tabs, announce_session=announce_session
+                )
                 result["focus_trace"] = trace
                 if visual_proof_dir:
                     try:

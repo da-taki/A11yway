@@ -15,6 +15,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Low-vision browser checks for rendered contrast, reflow approximation, and focus visibility
 - Reviewer verdict ingestion for confirmed, false positive, fixed, and missed issues
 - Re-audit diff tracking for fixed, remaining, new, and task-execution changes
+- Announce transcript from Chromium's computed accessibility tree (roles, names, states) with unnamed focus stop findings
 
 ## v0.4 - Workflow Packs
 

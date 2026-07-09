@@ -18,6 +18,28 @@ def _clean_path(path: str | Path) -> str:
     return Path(path).as_posix()
 
 
+def _legend_transcript_lines(focus_points: list[dict[str, Any]]) -> list[str]:
+    """Render the announce transcript inside the overlay legend.
+
+    Returns no lines when no focus point carries announce data, so overlays
+    from runs without accessibility tree access stay unchanged.
+    """
+    announced = [point for point in focus_points if point.get("announcement")]
+    if not announced:
+        return []
+    lines = [
+        "<h3>Announce Transcript</h3>",
+        '<p class="muted">Computed by Chromium\'s accessibility tree for each numbered focus stop. '
+        "Real screen readers (NVDA, JAWS, VoiceOver) can announce things differently.</p>",
+        "<ol>",
+    ]
+    for point in focus_points:
+        announcement = point.get("announcement") or "(announcement unavailable)"
+        lines.append(f"<li>{escape(str(announcement))}</li>")
+    lines.append("</ol>")
+    return lines
+
+
 def build_focus_overlay_html(
     screenshot_path: str | Path,
     focus_points: list[dict[str, Any]],
@@ -59,9 +81,11 @@ def build_focus_overlay_html(
         "<main>",
         '<section class="legend" aria-labelledby="legend-title">',
         '<h2 id="legend-title">Legend</h2>',
-        "<p>Marker numbers show the Tab order observed by A11yway during this browser run.</p>",
+        "<p>Marker numbers show the Tab order observed by A11yway during this browser run. "
+        "Hover a marker to see its announced role and name.</p>",
         '<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>',
         f'<p class="muted">{escape(viewport_text)}</p>' if viewport_text else "",
+        *_legend_transcript_lines(focus_points),
         "</section>",
         '<div class="frame">',
         f'<img src="{escape(screenshot_name)}" alt="Full-page screenshot used for focus path overlay">',
@@ -78,6 +102,7 @@ def build_focus_overlay_html(
 
         label_parts = [
             f"Step {step}",
+            str(point.get("announcement") or ""),
             str(point.get("tag") or ""),
             str(point.get("accessible_name_guess") or ""),
             str(point.get("id") or point.get("name") or ""),

@@ -81,6 +81,22 @@ Axe findings appear alongside A11yway's own checks with issue types like `axe_la
 
 The scan uses the axe-core copy bundled with the optional `axe-playwright-python` package (installed by `requirements-browser.txt`), so no network access is needed at audit time. If the package is missing, `--axe` prints setup instructions and exits; every static and browser command keeps working without it.
 
+## Announce Transcript
+
+In browser mode, A11yway asks Chromium's computed accessibility tree what a screen reader would be told at every observed Tab stop and at every task execution step: the computed role, the computed accessible name, and relevant states (disabled, required, invalid, checked, expanded). Reports render this as a numbered announce transcript, for example `3. button, (no accessible name)` or `7. textbox, "Full name", required`.
+
+```bash
+python -m a11yway.main examples/sample_announce_transcript_broken.html --browser --markdown reports/announce_transcript_broken_report.md
+```
+
+Focus stops whose computed accessible name is empty become `unnamed_focus_stop` findings with severity high, because a screen reader user hears at most a bare role at that stop. The paired samples show the difference: [examples/sample_announce_transcript.html](examples/sample_announce_transcript.html) announces a usable name at every stop, while [examples/sample_announce_transcript_broken.html](examples/sample_announce_transcript_broken.html) has three focus stops that announce nothing. The transcript appears in Markdown, JSON, and HTML reports, in the per-step task execution tables, and in the visual proof overlay (marker hover text and legend). No extra flag is needed: any `--browser` audit collects it.
+
+Announce transcript limitations:
+
+- The transcript is Chromium's computed accessibility tree, not a real screen reader. NVDA, JAWS, and VoiceOver apply their own rules and can announce things differently.
+- It reflects one run in one browser engine.
+- When accessibility tree data cannot be captured, transcript entries say "announcement unavailable" and A11yway falls back to its older estimated-name heuristic instead of guessing.
+
 ## Deterministic Task Execution
 
 Normal task mode maps static issues to likely blockers for a workflow. Deterministic task execution goes one step further: with `--execute-task`, A11yway attempts a task's scripted steps in the browser using **keyboard-only interaction**. Focus moves with Tab, text is typed, controls are activated with Enter, and the report states whether the task passed, failed, or was blocked.
@@ -217,7 +233,7 @@ Education sites carry forms, documents, videos, assignments, and deadlines. If a
 ## Limitations
 
 - Static checks are heuristics on HTML source; URL mode does not execute JavaScript.
-- Browser mode approximates keyboard interaction; accessible names are estimated and need manual review.
+- Browser mode approximates keyboard interaction; announced roles and names come from Chromium's computed accessibility tree when available (estimated otherwise) and need manual review.
 - No full screen-reader simulation.
 - No crawling, no logins, no private or unauthorized testing. Public pages or explicit permission only.
 - Findings are hints for human reviewers. A11yway does not certify WCAG compliance and does not replace testing with disabled users.
