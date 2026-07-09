@@ -26,6 +26,14 @@ dist/
 
 # Browser runtime noise
 debug.log
+*.log
+
+# Generated A11yway report runs
+reports/email_verified_outreach/
+reports/outreach_ai_scout/
+reports/web_demo_runs/*
+!reports/web_demo_runs/
+!reports/web_demo_runs/.gitkeep
 
 # IDE files
 .idea/
