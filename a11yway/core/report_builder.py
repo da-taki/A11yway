@@ -249,6 +249,13 @@ _EVIDENCE_KEYS = [
     "unreached_focusable_count",
     "tab_presses",
     "body_streak",
+    "zoom_percent",
+    "viewport_width",
+    "document_scroll_width",
+    "overflow_amount",
+    "clipped_by",
+    "first_element",
+    "second_element",
     "reason",
 ]
 
@@ -427,6 +434,28 @@ def build_markdown_report(report: dict) -> str:
                 "",
             ]
         )
+        zoom_levels = zoom.get("levels", [])
+        if zoom_levels:
+            lines.extend(
+                [
+                    "### Zoom Reflow Levels",
+                    "",
+                    "| Zoom | Viewport width | Scroll width | Overflow | Clipped | Overlaps |",
+                    "| ---: | ---: | ---: | ---: | ---: | ---: |",
+                ]
+            )
+            for level in zoom_levels:
+                lines.append(
+                    "| {zoom}% | {viewport} | {scroll} | {overflow} | {clipped} | {overlaps} |".format(
+                        zoom=level.get("zoom_percent", ""),
+                        viewport=level.get("viewport_width", ""),
+                        scroll=level.get("document_scroll_width", ""),
+                        overflow=level.get("overflow_amount", ""),
+                        clipped=len(level.get("clipped_elements", [])),
+                        overlaps=len(level.get("overlapping_pairs", [])),
+                    )
+                )
+            lines.append("")
         if low_vision.get("error"):
             lines.extend([f"- Error: {low_vision['error']}", ""])
         if low_vision.get("limitations"):
@@ -867,6 +896,26 @@ def build_html_report(report: dict) -> str:
                 "</tbody></table>",
             ]
         )
+        zoom_levels = zoom.get("levels", [])
+        if zoom_levels:
+            lines.extend(
+                [
+                    "<h3>Zoom Reflow Levels</h3>",
+                    "<table><thead><tr><th>Zoom</th><th>Viewport width</th><th>Scroll width</th><th>Overflow</th><th>Clipped</th><th>Overlaps</th></tr></thead><tbody>",
+                ]
+            )
+            for level in zoom_levels:
+                lines.append(
+                    "<tr><td>{zoom}%</td><td>{viewport}</td><td>{scroll}</td><td>{overflow}</td><td>{clipped}</td><td>{overlaps}</td></tr>".format(
+                        zoom=escape(str(level.get("zoom_percent", ""))),
+                        viewport=escape(str(level.get("viewport_width", ""))),
+                        scroll=escape(str(level.get("document_scroll_width", ""))),
+                        overflow=escape(str(level.get("overflow_amount", ""))),
+                        clipped=len(level.get("clipped_elements", [])),
+                        overlaps=len(level.get("overlapping_pairs", [])),
+                    )
+                )
+            lines.append("</tbody></table>")
         if low_vision.get("error"):
             lines.append(f"<p>Error: {escape(str(low_vision['error']))}</p>")
         lines.append(_html_list(low_vision.get("limitations", [])))

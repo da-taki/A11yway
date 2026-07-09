@@ -86,16 +86,22 @@ signals for reviewers, not full WCAG certification.
 | Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
 | --- | --- | --- | --- | --- | --- |
 | `low_contrast_text` | Low Vision | medium/high | Rendered text samples whose computed color contrast is below a conservative threshold | Low-vision readers may not be able to read the content | Does not prove full color-contrast compliance, especially over images or gradients |
-| `zoom_horizontal_overflow` | Low Vision | medium/high | Document width exceeds a narrow viewport used to approximate zoom/reflow stress | Users who zoom may need difficult horizontal scrolling | Approximates reflow; manual review at 200% zoom is still needed |
-| `zoom_fixed_width_content` | Low Vision | medium | Rendered elements wider than the viewport or using large fixed pixel widths | Fixed layouts can hide content when zoomed | Flags obvious wide elements and may miss complex layout problems |
+| `reflow_horizontal_scroll` | Low Vision | high (400%) / medium (200% only) | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths | Zoomed readers must scroll horizontally for every line (WCAG 1.4.10 Reflow, reference 320 CSS px) | Zoom is emulated through equivalent viewport widths in one Chromium run; intentional scroll regions such as data tables are allowed by WCAG and need manual review |
+| `reflow_clipped_content` | Low Vision | high | Text or controls whose bounding box sits beyond every reachable area at a zoom level | Clipped content disappears entirely for zoomed readers | Bounding boxes from one run; decorative cut-offs need manual confirmation |
+| `reflow_overlap` | Low Vision | medium | Interactive elements whose bounding boxes collide at a zoom level | An overlapped control can be hidden or impossible to activate | Cannot judge visual intent; intentional stacking such as badges can be fine |
+| `zoom_horizontal_overflow` | Low Vision | medium/high | (Legacy, no longer emitted) narrow-viewport overflow approximation | Kept so reports from older versions stay documented | Replaced by `reflow_horizontal_scroll` |
+| `zoom_fixed_width_content` | Low Vision | medium | (Legacy, no longer emitted) wide or fixed-width rendered elements | Kept so reports from older versions stay documented | Replaced by the `reflow_*` checks |
 | `focus_indicator_missing` | Low Vision | high | Focused elements without an obvious computed outline, border, or shadow | Keyboard users with low vision can lose track of focus | Heuristic; custom focus styles may need manual confirmation |
 
 Low-vision limitations:
 
 - Rendered contrast checks sample visible text and computed colors; they do
   not replace design review.
-- Zoom/reflow uses a narrow viewport approximation rather than a complete
-  zoom compliance test.
+- Zoom checks lay the page out at the CSS widths browser zoom produces
+  (640 px at 200%, 320 px at 400% from a 1280 px base, matching the WCAG
+  1.4.10 reference); they run in one Chromium engine and do not prove full
+  reflow compliance. Gradients, images, and intentional horizontal-scroll
+  regions need manual review.
 - Focus indicator detection may miss custom visual treatments.
 
 ## Browser Task Execution Checks (optional)

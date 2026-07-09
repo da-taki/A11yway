@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Exam Timetable</title>
+  <style>
+    /* Seeded reflow problems for A11yway zoom checks. */
+    .timetable { width: 900px; border: 1px solid #444; padding: 0.5rem; }
+    .clipper { width: 100%; overflow-x: hidden; position: relative; height: 3rem; }
+    .clipper p { position: absolute; left: 700px; width: 260px; margin: 0; }
+    .actions { position: relative; height: 3rem; }
+    .actions .print { position: absolute; left: 0; width: 200px; }
+    .actions .download { position: absolute; right: 0; width: 200px; }
+  </style>
+</head>
+<body>
+  <h1>Exam Timetable</h1>
+  <p>
+    This is a fictional education page for A11yway zoom reflow testing.
+    It seeds three problems that appear when the layout is checked at the
+    zoom-equivalent widths of 200% and 400%: a fixed 900px block that
+    forces horizontal scrolling, a note clipped behind overflow-x hidden,
+    and two absolutely positioned buttons that collide at 400% zoom.
+    Compare with sample_zoom_reflow_fixed.html.
+  </p>
+
+  <div class="timetable">
+    <h2>Summer term exams</h2>
+    <p>Mathematics: Monday 09:00. Science: Tuesday 09:00. History: Wednesday 09:00.</p>
+  </div>
+
+  <div class="clipper">
+    <p>Bring your student card to every exam.</p>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="print">Print timetable</button>
+    <button type="button" class="download">Download timetable</button>
+  </div>
+</body>
+</html>

@@ -56,6 +56,9 @@ EXPECTED_LOW_VISION_ISSUE_TYPES = {
     "low_contrast_text",
     "zoom_horizontal_overflow",
     "zoom_fixed_width_content",
+    "reflow_horizontal_scroll",
+    "reflow_clipped_content",
+    "reflow_overlap",
     "focus_indicator_missing",
 }
 

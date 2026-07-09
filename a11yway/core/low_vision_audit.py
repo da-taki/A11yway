@@ -17,16 +17,21 @@ except ImportError:  # Browser mode is optional.
 
 LOW_VISION_CHECKS_RUN = [
     "rendered_color_contrast",
-    "zoom_reflow_200",
+    "zoom_reflow_200_400",
     "focus_visibility",
 ]
 
 LOW_VISION_LIMITATIONS = [
     "Low-vision checks use browser-computed styles and conservative heuristics.",
     "Rendered color contrast checks do not prove full WCAG conformance.",
-    "Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.",
+    "Zoom checks emulate browser zoom through the equivalent CSS viewport widths (WCAG 1.4.10 uses 320 CSS px at 400%); gradients, images, and intentional horizontal-scroll regions need manual review.",
     "Focus indicator detection may miss custom focus styles.",
 ]
+
+# Zoom passes: browser zoom at N% lays a page out at base_width / N CSS px,
+# which is how WCAG 1.4.10 defines its 320 px reflow reference (1280 / 4).
+ZOOM_BASE_VIEWPORT = {"width": 1280, "height": 1024}
+ZOOM_LEVELS = [200, 400]
 
 _VISIBLE_TEXT_SCRIPT = r"""
 () => {
@@ -93,33 +98,101 @@ _VISIBLE_TEXT_SCRIPT = r"""
 }
 """
 
-_REFLOW_SCRIPT = r"""
+_ZOOM_CHECKS_SCRIPT = r"""
 () => {
-  const viewportWidth = document.documentElement.clientWidth;
-  const scrollWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
-  const wide = Array.from(document.querySelectorAll('body *')).map((el) => {
-    const style = window.getComputedStyle(el);
+  const TOL = 8;
+  const clean = (value) => (value || '').replace(/\s+/g, ' ').trim();
+  const describe = (el) => {
     const rect = el.getBoundingClientRect();
-    const widthStyle = style.width || '';
-    const position = style.position || '';
     return {
       tag: el.tagName.toLowerCase(),
       id: el.id || '',
-      class_name: el.className ? String(el.className).slice(0, 80) : '',
-      width: rect.width,
-      width_style: widthStyle,
-      position,
-      text: (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80)
+      text: clean(el.innerText || el.textContent).slice(0, 60),
+      box: {
+        x: Math.round(rect.x),
+        y: Math.round(rect.y),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      }
     };
-  }).filter((item) =>
-    item.width > viewportWidth + 24 ||
-    /^\d{3,}px$/.test(item.width_style)
-  ).slice(0, 5);
+  };
+  const isVisible = (el) => {
+    const style = window.getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.width > 0 && rect.height > 0 &&
+      style.visibility !== 'hidden' && style.display !== 'none'
+    );
+  };
+
+  const viewportWidth = document.documentElement.clientWidth;
+  const scrollWidth = Math.max(
+    document.documentElement.scrollWidth, document.body.scrollWidth
+  );
+  const reachableRight = Math.max(viewportWidth, scrollWidth);
+
+  // Clipped content: text or controls whose right edge sits beyond every
+  // reachable area (either past the document's scrollable width, or past a
+  // clipping overflow-hidden ancestor).
+  const contentSelector =
+    'h1,h2,h3,h4,h5,h6,p,li,a[href],button,input:not([type="hidden"]),select,textarea';
+  const clipped = [];
+  for (const el of document.querySelectorAll(contentSelector)) {
+    if (clipped.length >= 5 || !isVisible(el)) continue;
+    const rect = el.getBoundingClientRect();
+    let clippedBy = null;
+    if (rect.right > reachableRight + TOL) {
+      clippedBy = 'document';
+    } else {
+      let node = el.parentElement;
+      while (node && node !== document.body) {
+        const style = window.getComputedStyle(node);
+        if (['hidden', 'clip'].includes(style.overflowX)) {
+          const nodeRect = node.getBoundingClientRect();
+          if (rect.right > nodeRect.right + TOL) {
+            clippedBy = 'container';
+          }
+          break;
+        }
+        node = node.parentElement;
+      }
+    }
+    if (clippedBy) {
+      const item = describe(el);
+      item.clipped_by = clippedBy;
+      clipped.push(item);
+    }
+  }
+
+  // Overlapping interactive elements: unrelated controls whose boxes
+  // intersect by more than a quarter of the smaller control.
+  const interactive = Array.from(document.querySelectorAll(
+    'a[href], button, input:not([type="hidden"]), select, textarea'
+  )).filter(isVisible).slice(0, 40);
+  const overlaps = [];
+  for (let i = 0; i < interactive.length && overlaps.length < 5; i += 1) {
+    for (let j = i + 1; j < interactive.length && overlaps.length < 5; j += 1) {
+      const a = interactive[i];
+      const b = interactive[j];
+      if (a.contains(b) || b.contains(a)) continue;
+      const ra = a.getBoundingClientRect();
+      const rb = b.getBoundingClientRect();
+      const xOverlap = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
+      const yOverlap = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
+      if (xOverlap <= 4 || yOverlap <= 4) continue;
+      const overlapArea = xOverlap * yOverlap;
+      const smallerArea = Math.min(ra.width * ra.height, rb.width * rb.height);
+      if (smallerArea <= 0 || overlapArea < smallerArea * 0.25) continue;
+      overlaps.push({ first: describe(a), second: describe(b) });
+    }
+  }
+
   return {
     viewport_width: viewportWidth,
     document_scroll_width: scrollWidth,
     overflow_amount: Math.max(0, scrollWidth - viewportWidth),
-    wide_elements: wide
+    clipped_elements: clipped,
+    overlapping_pairs: overlaps
   };
 }
 """
@@ -268,47 +341,143 @@ def _contrast_issues(samples: list[dict[str, Any]]) -> list[AccessibilityIssue]:
     return issues
 
 
-def _zoom_issues(zoom_reflow: dict[str, Any]) -> list[AccessibilityIssue]:
-    """Return zoom/reflow approximation issues."""
+def _apply_zoom(page, zoom_percent: int) -> None:
+    """Lay the page out as browser zoom at zoom_percent would.
+
+    Browser zoom at N% renders the layout at base_width * 100 / N CSS
+    pixels, which is exactly how WCAG 1.4.10 defines its 320 px reflow
+    reference (1280 at 400%).
+    """
+    factor = zoom_percent / 100
+    page.set_viewport_size(
+        {
+            "width": int(ZOOM_BASE_VIEWPORT["width"] / factor),
+            "height": int(ZOOM_BASE_VIEWPORT["height"] / factor),
+        }
+    )
+
+
+def _element_label(element: dict[str, Any]) -> str:
+    """Describe one measured element compactly for evidence."""
+    tag = element.get("tag") or "element"
+    if element.get("id"):
+        return f"{tag}#{element['id']}"
+    text = (element.get("text") or "").strip()
+    if text:
+        return f'{tag} "{text[:40]}"'
+    return tag
+
+
+def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
+    """Build reflow findings from the per-zoom-level measurements."""
     issues: list[AccessibilityIssue] = []
-    overflow = int(zoom_reflow.get("overflow_amount", 0) or 0)
-    viewport_width = int(zoom_reflow.get("viewport_width", 0) or 0)
-    scroll_width = int(zoom_reflow.get("document_scroll_width", 0) or 0)
-    if overflow > 24:
-        severity = "high" if overflow > 240 else "medium"
+
+    overflowing = [
+        level for level in levels if int(level.get("overflow_amount", 0) or 0) > 8
+    ]
+    if overflowing:
+        wcag_reference_hit = any(
+            level["zoom_percent"] == 400 for level in overflowing
+        )
         issues.append(
             _low_vision_issue(
-                title="Page has horizontal overflow in a narrow viewport",
-                issue_type="zoom_horizontal_overflow",
-                severity=severity,
+                title="Page requires horizontal scrolling under zoom",
+                issue_type="reflow_horizontal_scroll",
+                severity="high" if wcag_reference_hit else "medium",
                 evidence={
-                    "viewport_width": viewport_width,
-                    "document_scroll_width": scroll_width,
-                    "overflow_amount": overflow,
-                    "reason": "At a narrow viewport used to approximate 200% zoom/reflow stress, the document is wider than the viewport.",
+                    "zoom_levels": [
+                        {
+                            "zoom_percent": level["zoom_percent"],
+                            "viewport_width": level.get("viewport_width"),
+                            "document_scroll_width": level.get(
+                                "document_scroll_width"
+                            ),
+                            "overflow_amount": level.get("overflow_amount"),
+                        }
+                        for level in overflowing
+                    ],
+                    "reason": (
+                        "The document is wider than the viewport at "
+                        + ", ".join(f"{level['zoom_percent']}%" for level in overflowing)
+                        + " zoom, so zoomed readers must scroll horizontally "
+                        "for every line (WCAG 1.4.10 reflow reference: 320 CSS "
+                        "px at 400%)."
+                    ),
                 },
-                suggested_fix="Use responsive layout, avoid fixed-width containers, and test reflow at high zoom.",
+                suggested_fix=(
+                    "Use responsive layout and max-width: 100% so content "
+                    "reflows into one column at high zoom. Intentional "
+                    "horizontal-scroll regions (data tables, maps) are "
+                    "allowed by WCAG and need manual review."
+                ),
             )
         )
-    for element in zoom_reflow.get("wide_elements", [])[:3]:
-        issues.append(
-            _low_vision_issue(
-                title="Fixed or wide content may prevent reflow",
-                issue_type="zoom_fixed_width_content",
-                severity="medium",
-                evidence={
-                    "tag": element.get("tag"),
-                    "id": element.get("id"),
-                    "class": element.get("class_name"),
-                    "width": element.get("width"),
-                    "width_style": element.get("width_style"),
-                    "text": element.get("text"),
-                    "viewport_width": viewport_width,
-                    "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
-                },
-                suggested_fix="Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+
+    seen_clipped: set[str] = set()
+    seen_overlaps: set[tuple[str, str]] = set()
+    for level in levels:
+        zoom = level["zoom_percent"]
+        for element in level.get("clipped_elements", []):
+            label = _element_label(element)
+            if label in seen_clipped:
+                continue
+            seen_clipped.add(label)
+            issues.append(
+                _low_vision_issue(
+                    title="Content is clipped outside the zoomed viewport",
+                    issue_type="reflow_clipped_content",
+                    severity="high",
+                    evidence={
+                        "tag": element.get("tag"),
+                        "id": element.get("id"),
+                        "text": element.get("text"),
+                        "bounding_box": element.get("box"),
+                        "clipped_by": element.get("clipped_by"),
+                        "zoom_percent": zoom,
+                        "viewport_width": level.get("viewport_width"),
+                        "reason": (
+                            f"At {zoom}% zoom this element extends beyond the "
+                            "reachable area, so zoomed readers cannot see or "
+                            "use it."
+                        ),
+                    },
+                    suggested_fix=(
+                        "Avoid fixed offsets and overflow: hidden cut-offs; "
+                        "let content wrap within the viewport width."
+                    ),
+                )
             )
-        )
+        for pair in level.get("overlapping_pairs", []):
+            first_label = _element_label(pair.get("first", {}))
+            second_label = _element_label(pair.get("second", {}))
+            key = tuple(sorted([first_label, second_label]))
+            if key in seen_overlaps:
+                continue
+            seen_overlaps.add(key)
+            issues.append(
+                _low_vision_issue(
+                    title="Interactive elements overlap under zoom",
+                    issue_type="reflow_overlap",
+                    severity="medium",
+                    evidence={
+                        "first_element": first_label,
+                        "first_bounding_box": pair.get("first", {}).get("box"),
+                        "second_element": second_label,
+                        "second_bounding_box": pair.get("second", {}).get("box"),
+                        "zoom_percent": zoom,
+                        "viewport_width": level.get("viewport_width"),
+                        "reason": (
+                            f"At {zoom}% zoom these two controls overlap, "
+                            "which can hide one of them or make both hard "
+                            "to activate."
+                        ),
+                    },
+                    suggested_fix=(
+                        "Let controls wrap or stack at narrow widths instead "
+                        "of using absolute positions that collide under zoom."
+                    ),
+                )
+            )
     return issues
 
 
@@ -389,12 +558,27 @@ def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
         result["contrast_samples"] = samples
         issues = _contrast_issues(samples)
 
-        original_viewport = page.viewport_size or {"width": 1280, "height": 720}
-        page.set_viewport_size({"width": 640, "height": original_viewport.get("height", 720)})
-        page.wait_for_timeout(100)
-        zoom_reflow = page.evaluate(_REFLOW_SCRIPT)
-        result["zoom_reflow"] = zoom_reflow
-        issues.extend(_zoom_issues(zoom_reflow))
+        original_viewport = page.viewport_size or dict(ZOOM_BASE_VIEWPORT)
+        levels: list[dict[str, Any]] = []
+        for zoom_percent in ZOOM_LEVELS:
+            _apply_zoom(page, zoom_percent)
+            page.wait_for_timeout(100)
+            measurements = page.evaluate(_ZOOM_CHECKS_SCRIPT)
+            measurements["zoom_percent"] = zoom_percent
+            levels.append(measurements)
+
+        # Legacy top-level keys mirror the 400% pass, the WCAG 1.4.10
+        # reference (320 CSS px), so older report consumers keep working.
+        reference = levels[-1]
+        result["zoom_reflow"] = {
+            "method": "browser_zoom_equivalent_viewports",
+            "base_viewport": dict(ZOOM_BASE_VIEWPORT),
+            "levels": levels,
+            "viewport_width": reference.get("viewport_width"),
+            "document_scroll_width": reference.get("document_scroll_width"),
+            "overflow_amount": reference.get("overflow_amount"),
+        }
+        issues.extend(_reflow_issues(levels))
 
         page.set_viewport_size(original_viewport)
         page.wait_for_timeout(100)
