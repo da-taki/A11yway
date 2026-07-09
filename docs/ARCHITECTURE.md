@@ -38,6 +38,10 @@ Reads a local HTML file or fetches a public `http(s)` URL with the standard libr
 
 A small `html.parser`-based analyzer that runs heuristic checks on the raw HTML: form labels, link/button names, image alt text, heading structure, page title/language, and media captions/transcripts. Each finding carries structured evidence: a tag snippet, the reason, and an approximate line number.
 
+### Indic-Language Checks - `a11yway/core/indic_checks.py`
+
+A static rule pack that runs inside every static analysis. It walks the HTML with a lang-tracking parser, detects Indic scripts through Unicode ranges, and flags Indic text with missing or contradicting lang markup plus mixed Latin/Indic text nodes. Script detection is a heuristic and cannot see transliterated text.
+
 ### Browser Runner - `a11yway/core/browser_runner.py` (Optional)
 
 Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Each focus stop is also resolved against Chromium's computed accessibility tree (see the announce module below); when tree data is unavailable, accessible names fall back to estimates. The focus trace is analyzed for keyboard traps (a subset of elements cycling at least twice without passing through the body while other focusable elements stay unreached) and for lost focus (repeated body landings). Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.

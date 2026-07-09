@@ -19,6 +19,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Keyboard trap and focus-loop detection from the observed focus trace, including trap-blocked task execution verdicts
 - CI mode with meaningful exit codes, SARIF 2.1.0 and JUnit XML export, and an example GitHub Actions task regression workflow
 - Real zoom reflow checks at 200% and 400% (horizontal scroll, clipped content, overlapping controls) replacing the narrow-viewport approximation
+- Static Indic-language checks (missing or mismatched lang markup and mixed-script text) for TTS-critical Indian-language content
 
 ## v0.4 - Workflow Packs
 

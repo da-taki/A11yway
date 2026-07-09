@@ -290,6 +290,89 @@ RULES: dict[str, dict] = {
             "Related to text alternatives for prerecorded audio."
         ),
     },
+    "missing_lang_indic": {
+        "issue_type": "missing_lang_indic",
+        "title": "Indic-script text lacks a matching lang attribute",
+        "category": "Language",
+        "default_severity": "high",
+        "why_it_matters": (
+            "Text-to-speech picks a voice from the declared language, so "
+            "Devanagari, Gurmukhi, Tamil, or other Indic-script text under a "
+            "missing or non-matching lang is read as garbled English."
+        ),
+        "how_to_fix": (
+            "Add a lang attribute matching the text's language (for example "
+            'lang="hi" for Hindi in Devanagari, lang="pa" for Punjabi in '
+            "Gurmukhi) on the element or a fitting ancestor."
+        ),
+        "manual_review_notes": (
+            "Confirm the actual language: several languages share a script "
+            "(Hindi and Marathi both use Devanagari), so the right lang value "
+            "needs a human decision."
+        ),
+        "static_check_limitations": (
+            "Script detection uses Unicode ranges and is a heuristic. "
+            "Transliterated text (Hindi written in Latin letters) cannot be "
+            "detected at all."
+        ),
+        "standard_hint": (
+            "Related to WCAG 3.1.1 Language of Page and 3.1.2 Language of Parts."
+        ),
+    },
+    "mixed_script_element": {
+        "issue_type": "mixed_script_element",
+        "title": "Latin and Indic scripts mix without a lang boundary",
+        "category": "Language",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "When one text run mixes scripts without lang-tagged boundaries, "
+            "speech engines cannot switch voices and commonly garble one of "
+            "the languages."
+        ),
+        "how_to_fix": (
+            "Wrap each language's text in an element with the matching lang "
+            "attribute so speech engines can switch voices."
+        ),
+        "manual_review_notes": (
+            "Short mixes are often fine; the check already ignores numbers, "
+            "short acronyms, and single loanwords, but listen with a real "
+            "screen reader to confirm impact."
+        ),
+        "static_check_limitations": (
+            "A conservative heuristic: it requires several Latin words next "
+            "to Indic text in one text node and may miss subtler mixes or "
+            "flag intentional bilingual lines."
+        ),
+        "standard_hint": (
+            "Related to WCAG 3.1.2 Language of Parts."
+        ),
+    },
+    "lang_mismatch": {
+        "issue_type": "lang_mismatch",
+        "title": "Declared lang contradicts the text's script",
+        "category": "Language",
+        "default_severity": "high",
+        "why_it_matters": (
+            "A lang attribute promising one language over text written in a "
+            "different script makes screen readers pick the wrong voice, "
+            "which is worse than no declaration at all."
+        ),
+        "how_to_fix": (
+            "Correct the lang attribute to match the language actually "
+            "written in the element."
+        ),
+        "manual_review_notes": (
+            "Languages sharing a script cannot be told apart here; the check "
+            "only fires when the script itself contradicts the declaration."
+        ),
+        "static_check_limitations": (
+            "Script detection uses Unicode ranges and cannot judge "
+            "transliterated or romanized text."
+        ),
+        "standard_hint": (
+            "Related to WCAG 3.1.2 Language of Parts."
+        ),
+    },
     "browser_no_focusable_elements": {
         "issue_type": "browser_no_focusable_elements",
         "title": "No keyboard focusable elements found",

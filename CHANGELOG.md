@@ -3,6 +3,28 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Indic-language checks
+
+- Added a static rule pack (standard library only, no browser) for
+  Indian-language content, detecting Indic scripts via Unicode ranges:
+  Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu,
+  Kannada, and Malayalam.
+- New finding types: `missing_lang_indic` (Indic text under a missing or
+  non-matching effective lang), `lang_mismatch` (an element's own lang
+  attribute contradicts its dominant script), and `mixed_script_element`
+  (one text node mixing several Latin words with Indic text and no lang
+  boundary; numbers, short acronyms, and single loanwords are ignored to
+  limit false positives).
+- The checks run as part of every static analysis, so browser DOM
+  re-checks get them too.
+- Added paired samples `examples/sample_indic_page.html` (seeded errors
+  in Devanagari, Gurmukhi, and mixed text) and
+  `examples/sample_indic_page_clean.html`, plus
+  `tests/test_indic_checks.py`.
+- Documented that script detection is a heuristic and that
+  transliterated text (Hindi written in Latin script) cannot be
+  detected.
+
 ## Unreleased - Real zoom reflow checks
 
 - Replaced the narrow-viewport reflow approximation in `--low-vision`
