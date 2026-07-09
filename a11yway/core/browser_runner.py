@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from a11yway.core.axe_runner import AXE_CHECK_NAME, run_axe_scan
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.source_loader import is_url
 from a11yway.core.visual_proof import (
@@ -433,11 +434,13 @@ def run_browser_audit(
     max_tabs: int = 40,
     wait_ms: int = 500,
     visual_proof_dir: str | Path | None = None,
+    include_axe: bool = False,
 ) -> dict:
     """Load a page in headless Chromium and run keyboard/DOM checks.
 
-    Always returns a result dict; on any failure success is False and the
-    error field explains what happened, so batch mode can keep going.
+    With include_axe, the axe-core rule set also runs against the rendered
+    page. Always returns a result dict; on any failure success is False and
+    the error field explains what happened, so batch mode can keep going.
     """
     result: dict[str, Any] = {
         "mode": "browser",
@@ -449,6 +452,7 @@ def run_browser_audit(
         "focus_trace": [],
         "issues": [],
         "visual_proof": None,
+        "axe": None,
     }
 
     if not is_playwright_available():
@@ -484,6 +488,15 @@ def run_browser_audit(
 
                 dom_issues = _rendered_dom_issues(page.content())
                 result["issues"] = interaction_issues + dom_issues
+
+                if include_axe:
+                    axe_result = run_axe_scan(page)
+                    axe_issues = axe_result.pop("issues")
+                    result["axe"] = axe_result
+                    if axe_result["success"]:
+                        result["checks_run"].append(AXE_CHECK_NAME)
+                        result["issues"] = result["issues"] + axe_issues
+
                 result["success"] = True
             finally:
                 browser.close()

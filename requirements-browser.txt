@@ -1,7 +1,10 @@
-# Optional dependency for A11yway browser interaction mode.
+# Optional dependencies for A11yway browser interaction mode.
 # Static audits work without this file.
 #
 # Install with:
 #   pip install -r requirements-browser.txt
 #   python -m playwright install chromium
 playwright
+
+# Bundled axe-core rule set for the optional --axe scan.
+axe-playwright-python

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from a11yway.core.batch_runner import run_batch
 from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
+from a11yway.core.axe_runner import AXE_SETUP_MESSAGE, is_axe_available
 from a11yway.core.browser_runner import (
     PLAYWRIGHT_SETUP_MESSAGE,
     is_playwright_available,
@@ -129,6 +130,17 @@ def print_browser_summary(
     print(f"   Browser issues: {total_issue_count - static_issue_count}")
     print(f"   Total issues: {total_issue_count}")
     print(f"   Focus trace length: {len(browser_result.get('focus_trace', []))}")
+
+    axe = browser_result.get("axe")
+    if axe is not None:
+        print()
+        print("Axe-core scan")
+        if not axe.get("success"):
+            print(f"   Status: failed ({axe.get('error')})")
+            return
+        print("   Status: passed")
+        print(f"   Rules violated: {axe.get('violation_rule_count', 0)}")
+        print(f"   Axe findings: {axe.get('issue_count', 0)}")
 
 
 def print_low_vision_summary(low_vision_result: dict, total_issue_count: int) -> None:
@@ -254,6 +266,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="low_vision",
         action="store_true",
         help="Run optional browser-based low-vision checks. Requires --browser.",
+    )
+    parser.add_argument(
+        "--axe",
+        dest="axe",
+        action="store_true",
+        help="Also run the axe-core rule scan on the rendered page. Requires --browser.",
     )
     parser.add_argument(
         "--ai-scout",
@@ -581,8 +599,16 @@ def main(argv: list[str] | None = None) -> int:
         print("Task execution requires browser mode. Add --browser to the command.")
         return 1
 
+    if parsed_args.axe and not parsed_args.browser:
+        print("The axe-core scan requires browser mode. Add --browser to the command.")
+        return 1
+
     if parsed_args.browser and not is_playwright_available():
         print(PLAYWRIGHT_SETUP_MESSAGE)
+        return 1
+
+    if parsed_args.axe and not is_axe_available():
+        print(AXE_SETUP_MESSAGE)
         return 1
 
     if parsed_args.batch_config:
@@ -597,6 +623,7 @@ def main(argv: list[str] | None = None) -> int:
             html_reports=parsed_args.html_reports,
             low_vision=parsed_args.low_vision,
             ai_scout=parsed_args.ai_scout,
+            axe=parsed_args.axe,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
@@ -604,6 +631,8 @@ def main(argv: list[str] | None = None) -> int:
             print("Browser mode: enabled")
         if parsed_args.low_vision:
             print("Low-vision checks: enabled")
+        if parsed_args.axe:
+            print("Axe-core scan: enabled")
         print(f"Batch file: {batch_result['config_path']}")
         print(f"Pages tested: {summary['total_pages_tested']}")
         print(f"Total issues: {summary['total_issues']}")
@@ -653,6 +682,7 @@ def main(argv: list[str] | None = None) -> int:
             max_tabs=parsed_args.max_tabs,
             wait_ms=parsed_args.wait_ms,
             visual_proof_dir=parsed_args.visual_proof_dir,
+            include_axe=parsed_args.axe,
         )
         issues = merge_browser_issues(issues, browser_result)
     browser_issue_total = len(issues)

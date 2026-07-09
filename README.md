@@ -69,6 +69,18 @@ python -m a11yway.main examples/sample_dynamic_form.html --browser --markdown re
 
 Tune with `--max-tabs N` (default 40) and `--wait-ms N` (default 500). [examples/sample_dynamic_form.html](examples/sample_dynamic_form.html) shows the difference: its JavaScript-added unlabeled field and unnamed button produce zero static findings but four browser findings. If Playwright is missing, `--browser` prints setup instructions and exits; every static command keeps working without it.
 
+## Optional axe-core Scan
+
+Browser mode can also run Deque's [axe-core](https://github.com/dequelabs/axe-core) rule set against the rendered page with `--axe`, in single audits and batch mode:
+
+```bash
+python -m a11yway.main examples/sample_form.html --browser --axe --markdown reports/axe_report.md
+```
+
+Axe findings appear alongside A11yway's own checks with issue types like `axe_label`, severities mapped from axe impacts (critical/serious become high, moderate becomes medium, minor becomes low), the affected element snippet, and a Deque University help link. Reports gain an "Axe-core Scan" section with a per-rule summary. A11yway's focus stays deterministic keyboard task evidence; the axe scan complements it with a mature, community-vetted rule set that covers far more technical rules than the built-in static checks.
+
+The scan uses the axe-core copy bundled with the optional `axe-playwright-python` package (installed by `requirements-browser.txt`), so no network access is needed at audit time. If the package is missing, `--axe` prints setup instructions and exits; every static and browser command keeps working without it.
+
 ## Deterministic Task Execution
 
 Normal task mode maps static issues to likely blockers for a workflow. Deterministic task execution goes one step further: with `--execute-task`, A11yway attempts a task's scripted steps in the browser using **keyboard-only interaction**. Focus moves with Tab, text is typed, controls are activated with Enter, and the report states whether the task passed, failed, or was blocked.
