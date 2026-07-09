@@ -11,6 +11,7 @@ from a11yway.core.browser_runner import (
     merge_browser_issues,
     run_browser_audit,
 )
+from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
 from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
@@ -59,6 +60,7 @@ def run_batch(
     execute_tasks: bool = False,
     html_reports: bool = False,
     low_vision: bool = False,
+    ai_scout: bool = False,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
@@ -105,6 +107,7 @@ def run_batch(
                     "task_execution_status": "",
                     "task_steps_passed": "",
                     "task_steps_total": "",
+                    "ai_scout_status": "",
                     "reports": {},
                 }
             )
@@ -186,6 +189,20 @@ def run_batch(
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
         html_path = output_dir / f"{item_id}.html"
+        ai_scout_status = ""
+        ai_scout_paths: dict[str, str] = {}
+        if ai_scout:
+            workflow_tested = item.get("workflow") or item.get("task") or item.get("notes", "")
+            ai_result = run_ai_scout(
+                report,
+                target_name=str(item.get("name", item_id)),
+                workflow_tested=str(workflow_tested),
+                outreach_tone=str(item.get("tone", "")),
+                workflow_pack=str(item.get("workflow_pack", "")),
+            )
+            ai_scout_status = ai_result.get("status", "")
+            report["ai_scout"] = ai_result
+            ai_scout_paths = save_ai_scout_outputs(ai_result, output_dir / item_id)
         save_json_report(report, json_path)
         save_markdown_report(report, markdown_path)
         if html_reports:
@@ -207,6 +224,9 @@ def run_batch(
         }
         if html_reports:
             reports["html"] = html_path.as_posix()
+        if ai_scout_paths:
+            reports["ai_scout_json"] = ai_scout_paths["json"]
+            reports["ai_scout_markdown"] = ai_scout_paths["markdown"]
 
         source_summaries.append(
             {
@@ -234,6 +254,7 @@ def run_batch(
                 "task_execution_status": task_execution_status,
                 "task_steps_passed": task_execution["steps_passed"] if task_execution else "",
                 "task_steps_total": task_execution["steps_total"] if task_execution else "",
+                "ai_scout_status": ai_scout_status,
                 "reports": reports,
             }
         )

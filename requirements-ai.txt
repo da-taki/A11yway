@@ -1,0 +1,6 @@
+# Optional dependency for A11yway AI Scout.
+# Static, browser, and deterministic audits work without this file.
+#
+# Install with:
+#   pip install -r requirements-ai.txt
+groq

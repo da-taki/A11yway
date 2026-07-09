@@ -12,6 +12,7 @@ from typing import List
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.report import AccessibilityReport
 from a11yway.models.task import AccessibilityTask
+from a11yway.core.ai_scout import build_ai_scout_markdown
 from a11yway.core.page_analyzer import STATIC_CHECKS_RUN
 from a11yway.core.rules import enrich_issue_with_rule
 
@@ -78,6 +79,7 @@ def build_json_report(
     browser_result: dict | None = None,
     task_execution: dict | None = None,
     low_vision_result: dict | None = None,
+    ai_scout_result: dict | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
     checks_run = list(STATIC_CHECKS_RUN)
@@ -189,6 +191,9 @@ def build_json_report(
             "steps": task_execution.get("steps", []),
             "limitations": list(TASK_EXECUTION_LIMITATIONS),
         }
+
+    if ai_scout_result is not None:
+        report["ai_scout"] = ai_scout_result
 
     return report
 
@@ -433,6 +438,10 @@ def build_markdown_report(report: dict) -> str:
         else:
             lines.append("- None found for this task.")
         lines.append("")
+
+    ai_scout = report.get("ai_scout")
+    if ai_scout is not None:
+        lines.extend([build_ai_scout_markdown(ai_scout), ""])
 
     lines.extend(["## Issues Found", ""])
     issues = report.get("issues", [])
@@ -732,6 +741,44 @@ def build_html_report(report: dict) -> str:
             )
         lines.append("</section>")
 
+    ai_scout = report.get("ai_scout")
+    if ai_scout is not None:
+        lines.extend(
+            [
+                "<section>",
+                "<h2>What the AI Found</h2>",
+                f"<p>Status: {escape(str(ai_scout.get('status', '')))}</p>",
+                f"<p>Mode: {escape(str(ai_scout.get('mode', 'suggest_only')))}</p>",
+                f"<p>Model: {escape(str(ai_scout.get('model', '')))}</p>",
+            ]
+        )
+        if ai_scout.get("status") != "ok":
+            reason = ai_scout.get("reason") or ai_scout.get("summary") or "unknown reason"
+            lines.append(
+                "<p>AI Scout was enabled, but no AI summary was produced because: "
+                f"{escape(str(reason))}. No AI findings should be inferred from this run.</p>"
+            )
+        else:
+            if ai_scout.get("summary"):
+                lines.append(f"<p>{escape(str(ai_scout['summary']))}</p>")
+            observations = ai_scout.get("ai_suggested_observations", [])
+            if observations:
+                lines.append("<ol>")
+                for item in observations:
+                    lines.append(
+                        "<li>"
+                        f"<strong>AI-suggested observation:</strong> {escape(str(item.get('observation', '')))}<br>"
+                        f"<strong>Related evidence, if any:</strong> {escape(str(item.get('related_deterministic_evidence', '')))}<br>"
+                        f"<strong>Human review needed:</strong> {escape(str(item.get('human_review_needed', True)).lower())}<br>"
+                        f"<strong>Confidence:</strong> {escape(str(item.get('confidence', 'unclear')))}"
+                        "</li>"
+                    )
+                lines.append("</ol>")
+            else:
+                lines.append("<p>AI Scout did not return specific observations.</p>")
+        lines.append(_html_list(ai_scout.get("limitations", [])))
+        lines.append("</section>")
+
     lines.extend(["<section>", "<h2>Issues Found</h2>"])
     issues = report.get("issues", [])
     if not issues:
@@ -796,6 +843,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
         analysis_modes = [mode for mode in ["static", "browser", "low_vision"] if mode == "static" or any(mode in item.get("analysis_modes", []) for item in items)]
     executed = [item for item in items if item.get("task_execution_status")]
     html_reports = [item for item in items if item.get("reports", {}).get("html")]
+    ai_scout_items = [item for item in items if item.get("ai_scout_status")]
 
     return {
         "tool": "A11yway",
@@ -817,6 +865,10 @@ def build_batch_index_report(items: list[dict]) -> dict:
                 1 for item in executed if item.get("task_execution_status") == "blocked"
             ),
             "html_reports": len(html_reports),
+            "ai_scout_runs": len(ai_scout_items),
+            "ai_scout_ok": sum(
+                1 for item in ai_scout_items if item.get("ai_scout_status") == "ok"
+            ),
             "low_vision_issues": sum(item.get("low_vision_issue_count", 0) for item in items),
             "counts_by_severity": counts_by_severity,
             "counts_by_issue_type": counts_by_issue_type,
@@ -853,8 +905,8 @@ def build_batch_index_markdown(index_report: dict) -> str:
         "",
         "## Sources Tested",
         "",
-        "| ID | Name | Source | Task | Status | Issues | Task blockers | Reports | Error |",
-        "| --- | --- | --- | --- | --- | ---: | ---: | --- | --- |",
+        "| ID | Name | Source | Task | Status | Issues | Task blockers | AI Scout | Reports | Error |",
+        "| --- | --- | --- | --- | --- | ---: | ---: | --- | --- | --- |",
     ]
 
     for item in index_report.get("sources", []):
@@ -863,7 +915,7 @@ def build_batch_index_markdown(index_report: dict) -> str:
             f"{kind}: {path}" for kind, path in reports.items() if path
         )
         lines.append(
-            "| {id} | {name} | {source} | {task} | {status} | {issues} | {blockers} | {reports} | {error} |".format(
+            "| {id} | {name} | {source} | {task} | {status} | {issues} | {blockers} | {ai_scout} | {reports} | {error} |".format(
                 id=item.get("id", ""),
                 name=item.get("name", ""),
                 source=item.get("source", ""),
@@ -871,6 +923,7 @@ def build_batch_index_markdown(index_report: dict) -> str:
                 status=item.get("status", "passed"),
                 issues=item.get("issue_count", 0),
                 blockers=item.get("task_blocker_count", 0),
+                ai_scout=item.get("ai_scout_status", ""),
                 reports=report_links,
                 error=item.get("error", ""),
             )
@@ -979,6 +1032,8 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
         f"- Total issues: {summary.get('total_issues', 0)}",
         f"- Total task blockers: {summary.get('total_task_blockers', 0)}",
         f"- HTML reports: {summary.get('html_reports', 0)}",
+        f"- AI Scout runs: {summary.get('ai_scout_runs', 0)}",
+        f"- AI Scout successful runs: {summary.get('ai_scout_ok', 0)}",
         f"- Low-vision issues: {summary.get('low_vision_issues', 0)}",
         "",
         "## Top Issue Types",
@@ -1044,6 +1099,28 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
                     result=item.get("task_execution_status", ""),
                     passed=item.get("task_steps_passed", 0),
                     total=item.get("task_steps_total", 0),
+                )
+            )
+
+    ai_scout_items = [item for item in sources if item.get("ai_scout_status")]
+    if ai_scout_items:
+        lines.extend(
+            [
+                "",
+                "## AI Scout Results",
+                "",
+                "AI Scout suggestions are suggest-only and require human review.",
+                "",
+                "| Name | Status | AI Scout report |",
+                "| --- | --- | --- |",
+            ]
+        )
+        for item in ai_scout_items:
+            lines.append(
+                "| {name} | {status} | {report} |".format(
+                    name=item.get("name", ""),
+                    status=item.get("ai_scout_status", ""),
+                    report=item.get("reports", {}).get("ai_scout_markdown", ""),
                 )
             )
 
