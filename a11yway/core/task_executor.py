@@ -6,7 +6,7 @@ text is typed with the keyboard, and controls are activated with Enter.
 The goal is honest evidence for one question: can a keyboard-only student
 complete this education workflow?
 
-The step runner is intentionally small and deterministic — no AI, no
+The step runner is intentionally small and deterministic: no AI, no
 crawling, and conservative heuristics. Playwright is optional; everything
 degrades gracefully when it is missing.
 """
@@ -73,7 +73,7 @@ def _matches_target(info: dict, target: str) -> bool:
 
     Strong signals (labels, accessible name, text) are checked first;
     id/name attributes are a weak fallback so tasks can still find fields
-    the page failed to label — the missing label is reported separately.
+    the page failed to label; the missing label is reported separately.
     """
     target_norm = _normalize(target)
     if not target_norm:

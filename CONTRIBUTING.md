@@ -1,7 +1,7 @@
 # Contributing to A11yway
 
 Thanks for helping make education pages more accessible. This project is
-intentionally small and readable for student developers — please keep it
+intentionally small and readable for student developers; please keep it
 that way.
 
 ## Set up static mode
@@ -38,7 +38,7 @@ tests skip themselves when the browser cannot run.
 
 1. Implement the check in `a11yway/core/page_analyzer.py` (static) or
    `a11yway/core/browser_runner.py` (browser). Keep heuristics
-   conservative — false positives waste reviewer trust.
+   conservative; false positives waste reviewer trust.
 2. Register the issue type in `a11yway/core/rules.py` with title,
    category, default severity, why_it_matters, how_to_fix,
    manual_review_notes, and the appropriate limitations field.

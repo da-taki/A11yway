@@ -2,7 +2,7 @@
 
 This guide walks through a responsible first NGO or school evaluation
 batch with A11yway. The goal is useful, honest feedback for the
-organization — not a public scorecard.
+organization, not a public scorecard.
 
 ## Ground rules
 
@@ -13,14 +13,14 @@ organization — not a public scorecard.
 - Do not publicly shame organizations. Share findings privately and give
   them time to respond and fix issues.
 
-## Step 1 — Pick a small page set
+## Step 1: Pick a small page set
 
 Choose 5–10 pages for the first batch. Good candidates: the homepage, a
 registration or application form, a learning resources page, a page with
 video or audio content. Small batches keep the review honest and the
 follow-up conversation manageable.
 
-## Step 2 — Create your batch config
+## Step 2: Create your batch config
 
 Copy the template and replace the placeholders:
 
@@ -32,7 +32,7 @@ Edit `my_first_batch.json`: set real page URLs (or local HTML files), give
 each entry a clear name, and pick a matching task id from
 `examples/sample_tasks.json` where one fits.
 
-## Step 3 — Run the static batch
+## Step 3: Run the static batch
 
 ```bash
 python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
@@ -44,7 +44,7 @@ python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batc
 This writes per-page JSON/Markdown reports plus `index.json`, `index.md`,
 `index.csv`, and `evaluation_summary.md`.
 
-## Step 4 — Optionally run the browser batch
+## Step 4: Optionally run the browser batch
 
 If Playwright is set up (see the README), a browser pass adds keyboard
 traversal findings and catches JavaScript-added controls:
@@ -53,14 +53,14 @@ traversal findings and catches JavaScript-added controls:
 python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir reports/browser_batch_sample --browser
 ```
 
-## Step 5 — Inspect reports before sending anything
+## Step 5: Inspect reports before sending anything
 
 Read `evaluation_summary.md` first, then the per-page Markdown reports.
 For each high severity finding, open the actual page and confirm the
 evidence snippet. Remove or annotate anything that looks like a false
 positive. You are the reviewer; the tool only drafts.
 
-## Step 6 — Send the report
+## Step 6: Send the report
 
 Send the Markdown report (or a cleaned-up version) together with the
 feedback form. Templates:
@@ -69,7 +69,7 @@ feedback form. Templates:
 - [Feedback form questions](outreach/FEEDBACK_FORM_QUESTIONS.md)
 - [Evaluation protocol](outreach/EVALUATION_PROTOCOL.md)
 
-## Step 7 — Track responses
+## Step 7: Track responses
 
 Use `index.csv` as the starting point for a tracking sheet: add columns
 for date sent, response received, confirmed findings, false positives,
