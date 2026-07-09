@@ -1,0 +1,335 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "examples/sample_zoom_reflow.html",
+  "summary": {
+    "issues_found": 3,
+    "counts_by_severity": {
+      "high": 2,
+      "medium": 1
+    },
+    "counts_by_issue_type": {
+      "reflow_horizontal_scroll": 1,
+      "reflow_clipped_content": 1,
+      "reflow_overlap": 1
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce",
+      "rendered_color_contrast",
+      "zoom_reflow_200_400",
+      "focus_visibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "reflow_horizontal_scroll",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Page requires horizontal scrolling under zoom",
+      "evidence": {
+        "zoom_levels": [
+          {
+            "zoom_percent": 200,
+            "viewport_width": 640,
+            "document_scroll_width": 926,
+            "overflow_amount": 286
+          },
+          {
+            "zoom_percent": 400,
+            "viewport_width": 320,
+            "document_scroll_width": 926,
+            "overflow_amount": 606
+          }
+        ],
+        "reason": "The document is wider than the viewport at 200%, 400% zoom, so zoomed readers must scroll horizontally for every line (WCAG 1.4.10 reflow reference: 320 CSS px at 400%).",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Use responsive layout and max-width: 100% so content reflows into one column at high zoom. Intentional horizontal-scroll regions (data tables, maps) are allowed by WCAG and need manual review.",
+      "rule": {
+        "title": "Page requires horizontal scrolling under zoom",
+        "category": "Low Vision",
+        "why_it_matters": "At high zoom, readers must scroll horizontally for every line when the page does not reflow into one column, which makes reading exhausting or impossible.",
+        "manual_review_notes": "Data tables, maps, and similar two-dimensional content may scroll horizontally by design; WCAG allows that, so confirm the overflow is not essential content.",
+        "browser_check_limitations": "Zoom is emulated through the equivalent CSS viewport widths (1280 base at 200% and 400%) in one Chromium run; gradients and image-heavy layouts need manual review."
+      }
+    },
+    {
+      "issue_type": "reflow_clipped_content",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Content is clipped outside the zoomed viewport",
+      "evidence": {
+        "tag": "p",
+        "id": "",
+        "text": "Bring your student card to every exam.",
+        "bounding_box": {
+          "x": 708,
+          "y": 305,
+          "width": 260,
+          "height": 18
+        },
+        "clipped_by": "document",
+        "zoom_percent": 200,
+        "viewport_width": 640,
+        "reason": "At 200% zoom this element extends beyond the reachable area, so zoomed readers cannot see or use it.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Avoid fixed offsets and overflow: hidden cut-offs; let content wrap within the viewport width.",
+      "rule": {
+        "title": "Content is clipped outside the zoomed viewport",
+        "category": "Low Vision",
+        "why_it_matters": "Text or controls cut off beyond the reachable area disappear entirely for zoomed readers; they cannot scroll to them.",
+        "manual_review_notes": "Confirm the clipped element holds real content; decorative elements cut by design are not a barrier.",
+        "browser_check_limitations": "Bounding boxes come from one Chromium run at emulated zoom widths; animation and lazy layout can shift results."
+      }
+    },
+    {
+      "issue_type": "reflow_overlap",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Interactive elements overlap under zoom",
+      "evidence": {
+        "first_element": "button \"Print timetable\"",
+        "first_bounding_box": {
+          "x": 8,
+          "y": 425,
+          "width": 200,
+          "height": 21
+        },
+        "second_element": "button \"Download timetable\"",
+        "second_bounding_box": {
+          "x": 112,
+          "y": 425,
+          "width": 200,
+          "height": 21
+        },
+        "zoom_percent": 400,
+        "viewport_width": 320,
+        "reason": "At 400% zoom these two controls overlap, which can hide one of them or make both hard to activate.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Let controls wrap or stack at narrow widths instead of using absolute positions that collide under zoom.",
+      "rule": {
+        "title": "Interactive elements overlap under zoom",
+        "category": "Low Vision",
+        "why_it_matters": "Controls that collide at high zoom can cover each other, so zoomed readers cannot see or activate the one underneath.",
+        "manual_review_notes": "Confirm the overlap visually; intentional stacking such as a badge over a button can be fine.",
+        "browser_check_limitations": "Overlap uses bounding-box intersection of visible controls in one Chromium run and cannot judge visual intent."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+    "Low-vision browser checks are conservative heuristics and require manual review."
+  ],
+  "source": {
+    "input": "examples/sample_zoom_reflow.html",
+    "type": "file",
+    "final_url": null,
+    "status_code": null,
+    "content_type": "text/html"
+  },
+  "analysis_modes": [
+    "static",
+    "browser",
+    "low_vision"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "file:///C:/Users/Asus/Desktop/A11yway/examples/sample_zoom_reflow.html",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "accessibility_tree_announce"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Print timetable",
+        "role": null,
+        "accessible_name_guess": "Print timetable",
+        "is_visible": true,
+        "x": 8,
+        "y": 298.6875,
+        "width": 200,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Print timetable",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Print timetable\""
+      },
+      {
+        "step": 2,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "button",
+        "href": null,
+        "src": null,
+        "text": "Download timetable",
+        "role": null,
+        "accessible_name_guess": "Download timetable",
+        "is_visible": true,
+        "x": 1072,
+        "y": 298.6875,
+        "width": 200,
+        "height": 21,
+        "announce": {
+          "role": "button",
+          "name": "Download timetable",
+          "states": [],
+          "ignored": false
+        },
+        "announcement": "button, \"Download timetable\""
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review.",
+      "The announce transcript comes from Chromium's computed accessibility tree in one browser run.",
+      "Real screen readers (NVDA, JAWS, VoiceOver) apply their own rules and can announce things differently."
+    ],
+    "announce_transcript": [
+      {
+        "step": 1,
+        "announcement": "button, \"Print timetable\"",
+        "role": "button",
+        "name": "Print timetable",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      },
+      {
+        "step": 2,
+        "announcement": "button, \"Download timetable\"",
+        "role": "button",
+        "name": "Download timetable",
+        "states": [],
+        "available": true,
+        "unnamed": false
+      }
+    ]
+  },
+  "low_vision": {
+    "success": true,
+    "error": null,
+    "checks_run": [
+      "rendered_color_contrast",
+      "zoom_reflow_200_400",
+      "focus_visibility"
+    ],
+    "contrast_sample_count": 7,
+    "zoom_reflow": {
+      "method": "browser_zoom_equivalent_viewports",
+      "base_viewport": {
+        "width": 1280,
+        "height": 1024
+      },
+      "levels": [
+        {
+          "viewport_width": 640,
+          "document_scroll_width": 926,
+          "overflow_amount": 286,
+          "clipped_elements": [
+            {
+              "tag": "p",
+              "id": "",
+              "text": "Bring your student card to every exam.",
+              "box": {
+                "x": 708,
+                "y": 305,
+                "width": 260,
+                "height": 18
+              },
+              "clipped_by": "document"
+            }
+          ],
+          "overlapping_pairs": [],
+          "zoom_percent": 200
+        },
+        {
+          "viewport_width": 320,
+          "document_scroll_width": 926,
+          "overflow_amount": 606,
+          "clipped_elements": [
+            {
+              "tag": "p",
+              "id": "",
+              "text": "Bring your student card to every exam.",
+              "box": {
+                "x": 708,
+                "y": 377,
+                "width": 260,
+                "height": 18
+              },
+              "clipped_by": "document"
+            }
+          ],
+          "overlapping_pairs": [
+            {
+              "first": {
+                "tag": "button",
+                "id": "",
+                "text": "Print timetable",
+                "box": {
+                  "x": 8,
+                  "y": 425,
+                  "width": 200,
+                  "height": 21
+                }
+              },
+              "second": {
+                "tag": "button",
+                "id": "",
+                "text": "Download timetable",
+                "box": {
+                  "x": 112,
+                  "y": 425,
+                  "width": 200,
+                  "height": 21
+                }
+              }
+            }
+          ],
+          "zoom_percent": 400
+        }
+      ],
+      "viewport_width": 320,
+      "document_scroll_width": 926,
+      "overflow_amount": 606
+    },
+    "focus_visibility": {
+      "checked_count": 2,
+      "flagged_count": 0
+    },
+    "limitations": [
+      "Low-vision checks use browser-computed styles and conservative heuristics.",
+      "Rendered color contrast checks do not prove full WCAG conformance.",
+      "Zoom checks emulate browser zoom through the equivalent CSS viewport widths (WCAG 1.4.10 uses 320 CSS px at 400%); gradients, images, and intentional horizontal-scroll regions need manual review.",
+      "Focus indicator detection may miss custom focus styles."
+    ]
+  }
+}

@@ -140,7 +140,12 @@ def test_sample_low_vision_page_reports_expected_issue_types() -> None:
 
     issue_types = {issue.issue_type for issue in result["issues"]}
     assert "low_contrast_text" in issue_types
-    assert {"zoom_horizontal_overflow", "zoom_fixed_width_content", "focus_indicator_missing"} & issue_types
+    assert {
+        "reflow_horizontal_scroll",
+        "reflow_clipped_content",
+        "reflow_overlap",
+        "focus_indicator_missing",
+    } & issue_types
 
 
 def test_issue_fingerprint_is_stable() -> None:

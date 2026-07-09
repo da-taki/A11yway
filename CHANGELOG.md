@@ -3,6 +3,29 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Real zoom reflow checks
+
+- Replaced the narrow-viewport reflow approximation in `--low-vision`
+  with zoom passes at 200% and 400%, laid out at the equivalent CSS
+  widths browser zoom produces (1280 base: 640 px and the WCAG 1.4.10
+  reference of 320 px).
+- Added three reflow finding types with computed evidence (element,
+  bounding boxes, zoom level): `reflow_horizontal_scroll` (high when the
+  400% reference overflows), `reflow_clipped_content` (text or controls
+  beyond every reachable area), and `reflow_overlap` (interactive
+  elements colliding under zoom).
+- Reports gain a per-level "Zoom Reflow Levels" table; the legacy
+  zoom_reflow keys now mirror the 400% pass so older consumers keep
+  working. The `zoom_horizontal_overflow` and `zoom_fixed_width_content`
+  rules stay registered for reports from older versions but are no
+  longer emitted.
+- Added paired samples `examples/sample_zoom_reflow.html` (seeded
+  horizontal scroll, clipped note, colliding buttons) and
+  `examples/sample_zoom_reflow_fixed.html`, plus
+  `tests/test_zoom_reflow.py` with real-browser integration tests.
+- Documented that gradients, images, and intentional horizontal-scroll
+  regions (allowed by WCAG 1.4.10) need manual review.
+
 ## Unreleased - CI mode
 
 - Added `--ci` for pipeline use with meaningful exit codes: 0 clean,

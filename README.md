@@ -202,7 +202,7 @@ The focus overlay shows observed Tab stops from a single browser run. It does no
 
 ## Low-Vision Checks
 
-Low-vision checks run in browser mode and use computed styles to review rendered color contrast, a narrow-viewport reflow approximation, and visible keyboard focus indicators.
+Low-vision checks run in browser mode and use computed styles to review rendered color contrast, zoom reflow at 200% and 400%, and visible keyboard focus indicators.
 
 ```bash
 python -m a11yway.main examples/sample_low_vision_page.html --browser --low-vision --json reports/low_vision_report.json --markdown reports/low_vision_report.md --html reports/low_vision_report.html
@@ -210,7 +210,13 @@ python -m a11yway.main examples/sample_low_vision_page.html --browser --low-visi
 python -m a11yway.main --batch examples/sample_low_vision_batch.json --out-dir reports/low_vision_batch --browser --low-vision --html-reports
 ```
 
-These checks are conservative browser observations. They do not prove full WCAG compliance, and manual review is still required, especially for custom focus styles, image backgrounds, gradients, and complex responsive layouts.
+The zoom checks lay the page out at the widths browser zoom produces (1280 base: 640 CSS px at 200% and 320 CSS px at 400%, the WCAG 1.4.10 reflow reference) and detect three problems with computed evidence (element, bounding boxes, zoom level): `reflow_horizontal_scroll` when the document is wider than the zoomed viewport, `reflow_clipped_content` when text or controls sit beyond every reachable area, and `reflow_overlap` when interactive elements collide. The paired samples show the difference: [examples/sample_zoom_reflow.html](examples/sample_zoom_reflow.html) seeds all three problems, while [examples/sample_zoom_reflow_fixed.html](examples/sample_zoom_reflow_fixed.html) reflows cleanly.
+
+```bash
+python -m a11yway.main examples/sample_zoom_reflow.html --browser --low-vision --markdown reports/zoom_reflow_report.md
+```
+
+These checks are conservative browser observations. They do not prove full WCAG compliance, and manual review is still required, especially for custom focus styles, image backgrounds, gradients, complex responsive layouts, and intentional horizontal-scroll regions such as data tables and maps (which WCAG 1.4.10 allows).
 
 ## Reviewer Verdicts
 

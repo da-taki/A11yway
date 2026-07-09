@@ -54,7 +54,7 @@ Visual proof is an evidence aid, not accessibility certification. The overlay sh
 
 ### Low-Vision Audit - `a11yway/core/low_vision_audit.py` (Optional)
 
-Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, approximates 200% zoom/reflow with a narrow viewport, and checks focused elements for obvious focus indicators. These checks are conservative heuristics and require manual review.
+Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, runs zoom reflow passes at 200% and 400% (laid out at the equivalent CSS widths browser zoom produces, including the WCAG 1.4.10 reference of 320 px) detecting horizontal scrolling, clipped content, and overlapping controls, and checks focused elements for obvious focus indicators. These checks are conservative and require manual review.
 
 ### Task Runner - `a11yway/core/task_runner.py`
 
