@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from a11yway.core.batch_runner import run_batch
+from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
 from a11yway.core.browser_runner import (
     PLAYWRIGHT_SETUP_MESSAGE,
     is_playwright_available,
@@ -253,6 +254,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="low_vision",
         action="store_true",
         help="Run optional browser-based low-vision checks. Requires --browser.",
+    )
+    parser.add_argument(
+        "--ai-scout",
+        dest="ai_scout",
+        action="store_true",
+        help="Run optional Groq-backed AI Scout in suggest-only mode and write sidecar reports.",
     )
     parser.add_argument(
         "--execute-task",
@@ -589,6 +596,7 @@ def main(argv: list[str] | None = None) -> int:
             execute_tasks=parsed_args.execute_tasks,
             html_reports=parsed_args.html_reports,
             low_vision=parsed_args.low_vision,
+            ai_scout=parsed_args.ai_scout,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
@@ -610,6 +618,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Tasks executed: {summary.get('tasks_executed', 0)}")
             print(f"Tasks completed: {summary.get('tasks_completed', 0)}")
             print(f"Tasks blocked: {summary.get('tasks_blocked', 0)}")
+        if parsed_args.ai_scout:
+            print(f"AI Scout runs: {summary.get('ai_scout_runs', 0)}")
+            print(f"AI Scout successful runs: {summary.get('ai_scout_ok', 0)}")
         return 0
 
     if parsed_args.csv_output:
@@ -689,7 +700,12 @@ def main(argv: list[str] | None = None) -> int:
         selected_task = execute_task_obj
         task_blockers = build_task_blockers(selected_task, issues)
 
-    if parsed_args.json_output or parsed_args.markdown_output or parsed_args.html_output:
+    if (
+        parsed_args.json_output
+        or parsed_args.markdown_output
+        or parsed_args.html_output
+        or parsed_args.ai_scout
+    ):
         report = build_json_report(
             source,
             issues,
@@ -700,6 +716,27 @@ def main(argv: list[str] | None = None) -> int:
             task_execution=task_execution,
             low_vision_result=low_vision_result,
         )
+        if parsed_args.ai_scout:
+            workflow_tested = selected_task.name if selected_task else ""
+            ai_result = run_ai_scout(
+                report,
+                target_name=source,
+                workflow_tested=workflow_tested,
+            )
+            report["ai_scout"] = ai_result
+            base_output = (
+                parsed_args.json_output
+                or parsed_args.markdown_output
+                or parsed_args.html_output
+                or "reports/ai_scout"
+            )
+            base_path = Path(base_output)
+            if base_path.suffix:
+                base_path = base_path.with_suffix("")
+            ai_paths = save_ai_scout_outputs(ai_result, base_path)
+            print()
+            print(f"AI Scout JSON saved: {ai_paths['json']}")
+            print(f"AI Scout Markdown saved: {ai_paths['markdown']}")
 
     if parsed_args.json_output:
         save_json_report(report, parsed_args.json_output)
