@@ -1,0 +1,55 @@
+# Example workflow: keyboard task regression check with A11yway.
+#
+# This file is a template for users to copy into their own repository.
+# It is intentionally triggered only by workflow_dispatch so it does not
+# run automatically on this repository's CI. In your project, replace the
+# trigger with push/pull_request, point PAGE at your own page, and declare
+# your workflow's browser_steps in a tasks JSON file.
+#
+# The build fails when the declared workflow becomes keyboard-blocked
+# (exit code 2) or when findings at or above the threshold appear
+# (exit code 1). Exit code 3 means a tool or setup problem.
+
+name: a11yway-example (copy me)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  keyboard-task-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install A11yway browser dependencies
+        run: |
+          pip install -r requirements-browser.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run the declared keyboard workflow
+        # Replace the page and task with your own. The task's browser_steps
+        # live in examples/sample_tasks.json (or your own tasks file).
+        run: |
+          python -m a11yway.main examples/sample_task_execution_form.html \
+            --browser \
+            --execute-task submit_scholarship_application \
+            --ci --fail-on-blocked --fail-severity high \
+            --sarif a11yway.sarif \
+            --junit a11yway-junit.xml
+
+      - name: Upload SARIF so findings render inline on GitHub
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: a11yway.sarif
+
+      - name: Upload JUnit XML as a build artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11yway-junit
+          path: a11yway-junit.xml

@@ -14,6 +14,12 @@ from a11yway.core.browser_runner import (
     merge_browser_issues,
     run_browser_audit,
 )
+from a11yway.core.ci_output import (
+    EXIT_TOOL_ERROR,
+    compute_ci_exit_code,
+    save_junit_xml,
+    save_sarif_report,
+)
 from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
@@ -368,6 +374,45 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         metavar=("OLD_REPORT", "NEW_REPORT"),
         help="Compare two A11yway JSON reports for re-audit tracking.",
     )
+    parser.add_argument(
+        "--ci",
+        dest="ci",
+        action="store_true",
+        help=(
+            "CI mode: exit 0 when clean, 1 for findings at or above "
+            "--fail-severity, 2 for a blocked task (with --fail-on-blocked), "
+            "3 for tool or setup errors."
+        ),
+    )
+    parser.add_argument(
+        "--fail-severity",
+        dest="fail_severity",
+        choices=["high", "medium", "low"],
+        default="high",
+        help="Lowest severity that fails a --ci run. Defaults to high.",
+    )
+    parser.add_argument(
+        "--fail-on-blocked",
+        dest="fail_on_blocked",
+        action="store_true",
+        help=(
+            "In --ci mode, exit 2 when a task execution is blocked. Without "
+            "this flag a blocked task still fails through its high-severity "
+            "findings, but with exit code 1."
+        ),
+    )
+    parser.add_argument(
+        "--sarif",
+        dest="sarif_output",
+        metavar="PATH",
+        help="Write findings as SARIF 2.1.0 so they render inline on GitHub.",
+    )
+    parser.add_argument(
+        "--junit",
+        dest="junit_output",
+        metavar="PATH",
+        help="Write task execution steps as JUnit XML test cases.",
+    )
     return parser.parse_args(argv)
 
 
@@ -547,10 +592,23 @@ def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | Non
     return 0
 
 
+def load_batch_item_reports(items: list[dict]) -> list[dict]:
+    """Load the per-item JSON reports a batch run wrote to disk."""
+    reports = []
+    for item in items:
+        json_path = (item.get("reports") or {}).get("json")
+        if json_path and Path(json_path).exists():
+            reports.append(json.loads(Path(json_path).read_text(encoding="utf-8")))
+    return reports
+
+
 def main(argv: list[str] | None = None) -> int:
     """Analyze a sample or provided HTML file from the command line."""
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
+
+    # In CI mode, setup problems must be distinguishable from findings.
+    setup_exit = EXIT_TOOL_ERROR if parsed_args.ci else 1
 
     if parsed_args.list_rules:
         print_rule_list()
@@ -592,27 +650,27 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.visual_proof_dir and not parsed_args.browser:
         print("Visual proof requires browser mode. Add --browser to the command.")
-        return 1
+        return setup_exit
 
     if parsed_args.low_vision and not parsed_args.browser:
         print("Low-vision checks require browser mode. Add --browser to the command.")
-        return 1
+        return setup_exit
 
     if (parsed_args.execute_task or parsed_args.execute_tasks) and not parsed_args.browser:
         print("Task execution requires browser mode. Add --browser to the command.")
-        return 1
+        return setup_exit
 
     if parsed_args.axe and not parsed_args.browser:
         print("The axe-core scan requires browser mode. Add --browser to the command.")
-        return 1
+        return setup_exit
 
     if parsed_args.browser and not is_playwright_available():
         print(PLAYWRIGHT_SETUP_MESSAGE)
-        return 1
+        return setup_exit
 
     if parsed_args.axe and not is_axe_available():
         print(AXE_SETUP_MESSAGE)
-        return 1
+        return setup_exit
 
     if parsed_args.batch_config:
         batch_result = run_batch(
@@ -653,6 +711,31 @@ def main(argv: list[str] | None = None) -> int:
         if parsed_args.ai_scout:
             print(f"AI Scout runs: {summary.get('ai_scout_runs', 0)}")
             print(f"AI Scout successful runs: {summary.get('ai_scout_ok', 0)}")
+
+        if parsed_args.sarif_output or parsed_args.junit_output or parsed_args.ci:
+            items = batch_result["index"]["sources"]
+            item_reports = load_batch_item_reports(items)
+            if parsed_args.sarif_output:
+                save_sarif_report(item_reports, parsed_args.sarif_output)
+                print(f"SARIF report saved: {parsed_args.sarif_output}")
+            if parsed_args.junit_output:
+                save_junit_xml(item_reports, parsed_args.junit_output)
+                print(f"JUnit XML saved: {parsed_args.junit_output}")
+            if parsed_args.ci:
+                tool_error = any(
+                    item.get("status") == "failed"
+                    or item.get("browser_status") in {"failed", "unavailable"}
+                    or item.get("task_execution_status") in {"failed", "unavailable"}
+                    for item in items
+                )
+                exit_code = compute_ci_exit_code(
+                    item_reports,
+                    fail_severity=parsed_args.fail_severity,
+                    fail_on_blocked=parsed_args.fail_on_blocked,
+                    tool_error=tool_error,
+                )
+                print(f"CI mode exit code: {exit_code}")
+                return exit_code
         return 0
 
     if parsed_args.csv_output:
@@ -664,17 +747,17 @@ def main(argv: list[str] | None = None) -> int:
         execute_task_obj = find_task(tasks, parsed_args.execute_task)
         if execute_task_obj is None:
             print(f'Task not found: "{parsed_args.execute_task}". Use a task id or name from {DEFAULT_TASKS_PATH}.')
-            return 1
+            return setup_exit
         if not execute_task_obj.browser_steps:
             print(f'Task "{execute_task_obj.id}" has no browser_steps defined, so it cannot be executed.')
-            return 1
+            return setup_exit
 
     source = parsed_args.html_path
     issues, source_result = analyze_html_source(source)
 
     if source_result["error"]:
         print(f"Could not load HTML source: {source_result['error']}", file=sys.stderr)
-        return 1
+        return setup_exit
 
     browser_result = None
     low_vision_result = None
@@ -733,11 +816,15 @@ def main(argv: list[str] | None = None) -> int:
         selected_task = execute_task_obj
         task_blockers = build_task_blockers(selected_task, issues)
 
+    report = None
     if (
         parsed_args.json_output
         or parsed_args.markdown_output
         or parsed_args.html_output
         or parsed_args.ai_scout
+        or parsed_args.sarif_output
+        or parsed_args.junit_output
+        or parsed_args.ci
     ):
         report = build_json_report(
             source,
@@ -785,6 +872,31 @@ def main(argv: list[str] | None = None) -> int:
         save_html_report(report, parsed_args.html_output)
         print()
         print(f"HTML report saved: {parsed_args.html_output}")
+
+    if parsed_args.sarif_output:
+        save_sarif_report([report], parsed_args.sarif_output)
+        print()
+        print(f"SARIF report saved: {parsed_args.sarif_output}")
+
+    if parsed_args.junit_output:
+        save_junit_xml([report], parsed_args.junit_output)
+        print()
+        print(f"JUnit XML saved: {parsed_args.junit_output}")
+
+    if parsed_args.ci:
+        tool_error = bool(
+            (browser_result is not None and not browser_result.get("success"))
+            or (task_execution is not None and not task_execution.get("success"))
+        )
+        exit_code = compute_ci_exit_code(
+            [report],
+            fail_severity=parsed_args.fail_severity,
+            fail_on_blocked=parsed_args.fail_on_blocked,
+            tool_error=tool_error,
+        )
+        print()
+        print(f"CI mode exit code: {exit_code}")
+        return exit_code
 
     return 0
 

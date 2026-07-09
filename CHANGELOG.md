@@ -3,6 +3,28 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - CI mode
+
+- Added `--ci` for pipeline use with meaningful exit codes: 0 clean,
+  1 findings at or above the threshold, 2 task blocked (with
+  `--fail-on-blocked`), 3 tool or setup error. Works in static, browser,
+  task execution, and batch modes.
+- Added `--fail-severity {high,medium,low}` (default high) to control the
+  failure threshold and `--fail-on-blocked` to give blocked tasks their
+  own exit code.
+- Added SARIF 2.1.0 export with `--sarif PATH`: severities map to SARIF
+  levels (high=error, medium=warning, low=note), rules carry descriptions
+  and fix help, and results carry file/line locations where available.
+- Added JUnit XML export with `--junit PATH`: each task execution step is
+  a test case, a blocked step is a failure with the evidence as its
+  message, and an execution that could not run is an error case.
+- Added a copy-me GitHub Actions workflow
+  (`.github/workflows/a11yway-example.yml`, workflow_dispatch only)
+  demonstrating a keyboard task regression gate.
+- Added `tests/test_ci_mode.py` with a structural SARIF validation and
+  integration tests for blocked (exit 2) and completed (exit 0) runs.
+- All CI outputs use only the standard library; no new dependencies.
+
 ## Unreleased - Keyboard trap and focus-loop detection
 
 - Browser mode now detects keyboard traps from the observed focus trace:
