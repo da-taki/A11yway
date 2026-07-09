@@ -167,7 +167,10 @@ def print_task_execution_summary(task_execution: dict) -> None:
     if task_execution.get("completed"):
         print("   Result: COMPLETED with keyboard-only interaction")
     else:
-        print(f"   Result: BLOCKED at step {task_execution.get('blocked_at_step')}")
+        verdict = f"   Result: BLOCKED at step {task_execution.get('blocked_at_step')}"
+        if task_execution.get("blocked_reason"):
+            verdict += f" (reason: {task_execution['blocked_reason']})"
+        print(verdict)
     print(
         f"   Steps passed: {task_execution.get('steps_passed', 0)} "
         f"of {task_execution.get('steps_total', 0)}"

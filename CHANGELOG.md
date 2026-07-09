@@ -3,6 +3,28 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Keyboard trap and focus-loop detection
+
+- Browser mode now detects keyboard traps from the observed focus trace:
+  a `keyboard_trap` finding (severity high) fires when Tab cycles through
+  the same subset of elements at least twice without passing through the
+  document body while other focusable elements are never reached, with
+  the looping element sequence and unreached-element count as evidence.
+- Added a `focus_lost` finding for focus that lands on the document body
+  repeatedly and never returns to page content.
+- Task execution now reports `BLOCKED at step <id> (reason: keyboard_trap)`
+  and identifies the looping elements when a step's control sits beyond a
+  focus loop; the blocked reason appears in JSON, Markdown, and HTML
+  reports.
+- The focusable-element estimate now counts only visible elements and
+  counts each radio group once, reducing false trap positives.
+- Added paired samples `examples/sample_keyboard_trap.html` (a feedback
+  dialog that swallows Tab) and `examples/sample_keyboard_trap_fixed.html`,
+  plus `tests/test_keyboard_trap.py` with real-browser integration tests.
+- Documented both rules as related to WCAG 2.1.2 No Keyboard Trap, with
+  the caveat that detection observes Tab behavior in one Chromium run and
+  cannot verify custom escape mechanisms.
+
 ## Unreleased - Accessibility-tree announce transcript
 
 - Browser mode now resolves every observed focus stop against Chromium's

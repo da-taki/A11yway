@@ -107,7 +107,7 @@ def test_sample_task_can_be_loaded() -> None:
     runner = TaskRunner(agents=[])
     tasks = runner.load_tasks(Path("examples/sample_tasks.json"))
 
-    assert len(tasks) == 2
+    assert len(tasks) == 3
     assert tasks[0].id == "submit_scholarship_application"
     assert tasks[0].name == "Submit scholarship application"
 
@@ -430,7 +430,7 @@ def test_sample_tasks_load_correctly() -> None:
     """Task scenario helpers should load the sample task file."""
     tasks = load_tasks("examples/sample_tasks.json")
 
-    assert len(tasks) == 2
+    assert len(tasks) == 3
     assert tasks[0].student_profile == "Keyboard-only student"
     assert "missing_form_label" in tasks[0].relevant_issue_types
 

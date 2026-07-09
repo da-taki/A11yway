@@ -445,6 +445,61 @@ RULES: dict[str, dict] = {
             "user interface components."
         ),
     },
+    "keyboard_trap": {
+        "issue_type": "keyboard_trap",
+        "title": "Keyboard focus is trapped in a loop",
+        "category": "Keyboard Interaction",
+        "default_severity": "high",
+        "why_it_matters": (
+            "Tab kept cycling through the same subset of elements without "
+            "ever reaching the rest of the page, so a keyboard-only user is "
+            "stuck and cannot finish anything beyond the loop."
+        ),
+        "how_to_fix": (
+            "Let Tab move past the widget, or provide a standard way out, "
+            "such as closing a modal with Escape and returning focus to the "
+            "trigger."
+        ),
+        "manual_review_notes": (
+            "Confirm the loop by hand and check for documented escape "
+            "mechanisms (Escape, arrow keys, custom shortcuts) that Tab-only "
+            "traversal cannot see."
+        ),
+        "browser_check_limitations": (
+            "Based on observed Tab behavior in one Chromium run. It cannot "
+            "verify custom escape mechanisms, and the count of unreached "
+            "elements is an estimate from visible focusable elements."
+        ),
+        "standard_hint": ("Related to WCAG 2.1.2 No Keyboard Trap."),
+    },
+    "focus_lost": {
+        "issue_type": "focus_lost",
+        "title": "Keyboard focus left the page content",
+        "category": "Keyboard Interaction",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Pressing Tab repeatedly landed on the document body and focus "
+            "never returned to page content, so keyboard users lose their "
+            "place and cannot continue."
+        ),
+        "how_to_fix": (
+            "Check for scripts that remove, hide, or blur the focused "
+            "element, and keep every control at a stable place in the Tab "
+            "order."
+        ),
+        "manual_review_notes": (
+            "A single pass through the body between the last and first "
+            "element is normal; this only fires when focus stays on the body "
+            "across several presses. Confirm by hand in a visible browser."
+        ),
+        "browser_check_limitations": (
+            "Observed in one headless Chromium run; focus handling can "
+            "differ in other browsers and with browser UI present."
+        ),
+        "standard_hint": (
+            "Related to keyboard operability and focus order requirements."
+        ),
+    },
     "task_step_blocked": {
         "issue_type": "task_step_blocked",
         "title": "Task step could not be completed with the keyboard",

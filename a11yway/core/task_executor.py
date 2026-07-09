@@ -23,6 +23,9 @@ from a11yway.core.announce import (
 from a11yway.core.browser_runner import (
     _FOCUS_INFO_SCRIPT,
     _accessible_name_guess,
+    _focus_signature,
+    _loop_sequence_label,
+    find_focus_cycle,
     is_playwright_available,
     source_to_browser_url,
     sync_playwright,
@@ -131,6 +134,8 @@ class _StepRunner:
         self.max_tabs = max_tabs
         self.announce_session = announce_session
         self.issues: list[AccessibilityIssue] = []
+        # Set by tab_search when the last search failed inside a focus loop.
+        self.last_search_trap: dict | None = None
 
     def focus_info(self) -> dict:
         """Return details about the currently focused element."""
@@ -149,18 +154,39 @@ class _StepRunner:
 
         Starts from the current focus position and presses Tab up to
         max_tabs times, which allows a full wrap-around of typical pages.
+        When the search fails inside a confirmed focus loop that never
+        passes through the body, last_search_trap records the looping
+        elements so the step can report a keyboard trap.
         """
+        self.last_search_trap = None
         info = self.focus_info()
         if not info.get("is_body") and _matches_target(info, target):
             return info
 
+        signatures: list[tuple] = []
+        body_passed: list[bool] = []
+        entries: list[dict] = []
+        pending_body_pass = False
         for _press in range(self.max_tabs):
             self.page.keyboard.press("Tab")
             info = self.focus_info()
             if info.get("is_body"):
+                pending_body_pass = True
                 continue
             if _matches_target(info, target):
                 return info
+            signatures.append(_focus_signature(info))
+            body_passed.append(pending_body_pass)
+            pending_body_pass = False
+            entries.append(info)
+
+        period = find_focus_cycle(signatures)
+        if period is not None and not any(body_passed[-2 * period :]):
+            self.last_search_trap = {
+                "loop_sequence": _loop_sequence_label(entries[-period:]),
+                "loop_length": len(set(signatures[-period:])),
+                "tab_presses": self.max_tabs,
+            }
         return None
 
     def focus_by_selectors(self, selectors: list[str]) -> dict | None:
@@ -190,6 +216,7 @@ class _StepRunner:
             "detail": "",
             "used_fallback": False,
             "announced": None,
+            "blocked_reason": None,
         }
 
         handler = {
@@ -276,6 +303,7 @@ class _StepRunner:
             result["detail"] = (
                 "Not reachable by Tab; focused programmatically via fallback selector."
             )
+            self._record_trap_if_seen(step)
             self.issues.append(
                 _execution_issue(
                     title="Task control is not reachable with the keyboard",
@@ -289,6 +317,14 @@ class _StepRunner:
                     extra={"tag": fallback.get("tag"), "name": fallback.get("name")},
                 )
             )
+            return
+
+        if self._record_trap_if_seen(step):
+            result["detail"] = (
+                "Focus loops through "
+                f"{self.last_search_trap['loop_sequence']} and never reaches this control."
+            )
+            result["blocked_reason"] = "keyboard_trap"
             return
 
         result["detail"] = "No matching element could be focused."
@@ -363,6 +399,7 @@ class _StepRunner:
             result["detail"] = (
                 "Not reachable by Tab; activated after programmatic focus."
             )
+            self._record_trap_if_seen(step)
             self.issues.append(
                 _execution_issue(
                     title="Task control is not reachable with the keyboard",
@@ -376,6 +413,14 @@ class _StepRunner:
                     extra={"tag": fallback.get("tag")},
                 )
             )
+            return
+
+        if self._record_trap_if_seen(step):
+            result["detail"] = (
+                "Focus loops through "
+                f"{self.last_search_trap['loop_sequence']} and never reaches this control."
+            )
+            result["blocked_reason"] = "keyboard_trap"
             return
 
         result["detail"] = "No keyboard-activatable control matched this step."
@@ -415,6 +460,30 @@ class _StepRunner:
             )
         )
 
+    def _record_trap_if_seen(self, step: dict) -> bool:
+        """Record a keyboard_trap issue when the last Tab search looped.
+
+        Returns whether a trap was recorded, so callers can mark the step
+        as blocked with reason keyboard_trap.
+        """
+        if not self.last_search_trap:
+            return False
+        self.issues.append(
+            _execution_issue(
+                title="Keyboard focus is trapped in a loop",
+                issue_type="keyboard_trap",
+                severity="high",
+                step=step,
+                reason=(
+                    "While searching for this step's control, Tab kept cycling "
+                    "through the same elements without passing through the rest "
+                    "of the page."
+                ),
+                extra=dict(self.last_search_trap),
+            )
+        )
+        return True
+
 
 def run_task_execution(
     source: str,
@@ -437,6 +506,7 @@ def run_task_execution(
         "error": None,
         "completed": False,
         "blocked_at_step": None,
+        "blocked_reason": None,
         "steps_total": len(task.browser_steps),
         "steps_passed": 0,
         "steps": [],
@@ -479,6 +549,7 @@ def run_task_execution(
                                 "detail": "Skipped because an earlier step was blocked.",
                                 "used_fallback": False,
                                 "announced": None,
+                                "blocked_reason": None,
                             }
                         )
                         continue
@@ -488,6 +559,7 @@ def run_task_execution(
                     if step_result["status"] == "failed":
                         blocked = True
                         result["blocked_at_step"] = step_result["id"]
+                        result["blocked_reason"] = step_result.get("blocked_reason")
 
                 result["issues"] = runner.issues
                 result["steps_passed"] = sum(

@@ -16,6 +16,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - Reviewer verdict ingestion for confirmed, false positive, fixed, and missed issues
 - Re-audit diff tracking for fixed, remaining, new, and task-execution changes
 - Announce transcript from Chromium's computed accessibility tree (roles, names, states) with unnamed focus stop findings
+- Keyboard trap and focus-loop detection from the observed focus trace, including trap-blocked task execution verdicts
 
 ## v0.4 - Workflow Packs
 

@@ -40,7 +40,7 @@ A small `html.parser`-based analyzer that runs heuristic checks on the raw HTML:
 
 ### Browser Runner - `a11yway/core/browser_runner.py` (Optional)
 
-Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Each focus stop is also resolved against Chromium's computed accessibility tree (see the announce module below); when tree data is unavailable, accessible names fall back to estimates. Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.
+Only used with `--browser`. Loads the page in headless Chromium via Playwright, presses Tab repeatedly to build a keyboard focus trace, then re-runs the static checks on the JavaScript-rendered DOM (`detected_in: "browser_dom"`). Each focus stop is also resolved against Chromium's computed accessibility tree (see the announce module below); when tree data is unavailable, accessible names fall back to estimates. The focus trace is analyzed for keyboard traps (a subset of elements cycling at least twice without passing through the body while other focusable elements stay unreached) and for lost focus (repeated body landings). Playwright is imported optionally so this module is always safe to import. `merge_browser_issues` combines static and browser findings without duplicating DOM re-checks that match static findings.
 
 ### Announce Transcript - `a11yway/core/announce.py` (Optional)
 
@@ -62,7 +62,7 @@ Loads task scenarios, filters findings down to the issue types relevant to a tas
 
 ### Task Executor - `a11yway/core/task_executor.py` (Optional)
 
-Only used with `--browser --execute-task` or batch `--execute-tasks`. Attempts explicit `browser_steps` from a task definition using keyboard-style browser actions: Tab traversal, typed text, option selection, Enter activation, and visible-text assertions. It returns a pass, blocked, failed, or unavailable result with per-step evidence. It is deterministic browser automation, not AI, and it only tests the scripted workflow path.
+Only used with `--browser --execute-task` or batch `--execute-tasks`. Attempts explicit `browser_steps` from a task definition using keyboard-style browser actions: Tab traversal, typed text, option selection, Enter activation, and visible-text assertions. It returns a pass, blocked, failed, or unavailable result with per-step evidence; a step whose control sits beyond a confirmed focus loop blocks with reason `keyboard_trap` and the looping elements identified. It is deterministic browser automation, not AI, and it only tests the scripted workflow path.
 
 ### Workflow Packs - `a11yway/core/workflow_packs.py` and `a11yway/workflow_packs/`
 

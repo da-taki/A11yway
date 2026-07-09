@@ -31,7 +31,10 @@
         "id": "focus_name",
         "action": "focus_by_label_or_name",
         "target": "Student name",
-        "fallback_selectors": ["input[name='student_name']", "#student_name"],
+        "fallback_selectors": [
+          "input[name='student_name']",
+          "#student_name"
+        ],
         "description": "Move to the student name field."
       },
       {
@@ -44,7 +47,10 @@
         "id": "focus_email",
         "action": "focus_by_label_or_name",
         "target": "Email",
-        "fallback_selectors": ["input[name='email']", "#email"],
+        "fallback_selectors": [
+          "input[name='email']",
+          "#email"
+        ],
         "description": "Move to the email field."
       },
       {
@@ -57,7 +63,10 @@
         "id": "focus_school",
         "action": "focus_by_label_or_name",
         "target": "School",
-        "fallback_selectors": ["select[name='school']", "#school"],
+        "fallback_selectors": [
+          "select[name='school']",
+          "#school"
+        ],
         "description": "Move to the school field."
       },
       {
@@ -69,7 +78,9 @@
         "id": "focus_accommodation_request",
         "action": "focus_by_label_or_name",
         "target": "Accommodation request",
-        "fallback_selectors": ["textarea[name='accommodation_request']"],
+        "fallback_selectors": [
+          "textarea[name='accommodation_request']"
+        ],
         "description": "Move to the accommodation request field."
       },
       {
@@ -82,7 +93,10 @@
         "id": "submit_form",
         "action": "activate_by_role_or_text",
         "target": "Submit application",
-        "fallback_selectors": ["button[type='submit']", "input[type='submit']"],
+        "fallback_selectors": [
+          "button[type='submit']",
+          "input[type='submit']"
+        ],
         "description": "Submit the application."
       },
       {
@@ -111,6 +125,43 @@
       "missing_audio_transcript",
       "missing_image_alt",
       "missing_page_title"
+    ]
+  },
+  {
+    "id": "fill_course_survey",
+    "name": "Fill the course survey",
+    "description": "A student answers the course survey behind an optional feedback dialog.",
+    "student_profile": "Keyboard-only student",
+    "required_actions": [
+      "Reach the survey form",
+      "Enter a favorite topic",
+      "Submit the survey"
+    ],
+    "relevant_issue_types": [
+      "keyboard_trap",
+      "focus_lost",
+      "browser_repeated_focus"
+    ],
+    "browser_steps": [
+      {
+        "id": "focus_favorite_topic",
+        "action": "focus_by_label_or_name",
+        "target": "Favorite topic",
+        "description": "Move to the favorite topic field."
+      },
+      {
+        "id": "type_favorite_topic",
+        "action": "type_text",
+        "value": "Accessible design",
+        "description": "Type an answer."
+      },
+      {
+        "id": "submit_survey",
+        "action": "activate_by_role_or_text",
+        "target": "Submit survey",
+        "fallback_selectors": [],
+        "description": "Submit the survey with the keyboard."
+      }
     ]
   }
 ]

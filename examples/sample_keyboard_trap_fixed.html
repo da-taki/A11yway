@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Course Survey</title>
+  <style>
+    .overlay { border: 2px solid #444; padding: 1rem; max-width: 24rem; }
+  </style>
+</head>
+<body>
+  <h1>Course Survey</h1>
+  <p>
+    This is the fixed twin of sample_keyboard_trap.html. The feedback
+    dialog does not intercept the Tab key, so keyboard focus moves through
+    its controls and continues into the survey form below.
+  </p>
+
+  <div class="overlay" role="dialog" aria-label="Quick feedback" id="feedback_dialog">
+    <h2>Quick feedback</h2>
+    <label for="rating">How was the last lesson?</label>
+    <select id="rating" name="rating">
+      <option value="">Choose a rating</option>
+      <option value="good">Good</option>
+      <option value="okay">Okay</option>
+    </select>
+    <button type="button" id="send_feedback">Send feedback</button>
+    <button type="button" id="dismiss_feedback">Dismiss</button>
+  </div>
+
+  <form action="/survey" method="post">
+    <h2>Course survey</h2>
+    <label for="favorite_topic">Favorite topic this term</label>
+    <input id="favorite_topic" type="text" name="favorite_topic">
+
+    <label for="comments">Comments</label>
+    <textarea id="comments" name="comments"></textarea>
+
+    <button type="submit">Submit survey</button>
+  </form>
+</body>
+</html>

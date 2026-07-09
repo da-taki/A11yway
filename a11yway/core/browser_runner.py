@@ -51,16 +51,39 @@ CONTROL_TAGS = {"a", "button", "input", "select", "textarea"}
 # How many identical focus stops in a row look like a stuck Tab key.
 REPEATED_FOCUS_THRESHOLD = 3
 
+# How many consecutive body landings mean focus never re-enters the page.
+FOCUS_LOST_THRESHOLD = 3
+
 _PAGE_STATS_SCRIPT = r"""
-() => ({
-  focusable_count: document.querySelectorAll(
+() => {
+  const selector =
     'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), ' +
-    'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  ).length,
-  interactive_like_count: document.querySelectorAll(
-    'a, button, input:not([type="hidden"]), select, textarea, [role="button"], [role="link"]'
-  ).length
-})
+    'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const seenRadioGroups = new Set();
+  let focusableCount = 0;
+  for (const el of document.querySelectorAll(selector)) {
+    const style = window.getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    const visible =
+      (rect.width > 0 || rect.height > 0) &&
+      style.visibility !== "hidden" &&
+      style.display !== "none";
+    if (!visible) continue;
+    // A radio group is one Tab stop, so count each group once.
+    const type = (el.getAttribute("type") || "").toLowerCase();
+    if (el.tagName === "INPUT" && type === "radio" && el.name) {
+      if (seenRadioGroups.has(el.name)) continue;
+      seenRadioGroups.add(el.name);
+    }
+    focusableCount += 1;
+  }
+  return {
+    focusable_count: focusableCount,
+    interactive_like_count: document.querySelectorAll(
+      'a, button, input:not([type="hidden"]), select, textarea, [role="button"], [role="link"]'
+    ).length
+  };
+}
 """
 
 _FOCUS_INFO_SCRIPT = r"""
@@ -166,6 +189,38 @@ def _focus_signature(info: dict) -> tuple:
     )
 
 
+def find_focus_cycle(signatures: list[tuple]) -> int | None:
+    """Return the length of a confirmed repeating cycle at the trace tail.
+
+    A cycle counts as confirmed only when the same signature sequence was
+    observed at least twice in a row, so one accidental revisit is never
+    reported as a trap. Returns the shortest confirmed period, or None.
+    """
+    count = len(signatures)
+    for period in range(1, count // 2 + 1):
+        if signatures[-period:] == signatures[-2 * period : -period]:
+            return period
+    return None
+
+
+def _short_element_label(entry: dict) -> str:
+    """Describe one trace entry compactly for loop evidence."""
+    tag = entry.get("tag") or "element"
+    for key in ["id", "name"]:
+        value = entry.get(key)
+        if value:
+            return f"{tag}#{value}"
+    text = (entry.get("text") or "").strip()
+    if text:
+        return f'{tag} "{text[:40]}"'
+    return tag
+
+
+def _loop_sequence_label(entries: list[dict]) -> str:
+    """Render the looping element sequence as readable evidence."""
+    return " -> ".join(_short_element_label(entry) for entry in entries)
+
+
 def _trace_entry(step: int, info: dict) -> dict:
     """Build one focus trace entry for reports."""
     return {
@@ -252,32 +307,57 @@ def _run_keyboard_traversal(
         return trace, issues
 
     signatures: list[tuple] = []
+    # Parallel to signatures: whether a body stop happened right before the
+    # entry. A repeating cycle that passes through the body is a normal page
+    # wrap; a cycle that never touches the body is a trap.
+    body_passed: list[bool] = []
     consecutive_repeats = 1
     worst_repeat_count = 1
     worst_repeat_entry: dict | None = None
+    body_streak = 0
+    pending_body_pass = False
+    full_pass = False
+    focus_lost = False
 
     for step in range(1, max_tabs + 1):
         page.keyboard.press("Tab")
         info = page.evaluate(_FOCUS_INFO_SCRIPT)
 
         if info.get("is_body"):
-            if trace:
-                break  # Tab cycled through the page and returned to the body.
+            if not trace:
+                continue
+            body_streak += 1
+            pending_body_pass = True
+            if body_streak >= FOCUS_LOST_THRESHOLD:
+                focus_lost = True
+                break  # Focus keeps landing on the body and never re-enters.
             continue
+        body_streak = 0
 
         signature = _focus_signature(info)
+        wrapped = bool(
+            signatures
+            and signature == signatures[0]
+            and (pending_body_pass or signature != signatures[-1])
+        )
+        if wrapped and len(set(signatures)) >= focusable_count:
+            full_pass = True
+            break  # Focus wrapped after visiting every focusable element.
+        # On an early wrap, keep pressing Tab: a real trap shows up below as
+        # the same subset repeating without a pass through the body.
+
         if signatures and signature == signatures[-1]:
             consecutive_repeats += 1
         else:
             consecutive_repeats = 1
-        if signatures and signature == signatures[0] and signature != signatures[-1]:
-            break  # Focus wrapped around to the first element again.
 
         entry = _trace_entry(len(trace) + 1, info)
         announce = capture_focused_announcement(announce_session)
         entry["announce"] = announce
         entry["announcement"] = format_announcement(announce) if announce else None
         signatures.append(signature)
+        body_passed.append(pending_body_pass)
+        pending_body_pass = False
         trace.append(entry)
 
         if consecutive_repeats > worst_repeat_count:
@@ -306,7 +386,71 @@ def _run_keyboard_traversal(
         )
         return trace, issues
 
-    if worst_repeat_count >= REPEATED_FOCUS_THRESHOLD and worst_repeat_entry:
+    if focus_lost:
+        issues.append(
+            _browser_issue(
+                title="Keyboard focus left the page content",
+                issue_type="focus_lost",
+                severity="medium",
+                evidence={
+                    "reason": (
+                        f"After {len(trace)} focus stop(s), pressing Tab landed on "
+                        f"the document body {body_streak} times in a row and focus "
+                        "never returned to page content."
+                    ),
+                    "body_streak": body_streak,
+                    "focusable_count": focusable_count,
+                },
+                suggested_fix=(
+                    "Check for scripts that remove, hide, or blur the focused "
+                    "element, and keep every control at a stable place in the "
+                    "Tab order."
+                ),
+            )
+        )
+
+    trap_signatures: set[tuple] = set()
+    if trace and not full_pass and not focus_lost:
+        period = find_focus_cycle(signatures)
+        unreached = focusable_count - len(set(signatures))
+        if (
+            period is not None
+            and unreached >= 1
+            and not any(body_passed[-2 * period :])
+        ):
+            loop_entries = trace[-period:]
+            trap_signatures = set(signatures[-period:])
+            issues.append(
+                _browser_issue(
+                    title="Keyboard focus is trapped in a loop",
+                    issue_type="keyboard_trap",
+                    severity="high",
+                    evidence={
+                        "reason": (
+                            "Tab keeps cycling through the same "
+                            f"{len(trap_signatures)} element(s) without passing "
+                            f"through the rest of the page; about {unreached} "
+                            "focusable element(s) were never reached within "
+                            f"{max_tabs} Tab presses."
+                        ),
+                        "loop_sequence": _loop_sequence_label(loop_entries),
+                        "loop_length": len(trap_signatures),
+                        "unreached_focusable_count": unreached,
+                        "tab_presses": max_tabs,
+                    },
+                    suggested_fix=(
+                        "Let Tab move past the widget, or provide a standard way "
+                        "out, such as closing a modal with Escape and returning "
+                        "focus. Related to WCAG 2.1.2 No Keyboard Trap."
+                    ),
+                )
+            )
+
+    if (
+        worst_repeat_count >= REPEATED_FOCUS_THRESHOLD
+        and worst_repeat_entry
+        and _focus_signature(worst_repeat_entry) not in trap_signatures
+    ):
         issues.append(
             _browser_issue(
                 title="Keyboard focus repeats on the same element",
