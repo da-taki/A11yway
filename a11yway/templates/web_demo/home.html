@@ -1,0 +1,43 @@
+{% extends "web_demo/base.html" %}
+{% block title %}A11yway Web Demo{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1>Deterministic accessibility review for a public page</h1>
+  <p>This tool only tests public pages. Do not enter private dashboards, login pages, internal tools, or pages you do not have permission to test.</p>
+</section>
+
+<form class="panel" method="post" action="{{ url_for('run_review') }}">
+  {% if error %}
+    <div class="alert" role="alert">{{ error }}</div>
+  {% endif %}
+
+  <label for="url">Website URL</label>
+  <input id="url" name="url" type="url" required placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}">
+
+  <label for="review_type">Review type</label>
+  <select id="review_type" name="review_type">
+    {% for key, review in review_types.items() %}
+      <option value="{{ key }}" {% if submitted.get('review_type') == key %}selected{% endif %}>{{ review.label }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="label">Optional label/name for the website</label>
+  <input id="label" name="label" type="text" maxlength="80" placeholder="Example home page" value="{{ submitted.get('label', '') }}">
+
+  <label class="check-row">
+    <input name="permission" type="checkbox" required>
+    <span>I confirm this is a public page or I have permission to review it.</span>
+  </label>
+
+  <button type="submit">Run review</button>
+</form>
+
+<section class="notes">
+  <h2>Guardrails</h2>
+  <ul>
+    <li>One URL per run, no recursive crawling by default.</li>
+    <li>No login, form submission, account creation, payment flow testing, or destructive clicks.</li>
+    <li>No hacking, vulnerability scanning, auth bypass, port scanning, or private-data scraping.</li>
+  </ul>
+</section>
+{% endblock %}

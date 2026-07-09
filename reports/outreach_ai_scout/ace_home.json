@@ -1,0 +1,417 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "https://www.acenet.edu/",
+  "summary": {
+    "issues_found": 14,
+    "counts_by_severity": {
+      "high": 6,
+      "medium": 8
+    },
+    "counts_by_issue_type": {
+      "missing_link_name": 4,
+      "generic_link_text": 3,
+      "missing_image_alt": 7
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 265,
+        "snippet": "<a id=\"HiddenAnchor\" href=\"javascript:;\" style=\"display:none;\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "HiddenAnchor",
+        "href": "javascript:;"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 299,
+        "snippet": "<a href=\"#\" class=\"dropdown-toggle\" id=\"dropdownMenuSearch\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "dropdownMenuSearch",
+        "href": "#"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 446,
+        "snippet": "<a id=\"ctl00_megaMenu_ctl00_rptTopLevel_ctl01_hypReadMore\" class=\"read-more\" href=\"/Policy-Advocacy/Pages/National-Engagement/Economic-Impact-Higher-Ed.aspx\">Learn More</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "id": "ctl00_megaMenu_ctl00_rptTopLevel_ctl01_hypReadMore",
+        "href": "/Policy-Advocacy/Pages/National-Engagement/Economic-Impact-Higher-Ed.aspx",
+        "text": "Learn More"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\"",
+      "rule": {
+        "title": "Link text is too generic",
+        "category": "Interactive Elements",
+        "why_it_matters": "Students who navigate by a list of links hear 'click here' with no context and cannot tell links apart.",
+        "manual_review_notes": "Surrounding text may add context visually, but the link should still make sense on its own.",
+        "static_check_limitations": "The check only matches a small list of common generic phrases."
+      }
+    },
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 2928,
+        "snippet": "<a class=\"read-more\" href=\"https://www.acenet.edu/Programs-Services/Pages/Credit-Transcripts/Credit-Transcripts.aspx\" aria-label=\"CREDIT Evaluations\">Learn more</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "https://www.acenet.edu/Programs-Services/Pages/Credit-Transcripts/Credit-Transcripts.aspx",
+        "text": "Learn more"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\"",
+      "rule": {
+        "title": "Link text is too generic",
+        "category": "Interactive Elements",
+        "why_it_matters": "Students who navigate by a list of links hear 'click here' with no context and cannot tell links apart.",
+        "manual_review_notes": "Surrounding text may add context visually, but the link should still make sense on its own.",
+        "static_check_limitations": "The check only matches a small list of common generic phrases."
+      }
+    },
+    {
+      "issue_type": "generic_link_text",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Link text is too generic",
+      "evidence": {
+        "tag": "a",
+        "line": 2928,
+        "snippet": "<a class=\"read-more\" href=\"https://www.acenet.edu/Programs-Services/Pages/Credit-Transcripts/Military-Evaluations.aspx\" aria-label=\"Military Evaluations\">Learn More</a>",
+        "reason": "Link text is generic and does not explain the destination or action.",
+        "href": "https://www.acenet.edu/Programs-Services/Pages/Credit-Transcripts/Military-Evaluations.aspx",
+        "text": "Learn More"
+      },
+      "suggested_fix": "Use descriptive link text like \"Download scholarship guidelines\" instead of \"click here.\"",
+      "rule": {
+        "title": "Link text is too generic",
+        "category": "Interactive Elements",
+        "why_it_matters": "Students who navigate by a list of links hear 'click here' with no context and cannot tell links apart.",
+        "manual_review_notes": "Surrounding text may add context visually, but the link should still make sense on its own.",
+        "static_check_limitations": "The check only matches a small list of common generic phrases."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 2966,
+        "snippet": "<a href=\"https://twitter.com/ACEducation\" class=\"footer-twitter-logo\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "https://twitter.com/ACEducation"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 2966,
+        "snippet": "<a href=\"https://bsky.app/profile/aceducation.bsky.social\" class=\"footer-bluesky-logo\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "https://bsky.app/profile/aceducation.bsky.social"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 224,
+        "snippet": "<img src=\"/_layouts/15/images/spcommon.png?rev=40\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/_layouts/15/images/spcommon.png?rev=40"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 225,
+        "snippet": "<img src=\"/_catalogs/masterpage/ACE/img/ACELogo.svg?rev=41\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/_catalogs/masterpage/ACE/img/ACELogo.svg?rev=41"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 2928,
+        "snippet": "<img class=\"image\" src=\"/PublishingImages/CreditEval-528x326.jpg\" title=\"Picture of two women smiling in an office setting\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/PublishingImages/CreditEval-528x326.jpg"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 2928,
+        "snippet": "<img class=\"image\" src=\"/PublishingImages/Military-528x326.jpg\" title=\"Picture of a classroom setting focused on a woman in a military uniform\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/PublishingImages/Military-528x326.jpg"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 2928,
+        "snippet": "<img class=\"image\" src=\"/PublishingImages/ged-test-528x326.png\" title=\"Women looking at a computer monitor\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/PublishingImages/ged-test-528x326.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 2966,
+        "snippet": "<img src=\"/_catalogs/masterpage/ACE/img/x-twitter.png\" style=\"height:18.75px !important; margin-top: -5px;\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/_catalogs/masterpage/ACE/img/x-twitter.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 2966,
+        "snippet": "<img src=\"/_catalogs/masterpage/ACE/img/Bluesky_Logo.png\" style=\"height:18.75px !important; margin-top: -5px;\" />",
+        "reason": "Image is missing useful alt text.",
+        "src": "/_catalogs/masterpage/ACE/img/Bluesky_Logo.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+    "Low-vision browser checks are conservative heuristics and require manual review."
+  ],
+  "source": {
+    "input": "https://www.acenet.edu/",
+    "type": "url",
+    "final_url": "https://www.acenet.edu/Pages/default.aspx",
+    "status_code": 200,
+    "content_type": "text/html; charset=utf-8"
+  },
+  "analysis_modes": [
+    "static",
+    "browser",
+    "low_vision"
+  ],
+  "browser": {
+    "success": false,
+    "error": "Page.goto: Timeout 30000ms exceeded.",
+    "final_url": null,
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  },
+  "low_vision": {
+    "success": false,
+    "error": "Page.goto: Timeout 30000ms exceeded.",
+    "checks_run": [
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ],
+    "contrast_sample_count": 0,
+    "zoom_reflow": {},
+    "focus_visibility": {},
+    "limitations": [
+      "Low-vision checks use browser-computed styles and conservative heuristics.",
+      "Rendered color contrast checks do not prove full WCAG conformance.",
+      "Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.",
+      "Focus indicator detection may miss custom focus styles."
+    ]
+  },
+  "ai_scout": {
+    "enabled": true,
+    "mode": "suggest_only",
+    "model": "llama-3.3-70b-versatile",
+    "status": "ok",
+    "summary": "Possible accessibility barriers found in navigation and image alt text",
+    "ai_suggested_observations": [
+      {
+        "observation": "Some links may not have descriptive text for users who rely on assistive technologies",
+        "why_it_may_matter": "This could make it difficult for users to understand the purpose or destination of the link",
+        "related_deterministic_evidence": "Links with missing or generic text were detected",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      },
+      {
+        "observation": "Some images may be missing alternative text, which could impact users who rely on screen readers or have low vision",
+        "why_it_may_matter": "This could make it difficult for users to understand the content or purpose of the image",
+        "related_deterministic_evidence": "Images with missing alt text were detected",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      }
+    ],
+    "outreach_notes": [
+      "The American Council on Education website may have accessibility barriers that could impact users with disabilities. A human review of the site is recommended to ensure that all users can access and navigate the content."
+    ],
+    "limitations": [
+      "AI Scout findings are suggestions and need human review.",
+      "AI Scout output is not a confirmed accessibility finding.",
+      "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+      "AI Scout output is not a needs human review accessibility finding."
+    ]
+  }
+}

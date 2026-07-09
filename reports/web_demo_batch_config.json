@@ -1,0 +1,9 @@
+[
+  {
+    "id": "Example",
+    "name": "Example",
+    "source": "https://example.org",
+    "workflow": "AI-assisted suggest-only summary",
+    "notes": "Web demo run. Public pages only; no login, form submission, auth bypass, scraping, or security scanning."
+  }
+]

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Focus Path Overlay</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+header { padding: 1rem 1.25rem; background: #ffffff; border-bottom: 1px solid #d8deea; }
+main { padding: 1rem; }
+.frame { position: relative; display: inline-block; background: #ffffff; box-shadow: 0 2px 16px rgba(23, 32, 51, 0.16); }
+.frame img { display: block; max-width: none; }
+.marker { position: absolute; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; border: 3px solid #ffffff; background: #b42318; color: #ffffff; font-weight: 700; font-size: 0.85rem; line-height: 1.6rem; text-align: center; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45); transform: translate(-50%, -50%); }
+.box { position: absolute; border: 3px solid #b42318; background: rgba(180, 35, 24, 0.08); pointer-events: none; }
+.legend { max-width: 54rem; margin: 0 0 1rem; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #d8deea; }
+.muted { color: #526071; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Focus Path Overlay</h1>
+<p>Source: https://www.accessibilityassociation.org/</p>
+</header>
+<main>
+<section class="legend" aria-labelledby="legend-title">
+<h2 id="legend-title">Legend</h2>
+<p>Marker numbers show the Tab order observed by A11yway during this browser run.</p>
+<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>
+<p class="muted">Viewport observed: 1280 x 720 CSS pixels.</p>
+</section>
+<div class="frame">
+<img src="page.png" alt="Full-page screenshot used for focus path overlay">
+<div class="box" style="left: 0.0px; top: 12.0px; width: 410.671875px; height: 34.0px;"></div>
+<div class="marker" style="left: 205.3359375px; top: 29.0px;" title="Step 1 | c-skip-to-main-content | Skip to Main Content" aria-label="Step 1 | c-skip-to-main-content | Skip to Main Content">1</div>
+<div class="box" style="left: 426.671875px; top: 4.0px; width: 205.328125px; height: 50.0px;"></div>
+<div class="marker" style="left: 529.3359375px; top: 29.0px;" title="Step 2 | a | Subscribe to the IAAP Newsletter opens in a new tab" aria-label="Step 2 | a | Subscribe to the IAAP Newsletter opens in a new tab">2</div>
+<div class="box" style="left: 649.0px; top: 14.0px; width: 241.0px; height: 30.0px;"></div>
+<div class="marker" style="left: 769.5px; top: 29.0px;" title="Step 3 | input | Search | zhi9qdj" aria-label="Step 3 | input | Search | zhi9qdj">3</div>
+<div class="box" style="left: 907.0px; top: 13.0px; width: 49.0px; height: 32.0px;"></div>
+<div class="marker" style="left: 931.5px; top: 29.0px;" title="Step 4 | button | Search" aria-label="Step 4 | button | Search">4</div>
+<div class="box" style="left: 972.0px; top: 0.0px; width: 277.453125px; height: 58.0px;"></div>
+<div class="marker" style="left: 1110.7265625px; top: 29.0px;" title="Step 5 | c-user-profile | JOIN LOGIN" aria-label="Step 5 | c-user-profile | JOIN LOGIN">5</div>
+<div class="box" style="left: 972.0px; top: 0.0px; width: 277.453125px; height: 58.0px;"></div>
+<div class="marker" style="left: 1110.7265625px; top: 29.0px;" title="Step 6 | c-user-profile | JOIN LOGIN" aria-label="Step 6 | c-user-profile | JOIN LOGIN">6</div>
+<div class="box" style="left: 10.0px; top: 68.0px; width: 518.328125px; height: 70.390625px;"></div>
+<div class="marker" style="left: 269.1640625px; top: 103.1953125px;" title="Step 7 | linkifyanything-linkify-anything" aria-label="Step 7 | linkifyanything-linkify-anything">7</div>
+<div class="box" style="left: 544.328125px; top: 82.390625px; width: 725.671875px; height: 56.0px;"></div>
+<div class="marker" style="left: 907.1640625px; top: 110.390625px;" title="Step 8 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati" aria-label="Step 8 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati">8</div>
+<div class="box" style="left: 544.328125px; top: 82.390625px; width: 725.671875px; height: 56.0px;"></div>
+<div class="marker" style="left: 907.1640625px; top: 110.390625px;" title="Step 9 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati" aria-label="Step 9 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati">9</div>
+<div class="box" style="left: 544.328125px; top: 82.390625px; width: 725.671875px; height: 56.0px;"></div>
+<div class="marker" style="left: 907.1640625px; top: 110.390625px;" title="Step 10 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati" aria-label="Step 10 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati">10</div>
+<div class="box" style="left: 544.328125px; top: 82.390625px; width: 725.671875px; height: 56.0px;"></div>
+<div class="marker" style="left: 907.1640625px; top: 110.390625px;" title="Step 11 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati" aria-label="Step 11 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati">11</div>
+<div class="box" style="left: 544.328125px; top: 82.390625px; width: 725.671875px; height: 56.0px;"></div>
+<div class="marker" style="left: 907.1640625px; top: 110.390625px;" title="Step 12 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati" aria-label="Step 12 | ccnavmenus-nav-menu2 | About Expand About Membership Expand Membership Certification Expand Certificati">12</div>
+<div class="box" style="left: 895.65625px; top: 670.390625px; width: 105.265625px; height: 34.0px;"></div>
+<div class="marker" style="left: 948.2890625px; top: 687.390625px;" title="Step 13 | a | Join IAAP (Opens a new window or page)" aria-label="Step 13 | a | Join IAAP (Opens a new window or page)">13</div>
+<div class="box" style="left: 49.0px; top: 114.859375px; width: 360.65625px; height: 491.21875px;"></div>
+<div class="marker" style="left: 229.328125px; top: 360.46875px;" title="Step 14 | a | Visit Membership Overview Page" aria-label="Step 14 | a | Visit Membership Overview Page">14</div>
+<div class="box" style="left: 459.65625px; top: 114.859375px; width: 360.671875px; height: 468.5px;"></div>
+<div class="marker" style="left: 639.9921875px; top: 349.109375px;" title="Step 15 | a | Visit Certification Overview Page" aria-label="Step 15 | a | Visit Certification Overview Page">15</div>
+<div class="box" style="left: 870.328125px; top: 114.859375px; width: 360.671875px; height: 468.5px;"></div>
+<div class="marker" style="left: 1050.6640625px; top: 349.109375px;" title="Step 16 | a | Visit Education Overview Page" aria-label="Step 16 | a | Visit Education Overview Page">16</div>
+<div class="box" style="left: 99.984375px; top: 341.296875px; width: 144.03125px; height: 38.0px;"></div>
+<div class="marker" style="left: 172.0px; top: 360.296875px;" title="Step 17 | a | IAAP Resources" aria-label="Step 17 | a | IAAP Resources">17</div>
+<div class="box" style="left: 100.765625px; top: 412.296875px; width: 115.21875px; height: 22.0px;"></div>
+<div class="marker" style="left: 158.375px; top: 423.296875px;" title="Step 18 | a | IAAP Resources" aria-label="Step 18 | a | IAAP Resources">18</div>
+<div class="box" style="left: 366.421875px; top: 341.296875px; width: 235.140625px; height: 38.0px;"></div>
+<div class="marker" style="left: 483.9921875px; top: 360.296875px;" title="Step 19 | a | Certification Office Hours" aria-label="Step 19 | a | Certification Office Hours">19</div>
+<div class="box" style="left: 381.0px; top: 349.296875px; width: 55.078125px; height: 22.0px;"></div>
+<div class="marker" style="left: 408.5390625px; top: 360.296875px;" title="Step 20 | a | Sign up" aria-label="Step 20 | a | Sign up">20</div>
+<div class="box" style="left: 680.671875px; top: 341.296875px; width: 230.65625px; height: 38.0px;"></div>
+<div class="marker" style="left: 796.0px; top: 360.296875px;" title="Step 21 | a | Membership Orientation" aria-label="Step 21 | a | Membership Orientation">21</div>
+<div class="box" style="left: 693.0px; top: 532.296875px; width: 205.71875px; height: 46.0px;"></div>
+<div class="marker" style="left: 795.859375px; top: 555.296875px;" title="Step 22 | a | Contact Us form" aria-label="Step 22 | a | Contact Us form">22</div>
+<div class="box" style="left: 693.0px; top: 349.296875px; width: 55.078125px; height: 22.0px;"></div>
+<div class="marker" style="left: 720.5390625px; top: 360.296875px;" title="Step 23 | a | Sign up" aria-label="Step 23 | a | Sign up">23</div>
+<div class="box" style="left: 1042.34375px; top: 341.296875px; width: 131.296875px; height: 38.0px;"></div>
+<div class="marker" style="left: 1107.9921875px; top: 360.296875px;" title="Step 24 | a | IAAP Podcasts" aria-label="Step 24 | a | IAAP Podcasts">24</div>
+<div class="box" style="left: 1005.0px; top: 556.296875px; width: 158.96875px; height: 46.0px;"></div>
+<div class="marker" style="left: 1084.484375px; top: 579.296875px;" title="Step 25 | a | &quot;United in Accessibility&quot; podcast" aria-label="Step 25 | a | &quot;United in Accessibility&quot; podcast">25</div>
+<div class="box" style="left: 1005.0px; top: 325.296875px; width: 194.359375px; height: 70.0px;"></div>
+<div class="marker" style="left: 1102.1796875px; top: 360.296875px;" title="Step 26 | a | Designing for Real People: Accessibility with Chandra Harrison" aria-label="Step 26 | a | Designing for Real People: Accessibility with Chandra Harrison">26</div>
+<div class="box" style="left: 1057.921875px; top: 445.296875px; width: 74.53125px; height: 22.0px;"></div>
+<div class="marker" style="left: 1095.1875px; top: 456.296875px;" title="Step 27 | a | Reach out" aria-label="Step 27 | a | Reach out">27</div>
+<div class="box" style="left: 65.0px; top: 342.921875px; width: 143.015625px; height: 34.0px;"></div>
+<div class="marker" style="left: 136.5078125px; top: 359.921875px;" title="Step 28 | a | View all Events (Opens a new window)" aria-label="Step 28 | a | View all Events (Opens a new window)">28</div>
+<div class="box" style="left: 41.703125px; top: 578.578125px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 140.796875px; top: 619.578125px;" title="Step 29 | a | Visit Event Page" aria-label="Step 29 | a | Visit Event Page">29</div>
+<div class="box" style="left: 291.296875px; top: 578.578125px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 390.390625px; top: 619.578125px;" title="Step 30 | a | Visit Event Page" aria-label="Step 30 | a | Visit Event Page">30</div>
+<div class="box" style="left: 540.890625px; top: 578.578125px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 639.984375px; top: 619.578125px;" title="Step 31 | a | Visit Event Page" aria-label="Step 31 | a | Visit Event Page">31</div>
+<div class="box" style="left: 790.484375px; top: 578.578125px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 889.578125px; top: 619.578125px;" title="Step 32 | a | Visit Event Page" aria-label="Step 32 | a | Visit Event Page">32</div>
+<div class="box" style="left: 1040.078125px; top: 578.578125px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 1139.171875px; top: 619.578125px;" title="Step 33 | a | Visit Event Page" aria-label="Step 33 | a | Visit Event Page">33</div>
+<div class="box" style="left: 41.703125px; top: 318.984375px; width: 198.1875px; height: 82.0px;"></div>
+<div class="marker" style="left: 140.796875px; top: 359.984375px;" title="Step 34 | a | Visit Event Page" aria-label="Step 34 | a | Visit Event Page">34</div>
+<div class="box" style="left: 291.296875px; top: 318.984375px; width: 198.1875px; height: 182.0px;"></div>
+<div class="marker" style="left: 390.390625px; top: 409.984375px;" title="Step 35 | a | Visit Event Page" aria-label="Step 35 | a | Visit Event Page">35</div>
+<div class="box" style="left: 540.890625px; top: 318.984375px; width: 198.1875px; height: 157.0px;"></div>
+<div class="marker" style="left: 639.984375px; top: 397.484375px;" title="Step 36 | a | Visit Event Page" aria-label="Step 36 | a | Visit Event Page">36</div>
+<div class="box" style="left: 790.484375px; top: 318.984375px; width: 198.1875px; height: 107.0px;"></div>
+<div class="marker" style="left: 889.578125px; top: 372.484375px;" title="Step 37 | a | Visit Event Page" aria-label="Step 37 | a | Visit Event Page">37</div>
+<div class="box" style="left: 1040.078125px; top: 318.984375px; width: 198.1875px; height: 157.0px;"></div>
+<div class="marker" style="left: 1139.171875px; top: 397.484375px;" title="Step 38 | a | Visit Event Page" aria-label="Step 38 | a | Visit Event Page">38</div>
+<div class="box" style="left: 554.734375px; top: 570.640625px; width: 170.53125px; height: 34.0px;"></div>
+<div class="marker" style="left: 640.0px; top: 587.640625px;" title="Step 39 | button | Show More Events" aria-label="Step 39 | button | Show More Events">39</div>
+<div class="box" style="left: 592.078125px; top: 466.59375px; width: 80.921875px; height: 22.0px;"></div>
+<div class="marker" style="left: 632.5390625px; top: 477.59375px;" title="Step 40 | a | Contact Us" aria-label="Step 40 | a | Contact Us">40</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 41 | c-social-media-links-list" aria-label="Step 41 | c-social-media-links-list">41</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 42 | c-social-media-links-list" aria-label="Step 42 | c-social-media-links-list">42</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 43 | c-social-media-links-list" aria-label="Step 43 | c-social-media-links-list">43</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 44 | c-social-media-links-list" aria-label="Step 44 | c-social-media-links-list">44</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 45 | c-social-media-links-list" aria-label="Step 45 | c-social-media-links-list">45</div>
+<div class="box" style="left: 741.328125px; top: 424.703125px; width: 506.65625px; height: 52.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 450.703125px;" title="Step 46 | c-social-media-links-list" aria-label="Step 46 | c-social-media-links-list">46</div>
+<div class="box" style="left: 924.15625px; top: 533.375px; width: 141.0px; height: 22.0px;"></div>
+<div class="marker" style="left: 994.65625px; top: 544.375px;" title="Step 47 | a | G3ict Logo" aria-label="Step 47 | a | G3ict Logo">47</div>
+<div class="box" style="left: 16.0px; top: 660.203125px; width: 1248.0px; height: 28.0px;"></div>
+<div class="marker" style="left: 640.0px; top: 674.203125px;" title="Step 48 | c-footer-links-list | Privacy Policy Membership Accessibility" aria-label="Step 48 | c-footer-links-list | Privacy Policy Membership Accessibility">48</div>
+<div class="box" style="left: 16.0px; top: 660.203125px; width: 1248.0px; height: 28.0px;"></div>
+<div class="marker" style="left: 640.0px; top: 674.203125px;" title="Step 49 | c-footer-links-list | Privacy Policy Membership Accessibility" aria-label="Step 49 | c-footer-links-list | Privacy Policy Membership Accessibility">49</div>
+<div class="box" style="left: 16.0px; top: 660.203125px; width: 1248.0px; height: 28.0px;"></div>
+<div class="marker" style="left: 640.0px; top: 674.203125px;" title="Step 50 | c-footer-links-list | Privacy Policy Membership Accessibility" aria-label="Step 50 | c-footer-links-list | Privacy Policy Membership Accessibility">50</div>
+</div>
+</main>
+</body>
+</html>

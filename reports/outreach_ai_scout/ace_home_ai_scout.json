@@ -1,0 +1,32 @@
+{
+  "enabled": true,
+  "mode": "suggest_only",
+  "model": "llama-3.3-70b-versatile",
+  "status": "ok",
+  "summary": "Possible accessibility barriers found in navigation and image alt text",
+  "ai_suggested_observations": [
+    {
+      "observation": "Some links may not have descriptive text for users who rely on assistive technologies",
+      "why_it_may_matter": "This could make it difficult for users to understand the purpose or destination of the link",
+      "related_deterministic_evidence": "Links with missing or generic text were detected",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some images may be missing alternative text, which could impact users who rely on screen readers or have low vision",
+      "why_it_may_matter": "This could make it difficult for users to understand the content or purpose of the image",
+      "related_deterministic_evidence": "Images with missing alt text were detected",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    }
+  ],
+  "outreach_notes": [
+    "The American Council on Education website may have accessibility barriers that could impact users with disabilities. A human review of the site is recommended to ensure that all users can access and navigate the content."
+  ],
+  "limitations": [
+    "AI Scout findings are suggestions and need human review.",
+    "AI Scout output is not a confirmed accessibility finding.",
+    "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+    "AI Scout output is not a needs human review accessibility finding."
+  ]
+}

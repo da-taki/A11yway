@@ -1,0 +1,82 @@
+[
+  {
+    "id": "webaim_contact",
+    "name": "WebAIM",
+    "source": "https://webaim.org/contact/",
+    "workflow": "Review the public contact page and identify whether contact information and navigation are usable without submitting a form.",
+    "workflow_pack": "public_resources / education",
+    "tone": "expert feedback request"
+  },
+  {
+    "id": "knowbility_contact",
+    "name": "Knowbility",
+    "source": "https://knowbility.org/contact/",
+    "workflow": "Review the public contact page and stop before any real form submission.",
+    "workflow_pack": "education / public_resources / ngo_services",
+    "tone": "expert feedback request"
+  },
+  {
+    "id": "w3c_wai_contacting",
+    "name": "W3C WAI",
+    "source": "https://www.w3.org/WAI/about/contacting/",
+    "workflow": "Find public WAI contact information and review keyboard navigation through the page.",
+    "workflow_pack": "public_resources",
+    "tone": "very humble expert feedback request"
+  },
+  {
+    "id": "us_access_board_contact",
+    "name": "U.S. Access Board",
+    "source": "https://www.access-board.gov/contact/",
+    "workflow": "Find public agency contact information and review the page without submitting anything.",
+    "workflow_pack": "government_services / public_resources / ai_products",
+    "tone": "public-service accessibility feedback request"
+  },
+  {
+    "id": "doit_center_home",
+    "name": "DO-IT Center, University of Washington",
+    "source": "https://www.washington.edu/doit/",
+    "workflow": "Find public education/accessibility resources from the DO-IT landing page.",
+    "workflow_pack": "education / college_applications",
+    "tone": "education/accessibility feedback request"
+  },
+  {
+    "id": "cast_home",
+    "name": "CAST",
+    "source": "https://www.cast.org/",
+    "workflow": "Navigate public education/accessibility information from the CAST landing page.",
+    "workflow_pack": "education / public_resources",
+    "tone": "education/accessibility feedback request"
+  },
+  {
+    "id": "iaap_home",
+    "name": "IAAP / Accessibility Association",
+    "source": "https://www.accessibilityassociation.org/",
+    "workflow": "Review public association information and keyboard navigation from the landing page.",
+    "workflow_pack": "public_resources",
+    "tone": "expert feedback request"
+  },
+  {
+    "id": "ahead_home",
+    "name": "AHEAD",
+    "source": "https://www.ahead.org/",
+    "workflow": "Review public higher-ed disability/accessibility information from the landing page.",
+    "workflow_pack": "college_applications / education",
+    "tone": "higher-ed disability/accessibility feedback request"
+  },
+  {
+    "id": "ace_home",
+    "name": "American Council on Education",
+    "source": "https://www.acenet.edu/",
+    "workflow": "Review public college access and education resource navigation from the landing page.",
+    "workflow_pack": "college_applications / public_resources",
+    "tone": "college access/public-resource workflow framing"
+  },
+  {
+    "id": "washington_post_accessibility",
+    "name": "Washington Post accessibility page",
+    "source": "https://www.washingtonpost.com/information/2023/03/01/accessibility/",
+    "workflow": "Review the public accessibility information page and contact information without logging in.",
+    "workflow_pack": "public_resources",
+    "tone": "public information access, careful and specific"
+  }
+]

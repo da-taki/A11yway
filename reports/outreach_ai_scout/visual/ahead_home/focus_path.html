@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Focus Path Overlay</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+header { padding: 1rem 1.25rem; background: #ffffff; border-bottom: 1px solid #d8deea; }
+main { padding: 1rem; }
+.frame { position: relative; display: inline-block; background: #ffffff; box-shadow: 0 2px 16px rgba(23, 32, 51, 0.16); }
+.frame img { display: block; max-width: none; }
+.marker { position: absolute; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; border: 3px solid #ffffff; background: #b42318; color: #ffffff; font-weight: 700; font-size: 0.85rem; line-height: 1.6rem; text-align: center; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45); transform: translate(-50%, -50%); }
+.box { position: absolute; border: 3px solid #b42318; background: rgba(180, 35, 24, 0.08); pointer-events: none; }
+.legend { max-width: 54rem; margin: 0 0 1rem; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #d8deea; }
+.muted { color: #526071; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Focus Path Overlay</h1>
+<p>Source: https://www.ahead.org/</p>
+</header>
+<main>
+<section class="legend" aria-labelledby="legend-title">
+<h2 id="legend-title">Legend</h2>
+<p>Marker numbers show the Tab order observed by A11yway during this browser run.</p>
+<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>
+<p class="muted">Viewport observed: 1280 x 720 CSS pixels.</p>
+</section>
+<div class="frame">
+<img src="page.png" alt="Full-page screenshot used for focus path overlay">
+<div class="box" style="left: -6400.0px; top: 0.0px; width: 1267.1875px; height: 34.84375px;"></div>
+<div class="marker" style="left: -5766.40625px; top: 17.421875px;" title="Step 1 | a | Skip to main content (Press Enter). | skiplink" aria-label="Step 1 | a | Skip to main content (Press Enter). | skiplink">1</div>
+<div class="box" style="left: 1158.828125px; top: 5.0px; width: 76.171875px; height: 34.0px;"></div>
+<div class="marker" style="left: 1196.9140625px; top: 22.0px;" title="Step 2 | a | SIGN IN | Welcome_LoginLink" aria-label="Step 2 | a | SIGN IN | Welcome_LoginLink">2</div>
+<div class="box" style="left: 1107.828125px; top: 7.0px; width: 45.5px; height: 44.0px;"></div>
+<div class="marker" style="left: 1130.578125px; top: 29.0px;" title="Step 3 | button | Search Button" aria-label="Step 3 | button | Search Button">3</div>
+<div class="box" style="left: -2486.40625px; top: 5.0px; width: 616.5px; height: 34.84375px;"></div>
+<div class="marker" style="left: -2178.15625px; top: 22.421875px;" title="Step 4 | a | Skip auxiliary navigation (Press Enter). | auxskiplink" aria-label="Step 4 | a | Skip auxiliary navigation (Press Enter). | auxskiplink">4</div>
+<div class="box" style="left: 898.265625px; top: 15.0px; width: 207.5625px; height: 28.84375px;"></div>
+<div class="marker" style="left: 1002.046875px; top: 29.421875px;" title="Step 5 | ul | ABOUT US CONTACT US" aria-label="Step 5 | ul | ABOUT US CONTACT US">5</div>
+<div class="box" style="left: 642.265625px; top: 25.0px; width: 64.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 674.265625px; top: 34.5px;" title="Step 6 | a | AHEAD Linkedin page" aria-label="Step 6 | a | AHEAD Linkedin page">6</div>
+<div class="box" style="left: 706.265625px; top: 25.0px; width: 64.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 738.265625px; top: 34.5px;" title="Step 7 | a | AHEAD Facebook page" aria-label="Step 7 | a | AHEAD Facebook page">7</div>
+<div class="box" style="left: 770.265625px; top: 25.0px; width: 64.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 802.265625px; top: 34.5px;" title="Step 8 | a | AHEAD Youtube channel" aria-label="Step 8 | a | AHEAD Youtube channel">8</div>
+<div class="box" style="left: 834.265625px; top: 25.0px; width: 64.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 866.265625px; top: 34.5px;" title="Step 9 | a | AHEAD Instagram page" aria-label="Step 9 | a | AHEAD Instagram page">9</div>
+<div class="box" style="left: 45.0px; top: 35.546875px; width: 300.0px; height: 19.0px;"></div>
+<div class="marker" style="left: 195.0px; top: 45.046875px;" title="Step 10 | a | AHEAD - Association on Higher Education And Disability logo. This will take you to the homepage" aria-label="Step 10 | a | AHEAD - Association on Higher Education And Disability logo. This will take you to the homepage">10</div>
+<div class="box" style="left: -6565.0px; top: 100.0px; width: 1296.890625px; height: 34.84375px;"></div>
+<div class="marker" style="left: -5916.5546875px; top: 117.421875px;" title="Step 11 | a | Skip main navigation (Press Enter). | navskiplink" aria-label="Step 11 | a | Skip main navigation (Press Enter). | navskiplink">11</div>
+<div class="box" style="left: 40.0px; top: 100.0px; width: 78.625px; height: 50.0px;"></div>
+<div class="marker" style="left: 79.3125px; top: 125.0px;" title="Step 12 | a | Home | megaanchor1" aria-label="Step 12 | a | Home | megaanchor1">12</div>
+<div class="box" style="left: 118.625px; top: 100.0px; width: 93.953125px; height: 50.0px;"></div>
+<div class="marker" style="left: 165.6015625px; top: 125.0px;" title="Step 13 | a | About | megaanchor2" aria-label="Step 13 | a | About | megaanchor2">13</div>
+<div class="box" style="left: 212.578125px; top: 100.0px; width: 145.390625px; height: 50.0px;"></div>
+<div class="marker" style="left: 285.2734375px; top: 125.0px;" title="Step 14 | a | Membership | megaanchor3" aria-label="Step 14 | a | Membership | megaanchor3">14</div>
+<div class="box" style="left: 357.96875px; top: 100.0px; width: 152.890625px; height: 50.0px;"></div>
+<div class="marker" style="left: 434.4140625px; top: 125.0px;" title="Step 15 | a | Programming | megaanchor4" aria-label="Step 15 | a | Programming | megaanchor4">15</div>
+<div class="box" style="left: 510.859375px; top: 100.0px; width: 230.265625px; height: 50.0px;"></div>
+<div class="marker" style="left: 625.9921875px; top: 125.0px;" title="Step 16 | a | Professional Resources | megaanchor5" aria-label="Step 16 | a | Professional Resources | megaanchor5">16</div>
+<div class="box" style="left: 741.125px; top: 100.0px; width: 117.96875px; height: 50.0px;"></div>
+<div class="marker" style="left: 800.109375px; top: 125.0px;" title="Step 17 | a | Research | megaanchor6" aria-label="Step 17 | a | Research | megaanchor6">17</div>
+<div class="box" style="left: 859.09375px; top: 100.0px; width: 150.765625px; height: 50.0px;"></div>
+<div class="marker" style="left: 934.4765625px; top: 125.0px;" title="Step 18 | a | Communities | megaanchor7" aria-label="Step 18 | a | Communities | megaanchor7">18</div>
+<div class="box" style="left: 55.0px; top: 209.0px; width: 526.765625px; height: 74.1875px;"></div>
+<div class="marker" style="left: 318.3828125px; top: 246.09375px;" title="Step 19 | a | 2026 AHEAD Virtual Conference Info and Registration Now Available!" aria-label="Step 19 | a | 2026 AHEAD Virtual Conference Info and Registration Now Available!">19</div>
+<div class="marker" style="left: 640.0px; top: 192.0px;" title="Step 20 | a | graphic of interconnected points in space" aria-label="Step 20 | a | graphic of interconnected points in space">20</div>
+<div class="marker" style="left: 640.0px; top: 192.0px;" title="Step 21 | a" aria-label="Step 21 | a">21</div>
+<div class="marker" style="left: 81.0px; top: 653.390625px;" title="Step 22 | a | MainCopy_ctl05_BlogList_ProfileLink_0" aria-label="Step 22 | a | MainCopy_ctl05_BlogList_ProfileLink_0">22</div>
+<div class="box" style="left: 81.0px; top: 653.390625px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 101.0px; top: 673.390625px;" title="Step 23 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_0_lnkDisplay_0" aria-label="Step 23 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_0_lnkDisplay_0">23</div>
+<div class="box" style="left: 136.0px; top: 653.390625px; width: 180.875px; height: 79.78125px;"></div>
+<div class="marker" style="left: 226.4375px; top: 693.28125px;" title="Step 24 | a | AHEAD Board of Directors Election Results | MainCopy_ctl05_BlogList_BlogTitle_0" aria-label="Step 24 | a | AHEAD Board of Directors Election Results | MainCopy_ctl05_BlogList_BlogTitle_0">24</div>
+<div class="box" style="left: 156.40625px; top: 729.390625px; width: 41.953125px; height: 15.0px;"></div>
+<div class="marker" style="left: 177.3828125px; top: 736.890625px;" title="Step 25 | a | AHEAD | MainCopy_ctl05_BlogList_Author_0" aria-label="Step 25 | a | AHEAD | MainCopy_ctl05_BlogList_Author_0">25</div>
+<div class="marker" style="left: 81.0px; top: 861.34375px;" title="Step 26 | a | MainCopy_ctl05_BlogList_ProfileLink_1" aria-label="Step 26 | a | MainCopy_ctl05_BlogList_ProfileLink_1">26</div>
+<div class="box" style="left: 81.0px; top: 837.34375px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 101.0px; top: 857.34375px;" title="Step 27 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_1_lnkDisplay_1" aria-label="Step 27 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_1_lnkDisplay_1">27</div>
+<div class="box" style="left: 136.0px; top: 826.34375px; width: 187.03125px; height: 79.78125px;"></div>
+<div class="marker" style="left: 229.515625px; top: 866.234375px;" title="Step 28 | a | AHG 2026: Call for Proposals Closing Soon! | MainCopy_ctl05_BlogList_BlogTitle_1" aria-label="Step 28 | a | AHG 2026: Call for Proposals Closing Soon! | MainCopy_ctl05_BlogList_BlogTitle_1">28</div>
+<div class="box" style="left: 156.40625px; top: 837.34375px; width: 41.953125px; height: 15.0px;"></div>
+<div class="marker" style="left: 177.3828125px; top: 844.84375px;" title="Step 29 | a | AHEAD | MainCopy_ctl05_BlogList_Author_1" aria-label="Step 29 | a | AHEAD | MainCopy_ctl05_BlogList_Author_1">29</div>
+<div class="marker" style="left: 81.0px; top: 663.015625px;" title="Step 30 | a | MainCopy_ctl05_BlogList_ProfileLink_2" aria-label="Step 30 | a | MainCopy_ctl05_BlogList_ProfileLink_2">30</div>
+<div class="box" style="left: 81.0px; top: 625.015625px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 101.0px; top: 645.015625px;" title="Step 31 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_2_lnkDisplay_2" aria-label="Step 31 | a | Profile Picture | MainCopy_ctl05_BlogList_ProfileImage_2_lnkDisplay_2">31</div>
+<div class="box" style="left: 136.0px; top: 458.015625px; width: 226.03125px; height: 79.78125px;"></div>
+<div class="marker" style="left: 249.015625px; top: 497.90625px;" title="Step 32 | a | AHEAD’s 2026 Board of Directors Election is Open! VOTE Today | MainCopy_ctl05_BlogList_BlogTitle_2" aria-label="Step 32 | a | AHEAD’s 2026 Board of Directors Election is Open! VOTE Today | MainCopy_ctl05_BlogList_BlogTitle_2">32</div>
+<div class="box" style="left: 156.40625px; top: 480.015625px; width: 41.953125px; height: 15.0px;"></div>
+<div class="marker" style="left: 177.3828125px; top: 487.515625px;" title="Step 33 | a | AHEAD | MainCopy_ctl05_BlogList_Author_2" aria-label="Step 33 | a | AHEAD | MainCopy_ctl05_BlogList_Author_2">33</div>
+<div class="box" style="left: 55.0px; top: 579.6875px; width: 370.0px; height: 70.5625px;"></div>
+<div class="marker" style="left: 240.0px; top: 614.96875px;" title="Step 34 | a | See More News | MainCopy_ctl05_MoreLink" aria-label="Step 34 | a | See More News | MainCopy_ctl05_MoreLink">34</div>
+<div class="box" style="left: 606.0px; top: -69.609375px; width: 123.953125px; height: 79.78125px;"></div>
+<div class="marker" style="left: 667.9765625px; top: -29.71875px;" title="Step 35 | a | 49th Annual AHEAD Conference | MainCopy_ctl08_rptEventList_EventTitle_0" aria-label="Step 35 | a | 49th Annual AHEAD Conference | MainCopy_ctl08_rptEventList_EventTitle_0">35</div>
+<div class="box" style="left: 606.0px; top: 110.796875px; width: 191.890625px; height: 53.390625px;"></div>
+<div class="marker" style="left: 701.9453125px; top: 137.4921875px;" title="Step 36 | a | 2026 AHEAD Virtual Conference | MainCopy_ctl08_rptEventList_EventTitle_1" aria-label="Step 36 | a | 2026 AHEAD Virtual Conference | MainCopy_ctl08_rptEventList_EventTitle_1">36</div>
+<div class="box" style="left: 455.0px; top: 312.78125px; width: 370.0px; height: 70.5625px;"></div>
+<div class="marker" style="left: 640.0px; top: 348.0625px;" title="Step 37 | a | See More Events | MainCopy_ctl08_LinkToCalendar" aria-label="Step 37 | a | See More Events | MainCopy_ctl08_LinkToCalendar">37</div>
+<div class="marker" style="left: 881.0px; top: -5.609375px;" title="Step 38 | a | MainCopy_ctl11_DocumentsList_ProfileLink_0" aria-label="Step 38 | a | MainCopy_ctl11_DocumentsList_ProfileLink_0">38</div>
+<div class="box" style="left: 881.0px; top: -5.609375px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 901.0px; top: 14.390625px;" title="Step 39 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_0_lnkDisplay_0" aria-label="Step 39 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_0_lnkDisplay_0">39</div>
+<div class="box" style="left: 936.0px; top: -3.609375px; width: 178.609375px; height: 106.171875px;"></div>
+<div class="marker" style="left: 1025.3046875px; top: 49.4765625px;" title="Step 40 | a | RE: Housing Accommodation - Single for Sleepwalking, ... | MainCopy_ctl11_DocumentsList_DocumentTitle_0" aria-label="Step 40 | a | RE: Housing Accommodation - Single for Sleepwalking, ... | MainCopy_ctl11_DocumentsList_DocumentTitle_0">40</div>
+<div class="box" style="left: 956.390625px; top: 82.390625px; width: 97.8125px; height: 15.0px;"></div>
+<div class="marker" style="left: 1005.296875px; top: 89.890625px;" title="Step 41 | a | ZAC LOUNSBURY | MainCopy_ctl11_DocumentsList_Contributor_0" aria-label="Step 41 | a | ZAC LOUNSBURY | MainCopy_ctl11_DocumentsList_Contributor_0">41</div>
+<div class="marker" style="left: 881.0px; top: 154.53125px;" title="Step 42 | a | MainCopy_ctl11_DocumentsList_ProfileLink_1" aria-label="Step 42 | a | MainCopy_ctl11_DocumentsList_ProfileLink_1">42</div>
+<div class="box" style="left: 881.0px; top: 154.53125px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 901.0px; top: 174.53125px;" title="Step 43 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_1_lnkDisplay_1" aria-label="Step 43 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_1_lnkDisplay_1">43</div>
+<div class="box" style="left: 936.0px; top: 154.53125px; width: 201.703125px; height: 106.171875px;"></div>
+<div class="marker" style="left: 1036.8515625px; top: 207.6171875px;" title="Step 44 | a | RE: Applying Extended-Time Accommodations to Assignment ... | MainCopy_ctl11_DocumentsList_DocumentTitle_1" aria-label="Step 44 | a | RE: Applying Extended-Time Accommodations to Assignment ... | MainCopy_ctl11_DocumentsList_DocumentTitle_1">44</div>
+<div class="box" style="left: 956.390625px; top: 236.53125px; width: 93.453125px; height: 15.0px;"></div>
+<div class="marker" style="left: 1003.1171875px; top: 244.03125px;" title="Step 45 | a | JAMIE AXELROD | MainCopy_ctl11_DocumentsList_Contributor_1" aria-label="Step 45 | a | JAMIE AXELROD | MainCopy_ctl11_DocumentsList_Contributor_1">45</div>
+<div class="marker" style="left: 881.0px; top: 308.671875px;" title="Step 46 | a | MainCopy_ctl11_DocumentsList_ProfileLink_2" aria-label="Step 46 | a | MainCopy_ctl11_DocumentsList_ProfileLink_2">46</div>
+<div class="box" style="left: 881.0px; top: 308.671875px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 901.0px; top: 328.671875px;" title="Step 47 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_2_lnkDisplay_2" aria-label="Step 47 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_2_lnkDisplay_2">47</div>
+<div class="box" style="left: 936.0px; top: 308.671875px; width: 227.40625px; height: 79.78125px;"></div>
+<div class="marker" style="left: 1049.703125px; top: 348.5625px;" title="Step 48 | a | RE: Professor already incorporates extended time? | MainCopy_ctl11_DocumentsList_DocumentTitle_2" aria-label="Step 48 | a | RE: Professor already incorporates extended time? | MainCopy_ctl11_DocumentsList_DocumentTitle_2">48</div>
+<div class="box" style="left: 956.390625px; top: 390.671875px; width: 93.453125px; height: 15.0px;"></div>
+<div class="marker" style="left: 1003.1171875px; top: 398.171875px;" title="Step 49 | a | JAMIE AXELROD | MainCopy_ctl11_DocumentsList_Contributor_2" aria-label="Step 49 | a | JAMIE AXELROD | MainCopy_ctl11_DocumentsList_Contributor_2">49</div>
+<div class="marker" style="left: 881.0px; top: 462.8125px;" title="Step 50 | a | MainCopy_ctl11_DocumentsList_ProfileLink_3" aria-label="Step 50 | a | MainCopy_ctl11_DocumentsList_ProfileLink_3">50</div>
+<div class="box" style="left: 881.0px; top: 462.8125px; width: 40.0px; height: 40.0px;"></div>
+<div class="marker" style="left: 901.0px; top: 482.8125px;" title="Step 51 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_3_lnkDisplay_3" aria-label="Step 51 | a | Profile Picture | MainCopy_ctl11_DocumentsList_ProfileImage_3_lnkDisplay_3">51</div>
+<div class="box" style="left: 936.0px; top: 462.8125px; width: 227.40625px; height: 79.78125px;"></div>
+<div class="marker" style="left: 1049.703125px; top: 502.703125px;" title="Step 52 | a | RE: Professor already incorporates extended time? | MainCopy_ctl11_DocumentsList_DocumentTitle_3" aria-label="Step 52 | a | RE: Professor already incorporates extended time? | MainCopy_ctl11_DocumentsList_DocumentTitle_3">52</div>
+<div class="box" style="left: 956.390625px; top: 544.8125px; width: 80.59375px; height: 15.0px;"></div>
+<div class="marker" style="left: 996.6875px; top: 552.3125px;" title="Step 53 | a | BRENT BOYER | MainCopy_ctl11_DocumentsList_Contributor_3" aria-label="Step 53 | a | BRENT BOYER | MainCopy_ctl11_DocumentsList_Contributor_3">53</div>
+<div class="box" style="left: 855.0px; top: 616.953125px; width: 370.0px; height: 70.5625px;"></div>
+<div class="marker" style="left: 1040.0px; top: 652.234375px;" title="Step 54 | a | See More Resources | MainCopy_ctl11_MoreLink" aria-label="Step 54 | a | See More Resources | MainCopy_ctl11_MoreLink">54</div>
+<div class="box" style="left: 655.0px; top: 844.25px; width: 335.578125px; height: 101.0px;"></div>
+<div class="marker" style="left: 822.7890625px; top: 894.75px;" title="Step 55 | a | Join Today" aria-label="Step 55 | a | Join Today">55</div>
+<div class="box" style="left: 55.0px; top: 1428.25px; width: 270.0px; height: 187.0px;"></div>
+<div class="marker" style="left: 190.0px; top: 1521.75px;" title="Step 56 | a | National Center for College Students with Disabilities" aria-label="Step 56 | a | National Center for College Students with Disabilities">56</div>
+<div class="box" style="left: 355.0px; top: 1426.25px; width: 270.0px; height: 147.984375px;"></div>
+<div class="marker" style="left: 490.0px; top: 1500.2421875px;" title="Step 57 | a | Think College National Coordinating Center" aria-label="Step 57 | a | Think College National Coordinating Center">57</div>
+<div class="box" style="left: 655.0px; top: 1416.25px; width: 270.0px; height: 145.546875px;"></div>
+<div class="marker" style="left: 790.0px; top: 1489.0234375px;" title="Step 58 | a" aria-label="Step 58 | a">58</div>
+<div class="box" style="left: 955.0px; top: 1416.25px; width: 270.0px; height: 200.0px;"></div>
+<div class="marker" style="left: 1090.0px; top: 1516.25px;" title="Step 59 | a | Historically Black Colleges and Universities Disability Consortium" aria-label="Step 59 | a | Historically Black Colleges and Universities Disability Consortium">59</div>
+<div class="box" style="left: 55.0px; top: 1624.25px; width: 370.0px; height: 142.296875px;"></div>
+<div class="marker" style="left: 240.0px; top: 1695.3984375px;" title="Step 60 | a | Disability Rights, Education, Activism, and Mentoring" aria-label="Step 60 | a | Disability Rights, Education, Activism, and Mentoring">60</div>
+</div>
+</main>
+</body>
+</html>

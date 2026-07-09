@@ -1,0 +1,7 @@
+# Dependencies for the local/demo Flask interface.
+Flask
+gunicorn
+
+# Optional A11yway modes used by the demo when enabled.
+-r requirements-browser.txt
+-r requirements-ai.txt
