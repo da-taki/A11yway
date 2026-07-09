@@ -20,6 +20,7 @@ This roadmap is practical, not a promise. Priorities will shift based on feedbac
 - CI mode with meaningful exit codes, SARIF 2.1.0 and JUnit XML export, and an example GitHub Actions task regression workflow
 - Real zoom reflow checks at 200% and 400% (horizontal scroll, clipped content, overlapping controls) replacing the narrow-viewport approximation
 - Static Indic-language checks (missing or mismatched lang markup and mixed-script text) for TTS-critical Indian-language content
+- Optional video recording of task executions saved with the visual proof assets and linked from HTML reports
 
 ## v0.4 - Workflow Packs
 

@@ -254,6 +254,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Optional directory for browser screenshot and focus overlay artifacts. Requires --browser.",
     )
     parser.add_argument(
+        "--video",
+        dest="video",
+        action="store_true",
+        help=(
+            "Record the task execution browser session as a video saved "
+            "alongside the visual proof assets. Requires --browser, "
+            "--execute-task, and --visual-proof."
+        ),
+    )
+    parser.add_argument(
         "--html-reports",
         dest="html_reports",
         action="store_true",
@@ -680,6 +690,15 @@ def main(argv: list[str] | None = None) -> int:
         print("The axe-core scan requires browser mode. Add --browser to the command.")
         return setup_exit
 
+    if parsed_args.video and not (
+        parsed_args.browser and parsed_args.execute_task and parsed_args.visual_proof_dir
+    ):
+        print(
+            "Video proof requires --browser, --execute-task, and --visual-proof "
+            "together."
+        )
+        return setup_exit
+
     if parsed_args.browser and not is_playwright_available():
         print(PLAYWRIGHT_SETUP_MESSAGE)
         return setup_exit
@@ -802,8 +821,16 @@ def main(argv: list[str] | None = None) -> int:
             execute_task_obj,
             max_tabs=parsed_args.max_tabs,
             wait_ms=parsed_args.wait_ms,
+            video_dir=parsed_args.visual_proof_dir if parsed_args.video else None,
         )
         issues = issues + list(task_execution["issues"])
+        video = task_execution.get("video") or {}
+        if video.get("enabled"):
+            print()
+            print(f"Task execution video saved: {video['path']}")
+        elif video.get("error"):
+            print()
+            print(f"Task execution video unavailable: {video['error']}")
 
     print_summary(source, issues)
 

@@ -3,6 +3,23 @@
 A11yway is a prototype. Versions below are development milestones, not
 production releases.
 
+## Unreleased - Video proof
+
+- Added `--video` (off by default): when `--visual-proof` and
+  `--execute-task` run together, the browser session is also recorded
+  with Playwright's video recording and saved as `task_execution.webm`
+  alongside the visual proof assets.
+- The HTML report links the video with a caption stating what run it
+  shows; JSON and Markdown reports carry the path and caption too, and a
+  failed recording is reported honestly instead of hidden.
+- Recording is viewport-sized (1280x720) to keep files small, never
+  breaks the task run, and degrades with setup instructions when
+  Playwright is missing.
+- Added `tests/test_video_proof.py` with real-browser integration tests
+  for the recording and the HTML link.
+- Documented that the video shows one Chromium run and is an evidence
+  aid for human reviewers.
+
 ## Unreleased - Indic-language checks
 
 - Added a static rule pack (standard library only, no browser) for
