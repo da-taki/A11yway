@@ -1,0 +1,39 @@
+{
+  "enabled": true,
+  "mode": "suggest_only",
+  "model": "llama-3.3-70b-versatile",
+  "status": "ok",
+  "summary": "Potential accessibility barriers were identified on the CAST website.",
+  "ai_suggested_observations": [
+    {
+      "observation": "Some images may lack alternative text, which could hinder users who rely on screen readers or have visual impairments.",
+      "why_it_may_matter": "Users who rely on assistive technologies may not be able to understand the content of images without alternative text.",
+      "related_deterministic_evidence": "Multiple instances of images with empty or missing alt attributes were detected.",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "A form control may be missing an accessible label, potentially causing issues for users who rely on screen readers or have visual impairments.",
+      "why_it_may_matter": "Users who rely on assistive technologies may not be able to understand the purpose of the form control without an accessible label.",
+      "related_deterministic_evidence": "A textarea element was detected with no accessible label.",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some text elements may have low contrast with their backgrounds, which could cause readability issues for users with visual impairments.",
+      "why_it_may_matter": "Users with visual impairments may have difficulty reading text with low contrast, potentially leading to frustration or abandonment of the website.",
+      "related_deterministic_evidence": "Multiple instances of text elements with low contrast were detected using conservative heuristics.",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    }
+  ],
+  "outreach_notes": [
+    "We suggest reviewing the website's accessibility to ensure that all users can navigate and understand the content effectively."
+  ],
+  "limitations": [
+    "AI Scout findings are suggestions and need human review.",
+    "AI Scout output is not a confirmed accessibility finding.",
+    "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+    "AI Scout output is not a needs human review accessibility finding."
+  ]
+}

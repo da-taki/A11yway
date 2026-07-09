@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: a11yway-web-demo
+    env: docker
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: A11YWAY_AI_SCOUT_ENABLED
+        value: "true"
+      - key: A11YWAY_REQUIRE_PERMISSION_NOTICE
+        value: "true"
+      - key: A11YWAY_AI_SCOUT_MODE
+        value: suggest_only
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: GROQ_API_KEY
+        sync: false
+      - key: A11YWAY_WEB_BROWSER_ENABLED
+        value: "true"

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "level_access_contact",
+    "slug": "level_access_contact",
+    "name": "Level Access",
+    "source": "https://www.levelaccess.com/contact/",
+    "website": "https://www.levelaccess.com/",
+    "verified_public_email": "info@levelaccess.com",
+    "email_source_url": "https://www.levelaccess.com/contact/",
+    "email_status": "confirmed_public_email",
+    "workflow": "Review public accessibility/resources/contact workflow. Stop before submitting any form.",
+    "workflow_pack": "public_resources / ai_products / accessibility_services",
+    "tone": "expert feedback request",
+    "notes": "Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  },
+  {
+    "id": "fable_contact",
+    "slug": "fable_contact",
+    "name": "Fable",
+    "source": "https://makeitfable.com/contact-fable/",
+    "website": "https://makeitfable.com/",
+    "verified_public_email": "info@makeitfable.com",
+    "email_source_url": "https://makeitfable.com/contact-fable/",
+    "email_status": "confirmed_public_email",
+    "workflow": "Review public accessibility testing/community/contact workflow. Stop before submitting any form.",
+    "workflow_pack": "public_resources / accessibility_services / ai_products",
+    "tone": "expert feedback request",
+    "notes": "Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  },
+  {
+    "id": "abilitynet_contact",
+    "slug": "abilitynet_contact",
+    "name": "AbilityNet",
+    "source": "https://abilitynet.org.uk/how-to-contact-us",
+    "website": "https://abilitynet.org.uk/",
+    "verified_public_email": "enquiries@abilitynet.org.uk",
+    "email_source_url": "https://abilitynet.org.uk/how-to-contact-us",
+    "email_status": "confirmed_public_email",
+    "workflow": "Review public accessibility services/contact workflow. Stop before submitting any form.",
+    "workflow_pack": "public_resources / accessibility_services / ngo_services",
+    "tone": "expert feedback request",
+    "notes": "Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  },
+  {
+    "id": "digital_accessibility_centre_home",
+    "slug": "digital_accessibility_centre_home",
+    "name": "Digital Accessibility Centre",
+    "source": "https://digitalaccessibilitycentre.org/",
+    "website": "https://digitalaccessibilitycentre.org/",
+    "verified_public_emails": [
+      "info@digitalaccessibilitycentre.org",
+      "team@daca11y.org"
+    ],
+    "email_source_url": "https://digitalaccessibilitycentre.org/",
+    "email_status": "confirmed_public_email",
+    "workflow": "Review public digital accessibility services/contact workflow. Stop before submitting any form.",
+    "workflow_pack": "public_resources / accessibility_services",
+    "tone": "expert feedback request",
+    "notes": "Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  },
+  {
+    "id": "coursera_contact",
+    "slug": "coursera_contact",
+    "name": "Coursera",
+    "source": "https://www.coursera.org/about/contact",
+    "website": "https://www.coursera.org/",
+    "verified_public_emails": [
+      "press@coursera.org",
+      "privacy@coursera.org"
+    ],
+    "email_source_url": "https://www.coursera.org/about/contact",
+    "email_status": "confirmed_public_email_but_not_ideal_for_accessibility_feedback",
+    "workflow": "Review public learning/help/accessibility workflow. Stop before submitting any form.",
+    "workflow_pack": "education / public_resources",
+    "tone": "careful public education-access note",
+    "notes": "Use this target only if the audit produces strong public-access findings. The public emails are not perfect for accessibility feedback. Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  },
+  {
+    "id": "rnib_home",
+    "slug": "rnib_home",
+    "name": "RNIB",
+    "source": "https://www.rnib.org.uk/",
+    "website": "https://www.rnib.org.uk/",
+    "verified_public_email": "",
+    "email_source_url": "https://www.rnib.org.uk/",
+    "email_status": "needs_manual_visual_confirmation",
+    "workflow": "Review public support/resources/contact workflow. Stop before submitting any form.",
+    "workflow_pack": "public_resources / ngo_services / accessibility_services",
+    "tone": "disability access feedback",
+    "notes": "Official page says there is a helpline email, but it was rendered as protected text. Do not invent the email. Visually confirm the email from the official page before outreach. Public-page workflow only. Do not log in, submit forms, create accounts, send messages, or interact with payment/support-ticket flows."
+  }
+]

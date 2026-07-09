@@ -1,0 +1,489 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "https://abilitynet.org.uk/how-to-contact-us",
+  "summary": {
+    "issues_found": 9,
+    "counts_by_severity": {
+      "medium": 4,
+      "high": 5
+    },
+    "counts_by_issue_type": {
+      "missing_image_alt": 1,
+      "low_contrast_text": 5,
+      "zoom_fixed_width_content": 3
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 645,
+        "snippet": "<img id=\"batBeacon751484973697\" width=\"0\" height=\"0\" alt=\"\" src=\"https://bat.bing.com/action/0?ti=343198634&amp;Ver=2&amp;mid=52112492-39fe-4da8-8e56-f381523b9279&amp;bo=1&amp;sid=831cf7f07b2e11f1b...",
+        "reason": "Image is missing useful alt text.",
+        "id": "batBeacon751484973697",
+        "src": "https://bat.bing.com/action/0?ti=343198634&Ver=2&mid=52112492-39fe-4da8-8e56-f381523b9279&bo=1&sid=831cf7f07b2e11f1ba030184a5530b66&vid=831d24607b2e11f1a363c300c736dc35&vids=1&msclkid=N&uach=pv%3D19.0.0&pi=0&lg=en-US&sw=1280&sh=720&sc=24&nwd=1&tl=How%20to%20contact%20us%20%7C%20AbilityNet&p=https%3A%2F%2Fabilitynet.org.uk%2Fhow-to-contact-us&r=&lt=1509&evt=pageLoad&sv=2&cdb=AQAQ&rn=346927",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "About",
+        "tag": "li",
+        "selector": "div.content > div.menu-block-wrapper.menu-block-26 > ul.menu > li.first.leaf",
+        "foreground_color": "rgb(44, 42, 41)",
+        "background_color": "rgb(0, 92, 110)",
+        "contrast_ratio": 1.87,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Contact Us",
+        "tag": "li",
+        "selector": "div.content > div.menu-block-wrapper.menu-block-26 > ul.menu > li.leaf.active-trail",
+        "foreground_color": "rgb(44, 42, 41)",
+        "background_color": "rgb(0, 92, 110)",
+        "contrast_ratio": 1.87,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Support Us",
+        "tag": "li",
+        "selector": "div.content > div.menu-block-wrapper.menu-block-26 > ul.menu > li.leaf.menu-mlid-937",
+        "foreground_color": "rgb(44, 42, 41)",
+        "background_color": "rgb(0, 92, 110)",
+        "contrast_ratio": 1.87,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Jobs",
+        "tag": "li",
+        "selector": "div.content > div.menu-block-wrapper.menu-block-26 > ul.menu > li.last.leaf",
+        "foreground_color": "rgb(44, 42, 41)",
+        "background_color": "rgb(0, 92, 110)",
+        "contrast_ratio": 1.87,
+        "font_size": "16px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Submit search",
+        "tag": "input",
+        "selector": "div.top-menu > div.top-search > form > input.button",
+        "foreground_color": "rgb(44, 42, 41)",
+        "background_color": "rgb(0, 92, 110)",
+        "contrast_ratio": 1.87,
+        "font_size": "18px",
+        "font_weight": "400",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "div",
+        "id": "hs-banner-parent",
+        "class": "",
+        "width": 640,
+        "width_style": "640px",
+        "text": "This website stores cookies on your device which collect information about how y",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "div",
+        "id": "hs-eu-cookie-confirmation",
+        "class": "hs-banner-optimization-animation",
+        "width": 576,
+        "width_style": "576px",
+        "text": "This website stores cookies on your device which collect information about how y",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "div",
+        "id": "hs-eu-cookie-confirmation-inner",
+        "class": "",
+        "width": 576,
+        "width_style": "576px",
+        "text": "This website stores cookies on your device which collect information about how y",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+    "Low-vision browser checks are conservative heuristics and require manual review."
+  ],
+  "source": {
+    "input": "https://abilitynet.org.uk/how-to-contact-us",
+    "type": "url",
+    "final_url": "https://abilitynet.org.uk/how-to-contact-us",
+    "status_code": 200,
+    "content_type": "text/html; charset=utf-8"
+  },
+  "analysis_modes": [
+    "static",
+    "browser",
+    "low_vision"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "https://abilitynet.org.uk/how-to-contact-us",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://abilitynet.org.uk/abilitynet-privacy-policy",
+        "src": null,
+        "text": "Privacy Policy",
+        "role": null,
+        "accessible_name_guess": "Privacy Policy",
+        "is_visible": true,
+        "x": 351.1875,
+        "y": 136,
+        "width": 110.703125,
+        "height": 20
+      },
+      {
+        "step": 2,
+        "tag": "button",
+        "id": "hs-eu-cookie-settings-button",
+        "name": null,
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Cookies settings",
+        "role": null,
+        "accessible_name_guess": "Cookies settings",
+        "is_visible": true,
+        "x": 595,
+        "y": 261.5,
+        "width": 198,
+        "height": 59.390625
+      },
+      {
+        "step": 3,
+        "tag": "button",
+        "id": "hs-eu-confirmation-button",
+        "name": null,
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Accept",
+        "role": null,
+        "accessible_name_guess": "Accept",
+        "is_visible": true,
+        "x": 802,
+        "y": 261.5,
+        "width": 198,
+        "height": 59.390625
+      },
+      {
+        "step": 4,
+        "tag": "button",
+        "id": "hs-eu-decline-button",
+        "name": null,
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "Decline",
+        "role": null,
+        "accessible_name_guess": "Decline",
+        "is_visible": true,
+        "x": 1009,
+        "y": 261.5,
+        "width": 198,
+        "height": 59.390625
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  },
+  "visual_proof": {
+    "enabled": true,
+    "screenshot_path": "reports/email_verified_outreach/visual/abilitynet_contact/page.png",
+    "focus_overlay_path": "reports/email_verified_outreach/visual/abilitynet_contact/focus_path.html",
+    "focus_points_count": 4,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "limitations": [
+      "Focus overlay shows observed Tab stops in this browser run.",
+      "It does not represent every assistive technology experience."
+    ]
+  },
+  "low_vision": {
+    "success": true,
+    "error": null,
+    "checks_run": [
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ],
+    "contrast_sample_count": 69,
+    "zoom_reflow": {
+      "viewport_width": 640,
+      "document_scroll_width": 640,
+      "overflow_amount": 0,
+      "wide_elements": [
+        {
+          "tag": "div",
+          "id": "hs-banner-parent",
+          "class_name": "",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": "This website stores cookies on your device which collect information about how y"
+        },
+        {
+          "tag": "div",
+          "id": "hs-eu-cookie-confirmation",
+          "class_name": "hs-banner-optimization-animation",
+          "width": 576,
+          "width_style": "576px",
+          "position": "fixed",
+          "text": "This website stores cookies on your device which collect information about how y"
+        },
+        {
+          "tag": "div",
+          "id": "hs-eu-cookie-confirmation-inner",
+          "class_name": "",
+          "width": 576,
+          "width_style": "576px",
+          "position": "static",
+          "text": "This website stores cookies on your device which collect information about how y"
+        },
+        {
+          "tag": "div",
+          "id": "hs-eu-policy-wording",
+          "class_name": "",
+          "width": 504,
+          "width_style": "504px",
+          "position": "static",
+          "text": "This website stores cookies on your device which collect information about how y"
+        },
+        {
+          "tag": "div",
+          "id": "",
+          "class_name": "",
+          "width": 504,
+          "width_style": "504px",
+          "position": "static",
+          "text": "This website stores cookies on your device which collect information about how y"
+        }
+      ]
+    },
+    "focus_visibility": {
+      "checked_count": 40,
+      "flagged_count": 0
+    },
+    "limitations": [
+      "Low-vision checks use browser-computed styles and conservative heuristics.",
+      "Rendered color contrast checks do not prove full WCAG conformance.",
+      "Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.",
+      "Focus indicator detection may miss custom focus styles."
+    ]
+  },
+  "ai_scout": {
+    "enabled": true,
+    "mode": "suggest_only",
+    "model": "llama-3.3-70b-versatile",
+    "status": "ok",
+    "summary": "Possible accessibility barriers found on the AbilityNet contact page",
+    "ai_suggested_observations": [
+      {
+        "observation": "Some images may not have alternative text, which could make it difficult for users who rely on screen readers to understand the content",
+        "why_it_may_matter": "Users who rely on screen readers may not be able to understand the content of images without alternative text, which could impact their ability to navigate and use the website",
+        "related_deterministic_evidence": "Missing image alt text detected in the browser DOM",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      },
+      {
+        "observation": "Some text may have low contrast with its background, which could make it difficult for users with visual impairments to read",
+        "why_it_may_matter": "Users with visual impairments may have difficulty reading text with low contrast, which could impact their ability to understand and navigate the website",
+        "related_deterministic_evidence": "Low contrast text detected in the low vision check",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      },
+      {
+        "observation": "Some content may not reflow properly when the user zooms in, which could make it difficult for users with visual impairments to read and navigate the website",
+        "why_it_may_matter": "Users with visual impairments may rely on zooming in to read content, and if the content does not reflow properly, it could impact their ability to use the website",
+        "related_deterministic_evidence": "Fixed or wide content detected in the low vision check",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      }
+    ],
+    "outreach_notes": [
+      "We suggest reviewing the AbilityNet contact page for potential accessibility barriers, including missing image alt text, low contrast text, and content that does not reflow properly when zoomed in."
+    ],
+    "limitations": [
+      "AI Scout findings are suggestions and need human review.",
+      "AI Scout output is not a confirmed accessibility finding.",
+      "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+      "AI Scout output is not a needs human review accessibility finding."
+    ]
+  }
+}

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Focus Path Overlay</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; color: #172033; background: #f5f7fb; }
+header { padding: 1rem 1.25rem; background: #ffffff; border-bottom: 1px solid #d8deea; }
+main { padding: 1rem; }
+.frame { position: relative; display: inline-block; background: #ffffff; box-shadow: 0 2px 16px rgba(23, 32, 51, 0.16); }
+.frame img { display: block; max-width: none; }
+.marker { position: absolute; min-width: 1.6rem; height: 1.6rem; padding: 0 0.35rem; border-radius: 999px; border: 3px solid #ffffff; background: #b42318; color: #ffffff; font-weight: 700; font-size: 0.85rem; line-height: 1.6rem; text-align: center; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.45); transform: translate(-50%, -50%); }
+.box { position: absolute; border: 3px solid #b42318; background: rgba(180, 35, 24, 0.08); pointer-events: none; }
+.legend { max-width: 54rem; margin: 0 0 1rem; padding: 0.8rem 1rem; background: #ffffff; border: 1px solid #d8deea; }
+.muted { color: #526071; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Focus Path Overlay</h1>
+<p>Source: https://www.cast.org/</p>
+</header>
+<main>
+<section class="legend" aria-labelledby="legend-title">
+<h2 id="legend-title">Legend</h2>
+<p>Marker numbers show the Tab order observed by A11yway during this browser run.</p>
+<p class="muted">This is a browser observation, not a full screen-reader simulation or accessibility certification.</p>
+<p class="muted">Viewport observed: 1280 x 720 CSS pixels.</p>
+</section>
+<div class="frame">
+<img src="page.png" alt="Full-page screenshot used for focus path overlay">
+<div class="box" style="left: 891.28125px; top: 656.5px; width: 119.796875px; height: 44.0px;"></div>
+<div class="marker" style="left: 951.1796875px; top: 678.5px;" title="Step 1 | button | Customize" aria-label="Step 1 | button | Customize">1</div>
+<div class="box" style="left: 1019.078125px; top: 656.5px; width: 112.65625px; height: 44.0px;"></div>
+<div class="marker" style="left: 1075.40625px; top: 678.5px;" title="Step 2 | button | Reject All" aria-label="Step 2 | button | Reject All">2</div>
+<div class="box" style="left: 1139.734375px; top: 656.5px; width: 115.265625px; height: 44.0px;"></div>
+<div class="marker" style="left: 1197.3671875px; top: 678.5px;" title="Step 3 | button | Accept All" aria-label="Step 3 | button | Accept All">3</div>
+<div class="box" style="left: 10.0px; top: 10.0px; width: 166.21875px; height: 40.0px;"></div>
+<div class="marker" style="left: 93.109375px; top: 30.0px;" title="Step 4 | a | Skip to main content" aria-label="Step 4 | a | Skip to main content">4</div>
+<div class="box" style="left: 86.0px; top: 8.0px; width: 30.0px; height: 28.0px;"></div>
+<div class="marker" style="left: 101.0px; top: 22.0px;" title="Step 5 | button | webReader menu" aria-label="Step 5 | button | webReader menu">5</div>
+<div class="box" style="left: 86.0px; top: 8.0px; width: 149.140625px; height: 28.0px;"></div>
+<div class="marker" style="left: 160.5703125px; top: 22.0px;" title="Step 6 | a | Listen" aria-label="Step 6 | a | Listen">6</div>
+<div class="box" style="left: 755.8125px; top: 13.5px; width: 121.875px; height: 17.0px;"></div>
+<div class="marker" style="left: 816.75px; top: 22.0px;" title="Step 7 | a | UDL Guidelines" aria-label="Step 7 | a | UDL Guidelines">7</div>
+<div class="box" style="left: 899.6875px; top: 13.5px; width: 48.765625px; height: 17.0px;"></div>
+<div class="marker" style="left: 924.0703125px; top: 22.0px;" title="Step 8 | a | AEM" aria-label="Step 8 | a | AEM">8</div>
+<div class="box" style="left: 970.453125px; top: 13.5px; width: 58.90625px; height: 17.0px;"></div>
+<div class="marker" style="left: 999.90625px; top: 22.0px;" title="Step 9 | a | CITES" aria-label="Step 9 | a | CITES">9</div>
+<div class="box" style="left: 1051.359375px; top: 13.5px; width: 48.234375px; height: 17.0px;"></div>
+<div class="marker" style="left: 1075.4765625px; top: 22.0px;" title="Step 10 | a | Donate" aria-label="Step 10 | a | Donate">10</div>
+<div class="box" style="left: 1121.59375px; top: 13.5px; width: 72.40625px; height: 17.0px;"></div>
+<div class="marker" style="left: 1157.796875px; top: 22.0px;" title="Step 11 | a | Contact Us" aria-label="Step 11 | a | Contact Us">11</div>
+<div class="box" style="left: 16.0px; top: 64.359375px; width: 87.890625px; height: 32.0px;"></div>
+<div class="marker" style="left: 59.9453125px; top: 80.359375px;" title="Step 12 | button | Menu | main-menu-toggle" aria-label="Step 12 | button | Menu | main-menu-toggle">12</div>
+<div class="box" style="left: 553.953125px; top: 58.25px; width: 144.0px; height: 44.234375px;"></div>
+<div class="marker" style="left: 625.953125px; top: 80.3671875px;" title="Step 13 | a | CAST logo" aria-label="Step 13 | a | CAST logo">13</div>
+<div class="box" style="left: 1148.0px; top: 64.359375px; width: 32.0px; height: 32.0px;"></div>
+<div class="marker" style="left: 1164.0px; top: 80.359375px;" title="Step 14 | button | Open site search panel | search-overlay-toggle" aria-label="Step 14 | button | Open site search panel | search-overlay-toggle">14</div>
+<div class="box" style="left: 1190.0px; top: 64.359375px; width: 32.0px; height: 32.0px;"></div>
+<div class="marker" style="left: 1206.0px; top: 80.359375px;" title="Step 15 | button | Open language translation panel" aria-label="Step 15 | button | Open language translation panel">15</div>
+<div class="box" style="left: 1232.0px; top: 64.359375px; width: 32.0px; height: 32.0px;"></div>
+<div class="marker" style="left: 1248.0px; top: 80.359375px;" title="Step 16 | a | Link to the CAST store" aria-label="Step 16 | a | Link to the CAST store">16</div>
+<div class="box" style="left: 466.3671875px; top: 656.0px; width: 347.265625px; height: 52.953125px;"></div>
+<div class="marker" style="left: 640.0px; top: 682.4765625px;" title="Step 17 | a | Discover how we innovate for learning" aria-label="Step 17 | a | Discover how we innovate for learning">17</div>
+<div class="box" style="left: 150.0px; top: 1555.59375px; width: 394.03125px; height: 48.0px;"></div>
+<div class="marker" style="left: 347.015625px; top: 1579.59375px;" title="Step 18 | a | the power of Universal Design for Learning (UDL)" aria-label="Step 18 | a | the power of Universal Design for Learning (UDL)">18</div>
+<div class="box" style="left: 150.0px; top: 1629.59375px; width: 287.671875px; height: 52.953125px;"></div>
+<div class="marker" style="left: 293.8359375px; top: 1656.0703125px;" title="Step 19 | a | Discover UDL-Con: Live Online" aria-label="Step 19 | a | Discover UDL-Con: Live Online">19</div>
+<div class="box" style="left: 662.0px; top: 2300.65625px; width: 233.015625px; height: 52.953125px;"></div>
+<div class="marker" style="left: 778.5078125px; top: 2327.1328125px;" title="Step 20 | a | Learn more about UDL" aria-label="Step 20 | a | Learn more about UDL">20</div>
+<div class="box" style="left: 927.015625px; top: 2316.125px; width: 252.609375px; height: 22.0px;"></div>
+<div class="marker" style="left: 1053.3203125px; top: 2327.125px;" title="Step 21 | a | Explore the CAST UDL Guidelines" aria-label="Step 21 | a | Explore the CAST UDL Guidelines">21</div>
+<div class="box" style="left: 86.0px; top: 3240.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 357.0px; top: 3315.546875px;" title="Step 22 | a | PreK-12 Professional Development" aria-label="Step 22 | a | PreK-12 Professional Development">22</div>
+<div class="box" style="left: 652.0px; top: 3238.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 923.0px; top: 3313.546875px;" title="Step 23 | a | Workforce Professional Development" aria-label="Step 23 | a | Workforce Professional Development">23</div>
+<div class="box" style="left: 86.0px; top: 3412.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 357.0px; top: 3487.546875px;" title="Step 24 | a | Publishing" aria-label="Step 24 | a | Publishing">24</div>
+<div class="box" style="left: 652.0px; top: 3372.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 923.0px; top: 3447.546875px;" title="Step 25 | a | Evidence" aria-label="Step 25 | a | Evidence">25</div>
+<div class="box" style="left: 86.0px; top: 3546.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 357.0px; top: 3621.546875px;" title="Step 26 | a | Postsecondary Professional Development" aria-label="Step 26 | a | Postsecondary Professional Development">26</div>
+<div class="box" style="left: 652.0px; top: 3524.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 923.0px; top: 3599.546875px;" title="Step 27 | a | Research" aria-label="Step 27 | a | Research">27</div>
+<div class="box" style="left: 86.0px; top: 3698.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 357.0px; top: 3773.546875px;" title="Step 28 | a | Partnerships" aria-label="Step 28 | a | Partnerships">28</div>
+<div class="box" style="left: 652.0px; top: 3698.546875px; width: 542.0px; height: 150.0px;"></div>
+<div class="marker" style="left: 923.0px; top: 3773.546875px;" title="Step 29 | a | Accessibility" aria-label="Step 29 | a | Accessibility">29</div>
+<div class="box" style="left: 150.0px; top: 4941.953125px; width: 181.21875px; height: 20.0px;"></div>
+<div class="marker" style="left: 240.609375px; top: 4951.953125px;" title="Step 30 | a | Universal Design for Learning" aria-label="Step 30 | a | Universal Design for Learning">30</div>
+<div class="box" style="left: 150.0px; top: 4987.953125px; width: 401.609375px; height: 77.90625px;"></div>
+<div class="marker" style="left: 350.8046875px; top: 5026.90625px;" title="Step 31 | a | Join the UDL and AI Learning Community today" aria-label="Step 31 | a | Join the UDL and AI Learning Community today">31</div>
+<div class="box" style="left: 96.0px; top: 5717.234375px; width: 306.40625px; height: 52.953125px;"></div>
+<div class="marker" style="left: 249.203125px; top: 5743.7109375px;" title="Step 32 | a | Subscribe for updates from CAST" aria-label="Step 32 | a | Subscribe for updates from CAST">32</div>
+<div class="box" style="left: 86.0px; top: 6082.546875px; width: 761.46875px; height: 43.921875px;"></div>
+<div class="marker" style="left: 466.734375px; top: 6104.5078125px;" title="Step 33 | a | CAST logo" aria-label="Step 33 | a | CAST logo">33</div>
+<div class="box" style="left: 86.0px; top: 6182.46875px; width: 150.46875px; height: 52.953125px;"></div>
+<div class="marker" style="left: 161.234375px; top: 6208.9453125px;" title="Step 34 | a | Contact Us" aria-label="Step 34 | a | Contact Us">34</div>
+<div class="box" style="left: 260.46875px; top: 6182.46875px; width: 160.171875px; height: 52.953125px;"></div>
+<div class="marker" style="left: 340.5546875px; top: 6208.9453125px;" title="Step 35 | a | Donate Now" aria-label="Step 35 | a | Donate Now">35</div>
+<div class="box" style="left: 444.640625px; top: 6182.46875px; width: 301.25px; height: 52.953125px;"></div>
+<div class="marker" style="left: 595.265625px; top: 6208.9453125px;" title="Step 36 | a | Learn More about ReadSpeaker" aria-label="Step 36 | a | Learn More about ReadSpeaker">36</div>
+<div class="box" style="left: 903.46875px; top: 6082.546875px; width: 124.640625px; height: 14.0px;"></div>
+<div class="marker" style="left: 965.7890625px; top: 6089.546875px;" title="Step 37 | a | Join our community" aria-label="Step 37 | a | Join our community">37</div>
+<div class="box" style="left: 903.46875px; top: 6118.546875px; width: 172.703125px; height: 14.0px;"></div>
+<div class="marker" style="left: 989.8203125px; top: 6125.546875px;" title="Step 38 | a | Subscribe to our newsletter" aria-label="Step 38 | a | Subscribe to our newsletter">38</div>
+<div class="box" style="left: 903.46875px; top: 6156.546875px; width: 97.78125px; height: 14.0px;"></div>
+<div class="marker" style="left: 952.359375px; top: 6163.546875px;" title="Step 39 | a | UDL Guidelines" aria-label="Step 39 | a | UDL Guidelines">39</div>
+<div class="box" style="left: 903.46875px; top: 6194.546875px; width: 48.3125px; height: 14.0px;"></div>
+<div class="marker" style="left: 927.625px; top: 6201.546875px;" title="Step 40 | a | Careers" aria-label="Step 40 | a | Careers">40</div>
+<div class="box" style="left: 903.46875px; top: 6232.546875px; width: 134.21875px; height: 14.0px;"></div>
+<div class="marker" style="left: 970.578125px; top: 6239.546875px;" title="Step 41 | a | Financial information" aria-label="Step 41 | a | Financial information">41</div>
+<div class="box" style="left: 903.46875px; top: 6268.546875px; width: 97.375px; height: 14.0px;"></div>
+<div class="marker" style="left: 952.15625px; top: 6275.546875px;" title="Step 42 | a | Media inquiries" aria-label="Step 42 | a | Media inquiries">42</div>
+<div class="box" style="left: 1132.171875px; top: 6071.546875px; width: 54.28125px; height: 14.0px;"></div>
+<div class="marker" style="left: 1159.3125px; top: 6078.546875px;" title="Step 43 | a | LinkedIn" aria-label="Step 43 | a | LinkedIn">43</div>
+<div class="box" style="left: 1132.171875px; top: 6109.546875px; width: 50.03125px; height: 14.0px;"></div>
+<div class="marker" style="left: 1157.1875px; top: 6116.546875px;" title="Step 44 | a | Bluesky" aria-label="Step 44 | a | Bluesky">44</div>
+<div class="box" style="left: 1132.171875px; top: 6147.546875px; width: 61.828125px; height: 14.0px;"></div>
+<div class="marker" style="left: 1163.0859375px; top: 6154.546875px;" title="Step 45 | a | X/Twitter" aria-label="Step 45 | a | X/Twitter">45</div>
+<div class="box" style="left: 1132.171875px; top: 6185.546875px; width: 53.5625px; height: 14.0px;"></div>
+<div class="marker" style="left: 1158.953125px; top: 6192.546875px;" title="Step 46 | a | YouTube" aria-label="Step 46 | a | YouTube">46</div>
+<div class="box" style="left: 737.59375px; top: 6338.546875px; width: 115.359375px; height: 14.0px;"></div>
+<div class="marker" style="left: 795.2734375px; top: 6345.546875px;" title="Step 47 | a | Accessibility Policy" aria-label="Step 47 | a | Accessibility Policy">47</div>
+<div class="box" style="left: 876.953125px; top: 6336.546875px; width: 84.453125px; height: 14.0px;"></div>
+<div class="marker" style="left: 919.1796875px; top: 6343.546875px;" title="Step 48 | a | Privacy Policy" aria-label="Step 48 | a | Privacy Policy">48</div>
+<div class="box" style="left: 985.40625px; top: 6329.546875px; width: 79.640625px; height: 14.0px;"></div>
+<div class="marker" style="left: 1025.2265625px; top: 6336.546875px;" title="Step 49 | a | Terms of Use" aria-label="Step 49 | a | Terms of Use">49</div>
+<div class="box" style="left: 1089.046875px; top: 6317.546875px; width: 104.953125px; height: 14.0px;"></div>
+<div class="marker" style="left: 1141.5234375px; top: 6324.546875px;" title="Step 50 | a | Copyright Notice" aria-label="Step 50 | a | Copyright Notice">50</div>
+</div>
+</main>
+</body>
+</html>

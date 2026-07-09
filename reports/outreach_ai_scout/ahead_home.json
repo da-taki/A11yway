@@ -1,0 +1,2478 @@
+{
+  "tool": "A11yway",
+  "version": "prototype",
+  "source_file": "https://www.ahead.org/",
+  "summary": {
+    "issues_found": 54,
+    "counts_by_severity": {
+      "high": 40,
+      "low": 1,
+      "medium": 13
+    },
+    "counts_by_issue_type": {
+      "missing_link_name": 17,
+      "missing_image_alt": 1,
+      "multiple_h1": 1,
+      "skipped_heading_level": 4,
+      "browser_focused_control_missing_name": 9,
+      "browser_focus_on_hidden_element": 7,
+      "low_contrast_text": 6,
+      "zoom_fixed_width_content": 3,
+      "focus_indicator_missing": 6
+    },
+    "agents_used": [
+      "Keyboard-only student"
+    ],
+    "checks_run": [
+      "html_form_labels",
+      "interactive_names",
+      "image_alt_text",
+      "heading_structure",
+      "page_metadata",
+      "media_accessibility",
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot",
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ]
+  },
+  "issues": [
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 473,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_0\" href=\"https://www.ahead.org/people/ahead\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_0",
+        "href": "https://www.ahead.org/people/ahead"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 577,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_1\" href=\"https://www.ahead.org/people/ahead\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_1",
+        "href": "https://www.ahead.org/people/ahead"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 679,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_2\" href=\"https://www.ahead.org/people/ahead\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_2",
+        "href": "https://www.ahead.org/people/ahead"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 985,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_0\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_0",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1105,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_1\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_1",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1225,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_2\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_2",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1345,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_3\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_3",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1499,
+        "snippet": "<a href=\"http://accessinghigherground.org/\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "http://accessinghigherground.org/"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_image_alt",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Image is missing useful alt text",
+      "evidence": {
+        "tag": "img",
+        "line": 1499,
+        "snippet": "<img src=\"https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png\" alt=\"\" caption=\"false\" class=\"img-responsive\">",
+        "reason": "Image is missing useful alt text.",
+        "src": "https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png"
+      },
+      "suggested_fix": "Add alt text that describes the image purpose, or mark decorative images as presentation.",
+      "rule": {
+        "title": "Image missing useful alt text",
+        "category": "Images",
+        "why_it_matters": "Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.",
+        "manual_review_notes": "Confirm whether the image is informative or decorative; only a human can judge if existing alt text is actually useful.",
+        "static_check_limitations": "Static checks cannot judge alt text quality, only whether it exists."
+      }
+    },
+    {
+      "issue_type": "multiple_h1",
+      "severity": "low",
+      "agent_name": "Page Analyzer",
+      "message": "Page has multiple h1 headings",
+      "evidence": {
+        "tag": "h1",
+        "line": null,
+        "reason": "Document has multiple h1 headings.",
+        "count": 2
+      },
+      "suggested_fix": "Use one main h1 for the page purpose, then organize sections with h2 and lower headings.",
+      "rule": {
+        "title": "Page has multiple h1 headings",
+        "category": "Headings & Structure",
+        "why_it_matters": "Several h1 headings make it harder for students to identify the single main topic of the page.",
+        "manual_review_notes": "Some layouts intentionally use sectioned h1 elements; judge readability.",
+        "static_check_limitations": "Static HTML cannot evaluate how the headings are presented visually."
+      }
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h5",
+        "line": 1010,
+        "snippet": "<h5>",
+        "reason": "Heading level jumps from h3 to h5.",
+        "previous_level": 3,
+        "level": 5
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h5",
+        "line": 1130,
+        "snippet": "<h5>",
+        "reason": "Heading level jumps from h3 to h5.",
+        "previous_level": 3,
+        "level": 5
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h5",
+        "line": 1250,
+        "snippet": "<h5>",
+        "reason": "Heading level jumps from h3 to h5.",
+        "previous_level": 3,
+        "level": 5
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
+    },
+    {
+      "issue_type": "skipped_heading_level",
+      "severity": "medium",
+      "agent_name": "Page Analyzer",
+      "message": "Heading level is skipped",
+      "evidence": {
+        "tag": "h5",
+        "line": 1370,
+        "snippet": "<h5>",
+        "reason": "Heading level jumps from h3 to h5.",
+        "previous_level": 3,
+        "level": 5
+      },
+      "suggested_fix": "Do not skip heading levels; move from h1 to h2 before h3.",
+      "rule": {
+        "title": "Heading level is skipped",
+        "category": "Headings & Structure",
+        "why_it_matters": "Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.",
+        "manual_review_notes": "Check whether the heading order still makes sense when read as an outline.",
+        "static_check_limitations": "The check follows document order only; visual layout may differ."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 21,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "href": "https://www.ahead.org/events-programming/conferences/2026-virtual",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 22,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_0",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 22,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_0",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 26,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_1",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 26,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_1",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 30,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_2",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 30,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_2",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 38,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_0",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 38,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_0",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 42,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_1",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 42,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_1",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 46,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_2",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 46,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_2",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 50,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_3",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "browser_focus_on_hidden_element",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Keyboard focus landed on a hidden element",
+      "evidence": {
+        "step": 50,
+        "reason": "This element received keyboard focus but does not appear to be visible on the page.",
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_3",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Remove hidden elements from the Tab order with tabindex=\"-1\" or make them visible when focused.",
+      "rule": {
+        "title": "Keyboard focus landed on a hidden element",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "When focus moves to an invisible element, keyboard users lose track of where they are on the page.",
+        "manual_review_notes": "Check whether the element becomes visible on focus (like a skip link); that pattern is fine.",
+        "browser_check_limitations": "Visibility is estimated from element size and CSS and may not match what users actually see."
+      }
+    },
+    {
+      "issue_type": "browser_focused_control_missing_name",
+      "severity": "high",
+      "agent_name": "Keyboard Navigator",
+      "message": "Focused control has no accessible name",
+      "evidence": {
+        "step": 58,
+        "reason": "A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.",
+        "tag": "a",
+        "href": "http://accessinghigherground.org/",
+        "detected_in": "browser_interaction"
+      },
+      "suggested_fix": "Add a visible label, text content, or aria-label so students know what the control does.",
+      "rule": {
+        "title": "Focused control has no accessible name",
+        "category": "Keyboard Interaction",
+        "why_it_matters": "A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.",
+        "manual_review_notes": "The accessible name is estimated; confirm with browser dev tools or a screen reader what is actually announced.",
+        "browser_check_limitations": "Accessible names are estimated from labels, text, and common attributes, not from a full accessibility tree computation."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 487,
+        "snippet": "<a href=\"https://www.ahead.org/events-programming/conferences/2026-virtual\" tabindex=\"0\" data-feathr-click-track=\"true\" data-feathr-link-aids=\"5c8293d30d21f34805e168ef\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "https://www.ahead.org/events-programming/conferences/2026-virtual",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 511,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_0\" href=\"https://www.ahead.org/people/ahead\" data-feathr-click-track=\"true\" data-feathr-link-aids=\"5c8293d30d21f34805e168ef\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_0",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 615,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_1\" href=\"https://www.ahead.org/people/ahead\" data-feathr-click-track=\"true\" data-feathr-link-aids=\"5c8293d30d21f34805e168ef\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_1",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 717,
+        "snippet": "<a id=\"MainCopy_ctl05_BlogList_ProfileLink_2\" href=\"https://www.ahead.org/people/ahead\" data-feathr-click-track=\"true\" data-feathr-link-aids=\"5c8293d30d21f34805e168ef\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_2",
+        "href": "https://www.ahead.org/people/ahead",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1023,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_0\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c\" data-feathr-click-track=\"true\" data-f...",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_0",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1143,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_1\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab\" data-feathr-click-track=\"true\" data-f...",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_1",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1263,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_2\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab\" data-feathr-click-track=\"true\" data-f...",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_2",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1383,
+        "snippet": "<a id=\"MainCopy_ctl11_DocumentsList_ProfileLink_3\" href=\"https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4\" data-feathr-click-track=\"true\" data-f...",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_3",
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "missing_link_name",
+      "severity": "high",
+      "agent_name": "Page Analyzer",
+      "message": "Link is missing an accessible name",
+      "evidence": {
+        "tag": "a",
+        "line": 1537,
+        "snippet": "<a href=\"http://accessinghigherground.org/\" data-feathr-click-track=\"true\" data-feathr-link-aids=\"5c8293d30d21f34805e168ef\">",
+        "reason": "Link has no usable text, aria-label, title, or image alt text.",
+        "href": "http://accessinghigherground.org/",
+        "detected_in": "browser_dom"
+      },
+      "suggested_fix": "Add descriptive link text that explains the link destination or action.",
+      "rule": {
+        "title": "Link missing accessible name",
+        "category": "Interactive Elements",
+        "why_it_matters": "Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.",
+        "manual_review_notes": "Links wrapping only images need useful alt text on the image.",
+        "static_check_limitations": "Static HTML cannot detect link names injected by JavaScript."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "About",
+        "tag": "a",
+        "selector": "a#megaanchor2",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Membership",
+        "tag": "a",
+        "selector": "a#megaanchor3",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Programming",
+        "tag": "a",
+        "selector": "a#megaanchor4",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Professional Resources",
+        "tag": "a",
+        "selector": "a#megaanchor5",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Research",
+        "tag": "a",
+        "selector": "a#megaanchor6",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "low_contrast_text",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Rendered text may have low contrast",
+      "evidence": {
+        "text": "Communities",
+        "tag": "a",
+        "selector": "a#megaanchor7",
+        "foreground_color": "rgb(119, 119, 119)",
+        "background_color": "rgb(255, 255, 255)",
+        "contrast_ratio": 4.48,
+        "font_size": "18px",
+        "font_weight": "700",
+        "reason": "Computed foreground/background contrast is below the conservative 4.5:1 review threshold.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Increase foreground/background contrast and confirm the final design with manual review.",
+      "rule": {
+        "title": "Rendered text may have low contrast",
+        "category": "Low Vision",
+        "why_it_matters": "Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.",
+        "manual_review_notes": "Confirm the sampled colors match what users actually see, especially over gradients, images, and layered components.",
+        "browser_check_limitations": "The check samples browser-computed colors and does not prove full WCAG color contrast compliance."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "div",
+        "id": "MPOuterMost",
+        "class": "container full",
+        "width": 640,
+        "width_style": "640px",
+        "text": "Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "form",
+        "id": "MasterPageForm",
+        "class": "form",
+        "width": 640,
+        "width_style": "640px",
+        "text": "Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "zoom_fixed_width_content",
+      "severity": "medium",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Fixed or wide content may prevent reflow",
+      "evidence": {
+        "tag": "div",
+        "id": "",
+        "class": "aspNetHidden",
+        "width": 640,
+        "width_style": "640px",
+        "text": "",
+        "viewport_width": 640,
+        "reason": "A rendered element is wider than the narrow viewport or uses a large fixed pixel width.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Replace fixed-width layout with responsive sizing such as max-width: 100%.",
+      "rule": {
+        "title": "Fixed or wide content may prevent reflow",
+        "category": "Low Vision",
+        "why_it_matters": "Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.",
+        "manual_review_notes": "Confirm whether the wide element is essential and whether all content remains reachable without two-dimensional scrolling.",
+        "browser_check_limitations": "The check flags obvious wide rendered elements and fixed pixel widths; it may miss complex layout problems."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 13,
+        "tag": "a",
+        "id": "megaanchor2",
+        "name": null,
+        "text": "About",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 14,
+        "tag": "a",
+        "id": "megaanchor3",
+        "name": null,
+        "text": "Membership",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 15,
+        "tag": "a",
+        "id": "megaanchor4",
+        "name": null,
+        "text": "Programming",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 16,
+        "tag": "a",
+        "id": "megaanchor5",
+        "name": null,
+        "text": "Professional Resources",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 17,
+        "tag": "a",
+        "id": "megaanchor6",
+        "name": null,
+        "text": "Research",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    },
+    {
+      "issue_type": "focus_indicator_missing",
+      "severity": "high",
+      "agent_name": "Low Vision Browser Audit",
+      "message": "Focused element may not show a visible focus indicator",
+      "evidence": {
+        "step": 18,
+        "tag": "a",
+        "id": "megaanchor7",
+        "name": null,
+        "text": "Communities",
+        "outline_style": "none",
+        "outline_width": "3px",
+        "outline_color": "rgb(119, 119, 119)",
+        "box_shadow": "none",
+        "border": "0px none rgb(119, 119, 119)",
+        "reason": "The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.",
+        "detected_in": "low_vision"
+      },
+      "suggested_fix": "Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.",
+      "rule": {
+        "title": "Focused element may not show a visible focus indicator",
+        "category": "Low Vision",
+        "why_it_matters": "Keyboard users with low vision need a visible indicator to know which control currently has focus.",
+        "manual_review_notes": "Manually tab through the page; some custom focus styles may be visible but not detected by this heuristic.",
+        "browser_check_limitations": "Focus indicator detection checks computed outline, border, and shadow heuristically and can miss custom visual treatments."
+      }
+    }
+  ],
+  "limitations": [
+    "This prototype runs static HTML checks plus a basic keyboard interaction audit.",
+    "It does not replace a full human accessibility audit.",
+    "Browser mode does not simulate a full screen reader, and accessible names are estimated.",
+    "Low-vision browser checks are conservative heuristics and require manual review."
+  ],
+  "source": {
+    "input": "https://www.ahead.org/",
+    "type": "url",
+    "final_url": "https://www.ahead.org/home",
+    "status_code": 200,
+    "content_type": "text/html; charset=utf-8"
+  },
+  "analysis_modes": [
+    "static",
+    "browser",
+    "low_vision"
+  ],
+  "browser": {
+    "success": true,
+    "error": null,
+    "final_url": "https://www.ahead.org/home",
+    "checks_run": [
+      "keyboard_focus_traversal",
+      "browser_dom_snapshot"
+    ],
+    "focus_trace": [
+      {
+        "step": 1,
+        "tag": "a",
+        "id": "skiplink",
+        "name": null,
+        "type": null,
+        "href": "#MPContentArea",
+        "src": null,
+        "text": "Skip to main content (Press Enter).",
+        "role": null,
+        "accessible_name_guess": "Skip to main content (Press Enter).",
+        "is_visible": true,
+        "x": -6400,
+        "y": 0,
+        "width": 1267.1875,
+        "height": 34.84375
+      },
+      {
+        "step": 2,
+        "tag": "a",
+        "id": "Welcome_LoginLink",
+        "name": null,
+        "type": null,
+        "href": "https://ahead.memberclicks.net/oauth/v1/authorize?response_type=code&client_id=6CJ3uLhaAF7KdKse1eTi&scope=read&redirect_uri=http%3A%2F%2Fwww.ahead.org%2F&state=https%3a%2f%2fwww.ahead.org%2fhome",
+        "src": null,
+        "text": "SIGN IN",
+        "role": null,
+        "accessible_name_guess": "SIGN IN",
+        "is_visible": true,
+        "x": 1158.828125,
+        "y": 5,
+        "width": 76.171875,
+        "height": 34
+      },
+      {
+        "step": 3,
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "type": "reset",
+        "href": null,
+        "src": null,
+        "text": "Search Button",
+        "role": null,
+        "accessible_name_guess": "Search Button",
+        "is_visible": true,
+        "x": 1107.828125,
+        "y": 7,
+        "width": 45.5,
+        "height": 44
+      },
+      {
+        "step": 4,
+        "tag": "a",
+        "id": "auxskiplink",
+        "name": null,
+        "type": null,
+        "href": "#Logo",
+        "src": null,
+        "text": "Skip auxiliary navigation (Press Enter).",
+        "role": null,
+        "accessible_name_guess": "Skip auxiliary navigation (Press Enter).",
+        "is_visible": true,
+        "x": -2486.40625,
+        "y": 5,
+        "width": 616.5,
+        "height": 34.84375
+      },
+      {
+        "step": 5,
+        "tag": "ul",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": null,
+        "src": null,
+        "text": "ABOUT US CONTACT US",
+        "role": "menubar",
+        "accessible_name_guess": "ABOUT US CONTACT US",
+        "is_visible": true,
+        "x": 898.265625,
+        "y": 15,
+        "width": 207.5625,
+        "height": 28.84375
+      },
+      {
+        "step": 6,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.linkedin.com/company/association-on-higher-education-and-disability/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "AHEAD Linkedin page",
+        "is_visible": true,
+        "x": 642.265625,
+        "y": 25,
+        "width": 64,
+        "height": 19
+      },
+      {
+        "step": 7,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.facebook.com/AHEAD.org/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "AHEAD Facebook page",
+        "is_visible": true,
+        "x": 706.265625,
+        "y": 25,
+        "width": 64,
+        "height": 19
+      },
+      {
+        "step": 8,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.youtube.com/channel/UCCpOb89XX_o-pBKS5sgna8A",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "AHEAD Youtube channel",
+        "is_visible": true,
+        "x": 770.265625,
+        "y": 25,
+        "width": 64,
+        "height": 19
+      },
+      {
+        "step": 9,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.instagram.com/aheadorg_1977/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "AHEAD Instagram page",
+        "is_visible": true,
+        "x": 834.265625,
+        "y": 25,
+        "width": 64,
+        "height": 19
+      },
+      {
+        "step": 10,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/home",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "AHEAD - Association on Higher Education And Disability logo. This will take you to the homepage",
+        "is_visible": true,
+        "x": 45,
+        "y": 35.546875,
+        "width": 300,
+        "height": 19
+      },
+      {
+        "step": 11,
+        "tag": "a",
+        "id": "navskiplink",
+        "name": null,
+        "type": null,
+        "href": "#MPContentArea",
+        "src": null,
+        "text": "Skip main navigation (Press Enter).",
+        "role": null,
+        "accessible_name_guess": "Skip main navigation (Press Enter).",
+        "is_visible": true,
+        "x": -6565,
+        "y": 100,
+        "width": 1296.890625,
+        "height": 34.84375
+      },
+      {
+        "step": 12,
+        "tag": "a",
+        "id": "megaanchor1",
+        "name": null,
+        "type": null,
+        "href": "/home",
+        "src": null,
+        "text": "Home",
+        "role": null,
+        "accessible_name_guess": "Home",
+        "is_visible": true,
+        "x": 40,
+        "y": 100,
+        "width": 78.625,
+        "height": 50
+      },
+      {
+        "step": 13,
+        "tag": "a",
+        "id": "megaanchor2",
+        "name": null,
+        "type": null,
+        "href": "/about-ahead",
+        "src": null,
+        "text": "About",
+        "role": null,
+        "accessible_name_guess": "About",
+        "is_visible": true,
+        "x": 118.625,
+        "y": 100,
+        "width": 93.953125,
+        "height": 50
+      },
+      {
+        "step": 14,
+        "tag": "a",
+        "id": "megaanchor3",
+        "name": null,
+        "type": null,
+        "href": "/membership",
+        "src": null,
+        "text": "Membership",
+        "role": null,
+        "accessible_name_guess": "Membership",
+        "is_visible": true,
+        "x": 212.578125,
+        "y": 100,
+        "width": 145.390625,
+        "height": 50
+      },
+      {
+        "step": 15,
+        "tag": "a",
+        "id": "megaanchor4",
+        "name": null,
+        "type": null,
+        "href": "/events-programming",
+        "src": null,
+        "text": "Programming",
+        "role": null,
+        "accessible_name_guess": "Programming",
+        "is_visible": true,
+        "x": 357.96875,
+        "y": 100,
+        "width": 152.890625,
+        "height": 50
+      },
+      {
+        "step": 16,
+        "tag": "a",
+        "id": "megaanchor5",
+        "name": null,
+        "type": null,
+        "href": "/professional-resources",
+        "src": null,
+        "text": "Professional Resources",
+        "role": null,
+        "accessible_name_guess": "Professional Resources",
+        "is_visible": true,
+        "x": 510.859375,
+        "y": 100,
+        "width": 230.265625,
+        "height": 50
+      },
+      {
+        "step": 17,
+        "tag": "a",
+        "id": "megaanchor6",
+        "name": null,
+        "type": null,
+        "href": "/research",
+        "src": null,
+        "text": "Research",
+        "role": null,
+        "accessible_name_guess": "Research",
+        "is_visible": true,
+        "x": 741.125,
+        "y": 100,
+        "width": 117.96875,
+        "height": 50
+      },
+      {
+        "step": 18,
+        "tag": "a",
+        "id": "megaanchor7",
+        "name": null,
+        "type": null,
+        "href": "/communities",
+        "src": null,
+        "text": "Communities",
+        "role": null,
+        "accessible_name_guess": "Communities",
+        "is_visible": true,
+        "x": 859.09375,
+        "y": 100,
+        "width": 150.765625,
+        "height": 50
+      },
+      {
+        "step": 19,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events-programming/conferences/2026-virtual",
+        "src": null,
+        "text": "2026 AHEAD Virtual Conference Info and Registration Now Available!",
+        "role": null,
+        "accessible_name_guess": "2026 AHEAD Virtual Conference Info and Registration Now Available!",
+        "is_visible": true,
+        "x": 55,
+        "y": 209,
+        "width": 526.765625,
+        "height": 74.1875
+      },
+      {
+        "step": 20,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events-programming/conferences/2026-virtual",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "graphic of interconnected points in space",
+        "is_visible": true,
+        "x": 640,
+        "y": 192,
+        "width": 0,
+        "height": 19
+      },
+      {
+        "step": 21,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events-programming/conferences/2026-virtual",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true,
+        "x": 640,
+        "y": 192,
+        "width": 0,
+        "height": 19
+      },
+      {
+        "step": 22,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 81,
+        "y": 653.390625,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 23,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileImage_0_lnkDisplay_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 81,
+        "y": 653.390625,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 24,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_BlogTitle_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/blogs/ahead/2026/05/19/ahead-board-of-directors-election-results/",
+        "src": null,
+        "text": "AHEAD Board of Directors Election Results",
+        "role": null,
+        "accessible_name_guess": "AHEAD Board of Directors Election Results",
+        "is_visible": true,
+        "x": 136,
+        "y": 653.390625,
+        "width": 180.875,
+        "height": 79.78125
+      },
+      {
+        "step": 25,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_Author_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "AHEAD",
+        "role": null,
+        "accessible_name_guess": "AHEAD",
+        "is_visible": true,
+        "x": 156.40625,
+        "y": 729.390625,
+        "width": 41.953125,
+        "height": 15
+      },
+      {
+        "step": 26,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 81,
+        "y": 861.34375,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 27,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileImage_1_lnkDisplay_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 81,
+        "y": 837.34375,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 28,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_BlogTitle_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/blogs/ahead/2026/04/22/ahg-2026-call-for-proposals-closing-soon/",
+        "src": null,
+        "text": "AHG 2026: Call for Proposals Closing Soon!",
+        "role": null,
+        "accessible_name_guess": "AHG 2026: Call for Proposals Closing Soon!",
+        "is_visible": true,
+        "x": 136,
+        "y": 826.34375,
+        "width": 187.03125,
+        "height": 79.78125
+      },
+      {
+        "step": 29,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_Author_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "AHEAD",
+        "role": null,
+        "accessible_name_guess": "AHEAD",
+        "is_visible": true,
+        "x": 156.40625,
+        "y": 837.34375,
+        "width": 41.953125,
+        "height": 15
+      },
+      {
+        "step": 30,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileLink_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 81,
+        "y": 663.015625,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 31,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_ProfileImage_2_lnkDisplay_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 81,
+        "y": 625.015625,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 32,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_BlogTitle_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/blogs/ahead/2026/04/20/aheads-2026-board-of-directors-election-is-open-vo/",
+        "src": null,
+        "text": "AHEAD\u2019s 2026 Board of Directors Election is Open! VOTE Today",
+        "role": null,
+        "accessible_name_guess": "AHEAD\u2019s 2026 Board of Directors Election is Open! VOTE Today",
+        "is_visible": true,
+        "x": 136,
+        "y": 458.015625,
+        "width": 226.03125,
+        "height": 79.78125
+      },
+      {
+        "step": 33,
+        "tag": "a",
+        "id": "MainCopy_ctl05_BlogList_Author_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/people/ahead",
+        "src": null,
+        "text": "AHEAD",
+        "role": null,
+        "accessible_name_guess": "AHEAD",
+        "is_visible": true,
+        "x": 156.40625,
+        "y": 480.015625,
+        "width": 41.953125,
+        "height": 15
+      },
+      {
+        "step": 34,
+        "tag": "a",
+        "id": "MainCopy_ctl05_MoreLink",
+        "name": null,
+        "type": null,
+        "href": "/browse/latest-news",
+        "src": null,
+        "text": "See More News",
+        "role": null,
+        "accessible_name_guess": "See More News",
+        "is_visible": true,
+        "x": 55,
+        "y": 579.6875,
+        "width": 370,
+        "height": 70.5625
+      },
+      {
+        "step": 35,
+        "tag": "a",
+        "id": "MainCopy_ctl08_rptEventList_EventTitle_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events/event-description?CalendarEventKey=d94ed305-d589-4dc7-9279-019ce372d4b8&Home=%2fhome",
+        "src": null,
+        "text": "49th Annual AHEAD Conference",
+        "role": null,
+        "accessible_name_guess": "49th Annual AHEAD Conference",
+        "is_visible": true,
+        "x": 606,
+        "y": -69.609375,
+        "width": 123.953125,
+        "height": 79.78125
+      },
+      {
+        "step": 36,
+        "tag": "a",
+        "id": "MainCopy_ctl08_rptEventList_EventTitle_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events/event-description?CalendarEventKey=f3b17304-72ea-4bb1-bf54-019e8a08a43c&Home=%2fhome",
+        "src": null,
+        "text": "2026 AHEAD Virtual Conference",
+        "role": null,
+        "accessible_name_guess": "2026 AHEAD Virtual Conference",
+        "is_visible": true,
+        "x": 606,
+        "y": 110.796875,
+        "width": 191.890625,
+        "height": 53.390625
+      },
+      {
+        "step": 37,
+        "tag": "a",
+        "id": "MainCopy_ctl08_LinkToCalendar",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/events/calendar",
+        "src": null,
+        "text": "See More Events",
+        "role": null,
+        "accessible_name_guess": "See More Events",
+        "is_visible": true,
+        "x": 455,
+        "y": 312.78125,
+        "width": 370,
+        "height": 70.5625
+      },
+      {
+        "step": 38,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 881,
+        "y": -5.609375,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 39,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileImage_0_lnkDisplay_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 881,
+        "y": -5.609375,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 40,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_DocumentTitle_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/viewdocument/re-housing-accommodation-single-for-sleepwalking-sort-of?CommunityKey=86322ea6-71b2-4fe6-91ef-11349026ab2f&tab=librarydocuments",
+        "src": null,
+        "text": "RE: Housing Accommodation - Single for Sleepwalking, ...",
+        "role": null,
+        "accessible_name_guess": "RE: Housing Accommodation - Single for Sleepwalking, ...",
+        "is_visible": true,
+        "x": 936,
+        "y": -3.609375,
+        "width": 178.609375,
+        "height": 106.171875
+      },
+      {
+        "step": 41,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_Contributor_0",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c",
+        "src": null,
+        "text": "ZAC LOUNSBURY",
+        "role": null,
+        "accessible_name_guess": "ZAC LOUNSBURY",
+        "is_visible": true,
+        "x": 956.390625,
+        "y": 82.390625,
+        "width": 97.8125,
+        "height": 15
+      },
+      {
+        "step": 42,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 881,
+        "y": 154.53125,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 43,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileImage_1_lnkDisplay_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 881,
+        "y": 154.53125,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 44,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_DocumentTitle_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/viewdocument/re-applying-extended-time-accommodations-to-assignment-deadlines-vs-due-dates?CommunityKey=86322ea6-71b2-4fe6-91ef-11349026ab2f&tab=librarydocuments",
+        "src": null,
+        "text": "RE: Applying Extended-Time Accommodations to Assignment ...",
+        "role": null,
+        "accessible_name_guess": "RE: Applying Extended-Time Accommodations to Assignment ...",
+        "is_visible": true,
+        "x": 936,
+        "y": 154.53125,
+        "width": 201.703125,
+        "height": 106.171875
+      },
+      {
+        "step": 45,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_Contributor_1",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "JAMIE AXELROD",
+        "role": null,
+        "accessible_name_guess": "JAMIE AXELROD",
+        "is_visible": true,
+        "x": 956.390625,
+        "y": 236.53125,
+        "width": 93.453125,
+        "height": 15
+      },
+      {
+        "step": 46,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 881,
+        "y": 308.671875,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 47,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileImage_2_lnkDisplay_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 881,
+        "y": 308.671875,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 48,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_DocumentTitle_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/viewdocument/re-professor-already-incorporates-extended-time-1?CommunityKey=86322ea6-71b2-4fe6-91ef-11349026ab2f&tab=librarydocuments",
+        "src": null,
+        "text": "RE: Professor already incorporates extended time?",
+        "role": null,
+        "accessible_name_guess": "RE: Professor already incorporates extended time?",
+        "is_visible": true,
+        "x": 936,
+        "y": 308.671875,
+        "width": 227.40625,
+        "height": 79.78125
+      },
+      {
+        "step": 49,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_Contributor_2",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab",
+        "src": null,
+        "text": "JAMIE AXELROD",
+        "role": null,
+        "accessible_name_guess": "JAMIE AXELROD",
+        "is_visible": true,
+        "x": 956.390625,
+        "y": 390.671875,
+        "width": 93.453125,
+        "height": 15
+      },
+      {
+        "step": 50,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileLink_3",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": false,
+        "x": 881,
+        "y": 462.8125,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "step": 51,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_ProfileImage_3_lnkDisplay_3",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Profile Picture",
+        "is_visible": true,
+        "x": 881,
+        "y": 462.8125,
+        "width": 40,
+        "height": 40
+      },
+      {
+        "step": 52,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_DocumentTitle_3",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/viewdocument/re-professor-already-incorporates-extended-time?CommunityKey=86322ea6-71b2-4fe6-91ef-11349026ab2f&tab=librarydocuments",
+        "src": null,
+        "text": "RE: Professor already incorporates extended time?",
+        "role": null,
+        "accessible_name_guess": "RE: Professor already incorporates extended time?",
+        "is_visible": true,
+        "x": 936,
+        "y": 462.8125,
+        "width": 227.40625,
+        "height": 79.78125
+      },
+      {
+        "step": 53,
+        "tag": "a",
+        "id": "MainCopy_ctl11_DocumentsList_Contributor_3",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4",
+        "src": null,
+        "text": "BRENT BOYER",
+        "role": null,
+        "accessible_name_guess": "BRENT BOYER",
+        "is_visible": true,
+        "x": 956.390625,
+        "y": 544.8125,
+        "width": 80.59375,
+        "height": 15
+      },
+      {
+        "step": 54,
+        "tag": "a",
+        "id": "MainCopy_ctl11_MoreLink",
+        "name": null,
+        "type": null,
+        "href": "https://www.ahead.org/librarydocuments?CommunityKey=86322ea6-71b2-4fe6-91ef-11349026ab2f",
+        "src": null,
+        "text": "See More Resources",
+        "role": null,
+        "accessible_name_guess": "See More Resources",
+        "is_visible": true,
+        "x": 855,
+        "y": 616.953125,
+        "width": 370,
+        "height": 70.5625
+      },
+      {
+        "step": 55,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "join",
+        "src": null,
+        "text": "Join Today",
+        "role": null,
+        "accessible_name_guess": "Join Today",
+        "is_visible": true,
+        "x": 655,
+        "y": 844.25,
+        "width": 335.578125,
+        "height": 101
+      },
+      {
+        "step": 56,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://nccsd.ici.umn.edu",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "National Center for College Students with Disabilities",
+        "is_visible": true,
+        "x": 55,
+        "y": 1428.25,
+        "width": 270,
+        "height": 187
+      },
+      {
+        "step": 57,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "https://thinkcollege.net/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Think College National Coordinating Center",
+        "is_visible": true,
+        "x": 355,
+        "y": 1426.25,
+        "width": 270,
+        "height": 147.984375
+      },
+      {
+        "step": 58,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "http://accessinghigherground.org/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "",
+        "is_visible": true,
+        "x": 655,
+        "y": 1416.25,
+        "width": 270,
+        "height": 145.546875
+      },
+      {
+        "step": 59,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "http://www.hbcudisabilityconsortium.org/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Historically Black Colleges and Universities Disability Consortium",
+        "is_visible": true,
+        "x": 955,
+        "y": 1416.25,
+        "width": 270,
+        "height": 200
+      },
+      {
+        "step": 60,
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "type": null,
+        "href": "http://www.dreamcollegedisability.org/",
+        "src": null,
+        "text": "",
+        "role": null,
+        "accessible_name_guess": "Disability Rights, Education, Activism, and Mentoring",
+        "is_visible": true,
+        "x": 55,
+        "y": 1624.25,
+        "width": 370,
+        "height": 142.296875
+      }
+    ],
+    "limitations": [
+      "Browser mode approximates keyboard interaction but does not simulate a full screen reader.",
+      "Accessible names are estimated and require manual review."
+    ]
+  },
+  "visual_proof": {
+    "enabled": true,
+    "screenshot_path": "reports/outreach_ai_scout/visual/ahead_home/page.png",
+    "focus_overlay_path": "reports/outreach_ai_scout/visual/ahead_home/focus_path.html",
+    "focus_points_count": 60,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "limitations": [
+      "Focus overlay shows observed Tab stops in this browser run.",
+      "It does not represent every assistive technology experience."
+    ]
+  },
+  "low_vision": {
+    "success": true,
+    "error": null,
+    "checks_run": [
+      "rendered_color_contrast",
+      "zoom_reflow_200",
+      "focus_visibility"
+    ],
+    "contrast_sample_count": 63,
+    "zoom_reflow": {
+      "viewport_width": 640,
+      "document_scroll_width": 640,
+      "overflow_amount": 0,
+      "wide_elements": [
+        {
+          "tag": "div",
+          "id": "MPOuterMost",
+          "class_name": "container full",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": "Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat"
+        },
+        {
+          "tag": "form",
+          "id": "MasterPageForm",
+          "class_name": "form",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": "Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat"
+        },
+        {
+          "tag": "div",
+          "id": "",
+          "class_name": "aspNetHidden",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "id": "",
+          "class_name": "aspNetHidden",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": ""
+        },
+        {
+          "tag": "div",
+          "id": "GlobalMain",
+          "class_name": "",
+          "width": 640,
+          "width_style": "640px",
+          "position": "static",
+          "text": "//<![CDATA[ Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager1', "
+        }
+      ]
+    },
+    "focus_visibility": {
+      "checked_count": 40,
+      "flagged_count": 6
+    },
+    "limitations": [
+      "Low-vision checks use browser-computed styles and conservative heuristics.",
+      "Rendered color contrast checks do not prove full WCAG conformance.",
+      "Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.",
+      "Focus indicator detection may miss custom focus styles."
+    ]
+  },
+  "ai_scout": {
+    "enabled": true,
+    "mode": "suggest_only",
+    "model": "llama-3.3-70b-versatile",
+    "status": "ok",
+    "summary": "Possible accessibility barriers found on the AHEAD website, including missing link names and image alt text, which may impact users with disabilities.",
+    "ai_suggested_observations": [
+      {
+        "observation": "Links may be missing accessible names, potentially causing navigation difficulties for users relying on assistive technologies.",
+        "why_it_may_matter": "Accessible link names are crucial for screen reader users and those who rely on keyboard navigation to understand the purpose of links.",
+        "related_deterministic_evidence": "Multiple instances of missing link names were detected, such as in the snippets <a id=\"MainCopy_ctl05_BlogList_ProfileLink_0\" href=\"https://www.ahead.org/people/ahead\"> and <a href=\"http://accessinghigherground.org/\">.",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      },
+      {
+        "observation": "An image may be missing useful alt text, which could hinder users who rely on screen readers or have low vision from understanding the content.",
+        "why_it_may_matter": "Alt text provides a description of images for users who cannot see them, ensuring equal access to information.",
+        "related_deterministic_evidence": "An image with an empty alt attribute was found: <img src=\"https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png\" alt=\"\" class=\"img-responsive\">.",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      },
+      {
+        "observation": "The page structure may have skipped heading levels, potentially causing confusion for users navigating the content using assistive technologies.",
+        "why_it_may_matter": "Consistent heading levels help users understand the structure and hierarchy of the page content.",
+        "related_deterministic_evidence": "Heading level jumps from h3 to h5 were detected, as indicated by snippets like <h5>.",
+        "human_review_needed": true,
+        "confidence": "AI-only"
+      }
+    ],
+    "outreach_notes": [
+      "We suggest reviewing the website for accessibility barriers, particularly focusing on link names, image alt text, and heading structure, to ensure an inclusive experience for all users."
+    ],
+    "limitations": [
+      "AI Scout findings are suggestions and need human review.",
+      "AI Scout output is not a confirmed accessibility finding.",
+      "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+      "AI Scout output is not a needs human review accessibility finding."
+    ]
+  }
+}

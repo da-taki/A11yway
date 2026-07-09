@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A11yway Accessibility Report</title>
+<style>
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #172033; background: #f6f8fb; }
+header, main { max-width: 1120px; margin: 0 auto; padding: 1.25rem; }
+header { background: #ffffff; border-bottom: 1px solid #d8deea; }
+section { margin: 1rem 0; padding: 1rem; background: #ffffff; border: 1px solid #d8deea; }
+h1, h2, h3 { line-height: 1.2; }
+table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+th, td { border: 1px solid #d8deea; padding: 0.45rem 0.55rem; text-align: left; vertical-align: top; }
+th { background: #eef2f7; }
+code, pre { background: #eef2f7; }
+pre { overflow-x: auto; padding: 0.75rem; }
+.meta { color: #526071; }
+.issue { border-top: 4px solid #5067a3; }
+.high { border-top-color: #b42318; }
+.medium { border-top-color: #b86e00; }
+.low { border-top-color: #367a45; }
+</style>
+</head>
+<body>
+<header>
+<h1>A11yway Accessibility Report</h1>
+<p class="meta">Source: https://www.ahead.org/</p>
+</header>
+<main>
+<section>
+<h2>Summary</h2>
+<p>Issues found: <strong>54</strong></p>
+<p>Agents used: Keyboard-only student</p>
+<p>Checks run: html_form_labels, interactive_names, image_alt_text, heading_structure, page_metadata, media_accessibility, keyboard_focus_traversal, browser_dom_snapshot, rendered_color_contrast, zoom_reflow_200, focus_visibility</p>
+<h3>Counts By Severity</h3>
+<ul><li><code>high</code>: 40</li><li><code>low</code>: 1</li><li><code>medium</code>: 13</li></ul>
+<h3>Counts By Issue Type</h3>
+<ul><li><code>missing_link_name</code>: 17</li><li><code>missing_image_alt</code>: 1</li><li><code>multiple_h1</code>: 1</li><li><code>skipped_heading_level</code>: 4</li><li><code>browser_focused_control_missing_name</code>: 9</li><li><code>browser_focus_on_hidden_element</code>: 7</li><li><code>low_contrast_text</code>: 6</li><li><code>zoom_fixed_width_content</code>: 3</li><li><code>focus_indicator_missing</code>: 6</li></ul>
+</section>
+<section>
+<h2>Source Metadata</h2>
+<table><tbody>
+<tr><th>Input</th><td>https://www.ahead.org/</td></tr>
+<tr><th>Type</th><td>url</td></tr>
+<tr><th>Final URL</th><td>https://www.ahead.org/home</td></tr>
+<tr><th>Status code</th><td>200</td></tr>
+<tr><th>Content type</th><td>text/html; charset=utf-8</td></tr>
+</tbody></table>
+</section>
+<section>
+<h2>Analysis Modes</h2>
+<ul><li>static</li><li>browser</li><li>low_vision</li></ul>
+</section>
+<section>
+<h2>Browser Interaction Trace</h2>
+<p>Browser audit success: true</p>
+<p>Focus trace length: 60</p>
+<table><thead><tr><th>Step</th><th>Tag</th><th>Accessible name guess</th><th>ID/Name</th><th>Text/Href</th></tr></thead><tbody>
+<tr><td>1</td><td>a</td><td>Skip to main content (Press Enter).</td><td>skiplink</td><td>Skip to main content (Press Enter).</td></tr>
+<tr><td>2</td><td>a</td><td>SIGN IN</td><td>Welcome_LoginLink</td><td>SIGN IN</td></tr>
+<tr><td>3</td><td>button</td><td>Search Button</td><td></td><td>Search Button</td></tr>
+<tr><td>4</td><td>a</td><td>Skip auxiliary navigation (Press Enter).</td><td>auxskiplink</td><td>Skip auxiliary navigation (Press Enter).</td></tr>
+<tr><td>5</td><td>ul</td><td>ABOUT US CONTACT US</td><td></td><td>ABOUT US CONTACT US</td></tr>
+<tr><td>6</td><td>a</td><td>AHEAD Linkedin page</td><td></td><td>https://www.linkedin.com/company/association-on-higher-education-and-disability/</td></tr>
+<tr><td>7</td><td>a</td><td>AHEAD Facebook page</td><td></td><td>https://www.facebook.com/AHEAD.org/</td></tr>
+<tr><td>8</td><td>a</td><td>AHEAD Youtube channel</td><td></td><td>https://www.youtube.com/channel/UCCpOb89XX_o-pBKS5sgna8A</td></tr>
+<tr><td>9</td><td>a</td><td>AHEAD Instagram page</td><td></td><td>https://www.instagram.com/aheadorg_1977/</td></tr>
+<tr><td>10</td><td>a</td><td>AHEAD - Association on Higher Education And Disability logo. This will take you to the homepage</td><td></td><td>https://www.ahead.org/home</td></tr>
+<tr><td>11</td><td>a</td><td>Skip main navigation (Press Enter).</td><td>navskiplink</td><td>Skip main navigation (Press Enter).</td></tr>
+<tr><td>12</td><td>a</td><td>Home</td><td>megaanchor1</td><td>Home</td></tr>
+<tr><td>13</td><td>a</td><td>About</td><td>megaanchor2</td><td>About</td></tr>
+<tr><td>14</td><td>a</td><td>Membership</td><td>megaanchor3</td><td>Membership</td></tr>
+<tr><td>15</td><td>a</td><td>Programming</td><td>megaanchor4</td><td>Programming</td></tr>
+<tr><td>16</td><td>a</td><td>Professional Resources</td><td>megaanchor5</td><td>Professional Resources</td></tr>
+<tr><td>17</td><td>a</td><td>Research</td><td>megaanchor6</td><td>Research</td></tr>
+<tr><td>18</td><td>a</td><td>Communities</td><td>megaanchor7</td><td>Communities</td></tr>
+<tr><td>19</td><td>a</td><td>2026 AHEAD Virtual Conference Info and Registration Now Available!</td><td></td><td>2026 AHEAD Virtual Conference Info and Registration Now Available!</td></tr>
+<tr><td>20</td><td>a</td><td>graphic of interconnected points in space</td><td></td><td>https://www.ahead.org/events-programming/conferences/2026-virtual</td></tr>
+</tbody></table>
+<ul><li>Browser mode approximates keyboard interaction but does not simulate a full screen reader.</li><li>Accessible names are estimated and require manual review.</li></ul>
+</section>
+<section>
+<h2>Low-Vision Checks</h2>
+<p>Status: passed</p>
+<p>Checks run: rendered_color_contrast, zoom_reflow_200, focus_visibility</p>
+<p>Contrast samples analyzed: 63</p>
+<table><tbody>
+<tr><th>Viewport width</th><td>640</td></tr>
+<tr><th>Document scroll width</th><td>640</td></tr>
+<tr><th>Horizontal overflow amount</th><td>0</td></tr>
+<tr><th>Focus stops checked</th><td>40</td></tr>
+<tr><th>Focus indicator concerns</th><td>6</td></tr>
+</tbody></table>
+<ul><li>Low-vision checks use browser-computed styles and conservative heuristics.</li><li>Rendered color contrast checks do not prove full WCAG conformance.</li><li>Zoom/reflow uses a narrow viewport approximation rather than a full zoom compliance test.</li><li>Focus indicator detection may miss custom focus styles.</li></ul>
+</section>
+<section>
+<h2>Visual Proof</h2>
+<p>Visual proof is an evidence aid for manual review. It is not accessibility certification.</p>
+<p>Screenshot: <a href="reports/outreach_ai_scout/visual/ahead_home/page.png">reports/outreach_ai_scout/visual/ahead_home/page.png</a></p>
+<p>Observed focus path overlay: <a href="reports/outreach_ai_scout/visual/ahead_home/focus_path.html">reports/outreach_ai_scout/visual/ahead_home/focus_path.html</a></p>
+<p>Focus points count: 60</p>
+<ul><li>Focus overlay shows observed Tab stops in this browser run.</li><li>It does not represent every assistive technology experience.</li></ul>
+</section>
+<section>
+<h2>What the AI Found</h2>
+<p>Status: ok</p>
+<p>Mode: suggest_only</p>
+<p>Model: llama-3.3-70b-versatile</p>
+<p>Possible accessibility barriers found on the AHEAD website, including missing link names and image alt text, which may impact users with disabilities.</p>
+<ol>
+<li><strong>AI-suggested observation:</strong> Links may be missing accessible names, potentially causing navigation difficulties for users relying on assistive technologies.<br><strong>Related evidence, if any:</strong> Multiple instances of missing link names were detected, such as in the snippets &lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_0&quot; href=&quot;https://www.ahead.org/people/ahead&quot;&gt; and &lt;a href=&quot;http://accessinghigherground.org/&quot;&gt;.<br><strong>Human review needed:</strong> true<br><strong>Confidence:</strong> AI-only</li>
+<li><strong>AI-suggested observation:</strong> An image may be missing useful alt text, which could hinder users who rely on screen readers or have low vision from understanding the content.<br><strong>Related evidence, if any:</strong> An image with an empty alt attribute was found: &lt;img src=&quot;https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot;&gt;.<br><strong>Human review needed:</strong> true<br><strong>Confidence:</strong> AI-only</li>
+<li><strong>AI-suggested observation:</strong> The page structure may have skipped heading levels, potentially causing confusion for users navigating the content using assistive technologies.<br><strong>Related evidence, if any:</strong> Heading level jumps from h3 to h5 were detected, as indicated by snippets like &lt;h5&gt;.<br><strong>Human review needed:</strong> true<br><strong>Confidence:</strong> AI-only</li>
+</ol>
+<ul><li>AI Scout findings are suggestions and need human review.</li><li>AI Scout output is not a confirmed accessibility finding.</li><li>AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.</li><li>AI Scout output is not a needs human review accessibility finding.</li></ul>
+</section>
+<section>
+<h2>Issues Found</h2>
+<article class="issue high">
+<h3>1. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>473</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_0&quot; href=&quot;https://www.ahead.org/people/ahead&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>2. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>577</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_1&quot; href=&quot;https://www.ahead.org/people/ahead&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>3. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>679</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_2&quot; href=&quot;https://www.ahead.org/people/ahead&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>4. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c</td></tr><tr><th>line</th><td>985</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_0&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>5. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>line</th><td>1105</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_1&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>6. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>line</th><td>1225</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_2&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>7. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_3</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4</td></tr><tr><th>line</th><td>1345</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_3&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>8. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>http://accessinghigherground.org/</td></tr><tr><th>line</th><td>1499</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a href=&quot;http://accessinghigherground.org/&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>9. Image is missing useful alt text</h3>
+<p>Issue type: <code>missing_image_alt</code></p>
+<p>Severity: high</p>
+<p>Rule: Image missing useful alt text</p>
+<p>Why it matters: Students using screen readers miss the image content entirely, which can hide instructions, diagrams, or required information.</p>
+<p>Suggested fix: Add alt text that describes the image purpose, or mark decorative images as presentation.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>img</td></tr><tr><th>src</th><td>https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png</td></tr><tr><th>line</th><td>1499</td></tr><tr><th>reason</th><td>Image is missing useful alt text.</td></tr></tbody></table><pre><code>&lt;img src=&quot;https://higherlogicdownload.s3.amazonaws.com/AHEAD/38b602f4-ec53-451c-9be0-5c0bf5d27c0a/UploadedImages/Partner_Logos/ahg.png&quot; alt=&quot;&quot; caption=&quot;false&quot; class=&quot;img-responsive&quot;&gt;</code></pre>
+</article>
+<article class="issue low">
+<h3>10. Page has multiple h1 headings</h3>
+<p>Issue type: <code>multiple_h1</code></p>
+<p>Severity: low</p>
+<p>Rule: Page has multiple h1 headings</p>
+<p>Why it matters: Several h1 headings make it harder for students to identify the single main topic of the page.</p>
+<p>Suggested fix: Use one main h1 for the page purpose, then organize sections with h2 and lower headings.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h1</td></tr><tr><th>reason</th><td>Document has multiple h1 headings.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>11. Heading level is skipped</h3>
+<p>Issue type: <code>skipped_heading_level</code></p>
+<p>Severity: medium</p>
+<p>Rule: Heading level is skipped</p>
+<p>Why it matters: Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.</p>
+<p>Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h5</td></tr><tr><th>line</th><td>1010</td></tr><tr><th>reason</th><td>Heading level jumps from h3 to h5.</td></tr></tbody></table><pre><code>&lt;h5&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>12. Heading level is skipped</h3>
+<p>Issue type: <code>skipped_heading_level</code></p>
+<p>Severity: medium</p>
+<p>Rule: Heading level is skipped</p>
+<p>Why it matters: Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.</p>
+<p>Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h5</td></tr><tr><th>line</th><td>1130</td></tr><tr><th>reason</th><td>Heading level jumps from h3 to h5.</td></tr></tbody></table><pre><code>&lt;h5&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>13. Heading level is skipped</h3>
+<p>Issue type: <code>skipped_heading_level</code></p>
+<p>Severity: medium</p>
+<p>Rule: Heading level is skipped</p>
+<p>Why it matters: Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.</p>
+<p>Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h5</td></tr><tr><th>line</th><td>1250</td></tr><tr><th>reason</th><td>Heading level jumps from h3 to h5.</td></tr></tbody></table><pre><code>&lt;h5&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>14. Heading level is skipped</h3>
+<p>Issue type: <code>skipped_heading_level</code></p>
+<p>Severity: medium</p>
+<p>Rule: Heading level is skipped</p>
+<p>Why it matters: Jumping from h1 to h3 breaks the page outline that screen reader users rely on to understand and navigate content.</p>
+<p>Suggested fix: Do not skip heading levels; move from h1 to h2 before h3.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>h5</td></tr><tr><th>line</th><td>1370</td></tr><tr><th>reason</th><td>Heading level jumps from h3 to h5.</td></tr></tbody></table><pre><code>&lt;h5&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>15. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>https://www.ahead.org/events-programming/conferences/2026-virtual</td></tr><tr><th>step</th><td>21</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>16. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>22</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>17. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>22</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>18. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>26</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>19. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>26</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>20. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>30</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>21. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>step</th><td>30</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>22. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c</td></tr><tr><th>step</th><td>38</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>23. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c</td></tr><tr><th>step</th><td>38</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>24. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>step</th><td>42</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>25. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>step</th><td>42</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>26. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>step</th><td>46</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>27. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>step</th><td>46</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>28. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_3</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4</td></tr><tr><th>step</th><td>50</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>29. Keyboard focus landed on a hidden element</h3>
+<p>Issue type: <code>browser_focus_on_hidden_element</code></p>
+<p>Severity: high</p>
+<p>Rule: Keyboard focus landed on a hidden element</p>
+<p>Why it matters: When focus moves to an invisible element, keyboard users lose track of where they are on the page.</p>
+<p>Suggested fix: Remove hidden elements from the Tab order with tabindex=&quot;-1&quot; or make them visible when focused.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_3</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4</td></tr><tr><th>step</th><td>50</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>This element received keyboard focus but does not appear to be visible on the page.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>30. Focused control has no accessible name</h3>
+<p>Issue type: <code>browser_focused_control_missing_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused control has no accessible name</p>
+<p>Why it matters: A keyboard user can reach the control, but without a name a screen reader announces nothing useful about what it does.</p>
+<p>Suggested fix: Add a visible label, text content, or aria-label so students know what the control does.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>http://accessinghigherground.org/</td></tr><tr><th>step</th><td>58</td></tr><tr><th>detected_in</th><td>browser_interaction</td></tr><tr><th>reason</th><td>A keyboard user reached this control, but it has no label, text, aria-label, or other usable name.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>31. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>https://www.ahead.org/events-programming/conferences/2026-virtual</td></tr><tr><th>line</th><td>487</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a href=&quot;https://www.ahead.org/events-programming/conferences/2026-virtual&quot; tabindex=&quot;0&quot; data-feathr-click-track=&quot;true&quot; data-feathr-link-aids=&quot;5c8293d30d21f34805e168ef&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>32. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>511</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_0&quot; href=&quot;https://www.ahead.org/people/ahead&quot; data-feathr-click-track=&quot;true&quot; data-feathr-link-aids=&quot;5c8293d30d21f34805e168ef&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>33. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>615</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_1&quot; href=&quot;https://www.ahead.org/people/ahead&quot; data-feathr-click-track=&quot;true&quot; data-feathr-link-aids=&quot;5c8293d30d21f34805e168ef&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>34. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl05_BlogList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/people/ahead</td></tr><tr><th>line</th><td>717</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl05_BlogList_ProfileLink_2&quot; href=&quot;https://www.ahead.org/people/ahead&quot; data-feathr-click-track=&quot;true&quot; data-feathr-link-aids=&quot;5c8293d30d21f34805e168ef&quot;&gt;</code></pre>
+</article>
+<article class="issue high">
+<h3>35. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_0</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c</td></tr><tr><th>line</th><td>1023</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_0&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=80924270-8dc7-4e28-a294-019a83e6f89c&quot; data-feathr-click-track=&quot;true&quot; data-f...</code></pre>
+</article>
+<article class="issue high">
+<h3>36. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_1</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>line</th><td>1143</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_1&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab&quot; data-feathr-click-track=&quot;true&quot; data-f...</code></pre>
+</article>
+<article class="issue high">
+<h3>37. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_2</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab</td></tr><tr><th>line</th><td>1263</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_2&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=c03dd8e5-a84a-474d-8649-a2d38d6e54ab&quot; data-feathr-click-track=&quot;true&quot; data-f...</code></pre>
+</article>
+<article class="issue high">
+<h3>38. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>MainCopy_ctl11_DocumentsList_ProfileLink_3</td></tr><tr><th>href</th><td>https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4</td></tr><tr><th>line</th><td>1383</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a id=&quot;MainCopy_ctl11_DocumentsList_ProfileLink_3&quot; href=&quot;https://www.ahead.org/membership/network/members/profile?UserKey=01cb0141-971b-419b-8de1-5b0796a000f4&quot; data-feathr-click-track=&quot;true&quot; data-f...</code></pre>
+</article>
+<article class="issue high">
+<h3>39. Link is missing an accessible name</h3>
+<p>Issue type: <code>missing_link_name</code></p>
+<p>Severity: high</p>
+<p>Rule: Link missing accessible name</p>
+<p>Why it matters: Screen reader users hear an empty or meaningless link and cannot decide whether to follow it.</p>
+<p>Suggested fix: Add descriptive link text that explains the link destination or action.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>href</th><td>http://accessinghigherground.org/</td></tr><tr><th>line</th><td>1537</td></tr><tr><th>detected_in</th><td>browser_dom</td></tr><tr><th>reason</th><td>Link has no usable text, aria-label, title, or image alt text.</td></tr></tbody></table><pre><code>&lt;a href=&quot;http://accessinghigherground.org/&quot; data-feathr-click-track=&quot;true&quot; data-feathr-link-aids=&quot;5c8293d30d21f34805e168ef&quot;&gt;</code></pre>
+</article>
+<article class="issue medium">
+<h3>40. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>About</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>41. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Membership</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>42. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Programming</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>43. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Professional Resources</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>44. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Research</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>45. Rendered text may have low contrast</h3>
+<p>Issue type: <code>low_contrast_text</code></p>
+<p>Severity: medium</p>
+<p>Rule: Rendered text may have low contrast</p>
+<p>Why it matters: Low-vision readers may not be able to read text when the computed foreground and background colors are too similar.</p>
+<p>Suggested fix: Increase foreground/background contrast and confirm the final design with manual review.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>text</th><td>Communities</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>Computed foreground/background contrast is below the conservative 4.5:1 review threshold.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>46. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>div</td></tr><tr><th>id</th><td>MPOuterMost</td></tr><tr><th>text</th><td>Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>47. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>form</td></tr><tr><th>id</th><td>MasterPageForm</td></tr><tr><th>text</th><td>Skip to main content (Press Enter). SIGN IN Search Button Skip auxiliary navigat</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue medium">
+<h3>48. Fixed or wide content may prevent reflow</h3>
+<p>Issue type: <code>zoom_fixed_width_content</code></p>
+<p>Severity: medium</p>
+<p>Rule: Fixed or wide content may prevent reflow</p>
+<p>Why it matters: Large fixed-width elements can force horizontal scrolling and hide content when users zoom or use narrow windows.</p>
+<p>Suggested fix: Replace fixed-width layout with responsive sizing such as max-width: 100%.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>div</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>A rendered element is wider than the narrow viewport or uses a large fixed pixel width.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>49. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor2</td></tr><tr><th>text</th><td>About</td></tr><tr><th>step</th><td>13</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>50. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor3</td></tr><tr><th>text</th><td>Membership</td></tr><tr><th>step</th><td>14</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>51. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor4</td></tr><tr><th>text</th><td>Programming</td></tr><tr><th>step</th><td>15</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>52. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor5</td></tr><tr><th>text</th><td>Professional Resources</td></tr><tr><th>step</th><td>16</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>53. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor6</td></tr><tr><th>text</th><td>Research</td></tr><tr><th>step</th><td>17</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+<article class="issue high">
+<h3>54. Focused element may not show a visible focus indicator</h3>
+<p>Issue type: <code>focus_indicator_missing</code></p>
+<p>Severity: high</p>
+<p>Rule: Focused element may not show a visible focus indicator</p>
+<p>Why it matters: Keyboard users with low vision need a visible indicator to know which control currently has focus.</p>
+<p>Suggested fix: Provide a clear :focus or :focus-visible style with visible outline, border, or shadow.</p>
+<h4>Evidence</h4>
+<table><tbody><tr><th>tag</th><td>a</td></tr><tr><th>id</th><td>megaanchor7</td></tr><tr><th>text</th><td>Communities</td></tr><tr><th>step</th><td>18</td></tr><tr><th>detected_in</th><td>low_vision</td></tr><tr><th>reason</th><td>The focused element did not expose an obvious outline, box-shadow, or border focus style in computed CSS.</td></tr></tbody></table>
+</article>
+</section>
+<section>
+<h2>Limitations</h2>
+<ul><li>This prototype runs static HTML checks plus a basic keyboard interaction audit.</li><li>It does not replace a full human accessibility audit.</li><li>Browser mode does not simulate a full screen reader, and accessible names are estimated.</li><li>Low-vision browser checks are conservative heuristics and require manual review.</li></ul>
+</section>
+</main>
+</body>
+</html>

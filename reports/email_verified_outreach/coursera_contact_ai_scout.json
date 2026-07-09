@@ -1,0 +1,53 @@
+{
+  "enabled": true,
+  "mode": "suggest_only",
+  "model": "llama-3.3-70b-versatile",
+  "status": "ok",
+  "summary": "Possible accessibility barriers found on the Coursera contact page",
+  "ai_suggested_observations": [
+    {
+      "observation": "Some links may have generic text that does not explain their destination or action",
+      "why_it_may_matter": "Users who rely on screen readers or have cognitive disabilities may have difficulty understanding the purpose of these links",
+      "related_deterministic_evidence": "Multiple instances of generic link text found, such as 'here' and 'Learn more'",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some headings may have skipped levels, which could disrupt the page's structure",
+      "why_it_may_matter": "Users who rely on screen readers or have visual impairments may have difficulty navigating the page",
+      "related_deterministic_evidence": "One instance of a skipped heading level found, from h1 to h3",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some text may have low contrast with its background, which could make it difficult to read",
+      "why_it_may_matter": "Users with visual impairments may have difficulty reading text with low contrast",
+      "related_deterministic_evidence": "Multiple instances of low contrast text found, with a contrast ratio below the conservative 4.5:1 review threshold",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some content may not reflow properly when the page is zoomed in, which could make it difficult to read",
+      "why_it_may_matter": "Users with visual impairments may need to zoom in on the page to read the content",
+      "related_deterministic_evidence": "Multiple instances of fixed or wide content found, which may prevent reflow",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some focused elements may not have a visible focus indicator, which could make it difficult for users to navigate the page",
+      "why_it_may_matter": "Users who rely on keyboard navigation may have difficulty understanding which element has focus",
+      "related_deterministic_evidence": "Multiple instances of missing focus indicators found, including on input fields and links",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    }
+  ],
+  "outreach_notes": [
+    "We suggest reviewing the Coursera contact page for potential accessibility barriers and making necessary improvements to ensure equal access for all users."
+  ],
+  "limitations": [
+    "AI Scout findings are suggestions and need human review.",
+    "AI Scout output is not a confirmed accessibility finding.",
+    "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+    "AI Scout output is not a needs human review accessibility finding."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "enabled": true,
+  "mode": "suggest_only",
+  "model": "llama-3.3-70b-versatile",
+  "status": "ok",
+  "summary": "Possible accessibility barriers found in the contact page of Fable",
+  "ai_suggested_observations": [
+    {
+      "observation": "Some images may not have useful alt text",
+      "why_it_may_matter": "Users who rely on screen readers or have visual impairments may not be able to understand the content of these images",
+      "related_deterministic_evidence": "Multiple instances of missing image alt text were detected in the page",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    },
+    {
+      "observation": "Some text may have low contrast with its background",
+      "why_it_may_matter": "Users with visual impairments may have difficulty reading text with low contrast, which could impact their ability to understand the content",
+      "related_deterministic_evidence": "Multiple instances of low contrast text were detected in the page",
+      "human_review_needed": true,
+      "confidence": "AI-only"
+    }
+  ],
+  "outreach_notes": [
+    "We suggest reviewing the contact page for potential accessibility issues, particularly with regards to image alt text and text contrast"
+  ],
+  "limitations": [
+    "AI Scout findings are suggestions and need human review.",
+    "AI Scout output is not a confirmed accessibility finding.",
+    "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior.",
+    "AI Scout findings are suggestions and need human review",
+    "AI Scout output is not a needs human review accessibility finding",
+    "AI Scout does not determine legal compliance, WCAG compliance, or screen-reader behavior"
+  ]
+}

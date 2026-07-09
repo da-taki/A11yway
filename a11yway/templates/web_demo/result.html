@@ -1,0 +1,115 @@
+{% extends "web_demo/base.html" %}
+{% block title %}A11yway Result{% endblock %}
+{% block content %}
+<section class="result-head">
+  <div>
+    <h1>{{ run.target_name }}</h1>
+    <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+  </div>
+  <div class="status {{ run.status }}">{{ run.status }}</div>
+</section>
+
+{% if run.fallback_notice %}
+  <div class="alert">{{ run.fallback_notice }}</div>
+{% endif %}
+{% if run.error %}
+  <div class="alert" role="alert">{{ run.error }}</div>
+{% endif %}
+
+<section class="metrics">
+  <div>
+    <span>Total issues</span>
+    <strong>{{ run.score.get('total_issues', 0) }}</strong>
+  </div>
+  <div>
+    <span>Classification</span>
+    <strong>{{ run.score.get('classification', 'Not scored') }}</strong>
+  </div>
+  <div>
+    <span>Weighted score</span>
+    <strong>{{ run.score.get('weighted_score', 0) }}</strong>
+  </div>
+</section>
+
+<section class="grid two">
+  <div>
+    <h2>Severity Breakdown</h2>
+    <dl class="breakdown">
+      {% for severity, count in run.score.get('severity_counts', {}).items() %}
+        <div><dt>{{ severity }}</dt><dd>{{ count }}</dd></div>
+      {% endfor %}
+    </dl>
+  </div>
+  <div>
+    <h2>Quality Summary</h2>
+    <p>{{ run.score.get('plain_language_summary', '') }}</p>
+    {% if run.score.get('top_risk_areas') %}
+      <p class="muted">{{ run.score.get('top_risk_areas') | join(', ') }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<section>
+  <h2>Top Findings</h2>
+  {% if run.top_findings %}
+    <table>
+      <thead><tr><th>Severity</th><th>Type</th><th>Finding</th></tr></thead>
+      <tbody>
+        {% for finding in run.top_findings %}
+          <tr>
+            <td>{{ finding.severity }}</td>
+            <td><code>{{ finding.issue_type }}</code></td>
+            <td>{{ finding.message }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No top findings were reported by the current checks.</p>
+  {% endif %}
+</section>
+
+{% if run.ai_scout %}
+<section>
+  <h2>AI Scout Summary</h2>
+  <p>Status: {{ run.ai_scout.get('status', '') }}</p>
+  <p>{{ run.ai_scout.get('summary', '') }}</p>
+</section>
+{% endif %}
+
+<section class="grid two">
+  <div>
+    <h2>Reports</h2>
+    <ul class="links">
+      {% for label, href in run.reports.items() %}
+        <li><a href="{{ href }}">{{ label.replace('_', ' ') }}</a> <a class="download" href="{{ href }}?download=1">download</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div>
+    <h2>Visual Evidence</h2>
+    {% if run.visual_proof.screenshot_path %}
+      <p>Screenshot path: <a href="{{ run.visual_proof.screenshot_link }}">{{ run.visual_proof.screenshot_path }}</a></p>
+    {% else %}
+      <p>Screenshot path: unavailable</p>
+    {% endif %}
+    {% if run.visual_proof.focus_overlay_path %}
+      <p>Focus-path overlay path: <a href="{{ run.visual_proof.focus_overlay_link }}">{{ run.visual_proof.focus_overlay_path }}</a></p>
+    {% else %}
+      <p>Focus-path overlay path: unavailable</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="notes">
+  <h2>Run Details</h2>
+  <p>Batch config path: <code>{{ run.config_path }}</code></p>
+  <p>Output folder: <code>{{ run.output_dir }}</code></p>
+  <p>Review type: {{ run.review_type }}</p>
+  <ul>
+    {% for note in run.guardrails %}
+      <li>{{ note }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
