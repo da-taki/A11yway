@@ -1,0 +1,4 @@
+{
+  "problematic": ["security_mixed_content_script", "security_external_script_no_sri", "security_insecure_form_action", "security_sensitive_comment_pattern"],
+  "clean": []
+}

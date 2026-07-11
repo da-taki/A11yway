@@ -1,0 +1,4 @@
+{
+  "problematic": ["component_duplicate_id", "component_required_state_missing", "component_carousel_pause_missing"],
+  "clean": []
+}

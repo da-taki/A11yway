@@ -8,6 +8,7 @@ from pathlib import Path
 from a11yway.core.batch_runner import run_batch
 from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
 from a11yway.core.axe_runner import AXE_SETUP_MESSAGE, is_axe_available
+from a11yway.core.capabilities import detect_capabilities, format_capabilities_cli
 from a11yway.core.browser_runner import (
     PLAYWRIGHT_SETUP_MESSAGE,
     is_playwright_available,
@@ -21,6 +22,15 @@ from a11yway.core.ci_output import (
     save_sarif_report,
 )
 from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
+from a11yway.core.cognitive_audit import analyze_cognitive
+from a11yway.core.component_audit import analyze_components
+from a11yway.core.document_audit import analyze_document
+from a11yway.core.forms_audit import analyze_forms
+from a11yway.core.language_audit import analyze_language
+from a11yway.core.media_audit import MEDIA_EXTENSIONS, analyze_media, analyze_media_file
+from a11yway.core.mobile_audit import run_mobile_audit
+from a11yway.core.passive_security_audit import analyze_passive_security
+from a11yway.core.screen_reader_audit import run_screen_reader_audit
 from a11yway.core.fix_suggester import FixSuggester
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_diff import (
@@ -56,6 +66,7 @@ from a11yway.core.wcag_coverage import (
 )
 from a11yway.core.task_executor import run_task_execution
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
+from a11yway.core.workflow_audit import run_workflow_audit
 from a11yway.core.workflow_packs import (
     list_workflow_packs,
     load_workflow_pack,
@@ -473,6 +484,117 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         metavar="PATH",
         help="Write task execution steps as JUnit XML test cases.",
     )
+    parser.add_argument(
+        "--capabilities",
+        dest="capabilities",
+        action="store_true",
+        help="Print optional tool and adapter capability detection, then exit.",
+    )
+    parser.add_argument(
+        "--screen-reader",
+        dest="screen_reader",
+        action="store_true",
+        help="Add screen-reader evidence. Chromium engine uses the browser accessibility tree.",
+    )
+    parser.add_argument(
+        "--screen-reader-engine",
+        dest="screen_reader_engine",
+        default="chromium",
+        choices=["chromium", "nvda", "jaws", "voiceover", "talkback"],
+        help="Screen-reader evidence engine. Native engines run only when a safe adapter is available.",
+    )
+    parser.add_argument(
+        "--announce-transcript",
+        dest="announce_transcript",
+        action="store_true",
+        help="Include ordered accessibility-tree announcement transcript where available.",
+    )
+    parser.add_argument(
+        "--mobile",
+        dest="mobile",
+        action="store_true",
+        help="Run Playwright mobile device-emulation checks. This is not real mobile AT testing.",
+    )
+    parser.add_argument(
+        "--device",
+        dest="device",
+        default="android-small",
+        choices=["android-small", "android-large", "iphone-small", "iphone-large", "tablet"],
+        help="Mobile device profile for --mobile.",
+    )
+    parser.add_argument(
+        "--orientation",
+        dest="orientations",
+        action="append",
+        choices=["portrait", "landscape"],
+        help="Mobile orientation to test. Can be passed more than once.",
+    )
+    parser.add_argument(
+        "--document",
+        dest="document",
+        action="store_true",
+        help="Inspect a local PDF, DOCX, or PPTX file instead of HTML.",
+    )
+    parser.add_argument(
+        "--media",
+        dest="media",
+        action="store_true",
+        help="Run HTML media accessibility evidence checks.",
+    )
+    parser.add_argument(
+        "--workflow",
+        dest="workflow",
+        action="store_true",
+        help="Run a safe structured workflow from --workflow-config.",
+    )
+    parser.add_argument(
+        "--workflow-config",
+        dest="workflow_config",
+        help="JSON workflow config for --workflow.",
+    )
+    parser.add_argument(
+        "--safe-public-mode",
+        dest="safe_public_mode",
+        action="store_true",
+        default=True,
+        help="Block submitting or private workflow actions. Enabled by default for public-site workflows.",
+    )
+    parser.add_argument(
+        "--forms",
+        dest="forms",
+        action="store_true",
+        help="Run safe forms and error-recovery evidence checks.",
+    )
+    parser.add_argument(
+        "--cognitive",
+        dest="cognitive",
+        action="store_true",
+        help="Run cognitive-accessibility heuristic review checks.",
+    )
+    parser.add_argument(
+        "--language-audit",
+        dest="language_audit",
+        action="store_true",
+        help="Run multilingual and bidirectional-language checks.",
+    )
+    parser.add_argument(
+        "--components",
+        dest="components",
+        action="store_true",
+        help="Run complex component pattern checks.",
+    )
+    parser.add_argument(
+        "--passive-security",
+        dest="passive_security",
+        action="store_true",
+        help="Run opt-in passive security observations. This is not penetration testing.",
+    )
+    parser.add_argument(
+        "--all-accessibility-modules",
+        dest="all_accessibility_modules",
+        action="store_true",
+        help="Enable screen-reader, mobile, forms, cognitive, language, media, and components modules. Does not enable passive security.",
+    )
     return parser.parse_args(argv)
 
 
@@ -693,6 +815,96 @@ def load_batch_item_reports(items: list[dict]) -> list[dict]:
     return reports
 
 
+def _apply_all_accessibility_modules(parsed_args: argparse.Namespace) -> None:
+    """Expand --all-accessibility-modules without enabling passive security."""
+    if not parsed_args.all_accessibility_modules:
+        return
+    parsed_args.screen_reader = True
+    parsed_args.mobile = True
+    parsed_args.forms = True
+    parsed_args.cognitive = True
+    parsed_args.language_audit = True
+    parsed_args.media = True
+    parsed_args.components = True
+
+
+def _extended_module_flags(parsed_args: argparse.Namespace) -> bool:
+    return any(
+        [
+            parsed_args.screen_reader,
+            parsed_args.mobile,
+            parsed_args.document,
+            parsed_args.media,
+            parsed_args.workflow,
+            parsed_args.forms,
+            parsed_args.cognitive,
+            parsed_args.language_audit,
+            parsed_args.components,
+            parsed_args.passive_security,
+        ]
+    )
+
+
+def run_html_extended_modules(
+    source: str,
+    html: str,
+    parsed_args: argparse.Namespace,
+    *,
+    browser_result: dict | None = None,
+    source_result: dict | None = None,
+) -> tuple[list[AccessibilityIssue], list[dict]]:
+    """Run selected extended modules for one HTML source."""
+    issues: list[AccessibilityIssue] = []
+    results: list[dict] = []
+    if parsed_args.screen_reader:
+        module_issues, result = run_screen_reader_audit(
+            source,
+            browser_result,
+            engine=parsed_args.screen_reader_engine,
+            include_transcript=parsed_args.announce_transcript,
+        )
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.mobile:
+        module_issues, result = run_mobile_audit(
+            source,
+            device=parsed_args.device,
+            orientations=parsed_args.orientations or ["portrait"],
+            wait_ms=parsed_args.wait_ms,
+        )
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.forms:
+        module_issues, result = analyze_forms(html, source, permit_submission=False)
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.media:
+        module_issues, result = analyze_media(html, source)
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.cognitive:
+        module_issues, result = analyze_cognitive(html, source)
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.language_audit:
+        module_issues, result = analyze_language(html, source)
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.components:
+        module_issues, result = analyze_components(html, source)
+        issues.extend(module_issues)
+        results.append(result)
+    if parsed_args.passive_security:
+        module_issues, result = analyze_passive_security(
+            html,
+            source,
+            source_metadata=source_result,
+        )
+        issues.extend(module_issues)
+        results.append(result)
+    return issues, results
+
+
 def _make_console_safe() -> None:
     """Keep console output from crashing on limited encodings.
 
@@ -713,9 +925,24 @@ def main(argv: list[str] | None = None) -> int:
     _make_console_safe()
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
+    _apply_all_accessibility_modules(parsed_args)
+    if parsed_args.announce_transcript:
+        parsed_args.screen_reader = True
+    if parsed_args.screen_reader and parsed_args.screen_reader_engine == "chromium":
+        parsed_args.browser = True
 
     # In CI mode, setup problems must be distinguishable from findings.
     setup_exit = EXIT_TOOL_ERROR if parsed_args.ci else 1
+
+    if parsed_args.capabilities:
+        capabilities = detect_capabilities(verify_browsers=True)
+        print(format_capabilities_cli(capabilities))
+        if parsed_args.json_output:
+            output = Path(parsed_args.json_output)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(json.dumps(capabilities, indent=2), encoding="utf-8")
+            print(f"Capabilities JSON saved: {parsed_args.json_output}")
+        return 0
 
     if parsed_args.list_rules:
         print_rule_list()
@@ -799,6 +1026,87 @@ def main(argv: list[str] | None = None) -> int:
         print(AXE_SETUP_MESSAGE)
         return setup_exit
 
+    if parsed_args.workflow and not parsed_args.workflow_config:
+        print("--workflow requires --workflow-config.")
+        return setup_exit
+
+    if parsed_args.document:
+        issues, document_result = analyze_document(parsed_args.html_path)
+        print_summary(parsed_args.html_path, issues)
+        print()
+        print(f"Document module status: {document_result.get('status')}")
+        print(f"Document findings: {len(issues)}")
+        report = build_json_report(
+            parsed_args.html_path,
+            deduplicate_issues(issues),
+            source_metadata={
+                "source": parsed_args.html_path,
+                "source_type": "document",
+                "final_url": None,
+                "status_code": None,
+                "content_type": Path(parsed_args.html_path).suffix.lower(),
+            },
+            extended_results=[document_result],
+        )
+        if parsed_args.json_output:
+            save_json_report(report, parsed_args.json_output)
+            print(f"JSON report saved: {parsed_args.json_output}")
+        if parsed_args.markdown_output:
+            save_markdown_report(report, parsed_args.markdown_output)
+            print(f"Markdown report saved: {parsed_args.markdown_output}")
+        if parsed_args.html_output or parsed_args.html_reports:
+            output = parsed_args.html_output or "reports/document_audit.html"
+            save_html_report(report, output)
+            print(f"HTML report saved: {output}")
+        if parsed_args.sarif_output:
+            save_sarif_report([report], parsed_args.sarif_output)
+            print(f"SARIF report saved: {parsed_args.sarif_output}")
+        if parsed_args.junit_output:
+            save_junit_xml([report], parsed_args.junit_output)
+            print(f"JUnit XML saved: {parsed_args.junit_output}")
+        return 0
+
+    if parsed_args.workflow:
+        issues, workflow_result = run_workflow_audit(
+            parsed_args.workflow_config,
+            safe_public_mode=parsed_args.safe_public_mode,
+            wait_ms=parsed_args.wait_ms,
+        )
+        print_summary(parsed_args.workflow_config, issues)
+        print()
+        print(f"Workflow status: {workflow_result.get('status')}")
+        print(f"Workflow findings: {len(issues)}")
+        workflow_source = workflow_result.get("artifacts", {}).get("name", "") or parsed_args.workflow_config
+        report = build_json_report(
+            workflow_source,
+            deduplicate_issues(issues),
+            source_metadata={
+                "source": parsed_args.workflow_config,
+                "source_type": "workflow",
+                "final_url": None,
+                "status_code": None,
+                "content_type": "application/json",
+            },
+            extended_results=[workflow_result],
+        )
+        if parsed_args.json_output:
+            save_json_report(report, parsed_args.json_output)
+            print(f"JSON report saved: {parsed_args.json_output}")
+        if parsed_args.markdown_output:
+            save_markdown_report(report, parsed_args.markdown_output)
+            print(f"Markdown report saved: {parsed_args.markdown_output}")
+        if parsed_args.html_output or parsed_args.html_reports:
+            output = parsed_args.html_output or "reports/workflow_audit.html"
+            save_html_report(report, output)
+            print(f"HTML report saved: {output}")
+        if parsed_args.sarif_output:
+            save_sarif_report([report], parsed_args.sarif_output)
+            print(f"SARIF report saved: {parsed_args.sarif_output}")
+        if parsed_args.junit_output:
+            save_junit_xml([report], parsed_args.junit_output)
+            print(f"JUnit XML saved: {parsed_args.junit_output}")
+        return 0
+
     if parsed_args.batch_config:
         batch_result = run_batch(
             parsed_args.batch_config,
@@ -880,6 +1188,41 @@ def main(argv: list[str] | None = None) -> int:
             return setup_exit
 
     source = parsed_args.html_path
+    if parsed_args.media and Path(source).suffix.lower() in MEDIA_EXTENSIONS:
+        issues, media_result = analyze_media_file(source)
+        report = build_json_report(
+            source,
+            deduplicate_issues(issues),
+            source_metadata={
+                "source": source,
+                "source_type": "media",
+                "final_url": None,
+                "status_code": None,
+                "content_type": Path(source).suffix.lower(),
+            },
+            extended_results=[media_result],
+        )
+        print_summary(source, issues)
+        print()
+        print(f"Media module status: {media_result.get('status')}")
+        if parsed_args.json_output:
+            save_json_report(report, parsed_args.json_output)
+            print(f"JSON report saved: {parsed_args.json_output}")
+        if parsed_args.markdown_output:
+            save_markdown_report(report, parsed_args.markdown_output)
+            print(f"Markdown report saved: {parsed_args.markdown_output}")
+        if parsed_args.html_output or parsed_args.html_reports:
+            output = parsed_args.html_output or "reports/media_audit.html"
+            save_html_report(report, output)
+            print(f"HTML report saved: {output}")
+        if parsed_args.sarif_output:
+            save_sarif_report([report], parsed_args.sarif_output)
+            print(f"SARIF report saved: {parsed_args.sarif_output}")
+        if parsed_args.junit_output:
+            save_junit_xml([report], parsed_args.junit_output)
+            print(f"JUnit XML saved: {parsed_args.junit_output}")
+        return 0
+
     issues, source_result = analyze_html_source(source)
 
     if source_result["error"]:
@@ -924,6 +1267,17 @@ def main(argv: list[str] | None = None) -> int:
             print()
             print(f"Task execution video unavailable: {video['error']}")
 
+    extended_results: list[dict] = []
+    if _extended_module_flags(parsed_args):
+        module_issues, extended_results = run_html_extended_modules(
+            source,
+            source_result["html"],
+            parsed_args,
+            browser_result=browser_result,
+            source_result=source_result,
+        )
+        issues = issues + module_issues
+
     # One barrier seen by several detection modes becomes one finding that
     # lists every evidence source.
     issues = deduplicate_issues(issues)
@@ -956,6 +1310,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if task_execution is not None:
         print_task_execution_summary(task_execution)
+
+    if extended_results:
+        print()
+        print("Extended modules")
+        for result in extended_results:
+            print(
+                f"   {result.get('module')}: {result.get('status')} "
+                f"({len(result.get('findings', []))} findings)"
+            )
 
     selected_task = None
     task_blockers: list[dict] = []
@@ -992,6 +1355,7 @@ def main(argv: list[str] | None = None) -> int:
             browser_result=browser_result,
             task_execution=task_execution,
             low_vision_result=low_vision_result,
+            extended_results=extended_results,
         )
         if review_only_rules:
             report["summary"]["review_only_rules"] = sorted(review_only_rules)

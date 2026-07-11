@@ -1,0 +1,4 @@
+{
+  "problematic": ["screen_reader_empty_name", "screen_reader_focus_hidden"],
+  "clean": []
+}

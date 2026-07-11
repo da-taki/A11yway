@@ -1,0 +1,6 @@
+{
+  "problematic.pdf": ["document_pdf_untagged", "document_language_missing"],
+  "problematic.docx": ["document_title_missing", "document_heading_level_skipped"],
+  "problematic.pptx": ["document_slide_title_missing"],
+  "clean": []
+}

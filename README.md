@@ -63,6 +63,22 @@ python -m a11yway.main --rule missing_autocomplete
 
 The full matrix lives in [docs/WCAG_2_2_COVERAGE.md](docs/WCAG_2_2_COVERAGE.md) (regenerate with `--wcag-coverage-markdown docs/WCAG_2_2_COVERAGE.md`), and every report includes a coverage snapshot. WCAG evidence coverage is not the same as WCAG conformance coverage: A11yway does not claim WCAG conformance, and most criteria still require manual testing.
 
+## Extended Accessibility Modules
+
+A11yway now includes opt-in modules beyond the original static/browser/low-vision path:
+
+```bash
+python -m a11yway.main --capabilities
+python -m a11yway.main examples/sample_form.html --browser --screen-reader --announce-transcript --mobile --device android-small --forms --components --cognitive --language-audit --media --html-reports
+python -m a11yway.main examples/documents/problematic.pdf --document
+python -m a11yway.main --workflow --workflow-config examples/workflows/problematic_application.json --safe-public-mode
+python -m a11yway.main examples/security_passive/problematic_headers_fixture.html --passive-security
+```
+
+`--all-accessibility-modules` enables screen-reader evidence, mobile emulation, forms, cognitive review, language review, media, and component checks. It deliberately does not enable `--passive-security`, which must be requested explicitly.
+
+Screen-reader mode defaults to Chromium accessibility-tree evidence; it does not claim real NVDA, JAWS, VoiceOver, or TalkBack output unless a native adapter actually runs. Mobile mode uses Playwright device emulation and is not a real mobile assistive-technology test. Document mode inspects PDF/DOCX/PPTX metadata and structure evidence without claiming PDF/UA or Office conformance. Passive security observations are separate from accessibility findings and are not penetration testing.
+
 ## Confidence and Deduplication
 
 Every finding carries a confidence level. Deterministic browser blockage (a blocked task step, an observed keyboard trap) is `confirmed`; strong single-source evidence is `likely`; heuristic patterns (sensory language, unresolved contrast over images) are `needs_review`; pure review context (multiple h1 headings) is `informational`. Findings that the static analyzer, rendered-DOM re-check, browser interaction, accessibility tree, or axe-core all discover on the same element are merged into one primary finding listing every evidence source.
