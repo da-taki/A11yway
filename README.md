@@ -1,10 +1,60 @@
 # A11yway
 
+Current release: `0.8.0-beta.1` (`0.8.0b1` for Python packaging).
+
 A11yway audits essential web workflows for accessibility barriers that block real tasks. It began with education pages and now supports a broader public-interest accessibility stress-testing direction, with static HTML checks by default, an optional headless-browser keyboard audit, and deterministic task execution that proves whether a keyboard-only user can finish a declared workflow.
 
-**Status: prototype, open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review.
+**Status: public beta.** Not a WCAG certification tool, not native screen-reader certification, not real mobile assistive-technology testing, not penetration testing, and not a replacement for human accessibility review.
 
 A11yway provides native direct, partial, or supporting evidence related to 45 of the 86 WCAG 2.2 Success Criteria.
+
+## Installation
+
+Core static mode has no mandatory third-party runtime dependencies:
+
+```bash
+pip install -e .
+```
+
+Optional groups:
+
+```bash
+pip install -e ".[browser]"
+pip install -e ".[documents]"
+pip install -e ".[media]"
+pip install -e ".[development]"
+pip install -e ".[all]"
+```
+
+PowerShell uses the same quoting form:
+
+```powershell
+pip install -e ".[browser]"
+pip install -e ".[documents]"
+pip install -e ".[development]"
+pip install -e ".[all]"
+```
+
+Install Chromium for browser-backed modes:
+
+```bash
+python -m playwright install chromium
+```
+
+The installed CLI exposes the same commands as module mode:
+
+```bash
+a11yway --version
+a11yway --help
+a11yway --capabilities
+a11yway --wcag-coverage
+a11yway examples/sample_form.html --json reports/sample_form_report.json
+python -m a11yway.main --version
+```
+
+Optional native integrations for NVDA, JAWS, VoiceOver, TalkBack, ADB, and
+FFmpeg remain capability-gated. Missing optional tools are reported honestly
+and do not break core static audits.
 
 Instead of only scanning a page for technical rules, A11yway is built around tasks: submitting a scholarship form, finding an assignment, accessing a video lesson, locating public services, or using a public AI product interface. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
 

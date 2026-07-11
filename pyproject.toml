@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a11yway"
+dynamic = ["version"]
+description = "Task-centered accessibility evidence collection for public-interest web workflows."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = [
+  "accessibility",
+  "wcag",
+  "a11y",
+  "testing",
+  "playwright",
+  "screen-reader",
+  "public-interest",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Information Technology",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Text Processing :: Markup :: HTML",
+]
+
+[project.urls]
+Homepage = "https://github.com/da-taki/A11yway"
+Repository = "https://github.com/da-taki/A11yway"
+
+[project.scripts]
+a11yway = "a11yway.main:main"
+
+[project.optional-dependencies]
+browser = [
+  "playwright",
+  "axe-playwright-python",
+]
+documents = [
+  "pypdf",
+  "pdfplumber",
+  "python-docx",
+  "python-pptx",
+  "reportlab",
+  "Pillow",
+]
+media = [
+  "mutagen",
+]
+ai = [
+  "groq",
+]
+web = [
+  "Flask",
+  "gunicorn",
+]
+development = [
+  "build",
+  "coverage",
+  "pytest",
+  "pytest-cov",
+]
+all = [
+  "playwright",
+  "axe-playwright-python",
+  "pypdf",
+  "pdfplumber",
+  "python-docx",
+  "python-pptx",
+  "reportlab",
+  "Pillow",
+  "mutagen",
+  "groq",
+  "Flask",
+  "gunicorn",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "a11yway.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["a11yway*"]
+
+[tool.setuptools.package-data]
+a11yway = [
+  "workflow_packs/*.json",
+  "templates/web_demo/*.html",
+  "static/web_demo/*.css",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["a11yway"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

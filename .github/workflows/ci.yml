@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Python 3.12 on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install A11yway with beta test dependencies
+        run: python -m pip install -e ".[development,browser,documents,media]"
+
+      - name: Install Playwright Chromium on Linux
+        if: runner.os == 'Linux'
+        run: python -m playwright install --with-deps chromium
+
+      - name: Install Playwright Chromium on Windows
+        if: runner.os == 'Windows'
+        run: python -m playwright install chromium
+
+      - name: Dependency health
+        run: python -m pip check
+
+      - name: Compile sources
+        run: python -m compileall a11yway tests
+
+      - name: Run tests with coverage
+        run: python -m coverage run --branch -m pytest --junitxml reports/pytest.xml
+
+      - name: Coverage reports
+        run: |
+          python -m coverage report -m
+          python -m coverage json -o reports/coverage.json
+          python -m coverage html -d reports/coverage_html
+
+      - name: Build package
+        run: python -m build
+
+      - name: Installed wheel smoke test
+        shell: pwsh
+        run: |
+          $wheel = Get-ChildItem dist -Filter "*.whl" | Select-Object -First 1 -ExpandProperty FullName
+          python scripts/verify_wheel_install.py $wheel
+
+      - name: Upload coverage and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-${{ matrix.os }}
+          path: |
+            reports/pytest.xml
+            reports/coverage.json
+            reports/coverage_html/
+          if-no-files-found: ignore
+
+      - name: Upload built package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.os }}
+          path: dist/*
+          if-no-files-found: ignore

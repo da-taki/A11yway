@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
+from a11yway import __version__
 
 # Exit codes for --ci mode.
 EXIT_OK = 0
@@ -179,7 +180,7 @@ def build_sarif_report(reports: list[dict]) -> dict:
                 "tool": {
                     "driver": {
                         "name": "A11yway",
-                        "version": "prototype",
+                        "version": __version__,
                         "informationUri": "https://github.com/da-taki/A11yway",
                         "rules": rules,
                     }

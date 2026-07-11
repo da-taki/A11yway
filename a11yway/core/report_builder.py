@@ -9,6 +9,7 @@ from html import escape
 from pathlib import Path
 from typing import List
 
+from a11yway import __version__
 from a11yway.models.issue import AccessibilityIssue
 from a11yway.models.report import AccessibilityReport
 from a11yway.models.task import AccessibilityTask
@@ -146,7 +147,7 @@ def build_json_report(
 
     report = {
         "tool": "A11yway",
-        "version": "prototype",
+        "version": __version__,
         "report_schema_version": REPORT_SCHEMA_VERSION,
         "extended_result_schema_version": EXTENDED_RESULT_SCHEMA_VERSION,
         "source_file": source_file,
@@ -1324,7 +1325,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
 
     return {
         "tool": "A11yway",
-        "version": "prototype",
+        "version": __version__,
         "summary": {
             "analysis_modes": analysis_modes,
             "total_pages_tested": len(items),

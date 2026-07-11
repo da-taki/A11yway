@@ -1,7 +1,36 @@
 # Changelog
 
-A11yway is a prototype. Versions below are development milestones, not
-production releases.
+A11yway 0.8.0-beta.1 is the first public beta. It provides accessibility
+evidence for reviewer triage, not WCAG conformance certification.
+
+## 0.8.0-beta.1 - Public beta
+
+- Prepared package metadata for `a11yway` version `0.8.0b1`, with a console
+  script entry point and optional dependency groups for browser, document,
+  media, AI, web, development, and all runtime extras.
+- Added one authoritative version source at `a11yway.__version__` and exposed
+  it through `a11yway --version` and `python -m a11yway.main --version`.
+- Preserved the WCAG 2.2 evidence mapping: 1 direct native criterion, 21
+  partial native criteria, 23 supporting-evidence criteria, 0 axe-only
+  criteria, 41 manual-only criteria, and 0 unsupported criteria. A11yway
+  provides native direct, partial, or supporting evidence related to 45 of the
+  86 WCAG 2.2 Success Criteria.
+- Added Chromium accessibility-tree evidence, mobile Playwright emulation,
+  document inspection, media checks, safe workflow testing, form/error-recovery
+  review, cognitive review, multilingual and RTL checks, complex component
+  review, and opt-in passive security observations.
+- Added report schema versioning and extended module result schema versioning.
+- Hardened malformed document/media inputs, workflow safe-mode blocking,
+  malformed workflow configs, mobile resource cleanup, deterministic report
+  ordering, and passive-security request isolation.
+- Added Windows and Linux CI coverage for Python 3.12, Chromium installation,
+  dependency health, compile checks, pytest, coverage, package build, and clean
+  wheel-install smoke testing.
+- Known limitations: this is a public beta, evidence coverage is not WCAG
+  conformance, Chromium accessibility-tree evidence is not native screen-reader
+  testing, Playwright mobile emulation is not real TalkBack or VoiceOver
+  testing, passive security is not penetration testing, and native adapters
+  remain capability-gated.
 
 ## Unreleased - Video proof
 

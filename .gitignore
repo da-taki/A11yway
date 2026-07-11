@@ -8,6 +8,7 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+reports/coverage_html/
 
 # Virtual environments
 .venv/
@@ -23,10 +24,14 @@ env/
 build/
 dist/
 *.egg-info/
+_prod_*
 
 # Browser runtime noise
 debug.log
 *.log
+
+# Coverage artifacts
+reports/coverage.json
 
 # Generated A11yway report runs
 reports/email_verified_outreach/
@@ -34,6 +39,29 @@ reports/outreach_ai_scout/
 reports/web_demo_runs/*
 !reports/web_demo_runs/
 !reports/web_demo_runs/.gitkeep
+
+# Temporary end-to-end validation reports
+reports/_e2e.*
+
+# Report archives and bulk visual output
+reports/**/*.zip
+reports/**/screenshots/
+reports/**/focus_paths/
+reports/**/video/
+reports/**/videos/
+
+# Local generated outreach and university batch output
+reports/batch4_ngo_30_outreach*
+reports/batch5_public_service_31_outreach*
+reports/benetech_visionaid_nab*
+reports/ngo_email_outreach*
+reports/university_accessibility_25*
+reports/ivy_hypsm_wcag_10_smoke*
+reports/ivy_hypsm_wcag_50*
+reports/run_batch4_ngo_30_outreach.ps1
+reports/run_batch5_public_service_31_outreach.ps1
+reports/run_ngo_email_outreach_batch.ps1
+reports/run_university_accessibility_25.ps1
 
 # IDE files
 .idea/
