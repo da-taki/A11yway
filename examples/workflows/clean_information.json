@@ -1,0 +1,8 @@
+{
+  "name": "Find local fixture instructions",
+  "start_url": "examples/cognitive/clean.html",
+  "safe_mode": true,
+  "steps": [
+    {"action": "assert_text", "text": "Apply in three steps"}
+  ]
+}

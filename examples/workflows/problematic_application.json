@@ -1,0 +1,9 @@
+{
+  "name": "Problematic public application workflow",
+  "start_url": "examples/forms/problematic.html",
+  "safe_mode": true,
+  "steps": [
+    {"action": "navigate", "target": "Start application"},
+    {"action": "submit", "target": "Submit application"}
+  ]
+}

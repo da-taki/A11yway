@@ -1,0 +1,4 @@
+{
+  "problematic": ["mobile_viewport_overflow", "mobile_small_touch_target", "mobile_orientation_restriction", "mobile_hover_dependent_content"],
+  "clean": []
+}

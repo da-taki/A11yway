@@ -1,0 +1,4 @@
+{
+  "problematic": ["cognitive_dense_text_review", "cognitive_ambiguous_action_text", "cognitive_destructive_action_review", "cognitive_complex_password_rules"],
+  "clean": []
+}

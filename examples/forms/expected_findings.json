@@ -1,0 +1,4 @@
+{
+  "problematic": ["form_required_instruction_missing", "form_error_not_described", "show_password_state_missing", "form_submission_blocked_safe_mode"],
+  "clean": []
+}
