@@ -24,6 +24,7 @@ from a11yway.core.browser_runner import (
     merge_browser_issues,
     run_browser_audit,
 )
+from a11yway.core.dedup import deduplicate_issues
 from a11yway.core.report_builder import build_json_report, build_markdown_report
 from a11yway.main import main
 from a11yway.models.issue import AccessibilityIssue
@@ -121,8 +122,8 @@ def test_run_axe_scan_reports_missing_dependency(monkeypatch) -> None:
     assert result["issues"] == []
 
 
-def test_merge_browser_issues_keeps_axe_findings() -> None:
-    """Axe findings are new evidence, never deduped against static ones."""
+def test_final_dedup_merges_equivalent_axe_findings() -> None:
+    """Native and axe evidence for the same element should report once."""
     static_issue = AccessibilityIssue(
         title="Form control is missing an accessible label",
         issue_type="missing_form_label",
@@ -141,6 +142,13 @@ def test_merge_browser_issues_keeps_axe_findings() -> None:
 
     assert len(merged) == 2
     assert merged[1] is axe_issue
+
+    deduped = deduplicate_issues(merged)
+
+    assert len(deduped) == 1
+    assert deduped[0] is static_issue
+    assert deduped[0].evidence["evidence_sources"] == ["static", "axe_core"]
+    assert deduped[0].evidence["merged_finding_count"] == 2
 
 
 def test_cli_axe_without_browser_exits_with_guidance(capsys) -> None:

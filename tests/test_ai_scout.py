@@ -13,6 +13,7 @@ from a11yway.core.ai_scout import (
     redact_secrets,
     run_ai_scout,
     save_ai_scout_outputs,
+    select_ai_scout_findings,
 )
 
 
@@ -220,6 +221,75 @@ def test_ai_scout_payload_is_concise() -> None:
     assert payload["target_name"] == "Example"
     assert payload["deterministic_findings"][0]["evidence"]["snippet"] == '<input id="email">'
     assert "html" not in payload
+
+
+def test_ai_scout_prioritizes_evidence_sources_and_severity() -> None:
+    issues = [
+        {
+            "issue_type": "missing_alt_text",
+            "severity": "high",
+            "message": "Static issue",
+            "evidence": {"snippet": "<img>"},
+        },
+        {
+            "issue_type": "low_contrast_text",
+            "severity": "high",
+            "message": "Low vision issue",
+            "evidence": {"detected_in": "low_vision"},
+        },
+        {
+            "issue_type": "missing_form_label",
+            "severity": "high",
+            "message": "Rendered DOM issue",
+            "evidence": {"detected_in": "browser_dom"},
+        },
+        {
+            "issue_type": "browser_focus_on_hidden_element",
+            "severity": "medium",
+            "message": "Browser issue",
+            "evidence": {"detected_in": "browser_interaction"},
+        },
+        {
+            "issue_type": "axe_label",
+            "severity": "low",
+            "message": "Axe issue",
+            "evidence": {"detected_in": "axe_core"},
+        },
+        {
+            "issue_type": "axe_color_contrast",
+            "severity": "high",
+            "message": "High axe issue",
+            "evidence": {"detected_in": "axe_core"},
+        },
+    ]
+
+    selected = select_ai_scout_findings(issues)
+
+    assert [issue["issue_type"] for issue in selected] == [
+        "axe_color_contrast",
+        "axe_label",
+        "browser_focus_on_hidden_element",
+        "missing_form_label",
+        "low_contrast_text",
+        "missing_alt_text",
+    ]
+
+
+def test_ai_scout_payload_caps_findings_at_25() -> None:
+    report = sample_report()
+    report["issues"] = [
+        {
+            "issue_type": f"static_{index}",
+            "severity": "low",
+            "message": f"Static issue {index}",
+            "evidence": {"snippet": f"<span>{index}</span>"},
+        }
+        for index in range(30)
+    ]
+
+    payload = build_ai_scout_payload(report, target_name="Example")
+
+    assert len(payload["deterministic_findings"]) == 25
 
 
 def test_ai_scout_markdown_for_failed_run_uses_required_text() -> None:

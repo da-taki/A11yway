@@ -18,8 +18,13 @@ from a11yway.core.announce import (
     build_announce_transcript,
     trace_has_announce_data,
 )
+from a11yway.core.extended_results import EXTENDED_RESULT_SCHEMA_VERSION, json_safe
 from a11yway.core.page_analyzer import STATIC_CHECKS_RUN
 from a11yway.core.rules import enrich_issue_with_rule
+from a11yway.core.wcag_coverage import coverage_summary_for_report
+
+
+REPORT_SCHEMA_VERSION = "1.0"
 
 
 def _count_by(items: list[str]) -> dict[str, int]:
@@ -85,8 +90,17 @@ def build_json_report(
     task_execution: dict | None = None,
     low_vision_result: dict | None = None,
     ai_scout_result: dict | None = None,
+    extended_results: list[dict] | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
+    normalized_extended_results = sorted(
+        [json_safe(result) for result in (extended_results or [])],
+        key=lambda result: (
+            str(result.get("module", "")),
+            str(result.get("check_id", "")),
+            str(result.get("status", "")),
+        ),
+    )
     checks_run = list(STATIC_CHECKS_RUN)
     limitations = [
         "This prototype only runs static HTML checks.",
@@ -106,33 +120,62 @@ def build_json_report(
             limitations.append(
                 "Low-vision browser checks are conservative heuristics and require manual review."
             )
+    if normalized_extended_results:
+        for result in normalized_extended_results:
+            check_id = result.get("check_id")
+            if check_id:
+                checks_run.append(check_id)
+        limitations.append(
+            "Extended module evidence may include deterministic browser/file metadata and heuristic review points; it is not a certification claim."
+        )
+
+    enriched_issues = [
+        enrich_issue_with_rule(
+            {
+                "issue_type": issue.issue_type,
+                "severity": issue.severity,
+                "agent_name": issue.agent_name,
+                "message": issue.title,
+                "evidence": _format_evidence_for_json(issue.evidence),
+                "suggested_fix": issue.suggested_fix,
+                **({"confidence": issue.confidence} if issue.confidence else {}),
+            }
+        )
+        for issue in issues
+    ]
 
     report = {
         "tool": "A11yway",
         "version": "prototype",
+        "report_schema_version": REPORT_SCHEMA_VERSION,
+        "extended_result_schema_version": EXTENDED_RESULT_SCHEMA_VERSION,
         "source_file": source_file,
         "summary": {
             "issues_found": len(issues),
             "counts_by_severity": _count_by([issue.severity for issue in issues]),
             "counts_by_issue_type": _count_by([issue.issue_type for issue in issues]),
+            "counts_by_confidence": _count_by(
+                [issue.get("confidence", "") for issue in enriched_issues]
+            ),
             "agents_used": ["Keyboard-only student"],
             "checks_run": checks_run,
         },
-        "issues": [
-            enrich_issue_with_rule(
-                {
-                    "issue_type": issue.issue_type,
-                    "severity": issue.severity,
-                    "agent_name": issue.agent_name,
-                    "message": issue.title,
-                    "evidence": _format_evidence_for_json(issue.evidence),
-                    "suggested_fix": issue.suggested_fix,
-                }
-            )
-            for issue in issues
-        ],
+        "issues": enriched_issues,
+        "wcag_coverage": coverage_summary_for_report(),
         "limitations": limitations,
     }
+
+    if normalized_extended_results:
+        report["extended_modules"] = normalized_extended_results
+        report["summary"]["extended_modules"] = [
+            {
+                "module": result.get("module"),
+                "check_id": result.get("check_id"),
+                "status": result.get("status"),
+                "findings": len(result.get("findings", [])),
+            }
+            for result in extended_results
+        ]
 
     if task:
         report["task"] = {
@@ -231,7 +274,7 @@ def save_json_report(report: dict, output_path: str | Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
     with path.open("w", encoding="utf-8") as file:
-        json.dump(report, file, indent=2)
+        json.dump(report, file, indent=2, sort_keys=True)
 
 
 def _format_count_items(counts: dict) -> list[str]:
@@ -251,6 +294,36 @@ _EVIDENCE_KEYS = [
     "line",
     "step",
     "detected_in",
+    "evidence_sources",
+    "merged_finding_count",
+    "fingerprint",
+    "selector",
+    "contrast_ratio",
+    "foreground_color",
+    "background_color",
+    "background_image_in_stack",
+    "group_name",
+    "option_count",
+    "label_text",
+    "suggested_token",
+    "matched_phrase",
+    "visible_label",
+    "aria_label",
+    "nav_link_count",
+    "width",
+    "height",
+    "bounding_box",
+    "nearby_target",
+    "covered_points",
+    "sampled_points",
+    "covering_element",
+    "covering_position",
+    "detection_method",
+    "direction",
+    "element",
+    "bounding_box_before",
+    "bounding_box_after",
+    "downgraded_to_review_only",
     "announced_role",
     "announcement",
     "loop_sequence",
@@ -266,6 +339,17 @@ _EVIDENCE_KEYS = [
     "first_element",
     "second_element",
     "reason",
+    "module",
+    "check_id",
+    "evidence_type",
+    "review_status",
+    "source",
+    "observed",
+    "expected",
+    "manual_verification",
+    "detection_source",
+    "deterministic",
+    "limitations",
 ]
 
 
@@ -308,7 +392,23 @@ def build_markdown_report(report: dict) -> str:
         "",
         *_format_count_items(summary.get("counts_by_issue_type", {})),
         "",
+        "### Counts By Confidence",
+        "",
+        *_format_count_items(summary.get("counts_by_confidence", {})),
+        "",
     ]
+    if summary.get("review_only_rules"):
+        lines.extend(
+            [
+                "### Rules Downgraded To Review-Only",
+                "",
+                "These rules still ran, but their findings carry needs_review "
+                "confidence in this report per configuration:",
+                "",
+                *[f"- {rule}" for rule in summary["review_only_rules"]],
+                "",
+            ]
+        )
     if source.get("final_url") or source.get("status_code"):
         lines.extend(
             [
@@ -510,6 +610,38 @@ def build_markdown_report(report: dict) -> str:
                 ]
             )
 
+    extended_modules = report.get("extended_modules", [])
+    if extended_modules:
+        lines.extend(["## Extended Accessibility Modules", ""])
+        for module in extended_modules:
+            namespace = module.get("namespace", "")
+            title = (
+                "Passive Security Observations"
+                if namespace == "security"
+                else str(module.get("module", "")).replace("_", " ").title()
+            )
+            lines.extend(
+                [
+                    f"### {title}",
+                    "",
+                    f"- Check: {module.get('check_id', '')}",
+                    f"- Status: {module.get('status', '')}",
+                    f"- Findings: {len(module.get('findings', []))}",
+                ]
+            )
+            if module.get("notice"):
+                lines.append(f"- Notice: {module['notice']}")
+            artifacts = module.get("artifacts", {})
+            if artifacts:
+                lines.append(
+                    f"- Artifacts: {json.dumps(artifacts, ensure_ascii=False)[:500]}"
+                )
+            limitations = module.get("limitations", [])
+            if limitations:
+                lines.append("- Limitations:")
+                lines.extend(f"  - {limitation}" for limitation in limitations)
+            lines.append("")
+
     execution = report.get("task_execution")
     if execution is not None:
         lines.extend(["## Task Execution", ""])
@@ -610,6 +742,16 @@ def build_markdown_report(report: dict) -> str:
         if rule.get("category"):
             lines.append(f"- Category: {rule['category']}")
         lines.append(f"- Severity: {issue.get('severity', '')}")
+        if issue.get("confidence"):
+            lines.append(f"- Confidence: {issue['confidence']}")
+        for mapping in issue.get("wcag", []) or []:
+            lines.append(
+                f"- Related to WCAG 2.2 SC {mapping.get('sc')} "
+                f"{mapping.get('name')} (Level {mapping.get('level')}, "
+                f"coverage: {mapping.get('coverage')})"
+            )
+            if mapping.get("manual_check"):
+                lines.append(f"  - Manual check: {mapping['manual_check']}")
         if rule.get("why_it_matters"):
             lines.append(f"- Why it matters: {rule['why_it_matters']}")
         lines.append(f"- Suggested fix: {issue.get('suggested_fix', '')}")
@@ -622,6 +764,31 @@ def build_markdown_report(report: dict) -> str:
         lines.extend(["", "Evidence:", ""])
         lines.extend(_format_evidence_lines(issue.get("evidence", {})))
         lines.append("")
+
+    coverage = report.get("wcag_coverage")
+    if coverage:
+        counts = coverage.get("counts", {})
+        lines.extend(
+            [
+                "## WCAG 2.2 Coverage Snapshot",
+                "",
+                "How A11yway's checks relate to the "
+                f"{coverage.get('total_criteria', 86)} WCAG "
+                f"{coverage.get('wcag_version', '2.2')} Success Criteria. "
+                "This describes tool coverage, not the conformance of the "
+                "audited page.",
+                "",
+                f"- Direct native coverage: {counts.get('direct', 0)}",
+                f"- Partial native coverage: {counts.get('partial', 0)}",
+                f"- Supporting evidence only: {counts.get('supporting_evidence', 0)}",
+                f"- Covered only through the optional axe-core scan: {counts.get('axe_only', 0)}",
+                f"- Manual review only: {counts.get('manual_only', 0)}",
+                f"- Unsupported: {counts.get('unsupported', 0)}",
+                "",
+                f"{coverage.get('note', '')}",
+                "",
+            ]
+        )
 
     lines.extend(["## Limitations", ""])
     lines.extend(f"- {limitation}" for limitation in report.get("limitations", []))
@@ -701,6 +868,7 @@ def build_html_report(report: dict) -> str:
         ".medium { border-top-color: #b86e00; }",
         ".low { border-top-color: #367a45; }",
         ".announce-unnamed { color: #b42318; font-weight: 600; }",
+        ".security-observations { border-left: 4px solid #7a2f00; padding-left: 0.75rem; background: #fff8f0; }",
         "</style>",
         "</head>",
         "<body>",
@@ -775,6 +943,35 @@ def build_html_report(report: dict) -> str:
             lines.append("</ul>")
         else:
             lines.append("<p>None found for this task.</p>")
+        lines.append("</section>")
+
+    extended_modules = report.get("extended_modules", [])
+    if extended_modules:
+        lines.extend(["<section>", "<h2>Extended Accessibility Modules</h2>"])
+        for module in extended_modules:
+            namespace = module.get("namespace", "")
+            css_class = ' class="security-observations"' if namespace == "security" else ""
+            title = (
+                "Passive Security Observations"
+                if namespace == "security"
+                else str(module.get("module", "")).replace("_", " ").title()
+            )
+            lines.extend(
+                [
+                    f"<article{css_class}>",
+                    f"<h3>{escape(title)}</h3>",
+                    f"<p><strong>Check:</strong> {escape(str(module.get('check_id', '')))}</p>",
+                    f"<p><strong>Status:</strong> {escape(str(module.get('status', '')))}</p>",
+                    f"<p><strong>Findings:</strong> {len(module.get('findings', []))}</p>",
+                ]
+            )
+            if module.get("notice"):
+                lines.append(f"<p><strong>Notice:</strong> {escape(str(module['notice']))}</p>")
+            limitations = module.get("limitations", [])
+            if limitations:
+                lines.append("<h4>Limitations</h4>")
+                lines.append(_html_list([str(item) for item in limitations]))
+            lines.append("</article>")
         lines.append("</section>")
 
     execution = report.get("task_execution")
@@ -1032,6 +1229,23 @@ def build_html_report(report: dict) -> str:
                 f"<p>Severity: {escape(str(severity))}</p>",
             ]
         )
+        if issue.get("confidence"):
+            lines.append(f"<p>Confidence: {escape(str(issue['confidence']))}</p>")
+        wcag_mappings = issue.get("wcag", []) or []
+        if wcag_mappings:
+            lines.append("<p>Related WCAG 2.2 Success Criteria (not a conformance claim):</p><ul>")
+            for mapping in wcag_mappings:
+                lines.append(
+                    "<li>SC {sc} {name} (Level {level}, coverage: {coverage})"
+                    "<br><span class=\"meta\">Manual check: {manual}</span></li>".format(
+                        sc=escape(str(mapping.get("sc", ""))),
+                        name=escape(str(mapping.get("name", ""))),
+                        level=escape(str(mapping.get("level", ""))),
+                        coverage=escape(str(mapping.get("coverage", ""))),
+                        manual=escape(str(mapping.get("manual_check", ""))),
+                    )
+                )
+            lines.append("</ul>")
         if rule.get("title"):
             lines.append(f"<p>Rule: {escape(str(rule['title']))}</p>")
         if rule.get("why_it_matters"):
@@ -1042,6 +1256,31 @@ def build_html_report(report: dict) -> str:
         lines.append(_html_evidence(issue.get("evidence", {})))
         lines.append("</article>")
     lines.append("</section>")
+
+    coverage = report.get("wcag_coverage")
+    if coverage:
+        counts = coverage.get("counts", {})
+        lines.extend(
+            [
+                "<section>",
+                "<h2>WCAG 2.2 Coverage Snapshot</h2>",
+                "<p>How A11yway's checks relate to the "
+                f"{coverage.get('total_criteria', 86)} WCAG "
+                f"{escape(str(coverage.get('wcag_version', '2.2')))} Success "
+                "Criteria. This describes tool coverage, not the conformance "
+                "of the audited page.</p>",
+                "<ul>",
+                f"<li>Direct native coverage: {counts.get('direct', 0)}</li>",
+                f"<li>Partial native coverage: {counts.get('partial', 0)}</li>",
+                f"<li>Supporting evidence only: {counts.get('supporting_evidence', 0)}</li>",
+                f"<li>Covered only through the optional axe-core scan: {counts.get('axe_only', 0)}</li>",
+                f"<li>Manual review only: {counts.get('manual_only', 0)}</li>",
+                f"<li>Unsupported: {counts.get('unsupported', 0)}</li>",
+                "</ul>",
+                f"<p class=\"meta\">{escape(str(coverage.get('note', '')))}</p>",
+                "</section>",
+            ]
+        )
 
     lines.extend(
         [

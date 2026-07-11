@@ -25,6 +25,7 @@ SYSTEM_PROMPT = (
 
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
 DEFAULT_MODE = "suggest_only"
+MAX_AI_SCOUT_FINDINGS = 25
 ALLOWED_CONFIDENCE = {"AI-only", "AI plus deterministic support", "unclear"}
 AI_SCOUT_LIMITATIONS = [
     "AI Scout findings are suggestions and need human review.",
@@ -181,6 +182,59 @@ def _issue_summary(issue: dict) -> dict:
     }
 
 
+def _severity_rank(issue: dict) -> int:
+    """Return a stable severity rank for AI Scout evidence ordering."""
+    severity = str(issue.get("severity", "") or "").strip().lower()
+    return {"high": 0, "medium": 1, "low": 2}.get(severity, 3)
+
+
+def _evidence_group_rank(issue: dict) -> int:
+    """Rank deterministic evidence by usefulness for AI Scout.
+
+    AI Scout should see the strongest, most reviewable evidence first:
+    axe-core results, browser interaction/accessibility-tree evidence,
+    rendered browser DOM evidence, low-vision evidence, then static findings.
+    """
+    evidence = issue.get("evidence", {})
+    if not isinstance(evidence, dict):
+        return 4
+
+    detected_in = str(evidence.get("detected_in", "") or "").strip().lower()
+    issue_type = str(issue.get("issue_type", "") or "").strip().lower()
+    agent_name = str(issue.get("agent_name", "") or "").strip().lower()
+
+    if detected_in == "axe_core" or issue_type.startswith("axe_"):
+        return 0
+    if (
+        detected_in == "browser_interaction"
+        or "accessibility_tree" in detected_in
+        or "announce" in issue_type
+        or "keyboard" in agent_name
+    ):
+        return 1
+    if detected_in == "browser_dom":
+        return 2
+    if detected_in == "low_vision" or "low vision" in agent_name:
+        return 3
+    return 4
+
+
+def select_ai_scout_findings(
+    issues: list[dict],
+    limit: int = MAX_AI_SCOUT_FINDINGS,
+) -> list[dict]:
+    """Select the most useful deterministic findings for AI Scout."""
+    indexed = list(enumerate(issues or []))
+    indexed.sort(
+        key=lambda item: (
+            _evidence_group_rank(item[1]),
+            _severity_rank(item[1]),
+            item[0],
+        )
+    )
+    return [issue for _index, issue in indexed[:limit]]
+
+
 def build_ai_scout_payload(
     report: dict,
     target_name: str = "",
@@ -189,7 +243,7 @@ def build_ai_scout_payload(
     workflow_pack: str = "",
 ) -> dict:
     """Create a compact, public-data-only payload for Groq."""
-    issues = report.get("issues", [])[:15]
+    issues = select_ai_scout_findings(report.get("issues", []))
     browser = report.get("browser") or {}
     focus_trace = browser.get("focus_trace", [])[:12]
     low_vision = report.get("low_vision") or {}

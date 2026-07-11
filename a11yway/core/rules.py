@@ -7,6 +7,7 @@ registry so reviewers can understand findings without reading the code.
 
 from __future__ import annotations
 
+from a11yway.core.wcag_coverage import wcag_mappings_for_issue_type
 from a11yway.models.issue import AccessibilityIssue
 
 
@@ -22,6 +23,80 @@ REPORT_RULE_FIELDS = [
     "static_check_limitations",
     "browser_check_limitations",
 ]
+
+# Confidence a finding carries when the check did not set one explicitly.
+# confirmed: deterministic observed blockage or state.
+# likely: strong single-source evidence with known blind spots.
+# needs_review: heuristic evidence a human must judge.
+# informational: context for reviewers, not a suspected failure.
+DEFAULT_CONFIDENCE_BY_RULE = {
+    "missing_form_label": "likely",
+    "missing_button_name": "likely",
+    "missing_link_name": "likely",
+    "generic_link_text": "needs_review",
+    "missing_image_alt": "likely",
+    "image_empty_alt_suspicious": "needs_review",
+    "missing_h1": "needs_review",
+    "skipped_heading_level": "needs_review",
+    "multiple_h1": "informational",
+    "missing_page_title": "likely",
+    "missing_html_lang": "likely",
+    "missing_video_captions": "needs_review",
+    "missing_audio_transcript": "needs_review",
+    "missing_lang_indic": "likely",
+    "mixed_script_element": "needs_review",
+    "lang_mismatch": "likely",
+    "radio_group_missing_fieldset": "likely",
+    "table_missing_headers": "likely",
+    "visual_required_not_programmatic": "likely",
+    "fake_heading": "needs_review",
+    "sensory_instruction": "needs_review",
+    "missing_autocomplete": "likely",
+    "no_bypass_mechanism": "needs_review",
+    "label_in_name_mismatch": "likely",
+    "browser_no_focusable_elements": "likely",
+    "browser_focus_not_moving": "likely",
+    "browser_repeated_focus": "needs_review",
+    "browser_focused_control_missing_name": "likely",
+    "browser_focus_on_hidden_element": "needs_review",
+    "unnamed_focus_stop": "likely",
+    "keyboard_trap": "confirmed",
+    "focus_lost": "needs_review",
+    "task_step_blocked": "confirmed",
+    "task_control_not_keyboard_reachable": "confirmed",
+    "task_expected_content_missing": "needs_review",
+    "low_contrast_text": "likely",
+    "contrast_unresolved_background": "needs_review",
+    "zoom_horizontal_overflow": "needs_review",
+    "zoom_fixed_width_content": "needs_review",
+    "reflow_horizontal_scroll": "likely",
+    "reflow_clipped_content": "likely",
+    "reflow_overlap": "needs_review",
+    "focus_indicator_missing": "likely",
+    "small_target_size": "likely",
+    "focus_obscured": "likely",
+    "text_spacing_content_loss": "likely",
+    "meaningful_sequence_reorder": "needs_review",
+    "orientation_restriction": "needs_review",
+    "color_only_indicator": "needs_review",
+    "autoplay_audio_no_control": "needs_review",
+    "image_of_text": "needs_review",
+    "hover_focus_content": "needs_review",
+    "single_character_shortcut": "needs_review",
+    "timing_adjustable_missing": "needs_review",
+    "moving_content_no_pause": "needs_review",
+    "possible_flashing_content": "needs_review",
+    "interaction_motion_no_reduced_motion": "needs_review",
+    "pointer_gesture_no_alternative": "needs_review",
+    "pointer_down_activation": "needs_review",
+    "dragging_no_alternative": "needs_review",
+    "focus_context_change": "needs_review",
+    "input_context_change": "needs_review",
+    "error_not_identified": "needs_review",
+    "error_suggestion_missing": "needs_review",
+}
+
+FALLBACK_CONFIDENCE = "needs_review"
 
 
 RULES: dict[str, dict] = {
@@ -841,7 +916,570 @@ RULES: dict[str, dict] = {
             "Related to visible focus accessibility requirements."
         ),
     },
+    "image_empty_alt_suspicious": {
+        "issue_type": "image_empty_alt_suspicious",
+        "title": "Empty alt on an image that looks informative",
+        "category": "Images",
+        "default_severity": "low",
+        "why_it_matters": (
+            'alt="" hides an image from screen readers entirely. That is '
+            "correct for decoration, but this image's filename suggests it "
+            "may carry information (chart, diagram, map, screenshot)."
+        ),
+        "how_to_fix": (
+            "If the image is informative, describe it in alt text. If it is "
+            'decorative, alt="" is already correct and this finding can be '
+            "dismissed."
+        ),
+        "manual_review_notes": (
+            "Only a human can decide whether the image carries information; "
+            "the filename heuristic is weak evidence."
+        ),
+        "static_check_limitations": (
+            "Based on the src filename only; the image content is not analyzed."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.1.1 Non-text Content; manual "
+            "confirmation required."
+        ),
+    },
+    "radio_group_missing_fieldset": {
+        "issue_type": "radio_group_missing_fieldset",
+        "title": "Radio group is not grouped with fieldset/legend",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Without fieldset/legend (or an equivalent named group role), a "
+            "screen reader user hears each radio option without the shared "
+            "question it answers."
+        ),
+        "how_to_fix": (
+            "Wrap the radio buttons in a <fieldset> whose <legend> states "
+            'the group question, or use role="radiogroup" with an '
+            "accessible name."
+        ),
+        "manual_review_notes": (
+            "Some designs convey the group through a nearby heading; judge "
+            "whether the question is announced with each option."
+        ),
+        "static_check_limitations": (
+            "Only fieldset/legend and role=radiogroup with a name are "
+            "recognized as grouping; aria-labelledby group idioms on other "
+            "containers may be missed."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.3.1 Info and Relationships."
+        ),
+    },
+    "table_missing_headers": {
+        "issue_type": "table_missing_headers",
+        "title": "Data table has no header cells",
+        "category": "Structure",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Without th cells (or scope/headers associations), screen "
+            "reader users hear data cells with no column or row context."
+        ),
+        "how_to_fix": (
+            "Mark header cells with <th> and scope, or use headers/id "
+            "associations for complex tables. Purely visual layout tables "
+            'should use role="presentation" or CSS layout instead.'
+        ),
+        "manual_review_notes": (
+            "A table can be a layout table; the check skips presentation "
+            "roles and trivial tables but cannot always tell intent."
+        ),
+        "static_check_limitations": (
+            "Static heuristic on markup: needs at least two rows and two "
+            "columns of data cells with no th anywhere."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.3.1 Info and Relationships."
+        ),
+    },
+    "visual_required_not_programmatic": {
+        "issue_type": "visual_required_not_programmatic",
+        "title": "Required marker is visual only",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "The label shows * or the word 'required', but the control does "
+            "not expose required state, so screen reader users are not told "
+            "the field is mandatory."
+        ),
+        "how_to_fix": (
+            'Add required or aria-required="true" to the control that the '
+            "visible marker refers to."
+        ),
+        "manual_review_notes": (
+            "Confirm the field is actually mandatory; some designs mark "
+            "optional fields instead."
+        ),
+        "static_check_limitations": (
+            "Only labels associated via for/id or wrapping are checked; "
+            "required markers placed outside labels are not seen."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.3.1 Info and Relationships and "
+            "SC 3.3.2 Labels or Instructions."
+        ),
+    },
+    "fake_heading": {
+        "issue_type": "fake_heading",
+        "title": "Styled text may act as a heading without heading markup",
+        "category": "Headings & Structure",
+        "default_severity": "low",
+        "why_it_matters": (
+            "Large bold text that visually introduces a section is invisible "
+            "to heading navigation when it is a styled div or span, so "
+            "screen reader users cannot jump to it."
+        ),
+        "how_to_fix": (
+            "Use a real heading element (h2-h6) at the right outline level "
+            "instead of styling a div or span."
+        ),
+        "manual_review_notes": (
+            "This is a review-only heuristic: decorated text (pull quotes, "
+            "prices, hero taglines) can legitimately be large and bold "
+            "without being a heading."
+        ),
+        "static_check_limitations": (
+            "Only inline style attributes are inspected; stylesheet-driven "
+            "fake headings are invisible statically."
+        ),
+        "standard_hint": (
+            "Possible review point related to WCAG 2.2 SC 1.3.1 Info and "
+            "Relationships; manual confirmation required."
+        ),
+    },
+    "sensory_instruction": {
+        "issue_type": "sensory_instruction",
+        "title": "Instruction may rely on sensory characteristics only",
+        "category": "Content",
+        "default_severity": "low",
+        "why_it_matters": (
+            "Instructions like 'click the red button' or 'use the box on "
+            "the right' can be meaningless to blind users, colorblind "
+            "users, or screen reader users who cannot perceive shape, "
+            "color, or position."
+        ),
+        "how_to_fix": (
+            "Also identify the target by its name or label, for example "
+            "'click the red Submit button'."
+        ),
+        "manual_review_notes": (
+            "Keyword presence alone is not a failure: the sentence may "
+            "already include the control's name, or the reference may be "
+            "supplemented elsewhere. A human must read it in context."
+        ),
+        "static_check_limitations": (
+            "English-language keyword patterns only; instructions in other "
+            "languages or unusual phrasings are missed."
+        ),
+        "standard_hint": (
+            "Possible review point related to WCAG 2.2 SC 1.3.3 Sensory "
+            "Characteristics; manual confirmation required."
+        ),
+    },
+    "missing_autocomplete": {
+        "issue_type": "missing_autocomplete",
+        "title": "Common personal-data field is missing an autocomplete token",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "autocomplete tokens let browsers and assistive tools fill and "
+            "explain fields that collect the user's own information, which "
+            "helps people with memory or motor difficulties."
+        ),
+        "how_to_fix": (
+            "Add the matching autocomplete token, for example "
+            'autocomplete="email" or autocomplete="given-name".'
+        ),
+        "manual_review_notes": (
+            "Confirm the field really collects information about the user "
+            "(SC 1.3.5 only applies then); fields about other people or "
+            "entities are exempt."
+        ),
+        "static_check_limitations": (
+            "Conservative token map keyed on type, name, id, and label "
+            "text; search boxes, one-time codes, and ambiguous fields are "
+            "skipped, so many missing tokens are not reported."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.3.5 Identify Input Purpose."
+        ),
+    },
+    "no_bypass_mechanism": {
+        "issue_type": "no_bypass_mechanism",
+        "title": "No apparent way to bypass repeated navigation",
+        "category": "Structure",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Keyboard and screen reader users must move through every "
+            "repeated navigation link on every page unless a skip link, "
+            "main landmark, or heading structure lets them jump past it."
+        ),
+        "how_to_fix": (
+            'Add a "Skip to main content" link as the first focusable '
+            "element, and mark the main content with <main> or "
+            'role="main".'
+        ),
+        "manual_review_notes": (
+            "Fires only when a substantial navigation block exists with no "
+            "skip link, no main landmark, and no headings; confirm no other "
+            "bypass mechanism exists."
+        ),
+        "static_check_limitations": (
+            "Static heuristic; visually hidden skip links that appear on "
+            "focus are recognized only if present in the markup."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 2.4.1 Bypass Blocks."
+        ),
+    },
+    "label_in_name_mismatch": {
+        "issue_type": "label_in_name_mismatch",
+        "title": "Visible label is missing from the accessible name",
+        "category": "Interactive Elements",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Speech-input users say the visible label to activate a "
+            "control; when an aria-label replaces rather than includes the "
+            "visible text, saying what they see does nothing."
+        ),
+        "how_to_fix": (
+            "Make the accessible name start with or contain the visible "
+            "label text, or remove the overriding aria-label."
+        ),
+        "manual_review_notes": (
+            "Comparison normalizes casing, punctuation, and whitespace and "
+            "does not require exact equality; judge whether a speech-input "
+            "user would realistically be blocked."
+        ),
+        "static_check_limitations": (
+            "Static text comparison; names computed from aria-labelledby "
+            "chains are only partially resolved."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 2.5.3 Label in Name."
+        ),
+    },
+    "contrast_unresolved_background": {
+        "issue_type": "contrast_unresolved_background",
+        "title": "Text contrast could not be resolved reliably",
+        "category": "Low Vision",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "This text sits over an image, gradient, or semi-transparent "
+            "background stack, so its contrast cannot be computed from CSS "
+            "colors alone and may be too low."
+        ),
+        "how_to_fix": (
+            "Measure contrast against the actual rendered background and, "
+            "if needed, add a solid backing color or text shadow."
+        ),
+        "manual_review_notes": (
+            "This is explicitly a needs-review observation, not a suspected "
+            "failure: the real contrast may be fine."
+        ),
+        "browser_check_limitations": (
+            "Reported instead of a low-contrast finding whenever the "
+            "background stack contains images, gradients, or transparency "
+            "the checker cannot resolve."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.4.3 Contrast (Minimum); manual "
+            "confirmation required."
+        ),
+    },
+    "small_target_size": {
+        "issue_type": "small_target_size",
+        "title": "Interactive target is smaller than 24x24 CSS pixels",
+        "category": "Low Vision",
+        "default_severity": "medium",
+        "why_it_matters": (
+            "Small touch/click targets placed near other targets are hard "
+            "to hit for people with tremor, limited dexterity, or large "
+            "pointers."
+        ),
+        "how_to_fix": (
+            "Make the target at least 24x24 CSS pixels, or give it enough "
+            "surrounding space that a 24 px circle centered on it does not "
+            "intersect another target."
+        ),
+        "manual_review_notes": (
+            "WCAG 2.5.8 has exceptions (equivalent control elsewhere, "
+            "inline text links, browser defaults, essential presentation); "
+            "inline links and spaced targets are already excluded, but the "
+            "equivalent-control exception needs human judgment."
+        ),
+        "browser_check_limitations": (
+            "Measured in one Chromium run at default zoom; CSS hit areas "
+            "extended through pseudo-elements are not seen."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 2.5.8 Target Size (Minimum)."
+        ),
+    },
+    "focus_obscured": {
+        "issue_type": "focus_obscured",
+        "title": "Focused control is covered by overlaying content",
+        "category": "Low Vision",
+        "default_severity": "high",
+        "why_it_matters": (
+            "When a sticky header, fixed footer, cookie banner, or floating "
+            "widget covers the focused control, keyboard users cannot see "
+            "where they are."
+        ),
+        "how_to_fix": (
+            "Use scroll-padding or scroll-margin so focused elements scroll "
+            "clear of fixed overlays, or make overlays dismissible."
+        ),
+        "manual_review_notes": (
+            "Partial covering is reported at lower confidence; confirm how "
+            "much of the control stays visible while focused."
+        ),
+        "browser_check_limitations": (
+            "Bounding-box and hit-test sampling in one run; overlays that "
+            "appear only after user actions are not seen."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 2.4.11 Focus Not Obscured (Minimum)."
+        ),
+    },
+    "text_spacing_content_loss": {
+        "issue_type": "text_spacing_content_loss",
+        "title": "Content breaks under WCAG text-spacing overrides",
+        "category": "Low Vision",
+        "default_severity": "high",
+        "why_it_matters": (
+            "People who need wider line, letter, and word spacing apply "
+            "user stylesheets; content that clips, overlaps, or disappears "
+            "under the WCAG reference overrides is lost to them."
+        ),
+        "how_to_fix": (
+            "Avoid fixed-height text containers and overflow: hidden on "
+            "text; let containers grow with their content."
+        ),
+        "manual_review_notes": (
+            "Before/after bounding boxes are included; confirm the loss "
+            "with a text-spacing bookmarklet in a visible browser."
+        ),
+        "browser_check_limitations": (
+            "Applies line-height 1.5, paragraph spacing 2em, letter "
+            "spacing 0.12em, and word spacing 0.16em in one Chromium run; "
+            "JavaScript that reacts to layout changes is not modeled."
+        ),
+        "standard_hint": (
+            "Related to WCAG 2.2 SC 1.4.12 Text Spacing."
+        ),
+    },
+    "meaningful_sequence_reorder": {
+        "issue_type": "meaningful_sequence_reorder",
+        "title": "CSS may reorder content away from DOM order",
+        "category": "Structure",
+        "default_severity": "low",
+        "why_it_matters": "Screen reader and keyboard users follow DOM/focus order, so visual reordering can make content hard to understand when order conveys meaning.",
+        "how_to_fix": "Keep meaningful sequence in the DOM, or verify visual reordering does not change meaning.",
+        "manual_review_notes": "Compare DOM, visual, and focus order. CSS order alone is not a failure.",
+        "static_check_limitations": "Only inline CSS order/grid placement is inspected; final layout needs browser review.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 1.3.2 Meaningful Sequence.",
+    },
+    "orientation_restriction": {
+        "issue_type": "orientation_restriction",
+        "title": "Page may restrict use to one orientation",
+        "category": "Responsive Layout",
+        "default_severity": "medium",
+        "why_it_matters": "People using mounted devices or fixed displays may be unable to rotate their screen.",
+        "how_to_fix": "Support both portrait and landscape unless a specific orientation is essential.",
+        "manual_review_notes": "Confirm content or functionality is actually restricted, not merely adapted responsively.",
+        "static_check_limitations": "Requires strong static evidence such as rotate messaging, orientation-lock code, or hidden content in an orientation media query.",
+        "standard_hint": "Partial evidence related to WCAG 2.2 SC 1.3.4 Orientation.",
+    },
+    "color_only_indicator": {
+        "issue_type": "color_only_indicator",
+        "title": "Color may be the only indicator",
+        "category": "Low Vision",
+        "default_severity": "low",
+        "why_it_matters": "Users who cannot perceive color differences may miss status, selection, required, or error cues.",
+        "how_to_fix": "Add text, an icon, border, underline, pattern, shape, or ARIA state in addition to color.",
+        "manual_review_notes": "Needs human review; static evidence cannot prove color is the only perceivable cue.",
+        "static_check_limitations": "Checks class/style/status cues and known non-color exceptions, but does not compute final styles.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 1.4.1 Use of Color.",
+    },
+    "autoplay_audio_no_control": {
+        "issue_type": "autoplay_audio_no_control",
+        "title": "Autoplaying audio may lack independent controls",
+        "category": "Media",
+        "default_severity": "medium",
+        "why_it_matters": "Autoplaying audio can interfere with screen readers and concentration if users cannot pause or control it.",
+        "how_to_fix": "Avoid autoplay or provide pause/stop and volume controls independent of system volume.",
+        "manual_review_notes": "Confirm duration, custom controls, and whether audio starts automatically in the rendered page.",
+        "static_check_limitations": "Only native audio autoplay without controls is detected statically.",
+        "standard_hint": "Partial evidence related to WCAG 2.2 SC 1.4.2 Audio Control.",
+    },
+    "image_of_text": {
+        "issue_type": "image_of_text",
+        "title": "Graphic appears to contain text",
+        "category": "Images",
+        "default_severity": "low",
+        "why_it_matters": "Text embedded in images does not adapt as well to user text settings and may pixelate or be unavailable to assistive tools.",
+        "how_to_fix": "Use real text where possible, or confirm an image-of-text exception applies.",
+        "manual_review_notes": "Review whether the graphic is essential, a logo, or can be replaced by styled text.",
+        "static_check_limitations": "Uses SVG text or filename heuristics; no OCR is performed.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 1.4.5 Images of Text.",
+    },
+    "hover_focus_content": {
+        "issue_type": "hover_focus_content",
+        "title": "Hover or focus may reveal additional content",
+        "category": "Interaction",
+        "default_severity": "low",
+        "why_it_matters": "People using magnification, keyboard, or pointer alternatives can lose hover/focus content if it cannot be dismissed, hovered, or kept visible.",
+        "how_to_fix": "Make hover/focus content dismissible, hoverable, and persistent until dismissed or focus/hover moves away.",
+        "manual_review_notes": "Test in a browser; native title tooltips are not fully testable here.",
+        "static_check_limitations": "Static event/CSS evidence only; behavior must be confirmed interactively.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 1.4.13 Content on Hover or Focus.",
+    },
+    "single_character_shortcut": {
+        "issue_type": "single_character_shortcut",
+        "title": "Single-character keyboard shortcut may be active",
+        "category": "Keyboard Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Speech input users and keyboard users can accidentally trigger unmodified character shortcuts.",
+        "how_to_fix": "Provide a way to turn off, remap, or require modifiers for character shortcuts.",
+        "manual_review_notes": "Verify shortcuts do not trigger while typing and that a disable/remap option exists.",
+        "static_check_limitations": "Script heuristic; minified or delegated listeners may be ambiguous.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.1.4 Character Key Shortcuts.",
+    },
+    "timing_adjustable_missing": {
+        "issue_type": "timing_adjustable_missing",
+        "title": "Timed behavior may not be adjustable",
+        "category": "Timing",
+        "default_severity": "medium",
+        "why_it_matters": "Users may need more time to read, type, or complete tasks.",
+        "how_to_fix": "Let users extend, disable, or adjust time limits unless an exception applies.",
+        "manual_review_notes": "Confirm the timeout exists, its duration, and whether it is essential or adjustable.",
+        "static_check_limitations": "Detects meta refresh, timeout scripts, and visible countdown language only.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.2.1 Timing Adjustable.",
+    },
+    "moving_content_no_pause": {
+        "issue_type": "moving_content_no_pause",
+        "title": "Auto-moving content may lack pause controls",
+        "category": "Motion",
+        "default_severity": "medium",
+        "why_it_matters": "Moving or updating content can distract users and make content hard to read.",
+        "how_to_fix": "Provide pause, stop, hide, or update-frequency controls for long-running movement.",
+        "manual_review_notes": "Confirm the motion lasts more than five seconds and is not a required progress indicator.",
+        "static_check_limitations": "Detects common carousel/ticker/marquee/autoplay evidence and visible pause controls.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.2.2 Pause, Stop, Hide.",
+    },
+    "possible_flashing_content": {
+        "issue_type": "possible_flashing_content",
+        "title": "Animation may flash rapidly",
+        "category": "Motion",
+        "default_severity": "medium",
+        "why_it_matters": "Rapid flashing can trigger seizures for some users.",
+        "how_to_fix": "Avoid rapid flashing or verify flash thresholds with a specialized tool.",
+        "manual_review_notes": "This is review evidence only; threshold testing requires visual analysis.",
+        "static_check_limitations": "Looks for flash/blink keyframes and fast durations in CSS.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.3.1 Three Flashes or Below Threshold.",
+    },
+    "interaction_motion_no_reduced_motion": {
+        "issue_type": "interaction_motion_no_reduced_motion",
+        "title": "Interaction-triggered motion lacks reduced-motion evidence",
+        "category": "Motion",
+        "default_severity": "low",
+        "why_it_matters": "Non-essential motion triggered by interaction can cause vestibular discomfort.",
+        "how_to_fix": "Respect prefers-reduced-motion or provide a control to disable non-essential motion.",
+        "manual_review_notes": "Confirm motion is non-essential and triggered by user interaction.",
+        "static_check_limitations": "CSS-only heuristic for transform/animation on hover/focus/active.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.3.3 Animation from Interactions.",
+    },
+    "pointer_gesture_no_alternative": {
+        "issue_type": "pointer_gesture_no_alternative",
+        "title": "Function may require a path or multipoint gesture",
+        "category": "Pointer Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Users with limited dexterity may be unable to perform swipes, pinches, or path gestures.",
+        "how_to_fix": "Provide simple pointer alternatives such as buttons, menus, fields, or steppers.",
+        "manual_review_notes": "Confirm the gesture is required and no single-pointer alternative exists.",
+        "static_check_limitations": "Event-name heuristic; rendered behavior must be verified.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.5.1 Pointer Gestures.",
+    },
+    "pointer_down_activation": {
+        "issue_type": "pointer_down_activation",
+        "title": "Control may activate on pointer down",
+        "category": "Pointer Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Down-event activation can prevent users from aborting an accidental pointer action.",
+        "how_to_fix": "Activate on pointer-up, support cancellation by moving away, or provide undo.",
+        "manual_review_notes": "Confirm down-event activation is not essential and cancellation/undo is unavailable.",
+        "static_check_limitations": "Requires strong event evidence and absence of obvious pointer-up/cancel handlers.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.5.2 Pointer Cancellation.",
+    },
+    "dragging_no_alternative": {
+        "issue_type": "dragging_no_alternative",
+        "title": "Function may require dragging",
+        "category": "Pointer Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Drag operations can be hard or impossible for users with limited pointer precision.",
+        "how_to_fix": "Provide non-drag alternatives such as buttons, menus, keyboard commands, or direct input.",
+        "manual_review_notes": "Confirm dragging is required for operation, not just an optional shortcut.",
+        "static_check_limitations": "Detects draggable markup or drag/drop script names and visible alternatives.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 2.5.7 Dragging Movements.",
+    },
+    "focus_context_change": {
+        "issue_type": "focus_context_change",
+        "title": "Focus may trigger a context change",
+        "category": "Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Changing context on focus can disorient keyboard and assistive technology users.",
+        "how_to_fix": "Do not navigate, submit, open modals, or move focus until explicit activation.",
+        "manual_review_notes": "Verify focusing alone causes the change; visual focus styling is expected and should not be flagged.",
+        "static_check_limitations": "Inline onfocus handlers only; external scripts may be missed.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.2.1 On Focus.",
+    },
+    "input_context_change": {
+        "issue_type": "input_context_change",
+        "title": "Changing a control may trigger a context change",
+        "category": "Interaction",
+        "default_severity": "medium",
+        "why_it_matters": "Unexpected navigation, submission, or focus movement after input can disorient users.",
+        "how_to_fix": "Warn users before context changes or require an explicit submit/activate action.",
+        "manual_review_notes": "Verify the context change occurs merely from changing the value.",
+        "static_check_limitations": "Inline oninput/onchange handlers only; external scripts may be missed.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.2.2 On Input.",
+    },
+    "error_not_identified": {
+        "issue_type": "error_not_identified",
+        "title": "Error message may not identify the affected field",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": "Users need to know which field has an error and what state it is in.",
+        "how_to_fix": "Identify the affected field in text and connect errors with aria-describedby and/or aria-invalid.",
+        "manual_review_notes": "Submit only local or permitted test forms with synthetic data to confirm behavior.",
+        "static_check_limitations": "Static error markup only; runtime validation may differ.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.3.1 Error Identification.",
+    },
+    "error_suggestion_missing": {
+        "issue_type": "error_suggestion_missing",
+        "title": "Error message may lack a correction suggestion",
+        "category": "Forms",
+        "default_severity": "low",
+        "why_it_matters": "When a correction is known, users benefit from guidance such as the required format or missing value.",
+        "how_to_fix": "Explain how to fix the error where a useful suggestion is possible.",
+        "manual_review_notes": "Do not judge subjective writing quality; look for practical correction guidance.",
+        "static_check_limitations": "Static text heuristic for common suggestion words.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.3.3 Error Suggestion.",
+    },
 }
+
+# Attach default confidence to every rule so --rule output and reports can
+# state it without repeating the table above.
+for _issue_type, _rule in RULES.items():
+    _rule["default_confidence"] = DEFAULT_CONFIDENCE_BY_RULE.get(
+        _issue_type, FALLBACK_CONFIDENCE
+    )
 
 
 def get_rule(issue_type: str) -> dict | None:
@@ -870,13 +1508,34 @@ def enrich_issue_with_rule(issue: AccessibilityIssue | dict) -> dict:
             "evidence": issue.evidence,
             "suggested_fix": issue.suggested_fix,
         }
+        if issue.confidence:
+            issue_dict["confidence"] = issue.confidence
     else:
         issue_dict = dict(issue)
 
-    rule = get_rule(issue_dict.get("issue_type", ""))
+    issue_type = issue_dict.get("issue_type", "")
+    rule = get_rule(issue_type)
     if rule:
         issue_dict["rule"] = {
             field: rule[field] for field in REPORT_RULE_FIELDS if field in rule
         }
+
+    if not issue_dict.get("confidence"):
+        issue_dict["confidence"] = DEFAULT_CONFIDENCE_BY_RULE.get(
+            issue_type, FALLBACK_CONFIDENCE
+        )
+
+    wcag = wcag_mappings_for_issue_type(issue_type)
+    if wcag:
+        issue_dict["wcag"] = [
+            {
+                "sc": item["sc"],
+                "name": item["name"],
+                "level": item["level"],
+                "coverage": item["coverage"],
+                "manual_check": item["manual_check"],
+            }
+            for item in wcag
+        ]
 
     return issue_dict

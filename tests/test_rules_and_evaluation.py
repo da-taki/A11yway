@@ -36,6 +36,33 @@ EXPECTED_STATIC_ISSUE_TYPES = {
     "missing_lang_indic",
     "mixed_script_element",
     "lang_mismatch",
+    "image_empty_alt_suspicious",
+    "radio_group_missing_fieldset",
+    "table_missing_headers",
+    "visual_required_not_programmatic",
+    "fake_heading",
+    "sensory_instruction",
+    "missing_autocomplete",
+    "no_bypass_mechanism",
+    "label_in_name_mismatch",
+    "meaningful_sequence_reorder",
+    "orientation_restriction",
+    "color_only_indicator",
+    "autoplay_audio_no_control",
+    "image_of_text",
+    "hover_focus_content",
+    "single_character_shortcut",
+    "timing_adjustable_missing",
+    "moving_content_no_pause",
+    "possible_flashing_content",
+    "interaction_motion_no_reduced_motion",
+    "pointer_gesture_no_alternative",
+    "pointer_down_activation",
+    "dragging_no_alternative",
+    "focus_context_change",
+    "input_context_change",
+    "error_not_identified",
+    "error_suggestion_missing",
 }
 
 EXPECTED_BROWSER_ISSUE_TYPES = {
@@ -57,12 +84,16 @@ EXPECTED_TASK_EXECUTION_ISSUE_TYPES = {
 
 EXPECTED_LOW_VISION_ISSUE_TYPES = {
     "low_contrast_text",
+    "contrast_unresolved_background",
     "zoom_horizontal_overflow",
     "zoom_fixed_width_content",
     "reflow_horizontal_scroll",
     "reflow_clipped_content",
     "reflow_overlap",
     "focus_indicator_missing",
+    "small_target_size",
+    "focus_obscured",
+    "text_spacing_content_loss",
 }
 
 EXPECTED_ISSUE_TYPES = (

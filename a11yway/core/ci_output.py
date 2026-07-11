@@ -133,6 +133,20 @@ def build_sarif_report(reports: list[dict]) -> dict:
                     }
                 if rule_meta.get("how_to_fix"):
                     sarif_rule["help"] = {"text": rule_meta["how_to_fix"]}
+                wcag = issue.get("wcag") or []
+                if wcag:
+                    sarif_rule["properties"] = {
+                        "tags": [f"WCAG-2.2-SC-{item['sc']}" for item in wcag],
+                        "wcag": [
+                            {
+                                "sc": item["sc"],
+                                "name": item["name"],
+                                "level": item["level"],
+                                "coverage": item["coverage"],
+                            }
+                            for item in wcag
+                        ],
+                    }
                 rules.append(sarif_rule)
 
             location: dict[str, Any] = {
@@ -144,17 +158,18 @@ def build_sarif_report(reports: list[dict]) -> dict:
                 if isinstance(line, int) and line > 0:
                     location["physicalLocation"]["region"] = {"startLine": line}
 
-            results.append(
-                {
-                    "ruleId": issue_type,
-                    "ruleIndex": rule_indexes[issue_type],
-                    "level": SEVERITY_TO_SARIF_LEVEL.get(
-                        issue.get("severity", "medium"), "warning"
-                    ),
-                    "message": {"text": _result_message(issue)},
-                    "locations": [location],
-                }
-            )
+            result: dict[str, Any] = {
+                "ruleId": issue_type,
+                "ruleIndex": rule_indexes[issue_type],
+                "level": SEVERITY_TO_SARIF_LEVEL.get(
+                    issue.get("severity", "medium"), "warning"
+                ),
+                "message": {"text": _result_message(issue)},
+                "locations": [location],
+            }
+            if issue.get("confidence"):
+                result["properties"] = {"confidence": issue["confidence"]}
+            results.append(result)
 
     return {
         "$schema": SARIF_SCHEMA_URI,

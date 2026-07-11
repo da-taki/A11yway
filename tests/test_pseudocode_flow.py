@@ -201,7 +201,7 @@ def test_sample_form_returns_expected_missing_label_count() -> None:
     """The sample form should contain the expected static audit issues."""
     issues = analyze_html_file(Path("examples/sample_form.html"))
 
-    assert len(issues) == 7
+    assert len(issues) == 8
     assert issue_types_for(issues) == {
         "missing_form_label",
         "generic_link_text",
@@ -209,16 +209,20 @@ def test_sample_form_returns_expected_missing_label_count() -> None:
         "missing_image_alt",
         "skipped_heading_level",
         "missing_video_captions",
+        # The labeled email field legitimately lacks an autocomplete token.
+        "missing_autocomplete",
     }
 
 
 def test_sample_form_labeled_fields_are_not_flagged() -> None:
-    """Properly labeled email and school controls should not be reported."""
+    """Properly labeled email and school controls should not be reported as unlabeled."""
     issues = analyze_html_file(Path("examples/sample_form.html"))
-    evidence = evidence_text_for(issues)
+    label_evidence = evidence_text_for(
+        [issue for issue in issues if issue.issue_type == "missing_form_label"]
+    )
 
-    assert "student_email" not in evidence
-    assert "school_name" not in evidence
+    assert "student_email" not in label_evidence
+    assert "school_name" not in label_evidence
 
 
 def test_sample_form_hidden_and_submit_fields_are_ignored() -> None:
@@ -376,9 +380,12 @@ def test_build_json_report_returns_expected_top_level_keys() -> None:
     assert set(report) == {
         "tool",
         "version",
+        "report_schema_version",
+        "extended_result_schema_version",
         "source_file",
         "summary",
         "issues",
+        "wcag_coverage",
         "limitations",
     }
 
@@ -388,8 +395,8 @@ def test_build_json_report_has_correct_issue_count() -> None:
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report("examples/sample_form.html", issues)
 
-    assert report["summary"]["issues_found"] == 7
-    assert len(report["issues"]) == 7
+    assert report["summary"]["issues_found"] == 8
+    assert len(report["issues"]) == 8
 
 
 def test_json_report_includes_issue_counts() -> None:
@@ -423,7 +430,7 @@ def test_save_json_report_writes_valid_json(tmp_path: Path) -> None:
 
     saved_report = json.loads(output_path.read_text(encoding="utf-8"))
     assert saved_report["tool"] == "A11yway"
-    assert saved_report["summary"]["issues_found"] == 7
+    assert saved_report["summary"]["issues_found"] == 8
 
 
 def test_sample_tasks_load_correctly() -> None:
@@ -544,7 +551,7 @@ def test_markdown_report_includes_summary_and_issue_types() -> None:
 
     assert "# A11yway Accessibility Report" in markdown
     assert "## Summary" in markdown
-    assert "Issues found: 7" in markdown
+    assert "Issues found: 8" in markdown
     assert "missing_form_label" in markdown
 
 
@@ -597,7 +604,7 @@ def test_cli_default_sample_still_runs(capsys) -> None:
 
     captured = capsys.readouterr()
     assert exit_code == 0
-    assert "Issues found: 7" in captured.out
+    assert "Issues found: 8" in captured.out
 
 
 def test_cli_task_mode_runs(capsys) -> None:
@@ -742,7 +749,7 @@ def test_batch_csv_includes_issue_counts(tmp_path: Path) -> None:
     with (out_dir / "index.csv").open("r", encoding="utf-8", newline="") as file:
         rows = list(csv.DictReader(file))
 
-    assert rows[0]["issues_found"] == "7"
+    assert rows[0]["issues_found"] == "8"
     assert int(rows[0]["high_count"]) >= 1
 
 
