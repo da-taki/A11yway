@@ -12,6 +12,7 @@ from a11yway.core.browser_runner import (
     run_browser_audit,
 )
 from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
+from a11yway.core.dedup import deduplicate_issues
 from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.page_analyzer import analyze_html_static
 from a11yway.core.report_builder import (
@@ -177,6 +178,8 @@ def run_batch(
                 else:
                     task_execution_status = "blocked"
                 issues = issues + list(task_execution["issues"])
+
+        issues = deduplicate_issues(issues)
 
         report = build_json_report(
             source,

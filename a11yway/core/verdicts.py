@@ -83,7 +83,98 @@ def apply_verdicts_to_report(report: dict[str, Any], verdicts: dict[str, Any]) -
     if verdicts.get("missed_issues"):
         updated["reviewer_missed_issues"] = verdicts["missed_issues"]
     updated["reviewer"] = verdicts.get("reviewer", {})
+    updated["precision_stats"] = build_precision_stats([updated])
     return updated
+
+
+def _issue_detection_modes(issue: dict[str, Any]) -> list[str]:
+    """Return the detection modes recorded in one issue's evidence."""
+    evidence = issue.get("evidence")
+    if not isinstance(evidence, dict):
+        return ["static"]
+    sources = evidence.get("evidence_sources")
+    if isinstance(sources, list) and sources:
+        return [str(source) for source in sources]
+    return [str(evidence.get("detected_in") or "static")]
+
+
+def _precision_bucket() -> dict[str, Any]:
+    """Return an empty precision accumulator."""
+    return {
+        "confirmed": 0,
+        "false_positive": 0,
+        "needs_review": 0,
+        "fixed": 0,
+        "reviewed": 0,
+        "precision": None,
+    }
+
+
+def _record_verdict(bucket: dict[str, Any], verdict: str) -> None:
+    """Count one verdict into a precision accumulator."""
+    if verdict in {"confirmed", "false_positive", "needs_review", "fixed"}:
+        bucket[verdict] += 1
+        bucket["reviewed"] += 1
+
+
+def _finalize_precision(bucket: dict[str, Any]) -> None:
+    """Compute precision as (confirmed + fixed) / decided reviews."""
+    decided = bucket["confirmed"] + bucket["fixed"] + bucket["false_positive"]
+    if decided:
+        bucket["precision"] = round(
+            (bucket["confirmed"] + bucket["fixed"]) / decided, 3
+        )
+
+
+def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, Any]:
+    """Compute reviewer precision per rule, WCAG criterion, and detection mode.
+
+    Precision counts confirmed and fixed verdicts as true positives and
+    false_positive verdicts as false positives; needs_review verdicts are
+    tracked but excluded from the ratio because they are undecided. Missed
+    issues affect recall, not precision, and are reported separately.
+    """
+    by_rule: dict[str, dict[str, Any]] = {}
+    by_sc: dict[str, dict[str, Any]] = {}
+    by_mode: dict[str, dict[str, Any]] = {}
+    total = _precision_bucket()
+    missed_issue_count = 0
+
+    for report in reviewed_reports:
+        missed_issue_count += len(report.get("reviewer_missed_issues", []))
+        for issue in report.get("issues", []):
+            review = issue.get("review")
+            if not review:
+                continue
+            verdict = review.get("verdict", "needs_review")
+            _record_verdict(total, verdict)
+            rule_bucket = by_rule.setdefault(
+                issue.get("issue_type", "unknown"), _precision_bucket()
+            )
+            _record_verdict(rule_bucket, verdict)
+            for mapping in issue.get("wcag", []) or []:
+                sc_bucket = by_sc.setdefault(mapping.get("sc", "?"), _precision_bucket())
+                _record_verdict(sc_bucket, verdict)
+            for mode in _issue_detection_modes(issue):
+                mode_bucket = by_mode.setdefault(mode, _precision_bucket())
+                _record_verdict(mode_bucket, verdict)
+
+    for bucket in [total, *by_rule.values(), *by_sc.values(), *by_mode.values()]:
+        _finalize_precision(bucket)
+
+    return {
+        "overall": total,
+        "missed_issue_count": missed_issue_count,
+        "by_rule": by_rule,
+        "by_wcag_sc": by_sc,
+        "by_detection_mode": by_mode,
+        "note": (
+            "Precision = (confirmed + fixed) / (confirmed + fixed + "
+            "false_positive). needs_review verdicts are undecided and "
+            "excluded from the ratio; missed issues affect recall, not "
+            "precision."
+        ),
+    }
 
 
 def build_verdict_summary_markdown(summary: dict[str, Any]) -> str:

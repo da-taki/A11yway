@@ -4,6 +4,8 @@ A11yway audits essential web workflows for accessibility barriers that block rea
 
 **Status: prototype, open for evaluation.** Not production software, not a WCAG certification tool, and not a replacement for human accessibility review.
 
+A11yway provides native direct, partial, or supporting evidence related to 45 of the 86 WCAG 2.2 Success Criteria.
+
 Instead of only scanning a page for technical rules, A11yway is built around tasks: submitting a scholarship form, finding an assignment, accessing a video lesson, locating public services, or using a public AI product interface. It reports which barriers likely block those tasks, with evidence a reviewer can verify.
 
 ## Responsible Accessibility Stress Testing
@@ -48,7 +50,28 @@ python -m a11yway.main --list-rules
 python -m a11yway.main --rule missing_form_label
 ```
 
-Static checks cover form labels, link/button names, image alt text, heading structure, page title/language, basic media captions/transcripts, and Indic-language markup. Every finding includes an evidence snippet, the reason, and an approximate line number.
+Static checks cover form labels, link/button names, image alt text, heading structure, page title/language, basic media captions/transcripts, Indic-language markup, structural relationships (radio groups, table headers, visual-only required markers), sensory-only instructions, autocomplete input purposes, bypass blocks, label-in-name mismatches, and conservative WCAG evidence for ordering, orientation restrictions, color-only cues, autoplay audio, images of text, hover/focus content, character shortcuts, timing, motion, pointer gestures, context changes, and error guidance. Every finding includes an evidence snippet, the reason, an approximate line number, and a confidence level (`confirmed`, `likely`, `needs_review`, or `informational`).
+
+## WCAG 2.2 Coverage Map
+
+A11yway maps every rule to the WCAG 2.2 Success Criteria it relates to, with an honest coverage level per criterion (`direct`, `partial`, `supporting_evidence`, `axe_only`, `manual_only`, or `unsupported`), the detection mode, known limitations, and manual verification guidance:
+
+```bash
+python -m a11yway.main --wcag-coverage
+python -m a11yway.main --rule missing_autocomplete
+```
+
+The full matrix lives in [docs/WCAG_2_2_COVERAGE.md](docs/WCAG_2_2_COVERAGE.md) (regenerate with `--wcag-coverage-markdown docs/WCAG_2_2_COVERAGE.md`), and every report includes a coverage snapshot. WCAG evidence coverage is not the same as WCAG conformance coverage: A11yway does not claim WCAG conformance, and most criteria still require manual testing.
+
+## Confidence and Deduplication
+
+Every finding carries a confidence level. Deterministic browser blockage (a blocked task step, an observed keyboard trap) is `confirmed`; strong single-source evidence is `likely`; heuristic patterns (sensory language, unresolved contrast over images) are `needs_review`; pure review context (multiple h1 headings) is `informational`. Findings that the static analyzer, rendered-DOM re-check, browser interaction, accessibility tree, or axe-core all discover on the same element are merged into one primary finding listing every evidence source.
+
+Rules with poor reviewer precision can be downgraded (not disabled) per run:
+
+```bash
+python -m a11yway.main page.html --review-only-rules generic_link_text,fake_heading --json reports/report.json
+```
 
 ## Indic-Language Checks
 
@@ -232,7 +255,7 @@ Video proof limitations:
 
 ## Low-Vision Checks
 
-Low-vision checks run in browser mode and use computed styles to review rendered color contrast, zoom reflow at 200% and 400%, and visible keyboard focus indicators.
+Low-vision checks run in browser mode and use computed styles to review rendered color contrast, zoom reflow at 200% and 400%, visible keyboard focus indicators (comparing focused and unfocused computed styles, including pseudo-elements and parent highlights), focus obscured by sticky/fixed overlays (WCAG 2.4.11), interactive target size with the 2.5.8 spacing and inline-link exceptions, and content loss under the WCAG 1.4.12 text-spacing overrides with before/after bounding boxes. Text over images, gradients, or transparency is reported as a `needs_review` observation instead of a suspected contrast failure, and intentional horizontal-scroll regions (data tables, code blocks) are excluded from reflow findings.
 
 ```bash
 python -m a11yway.main examples/sample_low_vision_page.html --browser --low-vision --json reports/low_vision_report.json --markdown reports/low_vision_report.md --html reports/low_vision_report.html
@@ -257,6 +280,8 @@ python -m a11yway.main --apply-verdicts reports/sample_verdicts.json --to report
 
 python -m a11yway.main --summarize-verdicts reports/sample_verdicts.json --markdown reports/verdict_summary.md
 ```
+
+Applying verdicts also computes precision statistics (confirmed + fixed vs false positives) per rule, per WCAG Success Criterion, and per detection mode, stored under `precision_stats` in the reviewed report and printed to the console. Rules that turn out imprecise can be demoted with `--review-only-rules` instead of being silently disabled.
 
 Do not publicly name reviewers or organizations unless permission was granted in the verdict file.
 
@@ -328,6 +353,7 @@ Do not claim "I helped change X websites" unless fixes are verified by re-audit 
 ## Documentation
 
 - [docs/RULES.md](docs/RULES.md) - every check: what it detects, why it matters, what it cannot verify
+- [docs/WCAG_2_2_COVERAGE.md](docs/WCAG_2_2_COVERAGE.md) - full WCAG 2.2 Success Criteria matrix: native coverage, axe-only coverage, limitations, manual testing needs
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - how a page flows through the tool
 - [docs/ROADMAP.md](docs/ROADMAP.md) - what is planned, and what is deliberately not
 - [docs/AI_SCOUT_DESIGN.md](docs/AI_SCOUT_DESIGN.md) - design notes for optional future AI scout mode

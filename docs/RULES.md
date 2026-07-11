@@ -8,6 +8,57 @@ replace human review or testing with disabled users.
 
 Run `python -m a11yway.main --list-rules` for a quick listing, or
 `python -m a11yway.main --rule missing_form_label` for details on one rule.
+Run `python -m a11yway.main --wcag-coverage` for the WCAG 2.2 coverage map;
+the full matrix lives in [WCAG_2_2_COVERAGE.md](WCAG_2_2_COVERAGE.md).
+
+## Extended Module Evidence
+
+The opt-in modules for screen-reader transcripts, mobile emulation, document
+inspection, media review, workflows, forms, cognitive review, multilingual
+content, components, and passive security add evidence channels and report
+sections. They do not automatically increase WCAG coverage counts, and
+heuristic findings default to `needs_review`. Passive security observations
+use a separate namespace and are never merged with accessibility findings.
+
+## Confidence Model
+
+Every finding carries a confidence level so reviewers know how much weight
+to give it:
+
+- `confirmed`: deterministic observed blockage or state (for example, a
+  scripted task step failed under keyboard-only interaction, or Tab was
+  observed cycling in a trap). Even confirmed findings describe one run in
+  one browser engine.
+- `likely`: strong single-source evidence with known blind spots (for
+  example, a form control with no label association in the parsed HTML).
+- `needs_review`: heuristic evidence a human must judge (for example, a
+  sensory-language pattern match or unresolved contrast over an image).
+- `informational`: context for reviewers, not a suspected failure (for
+  example, multiple h1 headings, which are valid HTML).
+
+Rules define a default confidence (shown by `--rule <issue_type>`); checks
+can override it per finding when their evidence is weaker or stronger.
+`--review-only-rules rule1,rule2` downgrades listed rules to `needs_review`
+in a run's reports without disabling them, for rules whose reviewer
+precision is poor.
+
+## Finding Deduplication
+
+Static analysis, the rendered-DOM re-check, browser interaction, the
+accessibility tree, and axe-core can see the same barrier. Findings that
+share a stable fingerprint (rule + normalized element identity) are merged
+into one primary finding whose evidence lists every `evidence_sources`
+entry and a `merged_finding_count`. Merged confidence is the strongest of
+the sources, because independent detection strengthens the evidence.
+
+## WCAG 2.2 Mapping Language
+
+Reports and rules deliberately say "related to WCAG 2.2 SC x.y.z", never
+"WCAG failure confirmed" or "WCAG compliant". Coverage levels (`direct`,
+`partial`, `supporting_evidence`, `axe_only`, `manual_only`, `unsupported`)
+describe what the tool observes, not the conformance of a page. WCAG evidence
+coverage is not the same as WCAG conformance coverage. See
+[WCAG_2_2_COVERAGE.md](WCAG_2_2_COVERAGE.md).
 
 ## Static Rule Overview
 
@@ -25,17 +76,72 @@ Run `python -m a11yway.main --list-rules` for a quick listing, or
 | `missing_html_lang` | Page Metadata | medium | html element without a lang attribute | Screen readers may mispronounce the page content | Only inspects the html element, not mixed-language sections |
 | `missing_video_captions` | Media | high | Video elements without a captions/subtitles track | Deaf and hard-of-hearing students cannot access spoken content | Cannot see player-level or burned-in captions |
 | `missing_audio_transcript` | Media | high | Audio elements on pages with no visible "transcript" text | Audio-only content needs a text alternative | The "transcript" text search is a rough heuristic |
+| `image_empty_alt_suspicious` | Images | low | `alt=""` on images whose filename suggests informative content (chart, diagram, map, screenshot) | An informative image hidden behind an empty alt is lost to screen readers | Filename heuristic only; review-only evidence |
+| `radio_group_missing_fieldset` | Forms | medium | Two or more same-name radios with no fieldset/legend or named radiogroup (WCAG 1.3.1) | The shared question is not announced with each option | Other grouping idioms (nearby heading, aria-labelledby containers) may be missed |
+| `table_missing_headers` | Structure | medium | Tables with 2+ rows and 2+ columns of data cells, no `th`, no `headers` attrs, not `role="presentation"` (WCAG 1.3.1) | Data cells announce with no column/row context | Cannot always tell a data table from a layout table |
+| `visual_required_not_programmatic` | Forms | medium | Labels showing `*` or "required" whose control lacks `required`/`aria-required` (WCAG 1.3.1, 3.3.2) | Screen reader users are not told the field is mandatory | Markers outside associated labels are not seen |
+| `fake_heading` | Headings & Structure | low | Inline-styled large bold `div`/`span` text that may act as a heading (WCAG 1.3.1, review-only) | Styled pseudo-headings are invisible to heading navigation | Only inline styles are inspected; decorated non-heading text can match |
+| `sensory_instruction` | Content | low | Instructions referencing only shape, color, position, or sound, e.g. "click the red button" (WCAG 1.3.3, review-only) | Users who cannot perceive the characteristic are lost | English keyword patterns; the sentence may also name the target |
+| `missing_autocomplete` | Forms | medium | Common personal-data fields (name, email, tel, postal code, username, passwords, birthday) without an autocomplete token (WCAG 1.3.5) | Autofill and comprehension support break for people with memory or motor difficulties | Conservative token map; search boxes, one-time codes, and ambiguous fields are skipped |
+| `no_bypass_mechanism` | Structure | medium | A navigation block of 5+ links with no skip link, no main landmark, and fewer than two headings (WCAG 2.4.1) | Keyboard users must re-traverse repeated links on every page | Static heuristic; pages with heading structure or a main landmark are never flagged |
+| `label_in_name_mismatch` | Interactive Elements | medium | Visible text missing from an overriding aria-label after normalization (WCAG 2.5.3) | Speech-input users saying the visible label cannot activate the control | aria-labelledby chains are only partially resolved |
+| `meaningful_sequence_reorder` | Structure | low | Inline CSS `order` or grid placement that may make visual order differ from DOM order (WCAG 1.3.2, review-only) | DOM/focus order can become confusing when order conveys meaning | Supporting evidence only; final visual/focus order needs browser review |
+| `orientation_restriction` | Responsive Layout | medium | Rotate-device messages, orientation-lock code, or content hidden by orientation media queries (WCAG 1.3.4) | Users with mounted or fixed displays may be blocked | Requires restriction evidence; ordinary responsive CSS is ignored |
+| `color_only_indicator` | Low Vision | low | Status/selection/error/required cues that appear color-only after common non-color exceptions are checked (WCAG 1.4.1) | Users who cannot distinguish color may miss the cue | Static styles only; computed visual review is needed |
+| `autoplay_audio_no_control` | Media | medium | Native autoplay audio without controls (WCAG 1.4.2) | Audio can interfere with screen readers and concentration | Duration and custom controls require manual confirmation |
+| `image_of_text` | Images | low | SVG text or image filenames suggesting embedded text (WCAG 1.4.5, review-only) | Image text may not adapt to user settings | No OCR; exceptions such as logos need review |
+| `hover_focus_content` | Interaction | low | Custom hover/focus-revealed content evidence (WCAG 1.4.13) | Content can disappear or obscure essential content | Static behavior evidence only |
+| `single_character_shortcut` | Keyboard Interaction | medium | Unmodified single-character keyboard listeners (WCAG 2.1.4) | Users can trigger shortcuts accidentally | Minified scripts and text-entry scoping need review |
+| `timing_adjustable_missing` | Timing | medium | Meta refresh, timeout scripts, or countdown text without visible adjustment controls (WCAG 2.2.1) | Users may need more time | Exceptions and runtime behavior need review |
+| `moving_content_no_pause` | Motion | medium | Auto-moving/updating content without visible pause/stop/hide controls (WCAG 2.2.2) | Movement can distract or block reading | Duration and process exceptions need review |
+| `possible_flashing_content` | Motion | medium | Fast flash/blink CSS animation evidence (WCAG 2.3.1, review-only) | Flashing may trigger seizures | Does not measure luminance area or exact threshold |
+| `interaction_motion_no_reduced_motion` | Motion | low | Interaction-triggered transform/animation without reduced-motion evidence (WCAG 2.3.3) | Motion can cause vestibular discomfort | CSS heuristic only |
+| `pointer_gesture_no_alternative` | Pointer Interaction | medium | Swipe/pinch/path gesture event evidence without obvious simple alternatives (WCAG 2.5.1) | Complex gestures can be hard to perform | Must confirm the gesture is required |
+| `pointer_down_activation` | Pointer Interaction | medium | Pointer-down activation without obvious up/cancel path (WCAG 2.5.2) | Users may be unable to abort accidental actions | Runtime behavior and undo need review |
+| `dragging_no_alternative` | Pointer Interaction | medium | Drag/drop evidence without obvious non-drag alternative (WCAG 2.5.7) | Dragging can be inaccessible to limited dexterity users | Must confirm dragging is required |
+| `focus_context_change` | Interaction | medium | Inline focus handlers that appear to navigate, submit, open UI, or move focus (WCAG 3.2.1) | Focus alone can unexpectedly change context | Inline handlers only |
+| `input_context_change` | Interaction | medium | Inline input/change handlers that appear to navigate, submit, open UI, reload, or move focus (WCAG 3.2.2) | Input alone can unexpectedly change context | Inline handlers only |
+| `error_not_identified` | Forms | medium | Static error messages not associated with controls by `aria-invalid` or `aria-describedby` (WCAG 3.3.1) | Users may not know which field failed | Runtime validation may differ |
+| `error_suggestion_missing` | Forms | low | Static error messages without obvious correction guidance (WCAG 3.3.3, review-only) | Users need practical correction guidance where possible | Heuristic text check only |
 
 ## Current Static Checks
 
 The analyzer currently runs these check groups over the raw HTML:
 
-- **Form labels**: form controls must have a programmatic label.
+- **Form labels**: form controls must have a programmatic label. Hidden or
+  non-user-facing controls (hidden attribute, `aria-hidden`, inline
+  `display:none`, hidden ancestors) are ignored; a placeholder is treated
+  as weak evidence, never as a valid label.
 - **Interactive names**: links and buttons need clear accessible names.
-- **Image alt text**: images need useful alternatives or a decorative marker.
-- **Heading structure**: one h1, no skipped levels.
+  Generic phrases ("learn more") are not flagged when aria-label or
+  aria-labelledby gives the link a specific computed name.
+- **Image alt text**: images need useful alternatives. `alt=""` is
+  respected as the standard decorative marker; an empty alt is flagged
+  only when the image is the sole content of an unnamed link/button, or
+  reported review-only when the filename suggests informative content.
+- **Heading structure**: one h1, no skipped levels. Multiple h1 elements
+  are informational review evidence, not a suspected failure. Skips are
+  not flagged across independent regions (articles, labeled landmark
+  regions), whose headings legitimately restart.
 - **Page metadata**: page title and document language.
 - **Media accessibility**: captions tracks for video, transcripts for audio.
+- **Structure relationships (WCAG 1.3.1)**: radio groups without
+  fieldset/legend, data tables without headers, visual-only required
+  markers, and (review-only) styled fake headings.
+- **Sensory instructions (WCAG 1.3.3)**: review-only detection of
+  instructions that rely on shape, color, position, or sound.
+- **Input purpose (WCAG 1.3.5)**: conservative autocomplete-token checks
+  for common personal-data fields.
+- **Bypass blocks (WCAG 2.4.1)**: substantial repeated navigation with no
+  skip link, main landmark, or heading structure.
+- **Label in name (WCAG 2.5.3)**: visible labels missing from overriding
+  aria-labels.
+- **Additional WCAG evidence (review-first)**: conservative static evidence
+  for meaningful sequence, orientation restrictions, color-only cues,
+  autoplay audio, images of text, hover/focus content, character shortcuts,
+  timing, moving/flashing/interaction-triggered motion, pointer gestures,
+  pointer cancellation, dragging, context changes on focus/input, and error
+  identification/suggestions. These checks default to `needs_review`.
 
 Findings include an evidence snippet, the reason the check fired, and an
 approximate source line number so reviewers can verify each result manually.
@@ -107,24 +213,38 @@ signals for reviewers, not full WCAG certification.
 
 | Issue type | Category | Default severity | What it detects | Why it matters | Current limitation |
 | --- | --- | --- | --- | --- | --- |
-| `low_contrast_text` | Low Vision | medium/high | Rendered text samples whose computed color contrast is below a conservative threshold | Low-vision readers may not be able to read the content | Does not prove full color-contrast compliance, especially over images or gradients |
+| `low_contrast_text` | Low Vision | medium/high | Rendered text samples whose computed color contrast is below a conservative threshold, with a fully resolved opaque background stack | Low-vision readers may not be able to read the content | Does not prove full color-contrast compliance; disabled controls are exempt and skipped |
+| `contrast_unresolved_background` | Low Vision | medium | Text whose background stack contains an image, gradient, or transparency, so the ratio cannot be computed reliably (needs_review, WCAG 1.4.3) | The real contrast may be too low, but CSS colors alone cannot tell | Explicitly a review observation, never a suspected failure |
+| `small_target_size` | Low Vision | medium | Interactive targets under 24x24 CSS px whose 24 px circle intersects another target (WCAG 2.5.8) | Small crowded targets are hard to hit for people with tremor or limited dexterity | Inline text links and spaced targets are excluded; equivalent-control and essential exceptions need human judgment |
+| `focus_obscured` | Low Vision | high (fully covered) / medium (partial) | Focused controls covered by sticky/fixed overlays (headers, footers, banners, floating widgets), via bounding-box hit-testing (WCAG 2.4.11) | Keyboard users cannot see where focus is | One run; overlays that appear only after user actions are not seen |
+| `text_spacing_content_loss` | Low Vision | high | Text that clips or controls that overlap only after applying the WCAG 1.4.12 reference overrides (line height 1.5, paragraph spacing 2em, letter spacing 0.12em, word spacing 0.16em), with before/after bounding boxes | People who need wider spacing lose the content entirely | One Chromium run; JavaScript reacting to layout changes is not modeled |
 | `reflow_horizontal_scroll` | Low Vision | high (400%) / medium (200% only) | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths | Zoomed readers must scroll horizontally for every line (WCAG 1.4.10 Reflow, reference 320 CSS px) | Zoom is emulated through equivalent viewport widths in one Chromium run; intentional scroll regions such as data tables are allowed by WCAG and need manual review |
 | `reflow_clipped_content` | Low Vision | high | Text or controls whose bounding box sits beyond every reachable area at a zoom level | Clipped content disappears entirely for zoomed readers | Bounding boxes from one run; decorative cut-offs need manual confirmation |
 | `reflow_overlap` | Low Vision | medium | Interactive elements whose bounding boxes collide at a zoom level | An overlapped control can be hidden or impossible to activate | Cannot judge visual intent; intentional stacking such as badges can be fine |
 | `zoom_horizontal_overflow` | Low Vision | medium/high | (Legacy, no longer emitted) narrow-viewport overflow approximation | Kept so reports from older versions stay documented | Replaced by `reflow_horizontal_scroll` |
 | `zoom_fixed_width_content` | Low Vision | medium | (Legacy, no longer emitted) wide or fixed-width rendered elements | Kept so reports from older versions stay documented | Replaced by the `reflow_*` checks |
-| `focus_indicator_missing` | Low Vision | high | Focused elements without an obvious computed outline, border, or shadow | Keyboard users with low vision can lose track of focus | Heuristic; custom focus styles may need manual confirmation |
+| `focus_indicator_missing` | Low Vision | high | Focus stops whose focused and unfocused computed styles are identical, checked across outline, border, box-shadow, background, text decoration, transform, filter, `::before`/`::after` pseudo-elements, and the parent element | Keyboard users with low vision can lose track of focus | One Chromium run; canvas-drawn or animation-only indicators can still be missed. Falls back to the old single-snapshot heuristic (needs_review) when the comparison is unavailable |
 
 Low-vision limitations:
 
 - Rendered contrast checks sample visible text and computed colors; they do
-  not replace design review.
+  not replace design review. When the background stack cannot be resolved
+  (images, gradients, transparency), the finding is downgraded to a
+  `contrast_unresolved_background` needs_review observation.
 - Zoom checks lay the page out at the CSS widths browser zoom produces
   (640 px at 200%, 320 px at 400% from a 1280 px base, matching the WCAG
   1.4.10 reference); they run in one Chromium engine and do not prove full
-  reflow compliance. Gradients, images, and intentional horizontal-scroll
-  regions need manual review.
-- Focus indicator detection may miss custom visual treatments.
+  reflow compliance. Content inside intentional horizontal-scroll regions
+  (tables, `pre`/`code`, figures, containers with `overflow-x: auto|scroll`)
+  is excluded, and document-level overflow attributed entirely to such
+  regions is not reported.
+- Focus indicator detection compares focused and unfocused computed styles;
+  canvas-drawn or animation-only indicators may still be missed.
+- Target size and focus-obscured measurements come from one run at default
+  zoom; WCAG 2.5.8 exceptions beyond inline links and spacing need human
+  judgment.
+- Text-spacing checks apply the WCAG 1.4.12 reference overrides once and
+  compare before/after; only regressions caused by the overrides count.
 
 ## Browser Task Execution Checks (optional)
 
@@ -172,13 +292,26 @@ Task execution limitations:
 
 These areas are out of scope for the current prototype:
 
-- Full screen-reader simulation (browser mode only estimates accessible names)
-- Complex keyboard interaction beyond Tab traversal (arrow keys, shortcuts, modals)
-- Authenticated portals and login-protected pages
+- Full screen-reader simulation (browser mode reads Chromium's computed
+  accessibility tree, which real screen readers may interpret differently)
+- Free-form keyboard interaction beyond Tab traversal. Task execution can
+  press arrow keys, Escape, Space, Home, End, and Enter through declared
+  `press_key` steps, but there is no automatic widget-pattern exploration
+- Hover/focus-triggered content behavior (WCAG 1.4.13)
+- Character-key shortcut detection (WCAG 2.1.4)
+- Before/after accessibility-tree state verification for custom widgets
+  (stale `aria-expanded`/`aria-checked`, WCAG 4.1.2 state changes) and
+  status message exposure (WCAG 4.1.3) beyond task-expected text
+- Authenticated portals and login-protected pages, including accessible
+  authentication checks (WCAG 3.3.8) against real login systems
 - PDFs and other documents
 - Mobile app accessibility
 - Full WCAG certification: A11yway results are hints for human reviewers,
   not conformance claims
+
+The full per-criterion status, including criteria covered only by the
+optional axe-core scan and criteria that are manual-only, lives in
+[WCAG_2_2_COVERAGE.md](WCAG_2_2_COVERAGE.md).
 
 If a page passes every current check, that only means these specific checks
 found nothing. Manual review is still required.

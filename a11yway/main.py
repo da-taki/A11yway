@@ -41,8 +41,19 @@ from a11yway.core.verdicts import (
     save_verdict_summary_markdown,
     summarize_verdicts,
 )
-from a11yway.core.rules import get_rule, list_rules
+from a11yway.core.dedup import deduplicate_issues
+from a11yway.core.rules import (
+    DEFAULT_CONFIDENCE_BY_RULE,
+    FALLBACK_CONFIDENCE,
+    get_rule,
+    list_rules,
+)
 from a11yway.core.source_loader import load_html_source
+from a11yway.core.wcag_coverage import (
+    build_coverage_markdown,
+    format_coverage_cli,
+    wcag_mappings_for_issue_type,
+)
 from a11yway.core.task_executor import run_task_execution
 from a11yway.core.task_runner import build_task_blockers, find_task, load_tasks
 from a11yway.core.workflow_packs import (
@@ -88,10 +99,23 @@ def print_summary(source: str | Path, issues: list[AccessibilityIssue]) -> None:
     print(f"Issues found: {len(issues)}")
 
     for index, issue in enumerate(issues, start=1):
+        confidence = issue.confidence or DEFAULT_CONFIDENCE_BY_RULE.get(
+            issue.issue_type, FALLBACK_CONFIDENCE
+        )
         print()
         print(f"{index}. {issue.title}")
         print(f"   Severity: {issue.severity}")
         print(f"   Type: {issue.issue_type}")
+        print(f"   Confidence: {confidence}")
+        wcag = wcag_mappings_for_issue_type(issue.issue_type)
+        if wcag:
+            print(
+                "   Related WCAG 2.2: "
+                + "; ".join(
+                    f"SC {item['sc']} {item['name']} ({item['coverage']})"
+                    for item in wcag
+                )
+            )
         print(f"   Message: {issue.title}")
         print(f"   Evidence: {format_evidence_for_cli(issue.evidence)}")
         if issue.suggested_fix:
@@ -331,6 +355,32 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Print all available static issue types and exit without auditing.",
     )
     parser.add_argument(
+        "--wcag-coverage",
+        dest="wcag_coverage",
+        action="store_true",
+        help=(
+            "Print the WCAG 2.2 coverage map (direct/partial/supporting/"
+            "axe-only/manual-only counts per Success Criterion) and exit. "
+            "Coverage is not a conformance claim."
+        ),
+    )
+    parser.add_argument(
+        "--wcag-coverage-markdown",
+        dest="wcag_coverage_markdown",
+        metavar="PATH",
+        help="Write the full WCAG 2.2 coverage matrix as Markdown and exit.",
+    )
+    parser.add_argument(
+        "--review-only-rules",
+        dest="review_only_rules",
+        metavar="RULES",
+        help=(
+            "Comma-separated issue types whose findings are downgraded to "
+            "needs_review confidence in this run's reports (for rules with "
+            "poor reviewer precision). The rules still run and report."
+        ),
+    )
+    parser.add_argument(
         "--rule",
         dest="rule_issue_type",
         help="Print detailed documentation for one issue type and exit.",
@@ -452,6 +502,7 @@ def print_rule_details(issue_type: str) -> int:
         ("Title", "title"),
         ("Category", "category"),
         ("Default severity", "default_severity"),
+        ("Default confidence", "default_confidence"),
         ("Why it matters", "why_it_matters"),
         ("How to fix", "how_to_fix"),
         ("Manual review notes", "manual_review_notes"),
@@ -462,6 +513,17 @@ def print_rule_details(issue_type: str) -> int:
     for label, key in detail_fields:
         if key in rule:
             print(f"{label}: {rule[key]}")
+    wcag = wcag_mappings_for_issue_type(issue_type)
+    if wcag:
+        print("Related WCAG 2.2 Success Criteria (not a conformance claim):")
+        for item in wcag:
+            print(
+                f"   SC {item['sc']} {item['name']} (Level {item['level']}) - "
+                f"coverage: {item['coverage']}, detection: {item['detection_mode']}, "
+                f"confidence: {item['confidence']}"
+            )
+            print(f"      Limitations: {item['limitations']}")
+            print(f"      Manual check: {item['manual_check']}")
     return 0
 
 
@@ -560,6 +622,25 @@ def apply_verdicts_cli(verdicts_path: str | None, report_path: str | None, outpu
     print(f"Confirmed: {summary.get('confirmed', 0)}")
     print(f"False positives: {summary.get('false_positive', 0)}")
     print(f"Missed issues: {summary.get('missed_issue_count', 0)}")
+    precision = reviewed.get("precision_stats", {})
+    overall = precision.get("overall", {})
+    if overall.get("precision") is not None:
+        print(f"Overall precision: {overall['precision']}")
+    by_rule = precision.get("by_rule", {})
+    if by_rule:
+        print("Precision by rule:")
+        for rule_name in sorted(by_rule):
+            bucket = by_rule[rule_name]
+            precision_text = (
+                bucket["precision"] if bucket.get("precision") is not None else "n/a"
+            )
+            print(
+                f"   {rule_name}: precision={precision_text} "
+                f"(confirmed={bucket.get('confirmed', 0)}, "
+                f"false_positive={bucket.get('false_positive', 0)}, "
+                f"needs_review={bucket.get('needs_review', 0)}, "
+                f"fixed={bucket.get('fixed', 0)})"
+            )
     return 0
 
 
@@ -638,6 +719,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if parsed_args.list_rules:
         print_rule_list()
+        return 0
+
+    if parsed_args.wcag_coverage:
+        print(format_coverage_cli())
+        return 0
+
+    if parsed_args.wcag_coverage_markdown:
+        output = Path(parsed_args.wcag_coverage_markdown)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(build_coverage_markdown(), encoding="utf-8")
+        print(f"WCAG 2.2 coverage matrix saved: {output}")
         return 0
 
     if parsed_args.rule_issue_type:
@@ -832,6 +924,28 @@ def main(argv: list[str] | None = None) -> int:
             print()
             print(f"Task execution video unavailable: {video['error']}")
 
+    # One barrier seen by several detection modes becomes one finding that
+    # lists every evidence source.
+    issues = deduplicate_issues(issues)
+
+    review_only_rules: set[str] = set()
+    if parsed_args.review_only_rules:
+        review_only_rules = {
+            name.strip()
+            for name in parsed_args.review_only_rules.split(",")
+            if name.strip()
+        }
+        for issue in issues:
+            if issue.issue_type not in review_only_rules:
+                continue
+            effective = issue.confidence or DEFAULT_CONFIDENCE_BY_RULE.get(
+                issue.issue_type, FALLBACK_CONFIDENCE
+            )
+            if effective in {"confirmed", "likely"}:
+                issue.confidence = "needs_review"
+                if isinstance(issue.evidence, dict):
+                    issue.evidence["downgraded_to_review_only"] = True
+
     print_summary(source, issues)
 
     if browser_result is not None:
@@ -879,6 +993,8 @@ def main(argv: list[str] | None = None) -> int:
             task_execution=task_execution,
             low_vision_result=low_vision_result,
         )
+        if review_only_rules:
+            report["summary"]["review_only_rules"] = sorted(review_only_rules)
         if parsed_args.ai_scout:
             workflow_tested = selected_task.name if selected_task else ""
             ai_result = run_ai_scout(
