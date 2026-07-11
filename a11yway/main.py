@@ -595,6 +595,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Enable screen-reader, mobile, forms, cognitive, language, media, and components modules. Does not enable passive security.",
     )
+    parser.add_argument(
+        "--verbose",
+        dest="verbose",
+        action="store_true",
+        help="Print additional setup and mode details during the run.",
+    )
     return parser.parse_args(argv)
 
 
@@ -933,6 +939,29 @@ def main(argv: list[str] | None = None) -> int:
 
     # In CI mode, setup problems must be distinguishable from findings.
     setup_exit = EXIT_TOOL_ERROR if parsed_args.ci else 1
+    if parsed_args.verbose:
+        active_modes = [
+            name
+            for name in (
+                "browser" if parsed_args.browser else "",
+                "low_vision" if parsed_args.low_vision else "",
+                "axe" if parsed_args.axe else "",
+                "screen_reader" if parsed_args.screen_reader else "",
+                "mobile" if parsed_args.mobile else "",
+                "document" if parsed_args.document else "",
+                "media" if parsed_args.media else "",
+                "workflow" if parsed_args.workflow else "",
+                "forms" if parsed_args.forms else "",
+                "cognitive" if parsed_args.cognitive else "",
+                "language" if parsed_args.language_audit else "",
+                "components" if parsed_args.components else "",
+                "passive_security" if parsed_args.passive_security else "",
+            )
+            if name
+        ]
+        print(f"Verbose: source={parsed_args.html_path}")
+        print(f"Verbose: modes={', '.join(active_modes) if active_modes else 'static'}")
+        print(f"Verbose: ci={str(parsed_args.ci).lower()} setup_exit={setup_exit}")
 
     if parsed_args.capabilities:
         capabilities = detect_capabilities(verify_browsers=True)
@@ -1341,6 +1370,7 @@ def main(argv: list[str] | None = None) -> int:
         parsed_args.json_output
         or parsed_args.markdown_output
         or parsed_args.html_output
+        or parsed_args.html_reports
         or parsed_args.ai_scout
         or parsed_args.sarif_output
         or parsed_args.junit_output
@@ -1395,6 +1425,12 @@ def main(argv: list[str] | None = None) -> int:
         save_html_report(report, parsed_args.html_output)
         print()
         print(f"HTML report saved: {parsed_args.html_output}")
+
+    if parsed_args.html_reports and not parsed_args.html_output:
+        default_html_output = "reports/a11yway_single_report.html"
+        save_html_report(report, default_html_output)
+        print()
+        print(f"HTML report saved: {default_html_output}")
 
     if parsed_args.sarif_output:
         save_sarif_report([report], parsed_args.sarif_output)
