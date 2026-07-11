@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from a11yway import __version__
 from a11yway.core.batch_runner import run_batch
 from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
 from a11yway.core.axe_runner import AXE_SETUP_MESSAGE, is_axe_available
@@ -245,6 +246,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     """Parse CLI arguments for the current prototype."""
     parser = argparse.ArgumentParser(
         description="Run A11yway's static HTML accessibility audit.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"a11yway {__version__}",
+        help="Print the A11yway version and exit.",
     )
     parser.add_argument(
         "html_path",

@@ -1,5 +1,3 @@
-"""A11yway package.
+"""A11yway package."""
 
-This package is currently a lightweight pseudocode scaffold for an
-agentic accessibility testing tool.
-"""
+__version__ = "0.8.0b1"
