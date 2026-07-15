@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from flask import Flask, abort, jsonify, redirect, render_template, request, send_file, url_for
@@ -263,6 +263,8 @@ def create_app() -> Flask:
 
     @app.get("/reports/<path:relative_path>")
     def report_file(relative_path: str):
+        if request_path_has_traversal():
+            abort(404)
         path = safe_report_path(relative_path)
         if path is None or not path.exists() or not path.is_file():
             abort(404)
@@ -270,6 +272,8 @@ def create_app() -> Flask:
 
     @app.get("/evidence/<path:relative_path>")
     def evidence_file(relative_path: str):
+        if request_path_has_traversal():
+            abort(404)
         path = safe_report_path(relative_path)
         if path is None or not path.exists() or not path.is_file():
             abort(404)
@@ -647,6 +651,7 @@ def execute_review(run_id: str, url: str, label: str, modules: list[str], passiv
         low_vision_result=low_vision,
         extended_results=extended_results,
     )
+    sanitize_visual_proof_paths(report)
     if passive_summary:
         report["passive_security_separate"] = {
             "status": passive_summary["status"],
@@ -736,7 +741,7 @@ def complete_extended_module_statuses(status: dict[str, Any], selected: set[str]
             mark_module(status, key, "unavailable", "Requires browser evidence.")
         elif result:
             status_value = result.get("status", "complete")
-            mark_module(status, key, "complete" if status_value in {"complete", "passed"} else status_value, f"{len(result.get('findings', []))} finding(s).")
+            mark_module(status, key, "complete" if status_value in {"complete", "completed", "passed"} else status_value, f"{len(result.get('findings', []))} finding(s).")
         else:
             mark_module(status, key, "complete", "No review points reported.")
 
@@ -924,6 +929,23 @@ def visual_links_for_report(report: dict[str, Any]) -> dict[str, str]:
     return links
 
 
+def sanitize_visual_proof_paths(report: dict[str, Any]) -> None:
+    """Keep public report paths relative to the repository root."""
+    visual = report.get("visual_proof")
+    if not isinstance(visual, dict):
+        return
+    for key in ["screenshot_path", "focus_overlay_path", "video_path"]:
+        path_text = visual.get(key)
+        if not path_text:
+            continue
+        try:
+            path = Path(path_text)
+            if path.is_absolute():
+                visual[key] = path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+        except (OSError, ValueError):
+            continue
+
+
 def update_status(run_dir: Path, status: dict[str, Any], *, state: str | None = None, current: str | None = None, message: str | None = None, progress: int | None = None, error: str = "", error_id: str = "", result_url: str = "", finished: bool = False) -> None:
     if state:
         status["status"] = state
@@ -983,11 +1005,16 @@ def report_link(path: Path) -> str:
         relative = resolved.relative_to(WEB_DEMO_RUNS_DIR.resolve()).as_posix()
     except (OSError, ValueError):
         return ""
-    return url_for("report_file", relative_path=relative)
+    try:
+        return url_for("report_file", relative_path=relative)
+    except RuntimeError:
+        return f"/reports/{relative}"
 
 
 def safe_report_path(relative_path: str) -> Path | None:
     """Resolve a report path while keeping file access inside web demo runs."""
+    if any(part in {"..", ""} for part in Path(relative_path).parts):
+        return None
     try:
         root = WEB_DEMO_RUNS_DIR.resolve()
         path = (root / relative_path).resolve()
@@ -995,6 +1022,22 @@ def safe_report_path(relative_path: str) -> Path | None:
     except (OSError, ValueError):
         return None
     return path
+
+
+def request_path_has_traversal() -> bool:
+    """Return whether the raw request URL contains a traversal segment."""
+    raw_values = [
+        request.environ.get("RAW_URI", ""),
+        request.environ.get("REQUEST_URI", ""),
+        request.full_path,
+        request.path,
+    ]
+    for raw in raw_values:
+        decoded = unquote(str(raw))
+        normalized = decoded.replace("\\", "/")
+        if any(part == ".." for part in normalized.split("/")):
+            return True
+    return False
 
 
 def load_run_summary(run_id: str) -> dict[str, Any] | None:
