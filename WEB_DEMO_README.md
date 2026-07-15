@@ -1,12 +1,18 @@
-# A11yway Web Demo
+# A11yway Public Web Audit Demo
 
-This demo adds a simple local website for running A11yway against one public page at a time. It is for accessibility stress-testing, workflow accessibility testing, public-interest accessibility testing, web quality review, and deterministic accessibility review.
+A11yway includes a Flask website for running the existing deterministic audit engine against one safe public URL at a time. The web flow is designed for public competition demos and Render deployment:
 
-A11yway is not a security scanner. Do not use the web demo for hacking, vulnerability scanning, auth bypass, pentesting, scraping private data, login flows, payment flows, or destructive actions.
+1. Enter a public `http://` or `https://` URL.
+2. Select an audit preset or individual A11yway modules.
+3. Confirm the page is public or authorized for review.
+4. Watch live progress while the server validates, fetches, audits, asks AI Scout when selected, and writes reports.
+5. Review the results dashboard and download generated reports.
 
-## Run Locally
+A11yway is not a security scanner and does not claim legal compliance certification. Reports require human review.
 
-From the repo root:
+## Local Development
+
+From the repository root:
 
 ```powershell
 cd C:\Users\Asus\Desktop\A11yway
@@ -18,122 +24,169 @@ cd C:\Users\Asus\Desktop\A11yway
 
 Open `http://127.0.0.1:5000`.
 
-The web demo writes the current single-target batch config here:
+The web app writes the current single-target batch config to:
 
 ```text
 reports/web_demo_batch_config.json
 ```
 
-Each run is stored in a unique subfolder under:
+Each run is isolated under:
 
 ```text
-reports/web_demo_runs
+reports/web_demo_runs/<run-id>
 ```
 
-## Run From The Terminal
+Those generated run artifacts are ignored by Git.
 
-After creating a run in the web UI, the same config can be used from the CLI:
+## Audit Modules
 
-```powershell
-cd C:\Users\Asus\Desktop\A11yway
+The web UI exposes existing A11yway capabilities. Presets only select combinations of these modules; they do not create fake capabilities.
 
-& 'C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m a11yway.main --batch reports/web_demo_batch_config.json --out-dir reports/web_demo_runs --browser --low-vision --html-reports --ai-scout --max-tabs 60 --wait-ms 1500
-```
+- Static HTML analysis
+- Browser-rendered analysis
+- Keyboard navigation
+- Keyboard trap and focus-loop detection
+- axe-core
+- Chromium accessibility-tree evidence
+- Low-vision and reflow checks
+- Mobile emulation
+- Forms
+- Components
+- Media
+- Language and cognitive checks
+- Indic-language checks
+- Screenshots
+- Focus-path overlays
+- AI Scout
 
-For static-only fallback, remove `--browser --low-vision`.
+Document auditing and video proof remain CLI-oriented for this one-page public URL flow and are shown as unavailable when applicable.
 
-## Review Types
+Passive security observations are opt-in, visually separate, and stored separately. They are not included in the accessibility score.
 
-- Quick accessibility review: static deterministic checks.
-- Full accessibility + low-vision review: browser focus traversal plus low-vision checks when Playwright is available.
-- Keyboard/focus review: browser focus traversal when Playwright is available.
-- AI-assisted report summary: static deterministic checks plus suggest-only AI Scout.
-- Full public workflow review: browser, low-vision, and suggest-only AI Scout when available.
+## AI Scout
 
-If browser mode is unavailable in a deployment, the app falls back and shows: `Browser evidence unavailable in this deployment.`
+AI Scout runs server-side only. The Groq key is read from environment variables or local `.env`; it is never placed in HTML, JavaScript, generated reports, or user-facing errors.
 
-## Environment Variables
+Required AI Scout behavior:
 
 ```env
-GROQ_MODEL=llama-3.3-70b-versatile
-A11YWAY_AI_SCOUT_ENABLED=true
-A11YWAY_REQUIRE_PERMISSION_NOTICE=true
 A11YWAY_AI_SCOUT_MODE=suggest_only
-GROQ_API_KEY=your_key_here
-A11YWAY_WEB_BROWSER_ENABLED=true
-A11YWAY_WEB_SECRET=change_this_for_shared_deployments
+A11YWAY_REQUIRE_PERMISSION_NOTICE=true
 ```
 
-Do not commit `.env`. The Groq API key is not shown in the UI, reports, or error output by the AI Scout helpers.
+If `GROQ_API_KEY` is missing or the provider is unavailable, deterministic auditing still completes and the results page marks AI Scout as unavailable or failed.
 
-## Deploy On Render
+## Required Environment Variables
 
-The included `render.yaml` uses Docker because browser mode needs Playwright/Chromium system dependencies.
+For a shared deployment:
 
-1. Push this repo to GitHub.
-2. In Render, create a new Blueprint or Web Service from the repo.
-3. Use the included `render.yaml` or choose Docker as the environment.
-4. Add `GROQ_API_KEY` as a secret environment variable if AI Scout should run.
-5. Confirm these environment variables:
-   - `A11YWAY_AI_SCOUT_ENABLED=true`
-   - `A11YWAY_REQUIRE_PERMISSION_NOTICE=true`
-   - `A11YWAY_AI_SCOUT_MODE=suggest_only`
-   - `GROQ_MODEL=llama-3.3-70b-versatile`
-   - `A11YWAY_WEB_BROWSER_ENABLED=true`
-6. Deploy.
+```env
+A11YWAY_WEB_SECRET=change_this_for_shared_deployments
+A11YWAY_REQUIRE_PERMISSION_NOTICE=true
+A11YWAY_AI_SCOUT_MODE=suggest_only
+```
 
-The Docker service starts:
+For AI Scout:
+
+```env
+A11YWAY_AI_SCOUT_ENABLED=true
+GROQ_API_KEY=your_render_secret
+GROQ_MODEL=llama-3.3-70b-versatile
+```
+
+For browser evidence:
+
+```env
+A11YWAY_WEB_BROWSER_ENABLED=true
+```
+
+Set `A11YWAY_WEB_BROWSER_ENABLED=false` if the host cannot run Chromium reliably. Static, forms, language, media, components, and AI Scout fallback behavior still work.
+
+## Render Deployment
+
+The repository includes:
+
+- `Dockerfile`
+- `render.yaml`
+- `Procfile`
+- `requirements-web.txt`
+
+The Docker setup uses the Playwright Python image so Chromium dependencies are available.
+
+Render build command:
+
+```bash
+docker build .
+```
+
+Render start command:
 
 ```bash
 gunicorn a11yway.web_app:app --bind 0.0.0.0:$PORT
 ```
 
-If the deployment plan cannot run browser mode reliably, set:
+The included Docker `CMD` uses the same app target and binds to Render's `$PORT`.
 
-```env
-A11YWAY_WEB_BROWSER_ENABLED=false
+Health check:
+
+```text
+/health
 ```
 
-The demo will still run static checks and clearly mark browser evidence as unavailable.
+Expected response:
+
+```json
+{"ok": true, "service": "a11yway-web", "browser_available": true}
+```
 
 ## Safety Guardrails
 
-The web demo validates URLs before running A11yway. It blocks:
+The web app validates URLs before auditing and rejects:
 
-- localhost, `127.0.0.1`, `0.0.0.0`, private IP ranges, link-local ranges, reserved IPs, and metadata IPs such as `169.254.169.254`
-- file, FTP, JavaScript, data, and other non-http(s) schemes
-- URLs with embedded credentials
-- obvious internal/private hostnames and short intranet-style hostnames
-- hostnames that resolve to private, local, metadata, or reserved addresses
+- localhost and loopback addresses
+- private, link-local, reserved, multicast, and metadata IPs
+- internal-looking hostnames and short intranet names
+- non-http(s) schemes
+- embedded usernames or passwords
+- unusually long URLs
+- unsafe non-web ports
+- unsafe redirect targets
 
-The demo only runs one URL per review. It does not log in, submit forms, create accounts, send emails, create support tickets, test payments, bypass authentication, scrape private data, or run vulnerability scans.
+The demo only reviews one public page per run. It does not log in, submit forms, create accounts, send messages, test payments, bypass authentication, scrape private data, run exploit checks, scan ports, or crawl private systems.
 
-## Scoring
+## Generated Reports
 
-The score is an issue-volume and severity indicator for normal readers. It is not a WCAG conformance score.
+When successfully generated, the results dashboard links to:
 
-Weights:
+- HTML
+- Markdown
+- JSON
+- CSV
+- SARIF
+- JUnit XML
+- AI Scout sidecars
+- Passive security sidecar, when selected
 
-- critical: 20
-- high: 10
-- medium: 4
-- low: 1
+Browser evidence can include screenshots and focus-path overlays.
 
-Classifications:
+## Verification
 
-- `Looks mostly clear`
-- `Minor review points`
-- `Needs review`
-- `Serious review recommended`
-- `Workflow may be blocked`
+Useful local checks:
 
-The app also groups top risk areas such as keyboard/focus, low vision/contrast, reflow/zoom, accessible names/labels, headings/structure, alt text/media, forms/errors, generic links, AI-assisted observations, and basic page quality.
+```powershell
+& 'C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m pytest
+& 'C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m a11yway.web_app
+```
 
-## Limitations
+Production-style startup smoke:
 
-- A11yway does not claim a page is accessible, inaccessible, WCAG compliant, or illegal.
-- Browser mode approximates keyboard interaction and does not simulate a full screen reader.
-- AI Scout is suggest-only and may be unavailable without a Groq API key.
-- Static checks cannot see all JavaScript-rendered state.
-- The web demo stores run files locally and does not use a database.
-- Render filesystems may be ephemeral, so past runs may not persist across redeploys unless storage is added.
+```powershell
+$env:PORT="5000"
+& 'C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' -m gunicorn a11yway.web_app:app --bind 127.0.0.1:5000
+```
+
+Then verify:
+
+```text
+http://127.0.0.1:5000/health
+```

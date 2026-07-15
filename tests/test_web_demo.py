@@ -10,6 +10,30 @@ import pytest
 import a11yway.web_app as web_app
 
 
+def _patch_web_runtime(monkeypatch, tmp_path: Path, html: str | None = None) -> None:
+    runs_dir = tmp_path / "reports" / "web_demo_runs"
+    config_path = tmp_path / "reports" / "web_demo_batch_config.json"
+    monkeypatch.setattr(web_app, "WEB_DEMO_RUNS_DIR", runs_dir)
+    monkeypatch.setattr(web_app, "WEB_DEMO_CONFIG_PATH", config_path)
+    monkeypatch.setattr(web_app, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(web_app, "validate_redirect_chain", lambda url: {"ok": True, "error": "", "url": url})
+    monkeypatch.setattr(web_app, "validate_public_url", lambda url, resolver=None: {"ok": True, "error": "", "url": url})
+    monkeypatch.setattr(web_app, "is_playwright_available", lambda: False)
+    monkeypatch.setattr(
+        web_app,
+        "load_html_source",
+        lambda source: {
+            "source": source,
+            "source_type": "url",
+            "html": html or "<html><body><h1>Example</h1><label>Name</label><input><button>Send</button></body></html>",
+            "final_url": source,
+            "status_code": 200,
+            "content_type": "text/html",
+            "error": None,
+        },
+    )
+
+
 @pytest.mark.parametrize(
     "url",
     [
@@ -38,6 +62,107 @@ def test_url_validation_allows_public_http_url() -> None:
     )
 
     assert result["ok"] is True
+
+
+def test_landing_page_renders_accessible_form_controls() -> None:
+    app = web_app.create_app()
+    client = app.test_client()
+
+    response = client.get("/")
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert 'id="url"' in body
+    assert "Public website URL" in body
+    assert "Audit preset" in body
+    assert "Select A11yway modules" in body
+    assert 'aria-live="polite"' not in body
+
+
+def test_selected_modules_from_form_forces_static_and_dedupes() -> None:
+    selected = web_app.selected_modules_from_form(["forms", "forms", "ai_scout"], "custom")
+
+    assert selected == ["forms", "ai_scout", "static"]
+
+
+def test_invalid_audit_request_shows_validation_error() -> None:
+    app = web_app.create_app()
+    client = app.test_client()
+
+    response = client.post("/audit", data={"url": "https://example.org", "modules": ["static"]})
+
+    assert response.status_code == 400
+    assert "Please confirm" in response.get_data(as_text=True)
+
+
+def test_audit_request_status_result_and_download(tmp_path: Path, monkeypatch) -> None:
+    _patch_web_runtime(monkeypatch, tmp_path)
+    app = web_app.create_app()
+    app.testing = True
+    client = app.test_client()
+
+    response = client.post(
+        "/audit",
+        data={
+            "url": "https://example.org",
+            "label": "Example",
+            "preset": "custom",
+            "modules": ["static", "forms", "indic"],
+            "permission": "on",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    run_id = response.headers["Location"].rstrip("/").split("/")[-2]
+    status_response = client.get(f"/api/audits/{run_id}/status")
+    assert status_response.status_code == 200
+    assert status_response.get_json()["status"] == "complete"
+
+    result_response = client.get(f"/runs/{run_id}")
+    result_body = result_response.get_data(as_text=True)
+    assert result_response.status_code == 200
+    assert "Executive summary" in result_body
+    assert "Report downloads" in result_body
+
+    summary = web_app.load_run_summary(run_id)
+    download = client.get(next(iter(summary["reports"].values())) + "?download=1")
+    assert download.status_code == 200
+
+
+def test_browser_mode_falls_back_when_unavailable(tmp_path: Path, monkeypatch) -> None:
+    _patch_web_runtime(monkeypatch, tmp_path)
+    app = web_app.create_app()
+    app.testing = True
+    client = app.test_client()
+
+    response = client.post(
+        "/audit",
+        data={
+            "url": "https://example.org",
+            "preset": "custom",
+            "modules": ["static", "browser", "keyboard"],
+            "permission": "on",
+        },
+    )
+
+    run_id = response.headers["Location"].rstrip("/").split("/")[-2]
+    status = client.get(f"/api/audits/{run_id}/status").get_json()
+    module_statuses = {module["key"]: module["status"] for module in status["modules"]}
+
+    assert status["status"] == "complete"
+    assert module_statuses["browser"] == "unavailable"
+    assert module_statuses["keyboard"] == "unavailable"
+
+
+def test_health_route_reports_ok() -> None:
+    app = web_app.create_app()
+    client = app.test_client()
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.get_json()["ok"] is True
 
 
 def test_web_run_creates_batch_config(tmp_path: Path) -> None:
@@ -80,46 +205,22 @@ def test_missing_groq_key_does_not_crash_web_summary(tmp_path: Path, monkeypatch
     monkeypatch.setattr(web_app, "WEB_DEMO_CONFIG_PATH", config_path)
     monkeypatch.setattr(web_app, "PROJECT_ROOT", tmp_path)
     monkeypatch.setattr(web_app, "is_playwright_available", lambda: False)
-    monkeypatch.delenv("GROQ_API_KEY", raising=False)
-
-    def fake_run_batch(config_path_arg, out_dir, **_kwargs):
-        config = json.loads(Path(config_path_arg).read_text(encoding="utf-8"))
-        item_id = config[0]["id"]
-        out = Path(out_dir)
-        report = {
-            "tool": "A11yway",
-            "source_file": config[0]["source"],
-            "summary": {
-                "issues_found": 1,
-                "counts_by_severity": {"high": 1},
-                "counts_by_issue_type": {"missing_form_label": 1},
-            },
-            "issues": [
-                {
-                    "issue_type": "missing_form_label",
-                    "severity": "high",
-                    "message": "Form control is missing an accessible label",
-                    "evidence": {},
-                }
-            ],
-            "ai_scout": {
-                "enabled": True,
-                "mode": "suggest_only",
-                "status": "failed",
-                "summary": "AI Scout did not produce suggestions: GROQ_API_KEY is not configured.",
-                "limitations": [],
-            },
-        }
-        out.mkdir(parents=True, exist_ok=True)
-        (out / f"{item_id}.json").write_text(json.dumps(report), encoding="utf-8")
-        (out / f"{item_id}.md").write_text("# Report", encoding="utf-8")
-        (out / f"{item_id}.html").write_text("<h1>Report</h1>", encoding="utf-8")
-        (out / "index.json").write_text(json.dumps({"sources": []}), encoding="utf-8")
-        (out / "index.md").write_text("# Index", encoding="utf-8")
-        (out / "evaluation_summary.md").write_text("# Summary", encoding="utf-8")
-        return {"index": {"summary": {"total_issues": 1}}}
-
-    monkeypatch.setattr(web_app, "run_batch", fake_run_batch)
+    monkeypatch.setenv("A11YWAY_AI_SCOUT_ENABLED", "true")
+    monkeypatch.setenv("A11YWAY_AI_SCOUT_MODE", "suggest_only")
+    monkeypatch.setenv("GROQ_API_KEY", "")
+    monkeypatch.setattr(
+        web_app,
+        "load_html_source",
+        lambda source: {
+            "source": source,
+            "source_type": "url",
+            "html": "<html><body><label>Name</label><input></body></html>",
+            "final_url": source,
+            "status_code": 200,
+            "content_type": "text/html",
+            "error": None,
+        },
+    )
     app = web_app.create_app()
 
     with app.test_request_context("/"):
@@ -132,4 +233,4 @@ def test_missing_groq_key_does_not_crash_web_summary(tmp_path: Path, monkeypatch
     assert result["status"] == "passed"
     assert result["ai_scout"]["status"] == "failed"
     assert "GROQ_API_KEY" in result["ai_scout"]["summary"]
-    assert result["reports"]["json"].endswith(".json")
+    assert result["reports"]["JSON"].endswith(".json")

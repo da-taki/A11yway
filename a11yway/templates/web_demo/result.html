@@ -1,115 +1,179 @@
 {% extends "web_demo/base.html" %}
-{% block title %}A11yway Result{% endblock %}
+{% block title %}A11yway result{% endblock %}
 {% block content %}
-<section class="result-head">
-  <div>
-    <h1>{{ run.target_name }}</h1>
-    <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
-  </div>
-  <div class="status {{ run.status }}">{{ run.status }}</div>
-</section>
-
-{% if run.fallback_notice %}
-  <div class="alert">{{ run.fallback_notice }}</div>
-{% endif %}
-{% if run.error %}
-  <div class="alert" role="alert">{{ run.error }}</div>
-{% endif %}
-
-<section class="metrics">
-  <div>
-    <span>Total issues</span>
-    <strong>{{ run.score.get('total_issues', 0) }}</strong>
-  </div>
-  <div>
-    <span>Classification</span>
-    <strong>{{ run.score.get('classification', 'Not scored') }}</strong>
-  </div>
-  <div>
-    <span>Weighted score</span>
-    <strong>{{ run.score.get('weighted_score', 0) }}</strong>
+<section class="result-hero">
+  <div class="section-inner result-head">
+    <div>
+      <p class="eyebrow">Audit results</p>
+      <h1>{{ run.target_name }}</h1>
+      <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+    </div>
+    <div class="status-pill {{ run.status }}">{{ run.status }}</div>
   </div>
 </section>
 
-<section class="grid two">
-  <div>
-    <h2>Severity Breakdown</h2>
-    <dl class="breakdown">
-      {% for severity, count in run.score.get('severity_counts', {}).items() %}
-        <div><dt>{{ severity }}</dt><dd>{{ count }}</dd></div>
-      {% endfor %}
-    </dl>
-  </div>
-  <div>
-    <h2>Quality Summary</h2>
-    <p>{{ run.score.get('plain_language_summary', '') }}</p>
-    {% if run.score.get('top_risk_areas') %}
-      <p class="muted">{{ run.score.get('top_risk_areas') | join(', ') }}</p>
-    {% endif %}
-  </div>
-</section>
-
-<section>
-  <h2>Top Findings</h2>
-  {% if run.top_findings %}
-    <table>
-      <thead><tr><th>Severity</th><th>Type</th><th>Finding</th></tr></thead>
-      <tbody>
-        {% for finding in run.top_findings %}
-          <tr>
-            <td>{{ finding.severity }}</td>
-            <td><code>{{ finding.issue_type }}</code></td>
-            <td>{{ finding.message }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No top findings were reported by the current checks.</p>
+<div class="section-inner">
+  {% if run.fallback_notice %}
+    <div class="alert">{{ run.fallback_notice }}</div>
   {% endif %}
-</section>
+  {% if run.error %}
+    <div class="alert" role="alert">{{ run.error }}</div>
+  {% endif %}
 
-{% if run.ai_scout %}
-<section>
-  <h2>AI Scout Summary</h2>
-  <p>Status: {{ run.ai_scout.get('status', '') }}</p>
-  <p>{{ run.ai_scout.get('summary', '') }}</p>
-</section>
-{% endif %}
+  <section class="dashboard" aria-labelledby="summary-heading">
+    <h2 id="summary-heading">Executive summary</h2>
+    <div class="metrics">
+      <div><span>Total findings</span><strong>{{ run.total_issues }}</strong></div>
+      <div><span>WCAG criteria represented</span><strong>{{ run.wcag_criteria_count }}</strong></div>
+      <div><span>Audit duration</span><strong>{{ run.duration_seconds }}s</strong></div>
+      <div><span>AI Scout</span><strong>{{ run.ai_scout.get('status', 'not run') }}</strong></div>
+    </div>
+    <dl class="detail-list compact">
+      <div><dt>Audit date</dt><dd>{{ run.created_at }}</dd></div>
+      <div><dt>Classification</dt><dd>{{ run.classification or run.score.get('classification', 'Not scored') }}</dd></div>
+      <div><dt>Modules completed</dt><dd>{{ run.module_statuses | selectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
+      <div><dt>Skipped, failed, or unavailable</dt><dd>{{ run.module_statuses | rejectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
+    </dl>
+  </section>
 
-<section class="grid two">
-  <div>
-    <h2>Reports</h2>
-    <ul class="links">
-      {% for label, href in run.reports.items() %}
-        <li><a href="{{ href }}">{{ label.replace('_', ' ') }}</a> <a class="download" href="{{ href }}?download=1">download</a></li>
+  <section class="dashboard" aria-labelledby="severity-heading">
+    <h2 id="severity-heading">Severity overview</h2>
+    <div class="severity-grid">
+      {% for label, key in [('Critical', 'critical'), ('Serious', 'serious'), ('Moderate', 'moderate'), ('Minor', 'minor'), ('Review required', 'review_required')] %}
+        <div class="severity-card {{ key }}"><span aria-hidden="true">●</span><strong>{{ run.severity_overview.get(key, 0) }}</strong><p>{{ label }}</p></div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="dashboard" aria-labelledby="modules-heading">
+    <h2 id="modules-heading">Module status</h2>
+    <ul class="module-status-list">
+      {% for module in run.module_statuses %}
+        <li><span class="status-dot {{ module.status }}" aria-hidden="true"></span><strong>{{ module.label }}</strong><span>{{ module.status }}</span><small>{{ module.message }}</small></li>
       {% endfor %}
     </ul>
-  </div>
-  <div>
-    <h2>Visual Evidence</h2>
-    {% if run.visual_proof.screenshot_path %}
-      <p>Screenshot path: <a href="{{ run.visual_proof.screenshot_link }}">{{ run.visual_proof.screenshot_path }}</a></p>
-    {% else %}
-      <p>Screenshot path: unavailable</p>
-    {% endif %}
-    {% if run.visual_proof.focus_overlay_path %}
-      <p>Focus-path overlay path: <a href="{{ run.visual_proof.focus_overlay_link }}">{{ run.visual_proof.focus_overlay_path }}</a></p>
-    {% else %}
-      <p>Focus-path overlay path: unavailable</p>
-    {% endif %}
-  </div>
-</section>
+  </section>
 
-<section class="notes">
-  <h2>Run Details</h2>
-  <p>Batch config path: <code>{{ run.config_path }}</code></p>
-  <p>Output folder: <code>{{ run.output_dir }}</code></p>
-  <p>Review type: {{ run.review_type }}</p>
-  <ul>
-    {% for note in run.guardrails %}
-      <li>{{ note }}</li>
-    {% endfor %}
-  </ul>
-</section>
+  <section class="dashboard" aria-labelledby="filters-heading">
+    <h2 id="filters-heading">Findings</h2>
+    <div class="filters" id="filters-heading">
+      <label>Search findings <input id="finding-search" type="search" autocomplete="off"></label>
+      <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
+      <label>WCAG criterion <select id="wcag-filter"><option value="">All</option></select></label>
+      <label>Module <select id="module-filter"><option value="">All</option></select></label>
+      <label>Issue category <select id="category-filter"><option value="">All</option></select></label>
+    </div>
+    {% if run.findings %}
+      <div id="findings-list" class="finding-list">
+        {% for finding in run.findings %}
+          <article class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}">
+            <div class="finding-head">
+              <h3>{{ finding.title }}</h3>
+              <span class="badge">{{ finding.display_severity }}</span>
+            </div>
+            <dl class="finding-meta">
+              <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
+              <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
+              <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+              <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
+              {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
+            </dl>
+            {% if finding.browser_observation %}<p><strong>Evidence:</strong> {{ finding.browser_observation }}</p>{% endif %}
+            {% if finding.snippet %}<pre><code>{{ finding.snippet }}</code></pre>{% endif %}
+            {% if finding.suggested_fix %}<p><strong>Suggested remediation:</strong> {{ finding.suggested_fix }}</p>{% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-state">No findings were reported by the selected checks.</p>
+    {% endif %}
+  </section>
+
+  {% if run.ai_scout %}
+  <section class="dashboard" aria-labelledby="ai-heading">
+    <h2 id="ai-heading">AI Scout review of deterministic findings</h2>
+    <p><strong>Status:</strong> {{ run.ai_scout.get('status', '') }}</p>
+    <p>{{ run.ai_scout.get('summary', '') }}</p>
+    {% if run.ai_scout.get('ai_suggested_observations') %}
+      <ol class="process-list">
+        {% for item in run.ai_scout.get('ai_suggested_observations', []) %}
+          <li><strong>{{ item.get('observation', '') }}</strong> {{ item.get('why_it_may_matter', '') }} <span class="muted">Evidence: {{ item.get('related_deterministic_evidence', '') }}. Human review required.</span></li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+    <p class="muted">AI Scout did not independently establish findings and does not make compliance or legal conclusions.</p>
+  </section>
+  {% endif %}
+
+  <section class="dashboard split" aria-labelledby="downloads-heading">
+    <div>
+      <h2 id="downloads-heading">Report downloads</h2>
+      <div class="download-grid">
+        {% for label, href in run.reports.items() %}
+          <a class="download-button" href="{{ href }}?download=1">{{ label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h2>Evidence gallery</h2>
+      {% if run.visual_proof.screenshot_link %}
+        <p><a href="{{ run.visual_proof.screenshot_link }}">Screenshot</a></p>
+      {% endif %}
+      {% if run.visual_proof.focus_overlay_link %}
+        <p><a href="{{ run.visual_proof.focus_overlay_link }}">Focus-path overlay</a></p>
+      {% endif %}
+      {% if run.visual_proof.video_link %}
+        <p><a href="{{ run.visual_proof.video_link }}">Video proof</a></p>
+      {% endif %}
+      {% if not run.visual_proof %}
+        <p class="empty-state">No visual evidence was generated for this run.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="dashboard" aria-labelledby="rerun-heading">
+    <h2 id="rerun-heading">Run again</h2>
+    <div class="actions">
+      <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another URL</a>
+      <a class="download-button" href="{{ url_for('home') }}#audit">Change selected modules</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const cards = Array.from(document.querySelectorAll('.finding-card'));
+function fillOptions(id, values) {
+  const select = document.getElementById(id);
+  [...new Set(values.filter(Boolean))].sort().forEach((value) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  });
+}
+fillOptions('severity-filter', cards.map((card) => card.dataset.severity));
+fillOptions('wcag-filter', cards.map((card) => card.dataset.wcag));
+fillOptions('module-filter', cards.map((card) => card.dataset.module));
+fillOptions('category-filter', cards.map((card) => card.dataset.category));
+function applyFilters() {
+  const query = document.getElementById('finding-search').value.toLowerCase();
+  const severity = document.getElementById('severity-filter').value;
+  const wcag = document.getElementById('wcag-filter').value;
+  const moduleName = document.getElementById('module-filter').value;
+  const category = document.getElementById('category-filter').value;
+  cards.forEach((card) => {
+    const matches = (!query || card.textContent.toLowerCase().includes(query))
+      && (!severity || card.dataset.severity === severity)
+      && (!wcag || card.dataset.wcag === wcag)
+      && (!moduleName || card.dataset.module === moduleName)
+      && (!category || card.dataset.category === category);
+    card.hidden = !matches;
+  });
+}
+document.querySelectorAll('#finding-search, #severity-filter, #wcag-filter, #module-filter, #category-filter').forEach((control) => {
+  control.addEventListener('input', applyFilters);
+});
+</script>
 {% endblock %}

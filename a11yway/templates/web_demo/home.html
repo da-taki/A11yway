@@ -1,43 +1,159 @@
 {% extends "web_demo/base.html" %}
-{% block title %}A11yway Web Demo{% endblock %}
+{% block title %}A11yway public accessibility audit{% endblock %}
 {% block content %}
-<section class="intro">
-  <h1>Deterministic accessibility review for a public page</h1>
-  <p>This tool only tests public pages. Do not enter private dashboards, login pages, internal tools, or pages you do not have permission to test.</p>
+<section class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Public-page accessibility evidence</p>
+    <h1>A11yway tests essential public web workflows with deterministic evidence.</h1>
+    <p class="lede">Run focused accessibility modules against one public URL, then review WCAG mappings, selectors, snippets, screenshots, focus traces, and downloadable reports.</p>
+    <form id="audit" class="audit-panel" method="post" action="{{ url_for('run_review') }}">
+      {% if error %}
+        <div class="alert" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <div class="field-grid">
+        <div class="field-grow">
+          <label for="url">Public website URL</label>
+          <input id="url" name="url" type="url" required autocomplete="url" inputmode="url" placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}" aria-describedby="url-help">
+          <p id="url-help" class="field-help">Try a public, non-login page such as <button class="link-button" type="button" data-sample-url="https://example.org">https://example.org</button>.</p>
+        </div>
+        <div>
+          <label for="label">Optional audit label</label>
+          <input id="label" name="label" type="text" maxlength="80" autocomplete="off" placeholder="Example home page" value="{{ submitted.get('label', '') }}">
+        </div>
+      </div>
+
+      <fieldset class="preset-field">
+        <legend>Audit preset</legend>
+        <div class="preset-grid">
+          {% for key, preset in presets.items() %}
+            <label class="preset-card">
+              <input type="radio" name="preset" value="{{ key }}" data-preset="{{ key }}" {% if (submitted.get('preset') or 'standard') == key %}checked{% endif %}>
+              <span class="preset-title">{{ preset.label }}</span>
+              <span class="preset-text">{{ preset.description }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset class="module-field">
+        <legend>Select A11yway modules</legend>
+        <p class="field-help">Presets only select existing A11yway capabilities. Static HTML analysis is always included.</p>
+        <div class="module-grid">
+          {% for key, module in modules.items() %}
+            {% if key != 'ai_scout' and not module.unavailable_for_url %}
+              <label class="module-card">
+                <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" {% if key in default_modules %}checked{% endif %} {% if module.always_on %}checked disabled{% endif %}>
+                {% if module.always_on %}<input type="hidden" name="modules" value="{{ key }}">{% endif %}
+                <span class="module-kicker">{{ module.category }}</span>
+                <span class="module-title">{{ module.label }}</span>
+                <span class="module-text">{{ module.description }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+          <label class="module-card accent-card">
+            <input type="checkbox" name="modules" value="ai_scout" data-module="ai_scout" {% if 'ai_scout' in default_modules %}checked{% endif %}>
+            <span class="module-kicker">Suggest-only review</span>
+            <span class="module-title">AI Scout</span>
+            <span class="module-text">Server-side AI Scout summarizes deterministic findings. It does not invent issues or make legal conclusions.</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <section class="passive-box" aria-labelledby="passive-heading">
+        <div>
+          <h2 id="passive-heading">Separate passive security observations</h2>
+          <p>Optional header and public-page hygiene observations. These are not part of the accessibility score and are not vulnerability testing.</p>
+        </div>
+        <label class="switch-row">
+          <input name="passive_security" type="checkbox" {% if submitted.get('passive_security') %}checked{% endif %}>
+          <span>Run separately</span>
+        </label>
+      </section>
+
+      <label class="check-row">
+        <input name="permission" type="checkbox" required>
+        <span>I confirm this is a public page or I have permission to review it. I will not use this demo for logins, private systems, payments, form submissions, exploitation, or scraping.</span>
+      </label>
+
+      <div class="actions">
+        <button class="primary-button" type="submit">Run accessibility audit</button>
+        <p class="safety-note">Public pages only. No API keys are sent to browser JavaScript.</p>
+      </div>
+    </form>
+  </div>
 </section>
 
-<form class="panel" method="post" action="{{ url_for('run_review') }}">
-  {% if error %}
-    <div class="alert" role="alert">{{ error }}</div>
-  {% endif %}
-
-  <label for="url">Website URL</label>
-  <input id="url" name="url" type="url" required placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}">
-
-  <label for="review_type">Review type</label>
-  <select id="review_type" name="review_type">
-    {% for key, review in review_types.items() %}
-      <option value="{{ key }}" {% if submitted.get('review_type') == key %}selected{% endif %}>{{ review.label }}</option>
-    {% endfor %}
-  </select>
-
-  <label for="label">Optional label/name for the website</label>
-  <input id="label" name="label" type="text" maxlength="80" placeholder="Example home page" value="{{ submitted.get('label', '') }}">
-
-  <label class="check-row">
-    <input name="permission" type="checkbox" required>
-    <span>I confirm this is a public page or I have permission to review it.</span>
-  </label>
-
-  <button type="submit">Run review</button>
-</form>
-
-<section class="notes">
-  <h2>Guardrails</h2>
-  <ul>
-    <li>One URL per run, no recursive crawling by default.</li>
-    <li>No login, form submission, account creation, payment flow testing, or destructive clicks.</li>
-    <li>No hacking, vulnerability scanning, auth bypass, port scanning, or private-data scraping.</li>
-  </ul>
+<section id="how" class="band">
+  <div class="section-inner">
+    <p class="eyebrow">How it works</p>
+    <h2>From URL to evidence without unsafe actions</h2>
+    <ol class="process-list">
+      <li><strong>Validate target.</strong> A11yway rejects private hosts, unsafe schemes, credentials, unsafe ports, and unsafe redirects.</li>
+      <li><strong>Run selected modules.</strong> The server uses the existing deterministic audit engine and records each module status.</li>
+      <li><strong>Review findings.</strong> AI Scout can summarize verified findings after the deterministic audit, but never replaces evidence.</li>
+      <li><strong>Download reports.</strong> Use generated HTML, Markdown, JSON, CSV, SARIF, and JUnit files when available.</li>
+    </ol>
+  </div>
 </section>
+
+<section id="checks" class="band subtle">
+  <div class="section-inner">
+    <p class="eyebrow">What A11yway checks</p>
+    <h2>Modules built for practical public-page review</h2>
+    <div class="info-grid">
+      <article><h3>Keyboard and rendered DOM</h3><p>Focus traversal, loop detection, rendered HTML comparison, axe-core, and Chromium accessibility-tree evidence when browser mode is available.</p></article>
+      <article><h3>Low vision and mobile</h3><p>Contrast samples, visible focus indicators, zoom reflow, mobile viewport overflow, orientation review, and touch target checks.</p></article>
+      <article><h3>HTML semantics</h3><p>Forms, components, media, headings, labels, language changes, cognitive load signals, and Indic-language markup.</p></article>
+      <article><h3>Evidence and reports</h3><p>Findings can include selectors, snippets, WCAG criteria, browser observations, screenshots, focus overlays, and suggested remediation.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="section-inner split">
+    <div>
+      <p class="eyebrow">Safety and scope</p>
+      <h2>Responsible public testing only</h2>
+      <p>A11yway does not log in, submit forms, test payments, scan networks, bypass authentication, exploit weaknesses, or claim legal compliance certification.</p>
+    </div>
+    <ul class="scope-list">
+      <li>Public pages only</li>
+      <li>No private systems</li>
+      <li>No form submissions</li>
+      <li>No security exploitation</li>
+      <li>Human review required</li>
+      <li>No legal certification claim</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const presets = {{ presets | tojson }};
+const moduleInputs = Array.from(document.querySelectorAll('[data-module]'));
+document.querySelectorAll('[data-preset]').forEach((input) => {
+  input.addEventListener('change', () => {
+    const preset = presets[input.value] || presets.standard;
+    const selected = new Set(preset.modules || []);
+    moduleInputs.forEach((box) => {
+      if (box.disabled) return;
+      box.checked = selected.has(box.value);
+    });
+  });
+});
+moduleInputs.forEach((box) => {
+  box.addEventListener('change', () => {
+    const custom = document.querySelector('[data-preset="custom"]');
+    if (custom && !box.disabled) custom.checked = true;
+  });
+});
+document.querySelectorAll('[data-sample-url]').forEach((button) => {
+  button.addEventListener('click', () => {
+    document.getElementById('url').value = button.dataset.sampleUrl;
+    document.getElementById('url').focus();
+  });
+});
+</script>
 {% endblock %}

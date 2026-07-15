@@ -4,6 +4,7 @@ services:
     env: docker
     plan: starter
     autoDeploy: false
+    healthCheckPath: /health
     envVars:
       - key: A11YWAY_AI_SCOUT_ENABLED
         value: "true"

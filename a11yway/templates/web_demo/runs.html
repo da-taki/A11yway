@@ -1,41 +1,45 @@
 {% extends "web_demo/base.html" %}
-{% block title %}A11yway Past Runs{% endblock %}
+{% block title %}Past A11yway runs{% endblock %}
 {% block content %}
-<section class="intro">
-  <h1>Past runs</h1>
-  <p>Recent local web-demo reviews from <code>reports/web_demo_runs</code>.</p>
-</section>
-
-{% if runs %}
-  <table>
-    <thead>
-      <tr>
-        <th>Target</th>
-        <th>URL</th>
-        <th>Date/time</th>
-        <th>Total issues</th>
-        <th>Classification</th>
-        <th>Reports</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for run in runs %}
-        <tr>
-          <td><a href="{{ url_for('result', run_id=run.run_id) }}">{{ run.target_name }}</a></td>
-          <td><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></td>
-          <td>{{ run.created_at }}</td>
-          <td>{{ run.score.get('total_issues', 0) }}</td>
-          <td>{{ run.score.get('classification', '') }}</td>
-          <td>
-            {% for label, href in run.reports.items() %}
-              <a href="{{ href }}">{{ label.replace('_', ' ') }}</a>{% if not loop.last %}, {% endif %}
+<section class="band">
+  <div class="section-inner">
+    <p class="eyebrow">Audit history</p>
+    <h1>Past runs</h1>
+    <p>Recent web-demo reviews stored under the isolated runtime report directory.</p>
+    {% if runs %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>URL</th>
+              <th>Date/time</th>
+              <th>Total findings</th>
+              <th>Classification</th>
+              <th>Reports</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for run in runs %}
+              <tr>
+                <td><a href="{{ url_for('result', run_id=run.run_id) }}">{{ run.target_name }}</a></td>
+                <td><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></td>
+                <td>{{ run.created_at }}</td>
+                <td>{{ run.total_issues or run.score.get('total_issues', 0) }}</td>
+                <td>{{ run.classification or run.score.get('classification', '') }}</td>
+                <td>
+                  {% for label, href in run.reports.items() %}
+                    <a href="{{ href }}">{{ label }}</a>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+              </tr>
             {% endfor %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p>No web demo runs found yet.</p>
-{% endif %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-state">No web demo runs found yet.</p>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}
