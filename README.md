@@ -22,6 +22,7 @@ Optional groups:
 pip install -e ".[browser]"
 pip install -e ".[documents]"
 pip install -e ".[media]"
+pip install -e ".[web]"
 pip install -e ".[development]"
 pip install -e ".[all]"
 ```
@@ -31,8 +32,16 @@ PowerShell uses the same quoting form:
 ```powershell
 pip install -e ".[browser]"
 pip install -e ".[documents]"
+pip install -e ".[web]"
 pip install -e ".[development]"
 pip install -e ".[all]"
+```
+
+For the same dependency set used by CI and local full-suite development:
+
+```bash
+pip install -e ".[development,browser,documents,media,web]"
+python -c "import flask; import a11yway.web_app"
 ```
 
 Install Chromium for browser-backed modes:

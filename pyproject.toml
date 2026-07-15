@@ -65,6 +65,8 @@ development = [
   "coverage",
   "pytest",
   "pytest-cov",
+  "setuptools>=69",
+  "wheel",
 ]
 all = [
   "playwright",
