@@ -42,6 +42,7 @@ reports/web_demo_runs/*
 
 # Temporary end-to-end validation reports
 reports/_e2e.*
+reports/web_demo_validation/
 
 # Report archives and bulk visual output
 reports/**/*.zip

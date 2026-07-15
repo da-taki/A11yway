@@ -124,10 +124,42 @@ def test_audit_request_status_result_and_download(tmp_path: Path, monkeypatch) -
     assert result_response.status_code == 200
     assert "Executive summary" in result_body
     assert "Report downloads" in result_body
+    assert 'id="page-filter"' in result_body
+    assert 'id="clear-filters"' in result_body
+    assert "<details open>" in result_body
 
     summary = web_app.load_run_summary(run_id)
     download = client.get(next(iter(summary["reports"].values())) + "?download=1")
     assert download.status_code == 200
+
+
+def test_run_web_review_builds_links_without_request_context(tmp_path: Path, monkeypatch) -> None:
+    _patch_web_runtime(monkeypatch, tmp_path)
+
+    result = web_app.run_web_review(
+        "https://example.org",
+        label="Example background",
+        selected_modules=["static", "forms"],
+    )
+
+    assert result["status"] == "passed"
+    assert result["reports"]["JSON"].startswith("/reports/")
+    assert all(module["status"] == "complete" for module in result["module_statuses"])
+
+
+def test_visual_proof_paths_are_sanitized_to_relative_paths(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(web_app, "PROJECT_ROOT", tmp_path)
+    report = {
+        "visual_proof": {
+            "screenshot_path": str(tmp_path / "reports" / "web_demo_runs" / "run" / "page.png"),
+            "focus_overlay_path": str(tmp_path / "reports" / "web_demo_runs" / "run" / "focus_path.html"),
+        }
+    }
+
+    web_app.sanitize_visual_proof_paths(report)
+
+    assert report["visual_proof"]["screenshot_path"] == "reports/web_demo_runs/run/page.png"
+    assert report["visual_proof"]["focus_overlay_path"] == "reports/web_demo_runs/run/focus_path.html"
 
 
 def test_browser_mode_falls_back_when_unavailable(tmp_path: Path, monkeypatch) -> None:
@@ -196,6 +228,10 @@ def test_report_links_are_generated_inside_demo_runs(tmp_path: Path, monkeypatch
     assert link == "/reports/run-one/example.json"
     assert resolved == report_path.resolve()
     assert web_app.safe_report_path("../secret.txt") is None
+    assert web_app.safe_report_path("run-one/../other-run/example.json") is None
+
+    client = app.test_client()
+    assert client.get("/reports/run-one/%2e%2e/secret.txt").status_code == 404
 
 
 def test_missing_groq_key_does_not_crash_web_summary(tmp_path: Path, monkeypatch) -> None:

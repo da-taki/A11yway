@@ -56,34 +56,41 @@
 
   <section class="dashboard" aria-labelledby="filters-heading">
     <h2 id="filters-heading">Findings</h2>
-    <div class="filters" id="filters-heading">
+    <div class="filters">
       <label>Search findings <input id="finding-search" type="search" autocomplete="off"></label>
       <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
       <label>WCAG criterion <select id="wcag-filter"><option value="">All</option></select></label>
       <label>Module <select id="module-filter"><option value="">All</option></select></label>
+      <label>Page <select id="page-filter"><option value="">All</option></select></label>
       <label>Issue category <select id="category-filter"><option value="">All</option></select></label>
+      <button id="clear-filters" class="download-button filter-clear" type="button">Clear filters</button>
     </div>
+    <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} findings shown.</p>
     {% if run.findings %}
       <div id="findings-list" class="finding-list">
         {% for finding in run.findings %}
-          <article class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}">
+          <article class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}" data-page="{{ finding.affected_url }}">
             <div class="finding-head">
               <h3>{{ finding.title }}</h3>
               <span class="badge">{{ finding.display_severity }}</span>
             </div>
-            <dl class="finding-meta">
-              <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
-              <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
-              <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
-              <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
-              {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
-            </dl>
-            {% if finding.browser_observation %}<p><strong>Evidence:</strong> {{ finding.browser_observation }}</p>{% endif %}
-            {% if finding.snippet %}<pre><code>{{ finding.snippet }}</code></pre>{% endif %}
-            {% if finding.suggested_fix %}<p><strong>Suggested remediation:</strong> {{ finding.suggested_fix }}</p>{% endif %}
+            <details open>
+              <summary>Evidence details</summary>
+              <dl class="finding-meta">
+                <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
+                <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
+                <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+                <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
+                {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
+              </dl>
+              {% if finding.browser_observation %}<p><strong>Evidence:</strong> {{ finding.browser_observation }}</p>{% endif %}
+              {% if finding.snippet %}<pre><code>{{ finding.snippet }}</code></pre>{% endif %}
+              {% if finding.suggested_fix %}<p><strong>Suggested remediation:</strong> {{ finding.suggested_fix }}</p>{% endif %}
+            </details>
           </article>
         {% endfor %}
       </div>
+      <p id="empty-filter-state" class="empty-state" hidden>No findings match the current filters.</p>
     {% else %}
       <p class="empty-state">No findings were reported by the selected checks.</p>
     {% endif %}
@@ -156,24 +163,39 @@ function fillOptions(id, values) {
 fillOptions('severity-filter', cards.map((card) => card.dataset.severity));
 fillOptions('wcag-filter', cards.map((card) => card.dataset.wcag));
 fillOptions('module-filter', cards.map((card) => card.dataset.module));
+fillOptions('page-filter', cards.map((card) => card.dataset.page));
 fillOptions('category-filter', cards.map((card) => card.dataset.category));
 function applyFilters() {
   const query = document.getElementById('finding-search').value.toLowerCase();
   const severity = document.getElementById('severity-filter').value;
   const wcag = document.getElementById('wcag-filter').value;
   const moduleName = document.getElementById('module-filter').value;
+  const page = document.getElementById('page-filter').value;
   const category = document.getElementById('category-filter').value;
+  let visibleCount = 0;
   cards.forEach((card) => {
     const matches = (!query || card.textContent.toLowerCase().includes(query))
       && (!severity || card.dataset.severity === severity)
       && (!wcag || card.dataset.wcag === wcag)
       && (!moduleName || card.dataset.module === moduleName)
+      && (!page || card.dataset.page === page)
       && (!category || card.dataset.category === category);
     card.hidden = !matches;
+    if (matches) visibleCount += 1;
   });
+  document.getElementById('finding-count').textContent = `${visibleCount} findings shown.`;
+  const empty = document.getElementById('empty-filter-state');
+  if (empty) empty.hidden = visibleCount !== 0;
 }
-document.querySelectorAll('#finding-search, #severity-filter, #wcag-filter, #module-filter, #category-filter').forEach((control) => {
+document.querySelectorAll('#finding-search, #severity-filter, #wcag-filter, #module-filter, #page-filter, #category-filter').forEach((control) => {
   control.addEventListener('input', applyFilters);
+});
+document.getElementById('clear-filters').addEventListener('click', () => {
+  document.getElementById('finding-search').value = '';
+  document.querySelectorAll('#severity-filter, #wcag-filter, #module-filter, #page-filter, #category-filter').forEach((control) => {
+    control.value = '';
+  });
+  applyFilters();
 });
 </script>
 {% endblock %}

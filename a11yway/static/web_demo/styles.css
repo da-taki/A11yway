@@ -21,10 +21,6 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
   background: var(--bg);
@@ -37,6 +33,7 @@ body {
 a {
   color: var(--accent-dark);
   text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
 }
 
 a:hover {
@@ -465,6 +462,8 @@ fieldset {
   margin: 22px 0;
   padding: clamp(16px, 3vw, 24px);
   box-shadow: none;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .metrics {
@@ -629,14 +628,20 @@ fieldset {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(150px, 1fr));
+  grid-template-columns: minmax(220px, 1.4fr) repeat(5, minmax(140px, 1fr)) auto;
   gap: 12px;
   margin: 18px 0;
+  align-items: end;
+}
+
+.filter-clear {
+  min-height: 46px;
 }
 
 .finding-list {
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .finding-card {
@@ -644,6 +649,8 @@ fieldset {
   border-radius: 8px;
   background: #fff;
   padding: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .finding-head {
@@ -651,6 +658,12 @@ fieldset {
   justify-content: space-between;
   gap: 14px;
   align-items: flex-start;
+  min-width: 0;
+}
+
+.finding-head h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .finding-meta {
@@ -658,6 +671,18 @@ fieldset {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 16px;
   margin: 14px 0;
+}
+
+.finding-card details {
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.finding-card summary {
+  cursor: pointer;
+  color: var(--accent-dark);
+  font-weight: 850;
+  min-width: 0;
 }
 
 pre,
@@ -669,14 +694,19 @@ code {
 
 code {
   padding: 2px 5px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 pre {
   max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   padding: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .download-grid {
