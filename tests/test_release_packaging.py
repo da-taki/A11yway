@@ -43,6 +43,18 @@ def _pyproject() -> dict:
     return tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
 
+def _requirements_browser() -> str:
+    return (ROOT / "requirements-browser.txt").read_text(encoding="utf-8")
+
+
+def _dockerfile() -> str:
+    return (ROOT / "Dockerfile").read_text(encoding="utf-8")
+
+
+def _dockerignore() -> str:
+    return (ROOT / ".dockerignore").read_text(encoding="utf-8")
+
+
 def test_single_version_source_and_cli_version() -> None:
     completed = subprocess.run(
         [sys.executable, "-m", "a11yway.main", "--version"],
@@ -70,7 +82,7 @@ def test_optional_dependency_groups_are_represented() -> None:
 
     for group in ("browser", "documents", "media", "ai", "web", "development", "all"):
         assert group in extras
-    assert "playwright" in extras["browser"]
+    assert "playwright==1.61.0" in extras["browser"]
     assert "pypdf" in extras["documents"]
     assert "mutagen" in extras["media"]
     assert "groq" in extras["ai"]
@@ -116,8 +128,40 @@ def test_ci_workflow_contains_release_checks_without_native_adapter_requirements
     assert "python -m pip check" in workflow
     assert "python -m build" in workflow
     assert "scripts/verify_wheel_install.py" in workflow
+    assert "Render Docker smoke" in workflow
+    assert "docker build -t a11yway-render-smoke ." in workflow
+    assert "python scripts/render_docker_smoke.py" in workflow
     assert "NVDA" not in workflow
     assert "JAWS" not in workflow
+
+
+def test_browser_dependency_is_pinned_for_docker_and_extras() -> None:
+    requirements = _requirements_browser()
+    extras = _pyproject()["project"]["optional-dependencies"]
+
+    assert "playwright==1.61.0" in requirements
+    assert "playwright==1.61.0" in extras["browser"]
+    assert "playwright==1.61.0" in extras["all"]
+
+
+def test_render_dockerfile_uses_python_312_and_matching_playwright_install() -> None:
+    dockerfile = _dockerfile()
+
+    assert "FROM python:3.12-bookworm" in dockerfile
+    assert "mcr.microsoft.com/playwright" not in dockerfile
+    assert "python -m pip install --no-cache-dir -r requirements-web.txt" in dockerfile
+    assert "python -m playwright install --with-deps chromium" in dockerfile
+    assert 'gunicorn a11yway.web_app:app --bind 0.0.0.0:${PORT:-10000}' in dockerfile
+
+
+def test_render_docker_context_excludes_secrets_and_generated_reports() -> None:
+    dockerignore = _dockerignore()
+
+    assert ".env" in dockerignore
+    assert ".env.*" in dockerignore
+    assert "!.env.example" in dockerignore
+    assert "reports/" in dockerignore
+    assert ".git" in dockerignore
 
 
 def test_all_accessibility_modules_still_excludes_passive_security() -> None:

@@ -47,7 +47,7 @@ python -c "import flask; import a11yway.web_app"
 Install Chromium for browser-backed modes:
 
 ```bash
-python -m playwright install chromium
+python -m playwright install --with-deps chromium
 ```
 
 The installed CLI exposes the same commands as module mode:
@@ -172,7 +172,7 @@ Install the optional dependency:
 
 ```bash
 pip install -r requirements-browser.txt
-python -m playwright install chromium
+python -m playwright install --with-deps chromium
 ```
 
 Then add `--browser` to any audit:
