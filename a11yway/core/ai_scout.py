@@ -99,7 +99,9 @@ def load_ai_scout_config(
     dotenv = _read_dotenv(dotenv_path)
 
     def get(name: str, default: str = "") -> str:
-        return env.get(name) or dotenv.get(name) or default
+        if name in env:
+            return env[name]
+        return dotenv.get(name) or default
 
     return AIScoutConfig(
         enabled=_truthy(get("A11YWAY_AI_SCOUT_ENABLED")),

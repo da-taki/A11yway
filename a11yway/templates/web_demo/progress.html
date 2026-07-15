@@ -1,0 +1,104 @@
+{% extends "web_demo/base.html" %}
+{% block title %}Audit progress - A11yway{% endblock %}
+{% block content %}
+<section class="progress-page">
+  <div class="section-inner">
+    <p class="eyebrow">Audit in progress</p>
+    <h1>{{ run.target_name }}</h1>
+    <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+
+    <div class="progress-layout">
+      <section class="progress-card" aria-labelledby="progress-heading">
+        <h2 id="progress-heading">Current status</h2>
+        <div class="meter" aria-hidden="true"><span id="meter-fill" style="width: {{ run.progress_percent }}%"></span></div>
+        <p id="live-status" class="live-status" role="status" aria-live="polite">{{ run.current_module }}</p>
+        <dl class="detail-list">
+          <div><dt>Progress</dt><dd id="progress-number">{{ run.progress_percent }}%</dd></div>
+          <div><dt>Elapsed time</dt><dd id="elapsed">{{ run.elapsed_seconds }} seconds</dd></div>
+          <div><dt>Target</dt><dd>{{ run.target_url }}</dd></div>
+        </dl>
+        <div id="error-box" class="alert" role="alert" hidden></div>
+        <a id="result-link" class="primary-button secondary-link" href="{{ url_for('result', run_id=run.run_id) }}" hidden>View results</a>
+      </section>
+
+      <section class="progress-card" aria-labelledby="modules-heading">
+        <h2 id="modules-heading">Selected modules</h2>
+        <ul id="module-list" class="module-status-list">
+          {% for module in run.modules %}
+            <li data-module-row="{{ module.key }}"><span class="status-dot {{ module.status }}" aria-hidden="true"></span><strong>{{ module.label }}</strong><span>{{ module.status }}</span><small>{{ module.message }}</small></li>
+          {% endfor %}
+        </ul>
+      </section>
+    </div>
+
+    <section class="progress-card" aria-labelledby="messages-heading">
+      <h2 id="messages-heading">Readable progress log</h2>
+      <ul id="message-list" class="message-list">
+        {% for message in run.messages[-8:] %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const statusUrl = "{{ url_for('audit_status', run_id=run.run_id) }}";
+const resultUrl = "{{ url_for('result', run_id=run.run_id) }}";
+const live = document.getElementById('live-status');
+const fill = document.getElementById('meter-fill');
+const progressNumber = document.getElementById('progress-number');
+const elapsed = document.getElementById('elapsed');
+const messageList = document.getElementById('message-list');
+const resultLink = document.getElementById('result-link');
+const errorBox = document.getElementById('error-box');
+
+function renderStatus(data) {
+  live.textContent = data.current_module || data.status;
+  fill.style.width = `${data.progress_percent || 0}%`;
+  progressNumber.textContent = `${data.progress_percent || 0}%`;
+  elapsed.textContent = `${data.elapsed_seconds || 0} seconds`;
+  messageList.innerHTML = '';
+  (data.messages || []).slice(-8).forEach((message) => {
+    const li = document.createElement('li');
+    li.textContent = message;
+    messageList.appendChild(li);
+  });
+  (data.modules || []).forEach((module) => {
+    const row = document.querySelector(`[data-module-row="${module.key}"]`);
+    if (!row) return;
+    const dot = row.querySelector('.status-dot');
+    dot.className = `status-dot ${module.status}`;
+    row.querySelector('span:nth-of-type(2)').textContent = module.status;
+    row.querySelector('small').textContent = module.message || '';
+  });
+  if (data.status === 'failed') {
+    errorBox.hidden = false;
+    errorBox.textContent = data.error_id ? `${data.error} Error ID: ${data.error_id}` : data.error;
+    resultLink.hidden = true;
+    return true;
+  }
+  if (data.status === 'complete') {
+    resultLink.hidden = false;
+    window.setTimeout(() => { window.location.href = resultUrl; }, 700);
+    return true;
+  }
+  return false;
+}
+
+async function poll() {
+  try {
+    const response = await fetch(statusUrl, {headers: {'Accept': 'application/json'}});
+    if (!response.ok) throw new Error('Status unavailable');
+    const done = renderStatus(await response.json());
+    if (!done) window.setTimeout(poll, 1200);
+  } catch (error) {
+    live.textContent = 'Still waiting for audit status...';
+    window.setTimeout(poll, 2500);
+  }
+}
+poll();
+</script>
+{% endblock %}
