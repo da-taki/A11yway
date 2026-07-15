@@ -3,36 +3,63 @@
 {% block content %}
 <section class="progress-page">
   <div class="section-inner">
-    <p class="eyebrow">Audit in progress</p>
-    <h1>{{ run.target_name }}</h1>
-    <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+    <div class="progress-hero">
+      <div class="domain-mark" aria-hidden="true">{{ run.target_name[:1] | upper }}</div>
+      <div>
+        <p class="eyebrow">Audit in progress</p>
+        <h1>{{ run.target_name }}</h1>
+        <p class="target-line"><svg aria-hidden="true"><use href="#icon-link"></use></svg><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+      </div>
+    </div>
 
     <div class="progress-layout">
-      <section class="progress-card" aria-labelledby="progress-heading">
-        <h2 id="progress-heading">Current status</h2>
-        <div class="meter" aria-hidden="true"><span id="meter-fill" style="width: {{ run.progress_percent }}%"></span></div>
+      <section class="progress-card status-panel" aria-labelledby="progress-heading">
+        <div class="card-title-row">
+          <h2 id="progress-heading">Current activity</h2>
+          <span class="status-pill {{ run.status }}">{{ run.status }}</span>
+        </div>
         <p id="live-status" class="live-status" role="status" aria-live="polite">{{ run.current_module }}</p>
-        <dl class="detail-list">
+        <div class="meter" aria-hidden="true"><span id="meter-fill" style="width: {{ run.progress_percent }}%"></span></div>
+        <dl class="detail-list compact">
           <div><dt>Progress</dt><dd id="progress-number">{{ run.progress_percent }}%</dd></div>
           <div><dt>Elapsed time</dt><dd id="elapsed">{{ run.elapsed_seconds }} seconds</dd></div>
-          <div><dt>Target</dt><dd>{{ run.target_url }}</dd></div>
+          <div><dt>Selected modules</dt><dd>{{ run.modules | length }}</dd></div>
+          <div><dt>Started</dt><dd>{{ run.started_at or 'Queued' }}</dd></div>
         </dl>
+        <div class="progress-reassurance">
+          <svg aria-hidden="true"><use href="#icon-check"></use></svg>
+          <span>Partial evidence and module status are preserved as the run advances.</span>
+        </div>
         <div id="error-box" class="alert" role="alert" hidden></div>
-        <a id="result-link" class="primary-button secondary-link" href="{{ url_for('result', run_id=run.run_id) }}" hidden>View results</a>
+        <div class="actions">
+          <a id="result-link" class="primary-button secondary-link" href="{{ url_for('result', run_id=run.run_id) }}" hidden>View results</a>
+          <a class="download-button" href="{{ url_for('home') }}#audit">Return to setup</a>
+        </div>
       </section>
 
       <section class="progress-card" aria-labelledby="modules-heading">
-        <h2 id="modules-heading">Selected modules</h2>
-        <ul id="module-list" class="module-status-list">
+        <div class="card-title-row">
+          <h2 id="modules-heading">Module timeline</h2>
+          <span class="mini-metric">{{ run.modules | length }} checks</span>
+        </div>
+        <ul id="module-list" class="module-status-list timeline-list">
           {% for module in run.modules %}
-            <li data-module-row="{{ module.key }}"><span class="status-dot {{ module.status }}" aria-hidden="true"></span><strong>{{ module.label }}</strong><span>{{ module.status }}</span><small>{{ module.message }}</small></li>
+            <li data-module-row="{{ module.key }}">
+              <span class="status-dot {{ module.status }}" aria-hidden="true"></span>
+              <strong>{{ module.label }}</strong>
+              <span>{{ module.status }}</span>
+              <small>{{ module.message or 'Waiting for evidence collection.' }}</small>
+            </li>
           {% endfor %}
         </ul>
       </section>
     </div>
 
-    <section class="progress-card" aria-labelledby="messages-heading">
-      <h2 id="messages-heading">Readable progress log</h2>
+    <section class="progress-card log-panel" aria-labelledby="messages-heading">
+      <div class="card-title-row">
+        <h2 id="messages-heading">Readable progress log</h2>
+        <span class="mini-metric">latest updates</span>
+      </div>
       <ul id="message-list" class="message-list">
         {% for message in run.messages[-8:] %}
           <li>{{ message }}</li>
@@ -72,7 +99,7 @@ function renderStatus(data) {
     const dot = row.querySelector('.status-dot');
     dot.className = `status-dot ${module.status}`;
     row.querySelector('span:nth-of-type(2)').textContent = module.status;
-    row.querySelector('small').textContent = module.message || '';
+    row.querySelector('small').textContent = module.message || 'Waiting for evidence collection.';
   });
   if (data.status === 'failed') {
     errorBox.hidden = false;

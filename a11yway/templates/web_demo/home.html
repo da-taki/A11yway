@@ -2,11 +2,38 @@
 {% block title %}A11yway public accessibility audit{% endblock %}
 {% block content %}
 <section class="hero">
-  <div class="hero-inner">
-    <p class="eyebrow">Public-page accessibility evidence</p>
-    <h1>A11yway tests essential public web workflows with deterministic evidence.</h1>
-    <p class="lede">Run focused accessibility modules against one public URL, then review WCAG mappings, selectors, snippets, screenshots, focus traces, and downloadable reports.</p>
-    <form id="audit" class="audit-panel" method="post" action="{{ url_for('run_review') }}">
+  <div class="hero-inner hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Public-page accessibility evidence</p>
+      <h1>Find barriers before users are forced to report them.</h1>
+      <p class="lede">A11yway combines deterministic analysis, real-browser evidence, keyboard traversal, reflow checks, and human review guidance for public web pages.</p>
+      <div class="hero-actions">
+        <a class="primary-button" href="#audit">Start an audit <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></a>
+        <a class="text-link" href="#how">See methodology</a>
+        <a class="text-link" href="https://github.com/da-taki/A11yway" rel="noreferrer">GitHub</a>
+      </div>
+      <div class="cred-strip" aria-label="A11yway credibility metrics">
+        <div><strong>651</strong><span>automated tests</span></div>
+        <div><strong>45 / 86</strong><span>WCAG 2.2 criteria with native evidence</span></div>
+        <div><strong>Linux + Windows</strong><span>CI coverage</span></div>
+        <div><strong>Render</strong><span>Docker validation</span></div>
+      </div>
+      <ul class="scope-tags" aria-label="Public demo scope">
+        <li>Public pages only</li>
+        <li>No logins or form submissions</li>
+        <li>Server-side AI Scout</li>
+      </ul>
+    </div>
+
+    <form id="audit" class="audit-panel audit-console" method="post" action="{{ url_for('run_review') }}">
+      <div class="console-head">
+        <div>
+          <p class="eyebrow">Audit console</p>
+          <h2>Configure evidence</h2>
+        </div>
+        <span class="console-status"><svg aria-hidden="true"><use href="#icon-check"></use></svg> Public-safe mode</span>
+      </div>
+
       {% if error %}
         <div class="alert" role="alert">{{ error }}</div>
       {% endif %}
@@ -15,7 +42,8 @@
         <div class="field-grow">
           <label for="url">Public website URL</label>
           <input id="url" name="url" type="url" required autocomplete="url" inputmode="url" placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}" aria-describedby="url-help">
-          <p id="url-help" class="field-help">Try a public, non-login page such as <button class="link-button" type="button" data-sample-url="https://example.org">https://example.org</button>.</p>
+          <p id="url-help" class="field-help">Try a public, non-login page such as example.org.</p>
+          <button class="link-button sample-button" type="button" data-sample-url="https://example.org">Use https://example.org</button>
         </div>
         <div>
           <label for="label">Optional audit label</label>
@@ -36,6 +64,8 @@
         </div>
       </fieldset>
 
+      <div class="selection-summary" id="module-summary">Modules selected.</div>
+
       <fieldset class="module-field">
         <legend>Select A11yway modules</legend>
         <p class="field-help">Presets only select existing A11yway capabilities. Static HTML analysis is always included.</p>
@@ -43,19 +73,23 @@
           {% for key, module in modules.items() %}
             {% if key != 'ai_scout' and not module.unavailable_for_url %}
               <label class="module-card">
-                <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" {% if key in default_modules %}checked{% endif %} {% if module.always_on %}checked disabled{% endif %}>
+                <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="{% if module.requires_browser %}Browser evidence{% elif module.always_on %}Always on{% else %}Deterministic review{% endif %}" {% if key in default_modules %}checked{% endif %} {% if module.always_on %}checked disabled{% endif %}>
                 {% if module.always_on %}<input type="hidden" name="modules" value="{{ key }}">{% endif %}
+                <span class="module-icon" aria-hidden="true"><svg><use href="#icon-grid"></use></svg></span>
                 <span class="module-kicker">{{ module.category }}</span>
                 <span class="module-title">{{ module.label }}</span>
                 <span class="module-text">{{ module.description }}</span>
+                <span class="module-purpose">{% if module.requires_browser %}Browser evidence{% elif module.always_on %}Always on{% else %}Deterministic review{% endif %}</span>
               </label>
             {% endif %}
           {% endfor %}
           <label class="module-card accent-card">
-            <input type="checkbox" name="modules" value="ai_scout" data-module="ai_scout" {% if 'ai_scout' in default_modules %}checked{% endif %}>
+            <input type="checkbox" name="modules" value="ai_scout" data-module="ai_scout" data-purpose="Suggest-only review" {% if 'ai_scout' in default_modules %}checked{% endif %}>
+            <span class="module-icon" aria-hidden="true"><svg><use href="#icon-spark"></use></svg></span>
             <span class="module-kicker">Suggest-only review</span>
             <span class="module-title">AI Scout</span>
             <span class="module-text">Server-side AI Scout summarizes deterministic findings. It does not invent issues or make legal conclusions.</span>
+            <span class="module-purpose">Server side only</span>
           </label>
         </div>
       </fieldset>
@@ -76,23 +110,29 @@
         <span>I confirm this is a public page or I have permission to review it. I will not use this demo for logins, private systems, payments, form submissions, exploitation, or scraping.</span>
       </label>
 
+      <div class="availability-grid" aria-label="Execution boundaries">
+        <div><svg aria-hidden="true"><use href="#icon-status"></use></svg><strong>Browser evidence</strong><span>Enabled when Playwright is available.</span></div>
+        <div><svg aria-hidden="true"><use href="#icon-spark"></use></svg><strong>AI Scout</strong><span>Organizes existing evidence on the server.</span></div>
+      </div>
+
       <div class="actions">
-        <button class="primary-button" type="submit">Run accessibility audit</button>
-        <p class="safety-note">Public pages only. No API keys are sent to browser JavaScript.</p>
+        <button class="primary-button" type="submit">Run accessibility audit <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></button>
+        <p class="safety-note">No API keys or local filesystem paths are sent to browser JavaScript.</p>
       </div>
     </form>
   </div>
 </section>
 
-<section id="how" class="band">
+<section id="how" class="band process-band">
   <div class="section-inner">
     <p class="eyebrow">How it works</p>
-    <h2>From URL to evidence without unsafe actions</h2>
-    <ol class="process-list">
-      <li><strong>Validate target.</strong> A11yway rejects private hosts, unsafe schemes, credentials, unsafe ports, and unsafe redirects.</li>
-      <li><strong>Run selected modules.</strong> The server uses the existing deterministic audit engine and records each module status.</li>
-      <li><strong>Review findings.</strong> AI Scout can summarize verified findings after the deterministic audit, but never replaces evidence.</li>
-      <li><strong>Download reports.</strong> Use generated HTML, Markdown, JSON, CSV, SARIF, and JUnit files when available.</li>
+    <h2>From public URL to review-ready evidence</h2>
+    <ol class="process-flow">
+      <li><span>1</span><strong>Enter a public URL</strong><p>Unsafe schemes, private hosts, credentials, unsafe ports, and unsafe redirects are rejected.</p></li>
+      <li><span>2</span><strong>Select modules</strong><p>Choose quick static checks, browser evidence, keyboard traversal, reflow, mobile, and AI Scout.</p></li>
+      <li><span>3</span><strong>Collect evidence</strong><p>The server runs deterministic modules and records module status without unsafe actions.</p></li>
+      <li><span>4</span><strong>Review findings</strong><p>Selectors, snippets, WCAG mappings, screenshots, focus paths, and observations stay traceable.</p></li>
+      <li><span>5</span><strong>Download reports</strong><p>Use generated HTML, Markdown, JSON, CSV, SARIF, and JUnit files when available.</p></li>
     </ol>
   </div>
 </section>
@@ -100,17 +140,21 @@
 <section id="checks" class="band subtle">
   <div class="section-inner">
     <p class="eyebrow">What A11yway checks</p>
-    <h2>Modules built for practical public-page review</h2>
-    <div class="info-grid">
-      <article><h3>Keyboard and rendered DOM</h3><p>Focus traversal, loop detection, rendered HTML comparison, axe-core, and Chromium accessibility-tree evidence when browser mode is available.</p></article>
-      <article><h3>Low vision and mobile</h3><p>Contrast samples, visible focus indicators, zoom reflow, mobile viewport overflow, orientation review, and touch target checks.</p></article>
-      <article><h3>HTML semantics</h3><p>Forms, components, media, headings, labels, language changes, cognitive load signals, and Indic-language markup.</p></article>
-      <article><h3>Evidence and reports</h3><p>Findings can include selectors, snippets, WCAG criteria, browser observations, screenshots, focus overlays, and suggested remediation.</p></article>
+    <h2>Practical modules for public-page review</h2>
+    <div class="capability-grid">
+      <article><svg aria-hidden="true"><use href="#icon-grid"></use></svg><h3>Structure and semantics</h3><p>Headings, landmarks, labels, language, alt text, and HTML patterns are checked from fetched source.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-check"></use></svg><h3>Forms and controls</h3><p>Inputs, grouping, instructions, errors, and recovery patterns are reviewed without submitting forms.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-status"></use></svg><h3>Keyboard navigation</h3><p>Focus traversal, repeated stops, lost focus, and focus-loop risks are recorded when browser evidence runs.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-lab"></use></svg><h3>Accessibility-tree evidence</h3><p>Rendered DOM and computed announcements support reviewer-visible evidence, not just source inspection.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-search"></use></svg><h3>Low vision and reflow</h3><p>Contrast, focus visibility, zoom reflow, mobile overflow, and touch target signals are surfaced.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-link"></use></svg><h3>Language and Indic scripts</h3><p>Multilingual, bidirectional, and Indic-language markup signals are prepared for human follow-up.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-download"></use></svg><h3>Developer reports</h3><p>HTML, Markdown, JSON, CSV, SARIF, and JUnit outputs support teams, judges, and CI workflows.</p></article>
+      <article><svg aria-hidden="true"><use href="#icon-spark"></use></svg><h3>AI Scout</h3><p>Suggest-only summaries prioritize deterministic findings without independently establishing failures.</p></article>
     </div>
   </div>
 </section>
 
-<section class="band">
+<section class="band dark-band">
   <div class="section-inner split">
     <div>
       <p class="eyebrow">Safety and scope</p>
@@ -133,6 +177,16 @@
 <script>
 const presets = {{ presets | tojson }};
 const moduleInputs = Array.from(document.querySelectorAll('[data-module]'));
+const moduleSummary = document.getElementById('module-summary');
+function updateModuleSummary() {
+  const selected = moduleInputs.filter((box) => box.checked);
+  const browserCount = selected.filter((box) => (box.dataset.purpose || '').includes('Browser')).length;
+  const aiEnabled = selected.some((box) => box.value === 'ai_scout');
+  const pieces = [`${selected.length} modules selected`];
+  pieces.push(browserCount ? 'Browser evidence enabled' : 'Static evidence only');
+  pieces.push(aiEnabled ? 'AI Scout enabled' : 'AI Scout off');
+  if (moduleSummary) moduleSummary.textContent = pieces.join(' - ');
+}
 document.querySelectorAll('[data-preset]').forEach((input) => {
   input.addEventListener('change', () => {
     const preset = presets[input.value] || presets.standard;
@@ -141,12 +195,14 @@ document.querySelectorAll('[data-preset]').forEach((input) => {
       if (box.disabled) return;
       box.checked = selected.has(box.value);
     });
+    updateModuleSummary();
   });
 });
 moduleInputs.forEach((box) => {
   box.addEventListener('change', () => {
     const custom = document.querySelector('[data-preset="custom"]');
     if (custom && !box.disabled) custom.checked = true;
+    updateModuleSummary();
   });
 });
 document.querySelectorAll('[data-sample-url]').forEach((button) => {
@@ -155,5 +211,6 @@ document.querySelectorAll('[data-sample-url]').forEach((button) => {
     document.getElementById('url').focus();
   });
 });
+updateModuleSummary();
 </script>
 {% endblock %}

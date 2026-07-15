@@ -8,11 +8,26 @@
   {% block head %}{% endblock %}
 </head>
 <body>
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 19h14"/></symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7v5l-4 2v-7L4 5Z"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></symbol>
+    <symbol id="icon-lab" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 16h8"/></symbol>
+    <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><path d="m21 21-5-5M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2L12 3Z"/></symbol>
+    <symbol id="icon-status" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M12 7v5l3 2"/></symbol>
+  </svg>
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="topbar">
     <a class="brand" href="{{ url_for('home') }}" aria-label="A11yway home">
       <span class="brand-mark" aria-hidden="true">A</span>
-      <span>A11yway</span>
+      <span class="brand-copy">
+        <span class="brand-name">A11yway</span>
+        <span class="brand-descriptor">Public accessibility evidence</span>
+      </span>
     </a>
     <nav aria-label="Primary navigation">
       <a href="{{ url_for('home') }}#audit">Audit a website</a>
@@ -20,6 +35,7 @@
       <a href="{{ url_for('home') }}#checks">What it tests</a>
       <a href="{{ url_for('past_runs') }}">Past runs</a>
       <a href="https://github.com/da-taki/A11yway" rel="noreferrer">GitHub</a>
+      <a class="nav-cta" href="{{ url_for('home') }}#audit">Run audit</a>
     </nav>
   </header>
   <main id="main">
