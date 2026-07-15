@@ -6,13 +6,16 @@
     <div>
       <p class="eyebrow">Audit results</p>
       <h1>{{ run.target_name }}</h1>
-      <p><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
+      <p class="target-line"><svg aria-hidden="true"><use href="#icon-link"></use></svg><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
     </div>
-    <div class="status-pill {{ run.status }}">{{ run.status }}</div>
+    <div class="result-actions">
+      <span class="status-pill {{ run.status }}">{{ run.status }}</span>
+      <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another page</a>
+    </div>
   </div>
 </section>
 
-<div class="section-inner">
+<div class="section-inner result-shell">
   {% if run.fallback_notice %}
     <div class="alert">{{ run.fallback_notice }}</div>
   {% endif %}
@@ -20,8 +23,14 @@
     <div class="alert" role="alert">{{ run.error }}</div>
   {% endif %}
 
-  <section class="dashboard" aria-labelledby="summary-heading">
-    <h2 id="summary-heading">Executive summary</h2>
+  <section class="dashboard summary-dashboard" aria-labelledby="summary-heading">
+    <div class="card-title-row">
+      <div>
+        <p class="eyebrow">Reviewer snapshot</p>
+        <h2 id="summary-heading">Executive summary</h2>
+      </div>
+      <span class="mini-metric">{{ run.review_type }}</span>
+    </div>
     <div class="metrics">
       <div><span>Total findings</span><strong>{{ run.total_issues }}</strong></div>
       <div><span>WCAG criteria represented</span><strong>{{ run.wcag_criteria_count }}</strong></div>
@@ -33,20 +42,28 @@
       <div><dt>Classification</dt><dd>{{ run.classification or run.score.get('classification', 'Not scored') }}</dd></div>
       <div><dt>Modules completed</dt><dd>{{ run.module_statuses | selectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
       <div><dt>Skipped, failed, or unavailable</dt><dd>{{ run.module_statuses | rejectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
+      <div><dt>Browser evidence</dt><dd>{% if run.browser_used %}Captured{% elif run.browser_requested %}Requested but unavailable{% else %}Not requested{% endif %}</dd></div>
+      <div><dt>Selected modules</dt><dd>{{ run.selected_modules | join(', ') }}</dd></div>
     </dl>
   </section>
 
-  <section class="dashboard" aria-labelledby="severity-heading">
-    <h2 id="severity-heading">Severity overview</h2>
+  <section class="dashboard severity-dashboard" aria-labelledby="severity-heading">
+    <div class="card-title-row">
+      <h2 id="severity-heading">Severity overview</h2>
+      <span class="mini-metric">Numbers include text labels, not color alone.</span>
+    </div>
     <div class="severity-grid">
       {% for label, key in [('Critical', 'critical'), ('Serious', 'serious'), ('Moderate', 'moderate'), ('Minor', 'minor'), ('Review required', 'review_required')] %}
-        <div class="severity-card {{ key }}"><span aria-hidden="true">●</span><strong>{{ run.severity_overview.get(key, 0) }}</strong><p>{{ label }}</p></div>
+        <div class="severity-card {{ key }}"><span class="severity-symbol" aria-hidden="true">!</span><strong>{{ run.severity_overview.get(key, 0) }}</strong><p>{{ label }}</p></div>
       {% endfor %}
     </div>
   </section>
 
   <section class="dashboard" aria-labelledby="modules-heading">
-    <h2 id="modules-heading">Module status</h2>
+    <div class="card-title-row">
+      <h2 id="modules-heading">Module status</h2>
+      <span class="mini-metric">{{ run.module_statuses | length }} tracked</span>
+    </div>
     <ul class="module-status-list">
       {% for module in run.module_statuses %}
         <li><span class="status-dot {{ module.status }}" aria-hidden="true"></span><strong>{{ module.label }}</strong><span>{{ module.status }}</span><small>{{ module.message }}</small></li>
@@ -54,53 +71,95 @@
     </ul>
   </section>
 
-  <section class="dashboard" aria-labelledby="filters-heading">
-    <h2 id="filters-heading">Findings</h2>
-    <div class="filters">
-      <label>Search findings <input id="finding-search" type="search" autocomplete="off"></label>
-      <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
-      <label>WCAG criterion <select id="wcag-filter"><option value="">All</option></select></label>
-      <label>Module <select id="module-filter"><option value="">All</option></select></label>
-      <label>Page <select id="page-filter"><option value="">All</option></select></label>
-      <label>Issue category <select id="category-filter"><option value="">All</option></select></label>
-      <button id="clear-filters" class="download-button filter-clear" type="button">Clear filters</button>
+  <section class="dashboard findings-dashboard" aria-labelledby="filters-heading">
+    <div class="card-title-row">
+      <div>
+        <p class="eyebrow">Engineering issues</p>
+        <h2 id="filters-heading">Findings</h2>
+      </div>
+      <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} findings shown.</p>
     </div>
-    <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} findings shown.</p>
+
+    <details class="filter-panel" open>
+      <summary><svg aria-hidden="true"><use href="#icon-filter"></use></svg> Filter findings</summary>
+      <div class="filters">
+        <label>Search findings <input id="finding-search" type="search" autocomplete="off"></label>
+        <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
+        <label>WCAG criterion <select id="wcag-filter"><option value="">All</option></select></label>
+        <label>Module <select id="module-filter"><option value="">All</option></select></label>
+        <label>Page <select id="page-filter"><option value="">All</option></select></label>
+        <label>Issue category <select id="category-filter"><option value="">All</option></select></label>
+        <button id="clear-filters" class="download-button filter-clear" type="button">Clear filters</button>
+      </div>
+    </details>
+
     {% if run.findings %}
       <div id="findings-list" class="finding-list">
         {% for finding in run.findings %}
           <article class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}" data-page="{{ finding.affected_url }}">
             <div class="finding-head">
-              <h3>{{ finding.title }}</h3>
-              <span class="badge">{{ finding.display_severity }}</span>
+              <div>
+                <span class="badge">{{ finding.display_severity }}</span>
+                <h3>{{ finding.title }}</h3>
+              </div>
+              <dl class="finding-quick-meta">
+                <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
+                <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+              </dl>
             </div>
             <details open>
               <summary>Evidence details</summary>
-              <dl class="finding-meta">
-                <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
-                <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
-                <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
-                <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
-                {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
-              </dl>
-              {% if finding.browser_observation %}<p><strong>Evidence:</strong> {{ finding.browser_observation }}</p>{% endif %}
-              {% if finding.snippet %}<pre><code>{{ finding.snippet }}</code></pre>{% endif %}
-              {% if finding.suggested_fix %}<p><strong>Suggested remediation:</strong> {{ finding.suggested_fix }}</p>{% endif %}
+              <div class="evidence-grid">
+                <div class="evidence-panel">
+                  <h4>Confirmed deterministic evidence</h4>
+                  <dl class="finding-meta">
+                    <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
+                    <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
+                    <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+                    <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
+                    {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
+                  </dl>
+                </div>
+                {% if finding.browser_observation %}
+                  <div class="evidence-panel">
+                    <h4>Browser observation</h4>
+                    <p>{{ finding.browser_observation }}</p>
+                  </div>
+                {% endif %}
+                {% if finding.suggested_fix %}
+                  <div class="evidence-panel">
+                    <h4>Suggested remediation</h4>
+                    <p>{{ finding.suggested_fix }}</p>
+                  </div>
+                {% endif %}
+              </div>
+              {% if finding.snippet %}
+                <div class="code-panel">
+                  <div class="code-panel-head"><strong>Relevant HTML</strong><button class="copy-button" type="button" data-copy-target="snippet-{{ loop.index }}">Copy</button></div>
+                  <pre id="snippet-{{ loop.index }}"><code>{{ finding.snippet }}</code></pre>
+                </div>
+              {% endif %}
+              <p class="review-note">Human review required before any legal, procurement, or compliance conclusion.</p>
             </details>
           </article>
         {% endfor %}
       </div>
       <p id="empty-filter-state" class="empty-state" hidden>No findings match the current filters.</p>
     {% else %}
-      <p class="empty-state">No findings were reported by the selected checks.</p>
+      <p class="empty-state">No findings were reported by the selected checks. Keep human review in the loop for critical public services.</p>
     {% endif %}
   </section>
 
   {% if run.ai_scout %}
-  <section class="dashboard" aria-labelledby="ai-heading">
-    <h2 id="ai-heading">AI Scout review of deterministic findings</h2>
-    <p><strong>Status:</strong> {{ run.ai_scout.get('status', '') }}</p>
-    <p>{{ run.ai_scout.get('summary', '') }}</p>
+  <section class="dashboard ai-panel" aria-labelledby="ai-heading">
+    <div class="card-title-row">
+      <div>
+        <p class="eyebrow">Suggest-only review</p>
+        <h2 id="ai-heading">AI Scout review of deterministic findings</h2>
+      </div>
+      <span class="status-pill {{ run.ai_scout.get('status', '') }}">{{ run.ai_scout.get('status', '') }}</span>
+    </div>
+    <p class="ai-summary">{{ run.ai_scout.get('summary', '') }}</p>
     {% if run.ai_scout.get('ai_suggested_observations') %}
       <ol class="process-list">
         {% for item in run.ai_scout.get('ai_suggested_observations', []) %}
@@ -108,37 +167,64 @@
         {% endfor %}
       </ol>
     {% endif %}
-    <p class="muted">AI Scout did not independently establish findings and does not make compliance or legal conclusions.</p>
+    <p class="review-note">AI Scout organises existing evidence. It does not independently establish an accessibility failure.</p>
   </section>
   {% endif %}
 
-  <section class="dashboard split" aria-labelledby="downloads-heading">
-    <div>
-      <h2 id="downloads-heading">Report downloads</h2>
-      <div class="download-grid">
-        {% for label, href in run.reports.items() %}
-          <a class="download-button" href="{{ href }}?download=1">{{ label }}</a>
-        {% endfor %}
+  <section class="dashboard downloads-panel" aria-labelledby="downloads-heading">
+    <div class="card-title-row">
+      <div>
+        <p class="eyebrow">Exports</p>
+        <h2 id="downloads-heading">Report downloads</h2>
       </div>
+      <span class="mini-metric">{{ run.reports | length }} generated</span>
     </div>
-    <div>
-      <h2>Evidence gallery</h2>
-      {% if run.visual_proof.screenshot_link %}
-        <p><a href="{{ run.visual_proof.screenshot_link }}">Screenshot</a></p>
-      {% endif %}
-      {% if run.visual_proof.focus_overlay_link %}
-        <p><a href="{{ run.visual_proof.focus_overlay_link }}">Focus-path overlay</a></p>
-      {% endif %}
-      {% if run.visual_proof.video_link %}
-        <p><a href="{{ run.visual_proof.video_link }}">Video proof</a></p>
-      {% endif %}
-      {% if not run.visual_proof %}
-        <p class="empty-state">No visual evidence was generated for this run.</p>
-      {% endif %}
+    <div class="download-grid">
+      {% for label, href in run.reports.items() %}
+        <article class="download-card">
+          <svg aria-hidden="true"><use href="#icon-download"></use></svg>
+          <div>
+            <h3>{{ label }}</h3>
+            <p>
+              {% if label == 'HTML' %}Reviewer-ready web report.
+              {% elif label == 'Markdown' %}Readable handoff notes.
+              {% elif label == 'JSON' %}Structured machine data.
+              {% elif label == 'CSV' %}Spreadsheet triage.
+              {% elif label == 'SARIF' %}Code-scanning integration.
+              {% elif label == 'JUnit' %}CI test reporting.
+              {% else %}Generated supporting artifact.
+              {% endif %}
+            </p>
+          </div>
+          <a class="download-button" href="{{ href }}?download=1">Download</a>
+        </article>
+      {% endfor %}
     </div>
   </section>
 
-  <section class="dashboard" aria-labelledby="rerun-heading">
+  <section class="dashboard evidence-gallery" aria-labelledby="evidence-heading">
+    <div class="card-title-row">
+      <h2 id="evidence-heading">Evidence gallery</h2>
+      <span class="mini-metric">visual proof</span>
+    </div>
+    {% if run.visual_proof.screenshot_link or run.visual_proof.focus_overlay_link or run.visual_proof.video_link %}
+      <div class="gallery-grid">
+        {% if run.visual_proof.screenshot_link %}
+          <article><h3>Screenshot</h3><p>Full-page captured evidence.</p><a class="download-button" href="{{ run.visual_proof.screenshot_link }}">Open full size</a></article>
+        {% endif %}
+        {% if run.visual_proof.focus_overlay_link %}
+          <article><h3>Focus-path overlay</h3><p>Keyboard traversal evidence for the affected page.</p><a class="download-button" href="{{ run.visual_proof.focus_overlay_link }}">Open overlay</a></article>
+        {% endif %}
+        {% if run.visual_proof.video_link %}
+          <article><h3>Video proof</h3><p>Recorded browser evidence.</p><a class="download-button" href="{{ run.visual_proof.video_link }}">Open video</a></article>
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="empty-state">No visual evidence was generated for this run. Browser-dependent modules may have been unavailable or not selected.</p>
+    {% endif %}
+  </section>
+
+  <section class="dashboard rerun-panel" aria-labelledby="rerun-heading">
     <h2 id="rerun-heading">Run again</h2>
     <div class="actions">
       <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another URL</a>
@@ -196,6 +282,15 @@ document.getElementById('clear-filters').addEventListener('click', () => {
     control.value = '';
   });
   applyFilters();
+});
+document.querySelectorAll('[data-copy-target]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const target = document.getElementById(button.dataset.copyTarget);
+    if (!target || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(target.textContent || '');
+    button.textContent = 'Copied';
+    window.setTimeout(() => { button.textContent = 'Copy'; }, 1400);
+  });
 });
 </script>
 {% endblock %}
