@@ -17,6 +17,17 @@ from a11yway.core.extended_results import (
 from a11yway.core.report_builder import REPORT_SCHEMA_VERSION, build_json_report
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_extended_results_uses_python_310_compatible_utc() -> None:
+    source = (ROOT / "a11yway/core/extended_results.py").read_text(encoding="utf-8")
+
+    assert "from datetime import UTC" not in source
+    assert "datetime.now(UTC)" not in source
+    assert "timezone.utc" in source
+
+
 def test_extended_result_contains_schema_version_and_timestamp() -> None:
     result = ExtendedCheckResult(module="forms", check_id="x").to_json()
 

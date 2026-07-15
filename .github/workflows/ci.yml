@@ -84,3 +84,43 @@ jobs:
           name: package-${{ matrix.os }}
           path: dist/*
           if-no-files-found: ignore
+
+  render-docker-smoke:
+    name: Render Docker smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Render Docker image
+        run: docker build -t a11yway-render-smoke .
+
+      - name: Verify container runtime imports and Chromium
+        run: |
+          docker run --rm a11yway-render-smoke python --version
+          docker run --rm a11yway-render-smoke python -c "from datetime import UTC; print(UTC)"
+          docker run --rm a11yway-render-smoke python -c "import flask; import playwright; import a11yway.web_app"
+          docker run --rm a11yway-render-smoke python -m playwright install --dry-run
+          docker run --rm a11yway-render-smoke python -c "from playwright.sync_api import sync_playwright; p=sync_playwright().start(); b=p.chromium.launch(headless=True); print(b.version); b.close(); p.stop()"
+
+      - name: Boot gunicorn and check health
+        run: |
+          docker run -d --name a11yway-render-smoke -e PORT=10000 -p 10000:10000 a11yway-render-smoke
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:10000/health; then
+              exit 0
+            fi
+            docker logs --tail 40 a11yway-render-smoke || true
+            sleep 2
+          done
+          docker logs a11yway-render-smoke
+          exit 1
+
+      - name: Run Render app smoke checks
+        run: docker run --rm a11yway-render-smoke python scripts/render_docker_smoke.py
+
+      - name: Stop Render smoke container
+        if: always()
+        run: docker rm -f a11yway-render-smoke || true
