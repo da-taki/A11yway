@@ -68,12 +68,21 @@ def test_package_metadata_uses_dynamic_version_and_console_script() -> None:
 def test_optional_dependency_groups_are_represented() -> None:
     extras = _pyproject()["project"]["optional-dependencies"]
 
-    for group in ("browser", "documents", "media", "development", "all"):
+    for group in ("browser", "documents", "media", "ai", "web", "development", "all"):
         assert group in extras
     assert "playwright" in extras["browser"]
     assert "pypdf" in extras["documents"]
     assert "mutagen" in extras["media"]
-    assert {"build", "coverage", "pytest", "pytest-cov"}.issubset(extras["development"])
+    assert "groq" in extras["ai"]
+    assert "Flask" in extras["web"]
+    assert {
+        "build",
+        "coverage",
+        "pytest",
+        "pytest-cov",
+        "setuptools>=69",
+        "wheel",
+    }.issubset(extras["development"])
     assert not any("ffmpeg" in item.lower() for deps in extras.values() for item in deps)
 
 
@@ -101,6 +110,8 @@ def test_ci_workflow_contains_release_checks_without_native_adapter_requirements
 
     assert "ubuntu-latest" in workflow
     assert "windows-latest" in workflow
+    assert 'python -m pip install -e ".[development,browser,documents,media,web]"' in workflow
+    assert 'python -c "import flask; import a11yway.web_app"' in workflow
     assert "python -m playwright install --with-deps chromium" in workflow
     assert "python -m pip check" in workflow
     assert "python -m build" in workflow
@@ -150,4 +161,3 @@ def test_wheel_imports_from_installed_environment_outside_source_tree(built_rele
     assert "console_version: a11yway 0.8.0b1" in completed.stdout
     assert "package_import: 0.8.0b1" in completed.stdout
     assert "fixture_audit: A11yway static HTML accessibility audit" in completed.stdout
-
