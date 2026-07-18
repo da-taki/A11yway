@@ -59,8 +59,8 @@ def test_reflow_rules_exist(issue_type: str) -> None:
     assert "1.4.10" in rule["standard_hint"]
 
 
-def test_horizontal_scroll_at_400_is_high_severity() -> None:
-    """Overflow at the WCAG reference width must be a high finding."""
+def test_horizontal_scroll_at_400_without_content_loss_is_review_only() -> None:
+    """Bare overflow at the WCAG reference width needs review."""
     issues = _reflow_issues(
         [
             level(200, overflow_amount=260, document_scroll_width=900),
@@ -70,9 +70,46 @@ def test_horizontal_scroll_at_400_is_high_severity() -> None:
 
     scroll = [i for i in issues if i.issue_type == "reflow_horizontal_scroll"]
     assert len(scroll) == 1
-    assert scroll[0].severity == "high"
+    assert scroll[0].severity == "medium"
+    assert scroll[0].confidence == "needs_review"
     zoom_levels = scroll[0].evidence["zoom_levels"]
     assert [entry["zoom_percent"] for entry in zoom_levels] == [200, 400]
+
+
+def test_horizontal_scroll_with_content_loss_is_high_severity() -> None:
+    """Overflow plus clipped content at 400% is a high-confidence barrier."""
+    issues = _reflow_issues(
+        [
+            level(200, overflow_amount=260, document_scroll_width=900),
+            level(
+                400,
+                overflow_amount=580,
+                document_scroll_width=900,
+                clipped_elements=[
+                    {
+                        "tag": "p",
+                        "id": "",
+                        "text": "Long label",
+                        "box": {"x": 700, "y": 100, "width": 260, "height": 20},
+                        "clipped_by": "document",
+                    }
+                ],
+            ),
+        ]
+    )
+
+    scroll = [i for i in issues if i.issue_type == "reflow_horizontal_scroll"]
+    assert len(scroll) == 1
+    assert scroll[0].severity == "high"
+
+
+def test_small_horizontal_overflow_is_treated_as_noise() -> None:
+    """Scrollbars and subpixel noise below the tolerance are ignored."""
+    issues = _reflow_issues(
+        [level(400, overflow_amount=20, document_scroll_width=340)]
+    )
+
+    assert [issue.issue_type for issue in issues] == []
 
 
 def test_horizontal_scroll_only_at_200_is_medium() -> None:

@@ -150,6 +150,14 @@ Rules with poor reviewer precision can be downgraded (not disabled) per run:
 python -m a11yway.main page.html --review-only-rules generic_link_text,fake_heading --json reports/report.json
 ```
 
+Reviewed reports can also calibrate that list automatically. Rules with
+enough reviewer samples and poor precision or high unable-to-reproduce rates
+are capped at `needs_review` while still appearing in the report:
+
+```bash
+python -m a11yway.main page.html --calibrate-rules-from reports/previous_reviewed.json --json reports/report.json
+```
+
 ## Indic-Language Checks
 
 Text-to-speech and screen readers pick a voice from the declared language, so Indian-language content with missing or wrong lang markup is commonly read as garbled English. A static rule pack (no browser needed) detects Indic-script text via Unicode ranges (Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada, Malayalam) and reports three problems: `missing_lang_indic` when Indic text sits under a missing or non-matching effective lang (for example Gurmukhi under `lang="en"`), `lang_mismatch` when an element's own lang attribute contradicts its dominant script (for example `lang="ta"` over Devanagari), and `mixed_script_element` when one text node mixes several Latin words with Indic text and no lang boundary.
@@ -196,6 +204,11 @@ python -m a11yway.main examples/sample_form.html --browser --axe --markdown repo
 Axe findings appear alongside A11yway's own checks with issue types like `axe_label`, severities mapped from axe impacts (critical/serious become high, moderate becomes medium, minor becomes low), the affected element snippet, and a Deque University help link. Reports gain an "Axe-core Scan" section with a per-rule summary. A11yway's focus stays deterministic keyboard task evidence; the axe scan complements it with a mature, community-vetted rule set that covers far more technical rules than the built-in static checks.
 
 The scan uses the axe-core copy bundled with the optional `axe-playwright-python` package (installed by `requirements-browser.txt`), so no network access is needed at audit time. If the package is missing, `--axe` prints setup instructions and exits; every static and browser command keeps working without it.
+
+Positive `tabindex` results from axe are treated as review-only evidence:
+A11yway reports the finding, but caps it at medium severity and
+`needs_review` confidence unless another A11yway check proves the focus order
+is harmful.
 
 ## Announce Transcript
 
@@ -348,6 +361,13 @@ python -m a11yway.main examples/sample_zoom_reflow.html --browser --low-vision -
 
 These checks are conservative browser observations. They do not prove full WCAG compliance, and manual review is still required, especially for custom focus styles, image backgrounds, gradients, complex responsive layouts, and intentional horizontal-scroll regions such as data tables and maps (which WCAG 1.4.10 allows).
 
+To reduce one-run browser noise, add `--verify-runs N` with browser-backed
+audits. Dynamic findings such as keyboard traps, focus-obscured results,
+contrast samples, and reflow findings get reproducibility evidence. For
+example, `--verify-runs 3` marks a dynamic finding confirmed when it appears
+in all three runs, likely when it appears in two, and `needs_review` when it
+only appeared in the primary run.
+
 ## Reviewer Verdicts
 
 Reviewer verdicts let humans mark findings as `confirmed`, `false_positive`, `partially_confirmed`, `needs_review`, `fixed`, `missed_issue`, `duplicate`, `not_applicable`, or `unable_to_reproduce`. Verdicts can record reviewer role, browser, operating system, assistive technology, manual testing method, WCAG criteria, severity adjustments, corrected evidence, and quote/name permissions. This helps measure precision and usefulness before outreach claims are made.
@@ -362,9 +382,15 @@ python -m a11yway.main --evaluate-verdicts reports/sample_verdicts.json --to rep
 python -m a11yway.main --precision-report reports/task_execution_report_reviewed.json --markdown reports/precision.md --json reports/precision.json --csv reports/precision.csv
 
 python -m a11yway.main --compare-human-review examples/human_review_sample.json --to reports/task_execution_report.json --json reports/human_comparison.json --markdown reports/human_comparison.md
+
+python -m a11yway.main --compare-human-review examples/cornell_human_review_anonymized.json --to reports/cornell_precision_regression/index.json --markdown reports/cornell_precision_regression/human_comparison.md
 ```
 
 Applying verdicts also computes precision statistics per rule, category, engine, severity, site, WCAG Success Criterion, unique root issue, and raw occurrence. Precision treats `confirmed`, `partially_confirmed`, and `fixed` as true positives; `false_positive`, `duplicate`, `not_applicable`, and `unable_to_reproduce` as false positives; and leaves `needs_review` undecided. Rules that turn out imprecise can be demoted with `--review-only-rules` instead of being silently disabled.
+
+Precision reports now include rule reliability profiles. A profile records the
+sample size, precision, false-positive rate, unable-to-reproduce rate, and any
+recommended confidence cap. These profiles power `--calibrate-rules-from`.
 
 Do not publicly name reviewers or organizations unless permission was granted in the verdict file.
 
@@ -391,6 +417,7 @@ Audit multiple pages in one run:
 ```bash
 python -m a11yway.main --batch examples/sample_batch.json --out-dir reports/batch_sample
 python -m a11yway.main --batch examples/sample_browser_batch.json --out-dir reports/browser_batch_sample --browser
+python -m a11yway.main --batch examples/sample_low_vision_batch.json --out-dir reports/verified_batch --browser --low-vision --verify-runs 3
 ```
 
 Each batch writes per-page JSON/Markdown reports plus:

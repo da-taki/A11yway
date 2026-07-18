@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "reviewer": {
+    "role": "trained accessibility professional",
+    "identity": "anonymous",
+    "organization": "not disclosed",
+    "browser": "Chrome",
+    "operating_system": "Windows",
+    "assistive_technology": "",
+    "manual_testing_method": "Manual keyboard, browser inspector, axe DevTools cross-check, zoom and text-spacing spot checks",
+    "permission_to_quote": false,
+    "permission_to_name_reviewer": false,
+    "permission_to_name_organization": false
+  },
+  "target": {
+    "name": "Cornell public-page precision regression",
+    "pages": [
+      "https://www.cornell.edu/",
+      "https://admissions.cornell.edu/",
+      "https://admissions.cornell.edu/how-to-apply/first-year-international-applicants",
+      "https://finaid.cornell.edu/"
+    ],
+    "review_date": "2026-07-18"
+  },
+  "findings": [
+    {
+      "description": "Search input uses placeholder text as its only visible prompt and has no programmatic label.",
+      "selector": "input#search-query",
+      "component": "site search form",
+      "severity": "high",
+      "verdict": "confirmed",
+      "wcag_criteria": ["3.3.2", "4.1.2"],
+      "expected_behavior": "The search field has a persistent visible or programmatic label.",
+      "actual_behavior": "The field relies on placeholder text.",
+      "notes": "Observed on Cornell admissions pages."
+    },
+    {
+      "description": "Positive tabindex values require manual focus-order review before being treated as a barrier.",
+      "selector": "[tabindex]",
+      "component": "skip links, navigation links, search controls, and floating widgets",
+      "severity": "medium",
+      "verdict": "unable_to_reproduce",
+      "wcag_criteria": ["2.4.3"],
+      "expected_behavior": "Tab order follows the visible and logical page order.",
+      "actual_behavior": "Axe reports positive tabindex, but harmful ordering was not proven from the report alone.",
+      "notes": "Keep as review-only evidence unless A11yway demonstrates a harmful focus-order outcome."
+    },
+    {
+      "description": "Nested menu or breadcrumb section text should not be reported as a label-in-name mismatch when the control name is a functional menu action such as Up one menu level.",
+      "selector": "button[aria-label='Up one menu level']",
+      "component": "mobile navigation menu and breadcrumb controls",
+      "severity": "medium",
+      "verdict": "unable_to_reproduce",
+      "wcag_criteria": ["2.5.3"],
+      "expected_behavior": "The functional menu control has an accessible name that explains the action.",
+      "actual_behavior": "Previous reports treated descendant section text as the visible label.",
+      "notes": "Suppress this pattern; still report true visible-label replacements such as Save draft named Close dialog."
+    },
+    {
+      "description": "Sticky-header focus-obscured findings should require substantial coverage or repeat reproduction before high-priority outreach.",
+      "selector": "a, button",
+      "component": "focused controls near fixed or sticky page chrome",
+      "severity": "medium",
+      "verdict": "unable_to_reproduce",
+      "wcag_criteria": ["2.4.11"],
+      "expected_behavior": "Focused controls remain visible and unobscured.",
+      "actual_behavior": "Prior report included partial hit-test coverage that was not clearly blocking.",
+      "notes": "Partial coverage below the tool threshold should not be reported."
+    },
+    {
+      "description": "Document-wide horizontal overflow without clipped or overlapping content should be treated as review evidence, not a confirmed high-severity reflow failure.",
+      "selector": "html",
+      "component": "responsive layout",
+      "severity": "medium",
+      "verdict": "unable_to_reproduce",
+      "wcag_criteria": ["1.4.10"],
+      "expected_behavior": "At 400 percent zoom, content reflows without loss in one direction.",
+      "actual_behavior": "Small or document-level overflow did not by itself prove content loss.",
+      "notes": "Report high severity when overflow coincides with clipped content or overlapping interactive controls."
+    }
+  ]
+}

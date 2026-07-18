@@ -172,11 +172,17 @@ def test_fully_covered_focus_is_high_and_likely() -> None:
     assert issue.confidence == "likely"
 
 
-def test_partially_covered_focus_is_review_only() -> None:
+def test_lightly_covered_focus_is_ignored() -> None:
     issue = _focus_obscured_issue(_stop(covered=2))
+    assert issue is None
+
+
+def test_substantially_covered_focus_is_review_only() -> None:
+    issue = _focus_obscured_issue(_stop(covered=4))
     assert issue is not None
     assert issue.severity == "medium"
     assert issue.confidence == "needs_review"
+    assert issue.evidence["coverage_ratio"] == 0.8
 
 
 def test_uncovered_focus_produces_no_finding() -> None:

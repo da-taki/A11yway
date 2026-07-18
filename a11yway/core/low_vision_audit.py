@@ -37,6 +37,9 @@ LOW_VISION_LIMITATIONS = [
 # which is how WCAG 1.4.10 defines its 320 px reflow reference (1280 / 4).
 ZOOM_BASE_VIEWPORT = {"width": 1280, "height": 1024}
 ZOOM_LEVELS = [200, 400]
+REFLOW_MIN_OVERFLOW_PX = 24
+REFLOW_MIN_OVERFLOW_RATIO = 0.05
+FOCUS_OBSCURED_MIN_COVERAGE = 0.8
 
 _VISIBLE_TEXT_SCRIPT = r"""
 () => {
@@ -774,6 +777,17 @@ def _overflow_is_intentional(level: dict[str, Any]) -> bool:
     )
 
 
+def _overflow_is_meaningful(level: dict[str, Any]) -> bool:
+    """Return whether document-wide overflow exceeds noise tolerances."""
+    overflow = int(level.get("overflow_amount", 0) or 0)
+    viewport = int(level.get("viewport_width", 0) or 0)
+    if overflow <= REFLOW_MIN_OVERFLOW_PX:
+        return False
+    if viewport and (overflow / viewport) <= REFLOW_MIN_OVERFLOW_RATIO:
+        return False
+    return True
+
+
 def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
     """Build reflow findings from the per-zoom-level measurements."""
     issues: list[AccessibilityIssue] = []
@@ -781,18 +795,22 @@ def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
     overflowing = [
         level
         for level in levels
-        if int(level.get("overflow_amount", 0) or 0) > 8
+        if _overflow_is_meaningful(level)
         and not _overflow_is_intentional(level)
     ]
     if overflowing:
         wcag_reference_hit = any(
             level["zoom_percent"] == 400 for level in overflowing
         )
+        has_content_loss = any(
+            level.get("clipped_elements") or level.get("overlapping_pairs")
+            for level in overflowing
+        )
         issues.append(
             _low_vision_issue(
                 title="Page requires horizontal scrolling under zoom",
                 issue_type="reflow_horizontal_scroll",
-                severity="high" if wcag_reference_hit else "medium",
+                severity="high" if wcag_reference_hit and has_content_loss else "medium",
                 evidence={
                     "zoom_levels": [
                         {
@@ -809,8 +827,10 @@ def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
                         "The document is wider than the viewport at "
                         + ", ".join(f"{level['zoom_percent']}%" for level in overflowing)
                         + " zoom, so zoomed readers must scroll horizontally "
-                        "for every line (WCAG 1.4.10 reflow reference: 320 CSS "
-                        "px at 400%)."
+                        "for every line. The overflow exceeds A11yway's "
+                        f"{REFLOW_MIN_OVERFLOW_PX}px / {int(REFLOW_MIN_OVERFLOW_RATIO * 100)}% "
+                        "noise tolerance for scrollbars and subpixel rounding "
+                        "(WCAG 1.4.10 reflow reference: 320 CSS px at 400%)."
                     ),
                 },
                 suggested_fix=(
@@ -821,6 +841,8 @@ def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
                 ),
             )
         )
+        if not has_content_loss:
+            issues[-1].confidence = "needs_review"
 
     seen_clipped: set[str] = set()
     seen_overlaps: set[tuple[str, str]] = set()
@@ -950,6 +972,9 @@ def _focus_obscured_issue(info: dict[str, Any]) -> AccessibilityIssue | None:
     total = int(obscured.get("sampled_points", 0) or 0)
     if covered == 0 or total == 0:
         return None
+    coverage = covered / total
+    if coverage < FOCUS_OBSCURED_MIN_COVERAGE:
+        return None
     fully_covered = covered >= total
     issue = _low_vision_issue(
         title="Focused control is covered by overlaying content",
@@ -962,6 +987,8 @@ def _focus_obscured_issue(info: dict[str, Any]) -> AccessibilityIssue | None:
             "text": info.get("text") or info.get("aria_label"),
             "covered_points": covered,
             "sampled_points": total,
+            "coverage_ratio": round(coverage, 3),
+            "coverage_threshold": FOCUS_OBSCURED_MIN_COVERAGE,
             "covering_element": obscured.get("covering_element"),
             "covering_position": obscured.get("covering_position"),
             "bounding_box": obscured.get("bounding_box"),
@@ -970,7 +997,8 @@ def _focus_obscured_issue(info: dict[str, Any]) -> AccessibilityIssue | None:
                 "control were covered by "
                 f"{obscured.get('covering_element') or 'an overlay'} "
                 f"(position: {obscured.get('covering_position')}), so a "
-                "keyboard user may not see where focus is."
+                "keyboard user may not see where focus is. "
+                f"Coverage ratio: {round(coverage, 2)}."
                 + ("" if fully_covered else " The control is only partially covered; manual confirmation required.")
             ),
         },

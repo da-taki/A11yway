@@ -59,6 +59,17 @@ can override it per finding when their evidence is weaker or stronger.
 in a run's reports without disabling them, for rules whose reviewer
 precision is poor.
 
+`--calibrate-rules-from reviewed_report.json` derives the review-only list
+from previous reviewed reports. A rule reliability profile records sample
+size, precision, false-positive rate, unable-to-reproduce rate, and any
+recommended `needs_review` confidence cap. The cap is advisory and visible in
+precision reports; findings are not hidden.
+
+For browser-backed dynamic checks, `--verify-runs N` repeats browser and
+low-vision checks and adds reproducibility evidence. With three runs, a
+dynamic finding seen in all three runs is `confirmed`, two of three is
+`likely`, and primary-run-only evidence is `needs_review`.
+
 ## Finding Deduplication
 
 Static analysis, the rendered-DOM re-check, browser interaction, the
@@ -241,7 +252,7 @@ signals for reviewers, not full WCAG certification.
 | `small_target_size` | Low Vision | medium | Interactive targets under 24x24 CSS px whose 24 px circle intersects another target (WCAG 2.5.8) | Small crowded targets are hard to hit for people with tremor or limited dexterity | Inline text links and spaced targets are excluded; equivalent-control and essential exceptions need human judgment |
 | `focus_obscured` | Low Vision | high (fully covered) / medium (partial) | Focused controls covered by sticky/fixed overlays (headers, footers, banners, floating widgets), via bounding-box hit-testing (WCAG 2.4.11) | Keyboard users cannot see where focus is | One run; overlays that appear only after user actions are not seen |
 | `text_spacing_content_loss` | Low Vision | high | Text that clips or controls that overlap only after applying the WCAG 1.4.12 reference overrides (line height 1.5, paragraph spacing 2em, letter spacing 0.12em, word spacing 0.16em), with before/after bounding boxes | People who need wider spacing lose the content entirely | One Chromium run; JavaScript reacting to layout changes is not modeled |
-| `reflow_horizontal_scroll` | Low Vision | high (400%) / medium (200% only) | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths | Zoomed readers must scroll horizontally for every line (WCAG 1.4.10 Reflow, reference 320 CSS px) | Zoom is emulated through equivalent viewport widths in one Chromium run; intentional scroll regions such as data tables are allowed by WCAG and need manual review |
+| `reflow_horizontal_scroll` | Low Vision | high when 400% overflow includes content loss / medium review-only otherwise | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths, above a 24 px and 5% viewport tolerance | Zoomed readers may need horizontal scrolling (WCAG 1.4.10 Reflow, reference 320 CSS px) | Bare document overflow is review evidence; high severity requires clipped content or overlapping interactive controls. Intentional scroll regions such as data tables are allowed by WCAG and need manual review |
 | `reflow_clipped_content` | Low Vision | high | Text or controls whose bounding box sits beyond every reachable area at a zoom level | Clipped content disappears entirely for zoomed readers | Bounding boxes from one run; decorative cut-offs need manual confirmation |
 | `reflow_overlap` | Low Vision | medium | Interactive elements whose bounding boxes collide at a zoom level | An overlapped control can be hidden or impossible to activate | Cannot judge visual intent; intentional stacking such as badges can be fine |
 | `zoom_horizontal_overflow` | Low Vision | medium/high | (Legacy, no longer emitted) narrow-viewport overflow approximation | Kept so reports from older versions stay documented | Replaced by `reflow_horizontal_scroll` |
@@ -259,13 +270,15 @@ Low-vision limitations:
   1.4.10 reference); they run in one Chromium engine and do not prove full
   reflow compliance. Content inside intentional horizontal-scroll regions
   (tables, `pre`/`code`, figures, containers with `overflow-x: auto|scroll`)
-  is excluded, and document-level overflow attributed entirely to such
-  regions is not reported.
+  is excluded, document-level overflow attributed entirely to such regions is
+  not reported, and small overflow below 24 px or 5% of the viewport is
+  ignored as noise.
 - Focus indicator detection compares focused and unfocused computed styles;
   canvas-drawn or animation-only indicators may still be missed.
 - Target size and focus-obscured measurements come from one run at default
   zoom; WCAG 2.5.8 exceptions beyond inline links and spacing need human
-  judgment.
+  judgment. Focus-obscured findings require at least 80% sampled coverage;
+  lighter partial overlap is ignored.
 - Text-spacing checks apply the WCAG 1.4.12 reference overrides once and
   compare before/after; only regressions caused by the overrides count.
 
