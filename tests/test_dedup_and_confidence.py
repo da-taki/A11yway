@@ -9,6 +9,7 @@ from a11yway.core.verdicts import (
     apply_verdicts_to_report,
     build_precision_stats,
     issue_fingerprint,
+    review_only_rules_from_reliability_profiles,
 )
 from a11yway.main import main
 from a11yway.models.issue import AccessibilityIssue
@@ -244,3 +245,33 @@ def test_precision_stats_empty_without_reviews() -> None:
     assert stats["overall"]["reviewed"] == 0
     assert stats["overall"]["precision"] is None
     assert stats["by_rule"] == {}
+
+
+def test_precision_stats_include_rule_reliability_profiles() -> None:
+    issues = [
+        make_issue("focus_obscured", snippet=f'<a id="item{i}">Item</a>')
+        for i in range(5)
+    ]
+    report = build_json_report("examples/sample.html", issues)
+    verdicts = {
+        "reviewer": {"role": "tester"},
+        "verdicts": [
+            {
+                "issue_fingerprint": issue_fingerprint(
+                    issue, source="sample.html"
+                ),
+                "verdict": "unable_to_reproduce",
+            }
+            for issue in report["issues"]
+        ],
+    }
+    reviewed = apply_verdicts_to_report(report, verdicts)
+
+    profile = reviewed["precision_stats"]["rule_reliability_profiles"]["focus_obscured"]
+
+    assert profile["sample_size"] == 5
+    assert profile["calibration_status"] == "review_only_recommended"
+    assert profile["confidence_cap"] == "needs_review"
+    assert review_only_rules_from_reliability_profiles(
+        reviewed["precision_stats"]["rule_reliability_profiles"]
+    ) == {"focus_obscured"}

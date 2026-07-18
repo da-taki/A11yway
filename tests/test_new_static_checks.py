@@ -314,6 +314,11 @@ def test_aria_label_missing_visible_text_is_flagged() -> None:
     assert issue_types(issues) == {"label_in_name_mismatch"}
 
 
+def test_functional_menu_control_label_is_not_treated_as_page_copy() -> None:
+    html = wrap('<button aria-label="Up one menu level">Admissions</button>')
+    assert analyze_label_in_name(html) == []
+
+
 def test_aria_label_containing_visible_text_passes() -> None:
     """Exact equality is not required; containment after normalization is."""
     html = wrap('<a href="/g" aria-label="Learn more about scholarships">Learn More!</a>')

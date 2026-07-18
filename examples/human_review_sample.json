@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "reviewer": {
+    "role": "trained accessibility tester",
+    "testing_environment": "Windows desktop manual review",
+    "browser": "Chrome",
+    "operating_system": "Windows",
+    "assistive_technology": "",
+    "permission_to_quote": false,
+    "permission_to_name_reviewer": false
+  },
+  "findings": [
+    {
+      "description": "Search input is missing a programmatic label.",
+      "selector": "input#search",
+      "component": "site search",
+      "wcag_criteria": ["3.3.2", "4.1.2"],
+      "severity": "high",
+      "actual_behavior": "The input is exposed without a useful label.",
+      "expected_behavior": "The input should have a visible label or equivalent programmatic name.",
+      "testing_method": "Keyboard review plus browser accessibility-tree inspection.",
+      "screenshot": "",
+      "notes": "This is a sample fixture for comparison reports."
+    }
+  ]
+}

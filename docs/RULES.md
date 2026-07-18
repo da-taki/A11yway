@@ -22,8 +22,9 @@ use a separate namespace and are never merged with accessibility findings.
 
 ## Confidence Model
 
-Every finding carries a confidence level so reviewers know how much weight
-to give it:
+Every finding carries a backward-compatible confidence value and a richer
+reviewer-facing `confidence_level` so reviewers know how much weight to give
+it. Compatibility confidence remains:
 
 - `confirmed`: deterministic observed blockage or state (for example, a
   scripted task step failed under keyboard-only interaction, or Tab was
@@ -36,11 +37,38 @@ to give it:
 - `informational`: context for reviewers, not a suspected failure (for
   example, multiple h1 headings, which are valid HTML).
 
+The post-collection validation pass also adds one of:
+
+- `confirmed_by_multiple_engines`: the same root concern was found by more
+  than one deterministic source, such as native checks and axe-core.
+- `strong`: deterministic browser, accessibility-tree, or task evidence
+  strongly supports the finding.
+- `likely`: single-source deterministic evidence supports the finding.
+- `needs_review`: the result needs human judgment before it is treated as a
+  failure.
+- `weak_heuristic`: useful review signal, but too weak to prioritize as a
+  confirmed barrier by itself.
+- `suppressed`: retained for audit transparency when a finding is
+  intentionally downgraded or removed from priority views.
+
+AI Scout suggestions never upgrade or validate deterministic findings.
+
 Rules define a default confidence (shown by `--rule <issue_type>`); checks
 can override it per finding when their evidence is weaker or stronger.
 `--review-only-rules rule1,rule2` downgrades listed rules to `needs_review`
 in a run's reports without disabling them, for rules whose reviewer
 precision is poor.
+
+`--calibrate-rules-from reviewed_report.json` derives the review-only list
+from previous reviewed reports. A rule reliability profile records sample
+size, precision, false-positive rate, unable-to-reproduce rate, and any
+recommended `needs_review` confidence cap. The cap is advisory and visible in
+precision reports; findings are not hidden.
+
+For browser-backed dynamic checks, `--verify-runs N` repeats browser and
+low-vision checks and adds reproducibility evidence. With three runs, a
+dynamic finding seen in all three runs is `confirmed`, two of three is
+`likely`, and primary-run-only evidence is `needs_review`.
 
 ## Finding Deduplication
 
@@ -50,6 +78,12 @@ share a stable fingerprint (rule + normalized element identity) are merged
 into one primary finding whose evidence lists every `evidence_sources`
 entry and a `merged_finding_count`. Merged confidence is the strongest of
 the sources, because independent detection strengthens the evidence.
+
+After element-level merging, reports also calculate root issue clusters.
+Each issue gets `occurrence_count`, `affected_page_count`, a
+`component_signature` when available, and a `deduplication_fingerprint`.
+Reports show both raw occurrences and unique root issues so repeated shared
+components do not overwhelm the reviewer queue.
 
 ## WCAG 2.2 Mapping Language
 
@@ -218,7 +252,7 @@ signals for reviewers, not full WCAG certification.
 | `small_target_size` | Low Vision | medium | Interactive targets under 24x24 CSS px whose 24 px circle intersects another target (WCAG 2.5.8) | Small crowded targets are hard to hit for people with tremor or limited dexterity | Inline text links and spaced targets are excluded; equivalent-control and essential exceptions need human judgment |
 | `focus_obscured` | Low Vision | high (fully covered) / medium (partial) | Focused controls covered by sticky/fixed overlays (headers, footers, banners, floating widgets), via bounding-box hit-testing (WCAG 2.4.11) | Keyboard users cannot see where focus is | One run; overlays that appear only after user actions are not seen |
 | `text_spacing_content_loss` | Low Vision | high | Text that clips or controls that overlap only after applying the WCAG 1.4.12 reference overrides (line height 1.5, paragraph spacing 2em, letter spacing 0.12em, word spacing 0.16em), with before/after bounding boxes | People who need wider spacing lose the content entirely | One Chromium run; JavaScript reacting to layout changes is not modeled |
-| `reflow_horizontal_scroll` | Low Vision | high (400%) / medium (200% only) | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths | Zoomed readers must scroll horizontally for every line (WCAG 1.4.10 Reflow, reference 320 CSS px) | Zoom is emulated through equivalent viewport widths in one Chromium run; intentional scroll regions such as data tables are allowed by WCAG and need manual review |
+| `reflow_horizontal_scroll` | Low Vision | high when 400% overflow includes content loss / medium review-only otherwise | The document is wider than the zoomed viewport at 200% or 400% zoom-equivalent widths, above a 24 px and 5% viewport tolerance | Zoomed readers may need horizontal scrolling (WCAG 1.4.10 Reflow, reference 320 CSS px) | Bare document overflow is review evidence; high severity requires clipped content or overlapping interactive controls. Intentional scroll regions such as data tables are allowed by WCAG and need manual review |
 | `reflow_clipped_content` | Low Vision | high | Text or controls whose bounding box sits beyond every reachable area at a zoom level | Clipped content disappears entirely for zoomed readers | Bounding boxes from one run; decorative cut-offs need manual confirmation |
 | `reflow_overlap` | Low Vision | medium | Interactive elements whose bounding boxes collide at a zoom level | An overlapped control can be hidden or impossible to activate | Cannot judge visual intent; intentional stacking such as badges can be fine |
 | `zoom_horizontal_overflow` | Low Vision | medium/high | (Legacy, no longer emitted) narrow-viewport overflow approximation | Kept so reports from older versions stay documented | Replaced by `reflow_horizontal_scroll` |
@@ -236,13 +270,15 @@ Low-vision limitations:
   1.4.10 reference); they run in one Chromium engine and do not prove full
   reflow compliance. Content inside intentional horizontal-scroll regions
   (tables, `pre`/`code`, figures, containers with `overflow-x: auto|scroll`)
-  is excluded, and document-level overflow attributed entirely to such
-  regions is not reported.
+  is excluded, document-level overflow attributed entirely to such regions is
+  not reported, and small overflow below 24 px or 5% of the viewport is
+  ignored as noise.
 - Focus indicator detection compares focused and unfocused computed styles;
   canvas-drawn or animation-only indicators may still be missed.
 - Target size and focus-obscured measurements come from one run at default
   zoom; WCAG 2.5.8 exceptions beyond inline links and spacing need human
-  judgment.
+  judgment. Focus-obscured findings require at least 80% sampled coverage;
+  lighter partial overlap is ignored.
 - Text-spacing checks apply the WCAG 1.4.12 reference overrides once and
   compare before/after; only regressions caused by the overrides count.
 

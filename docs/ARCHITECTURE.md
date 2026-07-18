@@ -15,6 +15,7 @@ source file/url
   -> workflow packs
   -> optional future AI scout suggestions
   -> deterministic verification
+  -> finding validation / deduplication / clustering
   -> optional reviewer verdicts / re-audit diff
   -> report builder
   -> JSON / Markdown / HTML / CSV outputs
@@ -60,7 +61,7 @@ With `--video`, a task execution run is also recorded (viewport-sized, via Playw
 
 ### Low-Vision Audit - `a11yway/core/low_vision_audit.py` (Optional)
 
-Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, runs zoom reflow passes at 200% and 400% (laid out at the equivalent CSS widths browser zoom produces, including the WCAG 1.4.10 reference of 320 px) detecting horizontal scrolling, clipped content, and overlapping controls, and checks focused elements for obvious focus indicators. These checks are conservative and require manual review.
+Only used with `--browser --low-vision`. Samples browser-computed styles for rendered contrast, runs zoom reflow passes at 200% and 400% (laid out at the equivalent CSS widths browser zoom produces, including the WCAG 1.4.10 reference of 320 px) detecting meaningful horizontal scrolling, clipped content, and overlapping controls, and checks focused elements for obvious focus indicators and substantial overlay coverage. These checks are conservative and require manual review.
 
 ### Task Runner - `a11yway/core/task_runner.py`
 
@@ -78,9 +79,25 @@ Loads deterministic JSON workflow templates for education, college applications,
 
 Future AI scout mode may propose likely workflows and accessibility risks. It should never mark a finding as confirmed by itself. Deterministic static, browser, or task checks must verify a finding before reports call it confirmed.
 
+### Finding Validation - `a11yway/core/finding_validation.py`
+
+Runs after raw findings are collected and element-level duplicates are
+merged. It normalizes page URLs, adds rule/category/source metadata,
+records selector/snippet/name/role evidence, assigns reviewer-facing
+confidence levels, and builds root issue clusters with raw occurrence and
+unique-root counts. AI Scout suggestions are never used as validation.
+
 ### Reviewer Verdicts - `a11yway/core/verdicts.py`
 
-Applies human reviewer verdicts to existing JSON reports and summarizes feedback. Verdicts can mark findings as confirmed, false positive, needs review, fixed, or missed issue. Organization names and quotes should only be used when permission fields allow it.
+Applies human reviewer verdicts to existing JSON reports and summarizes feedback. Verdicts can mark findings as confirmed, false positive, partially confirmed, needs review, fixed, missed issue, duplicate, not applicable, or unable to reproduce. Precision metrics are calculated by rule, category, engine, severity, site, WCAG criterion, unique root issue, and raw occurrence. Rule reliability profiles identify historically noisy rules that can be capped at `needs_review` through calibration. Organization names and quotes should only be used when permission fields allow it.
+
+### Human Comparison - `a11yway/core/human_compare.py`
+
+Compares an A11yway report with a structured human-tester finding file.
+Human findings do not need A11yway rule IDs; descriptions, selectors, WCAG
+criteria, components, and notes are used to identify likely matches,
+false positives, missed human findings, partial matches, and disagreement
+areas.
 
 ### Re-Audit Diff - `a11yway/core/report_diff.py`
 
@@ -106,7 +123,7 @@ Used with `--ci`, `--sarif`, and `--junit`. Maps audit outcomes onto exit codes 
 
 ### Batch Runner - `a11yway/core/batch_runner.py`
 
-Loads a batch config (a JSON list of sources with optional tasks), runs the audit for each item, keeps going when one item fails, and writes all per-page and index artifacts to the output directory.
+Loads a batch config (a JSON list of sources with optional tasks), runs the audit for each item, keeps going when one item fails, optionally repeats dynamic browser checks for `--verify-runs`, applies review-only rule calibration, and writes all per-page and index artifacts to the output directory.
 
 ### Agents - `a11yway/agents/`
 

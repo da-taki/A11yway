@@ -15,6 +15,9 @@ from a11yway.core.ai_scout import run_ai_scout, save_ai_scout_outputs
 from a11yway.core.dedup import deduplicate_issues
 from a11yway.core.low_vision_audit import run_low_vision_audit_for_source
 from a11yway.core.page_analyzer import analyze_html_static
+from a11yway.core.reproducibility import apply_reproducibility
+from a11yway.core.rule_calibration import downgrade_review_only_issues
+from a11yway.models.issue import AccessibilityIssue
 from a11yway.core.report_builder import (
     build_batch_index_report,
     build_json_report,
@@ -63,6 +66,8 @@ def run_batch(
     low_vision: bool = False,
     ai_scout: bool = False,
     axe: bool = False,
+    verify_runs: int = 1,
+    review_only_rules: set[str] | None = None,
 ) -> dict:
     """Run a static HTML batch audit and write per-page plus index reports.
 
@@ -76,6 +81,8 @@ def run_batch(
     output_dir.mkdir(parents=True, exist_ok=True)
     tasks = load_tasks(tasks_path)
     source_summaries = []
+    verify_runs = max(1, int(verify_runs or 1))
+    review_only_rules = set(review_only_rules or set())
 
     for item in batch_items:
         item_id = safe_report_id(str(item.get("id", item.get("name", "report"))))
@@ -93,6 +100,8 @@ def run_batch(
                     "status": "failed",
                     "error": source_result["error"],
                     "issue_count": 0,
+                    "raw_occurrences": 0,
+                    "unique_root_issues": 0,
                     "task_blocker_count": 0,
                     "counts_by_severity": {},
                     "counts_by_issue_type": {},
@@ -123,6 +132,7 @@ def run_batch(
         low_vision_result = None
         low_vision_status = ""
         low_vision_issue_count = 0
+        repeated_issue_runs: list[list[AccessibilityIssue]] = []
         if browser:
             if not is_playwright_available():
                 browser_status = "unavailable"
@@ -153,6 +163,29 @@ def run_batch(
                     )
                     low_vision_issue_count = len(low_vision_result.get("issues", []))
                     issues = issues + list(low_vision_result.get("issues", []))
+                for _run_index in range(max(0, verify_runs - 1)):
+                    repeat_issues = []
+                    repeat_browser = run_browser_audit(
+                        source,
+                        max_tabs=max_tabs,
+                        wait_ms=wait_ms,
+                        visual_proof_dir=None,
+                        include_axe=axe,
+                    )
+                    if repeat_browser.get("success"):
+                        repeat_issues.extend(
+                            merge_browser_issues([], repeat_browser)
+                        )
+                    if low_vision:
+                        repeat_low_vision = run_low_vision_audit_for_source(
+                            source,
+                            wait_ms=wait_ms,
+                        )
+                        if repeat_low_vision.get("success"):
+                            repeat_issues.extend(
+                                list(repeat_low_vision.get("issues", []))
+                            )
+                    repeated_issue_runs.append(repeat_issues)
 
         selected_task = None
         task_blockers: list[dict] = []
@@ -179,7 +212,13 @@ def run_batch(
                     task_execution_status = "blocked"
                 issues = issues + list(task_execution["issues"])
 
+        issues = apply_reproducibility(issues, repeated_issue_runs, verify_runs)
         issues = deduplicate_issues(issues)
+        downgrade_review_only_issues(
+            issues,
+            review_only_rules,
+            reason="Rule configured or historically calibrated as review-only.",
+        )
 
         report = build_json_report(
             source,
@@ -191,6 +230,13 @@ def run_batch(
             task_execution=task_execution,
             low_vision_result=low_vision_result,
         )
+        if verify_runs > 1:
+            report["verification_runs"] = {
+                "requested": verify_runs,
+                "additional_runs": max(0, verify_runs - 1),
+            }
+        if review_only_rules:
+            report["summary"]["review_only_rules"] = sorted(review_only_rules)
         json_path = output_dir / f"{item_id}.json"
         markdown_path = output_dir / f"{item_id}.md"
         html_path = output_dir / f"{item_id}.html"
@@ -243,6 +289,12 @@ def run_batch(
                 "status": "passed",
                 "error": "",
                 "issue_count": report["summary"]["issues_found"],
+                "raw_occurrences": report["summary"].get(
+                    "raw_occurrences", report["summary"]["issues_found"]
+                ),
+                "unique_root_issues": report["summary"].get(
+                    "unique_root_issues", report["summary"]["issues_found"]
+                ),
                 "task_blocker_count": len(task_blockers),
                 "counts_by_severity": report["summary"]["counts_by_severity"],
                 "counts_by_issue_type": report["summary"]["counts_by_issue_type"],
