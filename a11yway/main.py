@@ -40,6 +40,17 @@ from a11yway.core.report_diff import (
     save_diff_json,
     save_diff_markdown,
 )
+from a11yway.core.human_compare import (
+    compare_human_review,
+    load_human_review,
+    save_human_comparison,
+)
+from a11yway.core.reproducibility import apply_reproducibility
+from a11yway.core.rule_calibration import (
+    downgrade_review_only_issues,
+    parse_rule_list,
+    review_only_rules_from_reports,
+)
 from a11yway.core.report_builder import (
     build_json_report,
     save_html_report,
@@ -48,7 +59,10 @@ from a11yway.core.report_builder import (
 )
 from a11yway.core.verdicts import (
     apply_verdicts_to_report,
+    build_precision_stats,
     load_verdicts,
+    save_precision_report_csv,
+    save_precision_report_markdown,
     save_verdict_summary_markdown,
     summarize_verdicts,
 )
@@ -399,6 +413,27 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--calibrate-rules-from",
+        dest="calibrate_rules_from",
+        nargs="+",
+        metavar="REVIEWED_REPORT_JSON",
+        help=(
+            "Use prior reviewed reports to automatically downgrade historically "
+            "noisy rules to needs_review confidence for this run."
+        ),
+    )
+    parser.add_argument(
+        "--verify-runs",
+        dest="verify_runs",
+        type=int,
+        default=1,
+        help=(
+            "Total browser verification runs for dynamic findings, including "
+            "the primary run. Values above 1 repeat browser and low-vision "
+            "checks and annotate reproducibility evidence."
+        ),
+    )
+    parser.add_argument(
         "--rule",
         dest="rule_issue_type",
         help="Print detailed documentation for one issue type and exit.",
@@ -444,6 +479,32 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="summarize_verdicts",
         metavar="VERDICTS_JSON",
         help="Write a Markdown summary for reviewer verdicts.",
+    )
+    parser.add_argument(
+        "--evaluate-verdicts",
+        dest="evaluate_verdicts",
+        metavar="VERDICTS_JSON",
+        help="Apply verdicts and calculate reviewer precision metrics. Requires --to REPORT_JSON.",
+    )
+    parser.add_argument(
+        "--precision-report",
+        dest="precision_report",
+        nargs="+",
+        metavar="REVIEWED_REPORT_JSON",
+        help="Calculate precision metrics from one or more reviewed A11yway reports.",
+    )
+    parser.add_argument(
+        "--rule-quality-report",
+        dest="rule_quality_report",
+        nargs="+",
+        metavar="REVIEWED_REPORT_JSON",
+        help="Alias for --precision-report focused on rule-level precision.",
+    )
+    parser.add_argument(
+        "--compare-human-review",
+        dest="compare_human_review",
+        metavar="HUMAN_REVIEW_JSON",
+        help="Compare an A11yway report with structured human-tester findings. Requires --to REPORT_JSON.",
     )
     parser.add_argument(
         "--compare-reports",
@@ -795,6 +856,134 @@ def summarize_verdicts_cli(verdicts_path: str | None, markdown_path: str | None)
     return 0
 
 
+def evaluate_verdicts_cli(
+    verdicts_path: str | None,
+    report_path: str | None,
+    output_path: str | None,
+    markdown_path: str | None,
+    csv_path: str | None,
+) -> int:
+    """Apply verdicts and write optional precision artifacts."""
+    if not verdicts_path or not report_path:
+        print("--evaluate-verdicts requires VERDICTS_JSON and --to REPORT_JSON.")
+        return 1
+    report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    verdicts = load_verdicts(verdicts_path)
+    reviewed = apply_verdicts_to_report(report, verdicts)
+    if output_path:
+        output = Path(output_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(reviewed, indent=2), encoding="utf-8")
+        print(f"Reviewed report saved: {output_path}")
+    stats = reviewed.get("precision_stats", {})
+    if markdown_path:
+        save_precision_report_markdown(stats, markdown_path)
+        print(f"Precision Markdown saved: {markdown_path}")
+    if csv_path:
+        save_precision_report_csv(stats, csv_path)
+        print(f"Precision CSV saved: {csv_path}")
+    overall = stats.get("overall", {})
+    print(f"Reviewed findings: {overall.get('reviewed', 0)}")
+    print(f"Precision: {overall.get('precision', 'n/a')}")
+    print(f"False-positive rate: {overall.get('false_positive_rate', 'n/a')}")
+    print(f"Unable-to-reproduce rate: {overall.get('unable_to_reproduce_rate', 'n/a')}")
+    return 0
+
+
+def precision_report_cli(
+    report_paths: list[str] | None,
+    json_path: str | None,
+    markdown_path: str | None,
+    csv_path: str | None,
+) -> int:
+    """Calculate precision from one or more reviewed reports."""
+    if not report_paths:
+        print("--precision-report requires at least one reviewed report JSON.")
+        return 1
+    reports = [
+        json.loads(Path(path).read_text(encoding="utf-8"))
+        for path in report_paths
+    ]
+    stats = build_precision_stats(reports)
+    if json_path:
+        output = Path(json_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+        print(f"Precision JSON saved: {json_path}")
+    if markdown_path:
+        save_precision_report_markdown(stats, markdown_path)
+        print(f"Precision Markdown saved: {markdown_path}")
+    if csv_path:
+        save_precision_report_csv(stats, csv_path)
+        print(f"Precision CSV saved: {csv_path}")
+    overall = stats.get("overall", {})
+    print(f"Reviewed findings: {overall.get('reviewed', 0)}")
+    print(f"Precision: {overall.get('precision', 'n/a')}")
+    return 0
+
+
+def load_report_for_human_comparison(path: str | Path) -> dict:
+    """Load a single report or expand a batch index into one combined report."""
+    report_path = Path(path)
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    if report.get("issues") or not report.get("sources"):
+        return report
+
+    combined_issues = []
+    for source in report.get("sources", []):
+        json_report = source.get("reports", {}).get("json")
+        if not json_report:
+            continue
+        child_path = Path(json_report)
+        if not child_path.is_absolute():
+            child_path = report_path.parent / child_path.name
+        if not child_path.exists():
+            continue
+        child = json.loads(child_path.read_text(encoding="utf-8"))
+        for issue in child.get("issues", []):
+            issue = dict(issue)
+            evidence = issue.get("evidence", {})
+            if isinstance(evidence, dict):
+                evidence = dict(evidence)
+                evidence.setdefault("source", child.get("source_file", ""))
+                evidence.setdefault("batch_item_id", source.get("id", ""))
+                issue["evidence"] = evidence
+            combined_issues.append(issue)
+
+    combined = dict(report)
+    combined["source_file"] = str(report_path)
+    combined["issues"] = combined_issues
+    combined["summary"] = dict(report.get("summary", {}))
+    combined["summary"]["issues_found"] = len(combined_issues)
+    return combined
+
+
+def compare_human_review_cli(
+    human_review_path: str | None,
+    report_path: str | None,
+    json_path: str | None,
+    markdown_path: str | None,
+) -> int:
+    """Compare an A11yway report with a human-review file."""
+    if not human_review_path or not report_path:
+        print("--compare-human-review requires HUMAN_REVIEW_JSON and --to REPORT_JSON.")
+        return 1
+    report = load_report_for_human_comparison(report_path)
+    human_review = load_human_review(human_review_path)
+    comparison = compare_human_review(report, human_review)
+    save_human_comparison(comparison, json_path=json_path, markdown_path=markdown_path)
+    if json_path:
+        print(f"Human comparison JSON saved: {json_path}")
+    if markdown_path:
+        print(f"Human comparison Markdown saved: {markdown_path}")
+    summary = comparison.get("summary", {})
+    print(f"True positives: {summary.get('true_positives', 0)}")
+    print(f"Partial matches: {summary.get('partial_matches', 0)}")
+    print(f"False positives: {summary.get('false_positives', 0)}")
+    print(f"Missed human findings: {summary.get('missed_human_findings', 0)}")
+    return 0
+
+
 def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | None, json_path: str | None) -> int:
     """Compare reports from the CLI."""
     if not report_paths:
@@ -1011,6 +1200,31 @@ def main(argv: list[str] | None = None) -> int:
             parsed_args.markdown_output,
         )
 
+    if parsed_args.evaluate_verdicts:
+        return evaluate_verdicts_cli(
+            parsed_args.evaluate_verdicts,
+            parsed_args.verdict_report_json,
+            parsed_args.verdict_output_json,
+            parsed_args.markdown_output,
+            parsed_args.csv_output,
+        )
+
+    if parsed_args.precision_report or parsed_args.rule_quality_report:
+        return precision_report_cli(
+            parsed_args.precision_report or parsed_args.rule_quality_report,
+            parsed_args.json_output,
+            parsed_args.markdown_output,
+            parsed_args.csv_output,
+        )
+
+    if parsed_args.compare_human_review:
+        return compare_human_review_cli(
+            parsed_args.compare_human_review,
+            parsed_args.verdict_report_json,
+            parsed_args.json_output or parsed_args.verdict_output_json,
+            parsed_args.markdown_output,
+        )
+
     if parsed_args.compare_reports:
         return compare_reports_cli(
             parsed_args.compare_reports,
@@ -1065,6 +1279,11 @@ def main(argv: list[str] | None = None) -> int:
     if parsed_args.workflow and not parsed_args.workflow_config:
         print("--workflow requires --workflow-config.")
         return setup_exit
+
+    verify_runs = max(1, int(parsed_args.verify_runs or 1))
+    review_only_rules = parse_rule_list(parsed_args.review_only_rules)
+    calibrated_rules = review_only_rules_from_reports(parsed_args.calibrate_rules_from)
+    review_only_rules.update(calibrated_rules)
 
     if parsed_args.document:
         issues, document_result = analyze_document(parsed_args.html_path)
@@ -1156,6 +1375,8 @@ def main(argv: list[str] | None = None) -> int:
             low_vision=parsed_args.low_vision,
             ai_scout=parsed_args.ai_scout,
             axe=parsed_args.axe,
+            verify_runs=verify_runs,
+            review_only_rules=review_only_rules,
         )
         summary = batch_result["index"]["summary"]
         print("A11yway batch static HTML accessibility audit")
@@ -1165,6 +1386,10 @@ def main(argv: list[str] | None = None) -> int:
             print("Low-vision checks: enabled")
         if parsed_args.axe:
             print("Axe-core scan: enabled")
+        if verify_runs > 1:
+            print(f"Verification runs: {verify_runs}")
+        if review_only_rules:
+            print(f"Review-only rules: {', '.join(sorted(review_only_rules))}")
         print(f"Batch file: {batch_result['config_path']}")
         print(f"Pages tested: {summary['total_pages_tested']}")
         print(f"Total issues: {summary['total_issues']}")
@@ -1267,6 +1492,7 @@ def main(argv: list[str] | None = None) -> int:
 
     browser_result = None
     low_vision_result = None
+    repeated_issue_runs = []
     static_issue_count = len(issues)
     if parsed_args.browser:
         browser_result = run_browser_audit(
@@ -1284,6 +1510,26 @@ def main(argv: list[str] | None = None) -> int:
             wait_ms=parsed_args.wait_ms,
         )
         issues = issues + list(low_vision_result.get("issues", []))
+    if parsed_args.browser and verify_runs > 1:
+        for _run_index in range(verify_runs - 1):
+            repeat_issues = []
+            repeat_browser = run_browser_audit(
+                source,
+                max_tabs=parsed_args.max_tabs,
+                wait_ms=parsed_args.wait_ms,
+                visual_proof_dir=None,
+                include_axe=parsed_args.axe,
+            )
+            if repeat_browser.get("success"):
+                repeat_issues.extend(merge_browser_issues([], repeat_browser))
+            if parsed_args.low_vision:
+                repeat_low_vision = run_low_vision_audit_for_source(
+                    source,
+                    wait_ms=parsed_args.wait_ms,
+                )
+                if repeat_low_vision.get("success"):
+                    repeat_issues.extend(list(repeat_low_vision.get("issues", [])))
+            repeated_issue_runs.append(repeat_issues)
 
     task_execution = None
     if execute_task_obj is not None:
@@ -1316,25 +1562,13 @@ def main(argv: list[str] | None = None) -> int:
 
     # One barrier seen by several detection modes becomes one finding that
     # lists every evidence source.
+    issues = apply_reproducibility(issues, repeated_issue_runs, verify_runs)
     issues = deduplicate_issues(issues)
-
-    review_only_rules: set[str] = set()
-    if parsed_args.review_only_rules:
-        review_only_rules = {
-            name.strip()
-            for name in parsed_args.review_only_rules.split(",")
-            if name.strip()
-        }
-        for issue in issues:
-            if issue.issue_type not in review_only_rules:
-                continue
-            effective = issue.confidence or DEFAULT_CONFIDENCE_BY_RULE.get(
-                issue.issue_type, FALLBACK_CONFIDENCE
-            )
-            if effective in {"confirmed", "likely"}:
-                issue.confidence = "needs_review"
-                if isinstance(issue.evidence, dict):
-                    issue.evidence["downgraded_to_review_only"] = True
+    downgrade_review_only_issues(
+        issues,
+        review_only_rules,
+        reason="Rule configured or historically calibrated as review-only.",
+    )
 
     print_summary(source, issues)
 
@@ -1396,6 +1630,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         if review_only_rules:
             report["summary"]["review_only_rules"] = sorted(review_only_rules)
+        if calibrated_rules:
+            report["summary"]["calibrated_review_only_rules"] = sorted(calibrated_rules)
+        if verify_runs > 1:
+            report["verification_runs"] = {
+                "requested": verify_runs,
+                "additional_runs": verify_runs - 1,
+            }
         if parsed_args.ai_scout:
             workflow_tested = selected_task.name if selected_task else ""
             ai_result = run_ai_scout(

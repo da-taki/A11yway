@@ -47,6 +47,18 @@ AXE_IMPACT_TO_SEVERITY = {
 # Cap per-rule findings so one repeated template bug cannot flood a report.
 MAX_NODES_PER_VIOLATION = 10
 
+REVIEW_ONLY_AXE_RULES = {
+    "tabindex": {
+        "severity": "medium",
+        "confidence": "needs_review",
+        "reason_suffix": (
+            " A positive tabindex value is review evidence only here; "
+            "A11yway does not treat it as a strong finding unless observed "
+            "keyboard traversal proves a harmful focus-order mismatch."
+        ),
+    }
+}
+
 
 def is_axe_available() -> bool:
     """Return whether the optional axe-core dependency can be used."""
@@ -78,6 +90,9 @@ def axe_violations_to_issues(violations: list[dict]) -> list[AccessibilityIssue]
         rule_id = str(violation.get("id", "") or "unknown_rule")
         impact = str(violation.get("impact", "") or "")
         severity = axe_impact_to_severity(impact)
+        review_only = REVIEW_ONLY_AXE_RULES.get(rule_id)
+        if review_only:
+            severity = review_only["severity"]
         help_text = str(violation.get("help", "") or "")
         help_url = str(violation.get("helpUrl", "") or "")
         description = str(violation.get("description", "") or "")
@@ -99,6 +114,13 @@ def axe_violations_to_issues(violations: list[dict]) -> list[AccessibilityIssue]
                 ),
                 "nodes_total": len(nodes),
             }
+            confidence = None
+            if review_only:
+                confidence = review_only["confidence"]
+                evidence["review_only_reason"] = review_only["reason_suffix"].strip()
+                evidence["reason"] = _shorten(
+                    f"{evidence['reason']}{review_only['reason_suffix']}", 500
+                )
             if help_url:
                 evidence["help_url"] = help_url
 
@@ -110,6 +132,7 @@ def axe_violations_to_issues(violations: list[dict]) -> list[AccessibilityIssue]
                     agent_name=AXE_AGENT_NAME,
                     evidence=evidence,
                     suggested_fix=suggested_fix,
+                    confidence=confidence,
                 )
             )
 

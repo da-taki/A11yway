@@ -20,6 +20,7 @@ from a11yway.core.announce import (
     trace_has_announce_data,
 )
 from a11yway.core.extended_results import EXTENDED_RESULT_SCHEMA_VERSION, json_safe
+from a11yway.core.finding_validation import issue_cluster_summary, validate_findings
 from a11yway.core.page_analyzer import STATIC_CHECKS_RUN
 from a11yway.core.rules import enrich_issue_with_rule
 from a11yway.core.wcag_coverage import coverage_summary_for_report
@@ -94,6 +95,14 @@ def build_json_report(
     extended_results: list[dict] | None = None,
 ) -> dict:
     """Build the prototype JSON report shape for CLI exports."""
+    page_url = ""
+    if source_metadata:
+        page_url = (
+            source_metadata.get("final_url")
+            or source_metadata.get("source")
+            or source_file
+        )
+    issues = validate_findings(issues, page_url=page_url or source_file)
     normalized_extended_results = sorted(
         [json_safe(result) for result in (extended_results or [])],
         key=lambda result: (
@@ -144,6 +153,13 @@ def build_json_report(
         )
         for issue in issues
     ]
+    raw_occurrences = sum(
+        int(issue.evidence.get("occurrence_count", 1) or 1)
+        if isinstance(issue.evidence, dict)
+        else 1
+        for issue in issues
+    )
+    clusters = issue_cluster_summary(issues)
 
     report = {
         "tool": "A11yway",
@@ -153,15 +169,25 @@ def build_json_report(
         "source_file": source_file,
         "summary": {
             "issues_found": len(issues),
+            "raw_occurrences": raw_occurrences,
+            "unique_root_issues": len(clusters),
             "counts_by_severity": _count_by([issue.severity for issue in issues]),
             "counts_by_issue_type": _count_by([issue.issue_type for issue in issues]),
             "counts_by_confidence": _count_by(
                 [issue.get("confidence", "") for issue in enriched_issues]
             ),
+            "counts_by_confidence_level": _count_by(
+                [
+                    issue.get("evidence", {}).get("confidence_level", "")
+                    for issue in enriched_issues
+                    if isinstance(issue.get("evidence"), dict)
+                ]
+            ),
             "agents_used": ["Keyboard-only student"],
             "checks_run": checks_run,
         },
         "issues": enriched_issues,
+        "issue_clusters": clusters,
         "wcag_coverage": coverage_summary_for_report(),
         "limitations": limitations,
     }
@@ -286,6 +312,24 @@ def _format_count_items(counts: dict) -> list[str]:
 
 
 _EVIDENCE_KEYS = [
+    "rule_id",
+    "issue_category",
+    "source_engine",
+    "confidence_level",
+    "verification_status",
+    "reproducibility",
+    "deduplication_fingerprint",
+    "human_review_reason",
+    "review_only_reason",
+    "occurrence_count",
+    "affected_page_count",
+    "component_signature",
+    "normalized_page_url",
+    "element_selector",
+    "normalized_element_snippet",
+    "accessible_name",
+    "visible_text",
+    "role",
     "tag",
     "id",
     "name",
@@ -317,6 +361,8 @@ _EVIDENCE_KEYS = [
     "nearby_target",
     "covered_points",
     "sampled_points",
+    "coverage_ratio",
+    "coverage_threshold",
     "covering_element",
     "covering_position",
     "detection_method",
@@ -382,6 +428,8 @@ def build_markdown_report(report: dict) -> str:
         f"- Source: {source_label}",
         f"- Source type: {source.get('type', 'file')}",
         f"- Issues found: {summary.get('issues_found', 0)}",
+        f"- Raw occurrences: {summary.get('raw_occurrences', summary.get('issues_found', 0))}",
+        f"- Unique root issues: {summary.get('unique_root_issues', summary.get('issues_found', 0))}",
         f"- Agents used: {', '.join(summary.get('agents_used', []))}",
         f"- Checks run: {', '.join(summary.get('checks_run', []))}",
         "",
@@ -397,7 +445,34 @@ def build_markdown_report(report: dict) -> str:
         "",
         *_format_count_items(summary.get("counts_by_confidence", {})),
         "",
+        "### Counts By Confidence Level",
+        "",
+        *_format_count_items(summary.get("counts_by_confidence_level", {})),
+        "",
     ]
+    clusters = report.get("issue_clusters", [])
+    if clusters:
+        lines.extend(
+            [
+                "### Root Issue Clusters",
+                "",
+                "| Root issue | Rule | Component | Occurrences | Confidence |",
+                "| --- | --- | --- | ---: | --- |",
+            ]
+        )
+        for cluster in clusters[:10]:
+            lines.append(
+                "| {root} | {rule} | {component} | {occurrences} | {confidence} |".format(
+                    root=cluster.get("root_issue_id", ""),
+                    rule=cluster.get("rule_id", ""),
+                    component=cluster.get("component_signature", ""),
+                    occurrences=cluster.get("occurrence_count", 0),
+                    confidence=cluster.get("confidence_level", ""),
+                )
+            )
+        if len(clusters) > 10:
+            lines.append(f"| ... | {len(clusters) - 10} more |  |  |  |")
+        lines.append("")
     if summary.get("review_only_rules"):
         lines.extend(
             [
@@ -881,14 +956,39 @@ def build_html_report(report: dict) -> str:
         "<section>",
         "<h2>Summary</h2>",
         f"<p>Issues found: <strong>{summary.get('issues_found', 0)}</strong></p>",
+        f"<p>Raw occurrences: <strong>{summary.get('raw_occurrences', summary.get('issues_found', 0))}</strong></p>",
+        f"<p>Unique root issues: <strong>{summary.get('unique_root_issues', summary.get('issues_found', 0))}</strong></p>",
         f"<p>Agents used: {escape(', '.join(summary.get('agents_used', [])))}</p>",
         f"<p>Checks run: {escape(', '.join(summary.get('checks_run', [])))}</p>",
         "<h3>Counts By Severity</h3>",
         _html_count_list(summary.get("counts_by_severity", {})),
         "<h3>Counts By Issue Type</h3>",
         _html_count_list(summary.get("counts_by_issue_type", {})),
+        "<h3>Counts By Confidence Level</h3>",
+        _html_count_list(summary.get("counts_by_confidence_level", {})),
         "</section>",
     ]
+
+    clusters = report.get("issue_clusters", [])
+    if clusters:
+        lines.extend(
+            [
+                "<section>",
+                "<h2>Root Issue Clusters</h2>",
+                "<table><thead><tr><th>Root issue</th><th>Rule</th><th>Component</th><th>Occurrences</th><th>Confidence</th></tr></thead><tbody>",
+            ]
+        )
+        for cluster in clusters[:20]:
+            lines.append(
+                "<tr><td>{root}</td><td>{rule}</td><td>{component}</td><td>{occurrences}</td><td>{confidence}</td></tr>".format(
+                    root=escape(str(cluster.get("root_issue_id", ""))),
+                    rule=escape(str(cluster.get("rule_id", ""))),
+                    component=escape(str(cluster.get("component_signature", ""))),
+                    occurrences=escape(str(cluster.get("occurrence_count", 0))),
+                    confidence=escape(str(cluster.get("confidence_level", ""))),
+                )
+            )
+        lines.extend(["</tbody></table>", "</section>"])
 
     if source:
         lines.extend(
@@ -1332,6 +1432,14 @@ def build_batch_index_report(items: list[dict]) -> dict:
             "successful_pages": successful_pages,
             "failed_pages": len(items) - successful_pages,
             "total_issues": sum(item.get("issue_count", 0) for item in items),
+            "total_raw_occurrences": sum(
+                item.get("raw_occurrences", item.get("issue_count", 0))
+                for item in items
+            ),
+            "total_unique_root_issues": sum(
+                item.get("unique_root_issues", item.get("issue_count", 0))
+                for item in items
+            ),
             "total_task_blockers": sum(
                 item.get("task_blocker_count", 0) for item in items
             ),
@@ -1370,6 +1478,8 @@ def build_batch_index_markdown(index_report: dict) -> str:
         "",
         f"- Total pages tested: {summary.get('total_pages_tested', 0)}",
         f"- Total issues: {summary.get('total_issues', 0)}",
+        f"- Raw occurrences: {summary.get('total_raw_occurrences', summary.get('total_issues', 0))}",
+        f"- Unique root issues: {summary.get('total_unique_root_issues', summary.get('total_issues', 0))}",
         f"- CSV index: {index_report.get('csv_index_path', '')}",
         f"- Evaluation summary: {index_report.get('evaluation_summary_path', '')}",
         "",
@@ -1433,6 +1543,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
         "task",
         "status",
         "issues_found",
+        "raw_occurrences",
+        "unique_root_issues",
         "task_blockers",
         "browser_status",
         "browser_issue_count",
@@ -1467,6 +1579,8 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
                     "task": item.get("task", ""),
                     "status": item.get("status", ""),
                     "issues_found": item.get("issue_count", 0),
+                    "raw_occurrences": item.get("raw_occurrences", item.get("issue_count", 0)),
+                    "unique_root_issues": item.get("unique_root_issues", item.get("issue_count", 0)),
                     "task_blockers": item.get("task_blocker_count", 0),
                     "browser_status": item.get("browser_status", ""),
                     "browser_issue_count": item.get("browser_issue_count", 0),
@@ -1508,6 +1622,8 @@ def build_evaluation_summary_markdown(index_report: dict, config_path: str = "")
         f"- Successful pages: {summary.get('successful_pages', 0)}",
         f"- Failed pages: {summary.get('failed_pages', 0)}",
         f"- Total issues: {summary.get('total_issues', 0)}",
+        f"- Raw occurrences: {summary.get('total_raw_occurrences', summary.get('total_issues', 0))}",
+        f"- Unique root issues: {summary.get('total_unique_root_issues', summary.get('total_issues', 0))}",
         f"- Total task blockers: {summary.get('total_task_blockers', 0)}",
         f"- HTML reports: {summary.get('html_reports', 0)}",
         f"- AI Scout runs: {summary.get('ai_scout_runs', 0)}",

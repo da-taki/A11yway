@@ -12,6 +12,7 @@ import hashlib
 from html.parser import HTMLParser
 import re
 
+from a11yway.core.finding_validation import cluster_repeated_findings, validate_findings
 from a11yway.models.issue import AccessibilityIssue
 
 # Evidence keys that identify the element a finding is about, strongest
@@ -198,5 +199,6 @@ def deduplicate_issues(issues: list[AccessibilityIssue]) -> list[AccessibilityIs
             issue.evidence["evidence_sources"] = sources[fingerprint]
             if counts[fingerprint] > 1:
                 issue.evidence["merged_finding_count"] = counts[fingerprint]
+                issue.evidence["occurrence_count"] = counts[fingerprint]
         result.append(issue)
-    return result
+    return cluster_repeated_findings(validate_findings(result))

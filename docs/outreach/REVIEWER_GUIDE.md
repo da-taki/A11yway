@@ -4,7 +4,7 @@ This guide explains how to read an A11yway report.
 
 ## What The Summary Means
 
-The summary shows the tested source, total issues found, checks run, and counts by severity and issue type.
+The summary shows the tested source, total issues found, raw occurrences, unique root issues, checks run, and counts by severity, issue type, and confidence level.
 
 Use the summary to understand the overall shape of the report, not as a final accessibility score.
 
@@ -27,6 +27,8 @@ Each issue may include:
 - A short HTML snippet.
 - An approximate line number.
 - A reason the element was flagged.
+- Confidence and verification fields such as `confidence_level`, `verification_status`, and `human_review_reason`.
+- Occurrence and clustering fields such as `occurrence_count`, `affected_page_count`, and `component_signature`.
 
 Line numbers are approximate. They are meant to help locate the issue, not to be exact source-code references.
 
@@ -53,11 +55,15 @@ Reviewer verdict files can mark findings as:
 
 - `confirmed`
 - `false_positive`
+- `partially_confirmed`
 - `needs_review`
 - `fixed`
 - `missed_issue`
+- `duplicate`
+- `not_applicable`
+- `unable_to_reproduce`
 
-These verdicts help measure report accuracy. They should not be used to publicly name reviewers or organizations unless permission was granted.
+Verdicts may also include reviewer role, testing environment, browser, operating system, assistive technology, manual testing method, notes, related WCAG criteria, severity adjustment, and corrected evidence. These verdicts help measure report accuracy. They should not be used to publicly name reviewers or organizations unless permission was granted.
 
 ## How To Report Missed Issues
 
@@ -75,7 +81,7 @@ Useful details include:
 A11yway currently has important limits:
 
 - No full screen reader simulation.
-- No PDF support yet.
+- Document checks are evidence-only and do not certify PDF/UA or Office conformance.
 - No crawling, no logins, and no private portal testing without permission.
 - Low-vision checks are browser heuristics, not certification.
 - No full WCAG certification.

@@ -83,6 +83,32 @@ def test_violations_become_issues_with_reviewable_evidence() -> None:
     assert "dequeuniversity.com" in issue.suggested_fix
 
 
+def test_positive_tabindex_is_review_only_axe_evidence() -> None:
+    """Axe tabindex violations need human review until harmful order is proven."""
+    issues = axe_violations_to_issues(
+        [
+            fake_violation(
+                id="tabindex",
+                impact="serious",
+                help="Elements should not have tabindex greater than zero",
+                nodes=[
+                    {
+                        "html": '<a href="#main" tabindex="1">Skip</a>',
+                        "target": ["a[href='#main']"],
+                        "failureSummary": "Element has a positive tabindex",
+                    }
+                ],
+            )
+        ]
+    )
+
+    assert len(issues) == 1
+    assert issues[0].issue_type == "axe_tabindex"
+    assert issues[0].severity == "medium"
+    assert issues[0].confidence == "needs_review"
+    assert issues[0].evidence["review_only_reason"]
+
+
 def test_violation_nodes_are_capped_per_rule() -> None:
     """A rule hitting many elements must not flood the report."""
     nodes = [

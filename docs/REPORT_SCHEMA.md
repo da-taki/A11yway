@@ -13,6 +13,7 @@ Top-level keys for a static report:
 - `source_file`: analyzed source input.
 - `summary`: counts, agents, and checks.
 - `issues`: enriched findings.
+- `issue_clusters`: root-issue and component-level clustering summaries.
 - `wcag_coverage`: tool coverage summary, not a conformance claim.
 - `limitations`: report limitations.
 
@@ -44,6 +45,30 @@ Every extended module result includes:
 
 ## Issue Evidence
 
+Every report issue includes compatibility fields (`issue_type`, `severity`,
+`confidence`, `message`, `evidence`, `suggested_fix`) and enriched evidence
+for professional review.
+
+Post-collection validation evidence includes:
+
+- `rule_id`
+- `normalized_page_url`
+- `issue_category`
+- `source_engine`
+- `element_selector`
+- `normalized_element_snippet`
+- `accessible_name`
+- `visible_text`
+- `role`
+- `confidence_level`: `confirmed_by_multiple_engines`, `strong`, `likely`, `needs_review`, `weak_heuristic`, or `suppressed`
+- `verification_status`
+- `deduplication_fingerprint`
+- `human_review_reason`
+- `related_finding_ids`
+- `occurrence_count`
+- `affected_page_count`
+- `component_signature`
+
 Extended issue evidence includes:
 
 - `module`
@@ -69,7 +94,8 @@ Optional evidence fields include:
 ## Determinism Notes
 
 - Saved JSON reports use sorted keys.
+- Summary includes both `raw_occurrences` and `unique_root_issues`.
+- `issue_clusters` are sorted by occurrence count, then rule id.
 - Extended modules are sorted by module, check ID, and status in report output.
 - Findings inside an extended module are sorted by issue type, severity, selector, and observed text.
 - Dynamic timestamps should be normalized by downstream snapshot tests when byte-for-byte comparisons are needed.
-
