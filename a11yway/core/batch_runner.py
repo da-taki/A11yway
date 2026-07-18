@@ -91,9 +91,11 @@ def run_batch(
                     "source_type": source_result["source_type"],
                     "task": item.get("task", ""),
                     "status": "failed",
-                    "error": source_result["error"],
-                    "issue_count": 0,
-                    "task_blocker_count": 0,
+                "error": source_result["error"],
+                "issue_count": 0,
+                "raw_occurrences": 0,
+                "unique_root_issues": 0,
+                "task_blocker_count": 0,
                     "counts_by_severity": {},
                     "counts_by_issue_type": {},
                     "high_severity_issues": [],
@@ -243,6 +245,12 @@ def run_batch(
                 "status": "passed",
                 "error": "",
                 "issue_count": report["summary"]["issues_found"],
+                "raw_occurrences": report["summary"].get(
+                    "raw_occurrences", report["summary"]["issues_found"]
+                ),
+                "unique_root_issues": report["summary"].get(
+                    "unique_root_issues", report["summary"]["issues_found"]
+                ),
                 "task_blocker_count": len(task_blockers),
                 "counts_by_severity": report["summary"]["counts_by_severity"],
                 "counts_by_issue_type": report["summary"]["counts_by_issue_type"],

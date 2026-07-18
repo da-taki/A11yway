@@ -40,6 +40,11 @@ from a11yway.core.report_diff import (
     save_diff_json,
     save_diff_markdown,
 )
+from a11yway.core.human_compare import (
+    compare_human_review,
+    load_human_review,
+    save_human_comparison,
+)
 from a11yway.core.report_builder import (
     build_json_report,
     save_html_report,
@@ -48,7 +53,10 @@ from a11yway.core.report_builder import (
 )
 from a11yway.core.verdicts import (
     apply_verdicts_to_report,
+    build_precision_stats,
     load_verdicts,
+    save_precision_report_csv,
+    save_precision_report_markdown,
     save_verdict_summary_markdown,
     summarize_verdicts,
 )
@@ -446,6 +454,32 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Write a Markdown summary for reviewer verdicts.",
     )
     parser.add_argument(
+        "--evaluate-verdicts",
+        dest="evaluate_verdicts",
+        metavar="VERDICTS_JSON",
+        help="Apply verdicts and calculate reviewer precision metrics. Requires --to REPORT_JSON.",
+    )
+    parser.add_argument(
+        "--precision-report",
+        dest="precision_report",
+        nargs="+",
+        metavar="REVIEWED_REPORT_JSON",
+        help="Calculate precision metrics from one or more reviewed A11yway reports.",
+    )
+    parser.add_argument(
+        "--rule-quality-report",
+        dest="rule_quality_report",
+        nargs="+",
+        metavar="REVIEWED_REPORT_JSON",
+        help="Alias for --precision-report focused on rule-level precision.",
+    )
+    parser.add_argument(
+        "--compare-human-review",
+        dest="compare_human_review",
+        metavar="HUMAN_REVIEW_JSON",
+        help="Compare an A11yway report with structured human-tester findings. Requires --to REPORT_JSON.",
+    )
+    parser.add_argument(
         "--compare-reports",
         dest="compare_reports",
         nargs=2,
@@ -795,6 +829,98 @@ def summarize_verdicts_cli(verdicts_path: str | None, markdown_path: str | None)
     return 0
 
 
+def evaluate_verdicts_cli(
+    verdicts_path: str | None,
+    report_path: str | None,
+    output_path: str | None,
+    markdown_path: str | None,
+    csv_path: str | None,
+) -> int:
+    """Apply verdicts and write optional precision artifacts."""
+    if not verdicts_path or not report_path:
+        print("--evaluate-verdicts requires VERDICTS_JSON and --to REPORT_JSON.")
+        return 1
+    report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    verdicts = load_verdicts(verdicts_path)
+    reviewed = apply_verdicts_to_report(report, verdicts)
+    if output_path:
+        output = Path(output_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(reviewed, indent=2), encoding="utf-8")
+        print(f"Reviewed report saved: {output_path}")
+    stats = reviewed.get("precision_stats", {})
+    if markdown_path:
+        save_precision_report_markdown(stats, markdown_path)
+        print(f"Precision Markdown saved: {markdown_path}")
+    if csv_path:
+        save_precision_report_csv(stats, csv_path)
+        print(f"Precision CSV saved: {csv_path}")
+    overall = stats.get("overall", {})
+    print(f"Reviewed findings: {overall.get('reviewed', 0)}")
+    print(f"Precision: {overall.get('precision', 'n/a')}")
+    print(f"False-positive rate: {overall.get('false_positive_rate', 'n/a')}")
+    print(f"Unable-to-reproduce rate: {overall.get('unable_to_reproduce_rate', 'n/a')}")
+    return 0
+
+
+def precision_report_cli(
+    report_paths: list[str] | None,
+    json_path: str | None,
+    markdown_path: str | None,
+    csv_path: str | None,
+) -> int:
+    """Calculate precision from one or more reviewed reports."""
+    if not report_paths:
+        print("--precision-report requires at least one reviewed report JSON.")
+        return 1
+    reports = [
+        json.loads(Path(path).read_text(encoding="utf-8"))
+        for path in report_paths
+    ]
+    stats = build_precision_stats(reports)
+    if json_path:
+        output = Path(json_path)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+        print(f"Precision JSON saved: {json_path}")
+    if markdown_path:
+        save_precision_report_markdown(stats, markdown_path)
+        print(f"Precision Markdown saved: {markdown_path}")
+    if csv_path:
+        save_precision_report_csv(stats, csv_path)
+        print(f"Precision CSV saved: {csv_path}")
+    overall = stats.get("overall", {})
+    print(f"Reviewed findings: {overall.get('reviewed', 0)}")
+    print(f"Precision: {overall.get('precision', 'n/a')}")
+    return 0
+
+
+def compare_human_review_cli(
+    human_review_path: str | None,
+    report_path: str | None,
+    json_path: str | None,
+    markdown_path: str | None,
+) -> int:
+    """Compare an A11yway report with a human-review file."""
+    if not human_review_path or not report_path:
+        print("--compare-human-review requires HUMAN_REVIEW_JSON and --to REPORT_JSON.")
+        return 1
+    report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    human_review = load_human_review(human_review_path)
+    comparison = compare_human_review(report, human_review)
+    save_human_comparison(comparison, json_path=json_path, markdown_path=markdown_path)
+    if json_path:
+        print(f"Human comparison JSON saved: {json_path}")
+    if markdown_path:
+        print(f"Human comparison Markdown saved: {markdown_path}")
+    summary = comparison.get("summary", {})
+    print(f"True positives: {summary.get('true_positives', 0)}")
+    print(f"Partial matches: {summary.get('partial_matches', 0)}")
+    print(f"False positives: {summary.get('false_positives', 0)}")
+    print(f"Missed human findings: {summary.get('missed_human_findings', 0)}")
+    return 0
+
+
 def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | None, json_path: str | None) -> int:
     """Compare reports from the CLI."""
     if not report_paths:
@@ -1008,6 +1134,31 @@ def main(argv: list[str] | None = None) -> int:
     if parsed_args.summarize_verdicts:
         return summarize_verdicts_cli(
             parsed_args.summarize_verdicts,
+            parsed_args.markdown_output,
+        )
+
+    if parsed_args.evaluate_verdicts:
+        return evaluate_verdicts_cli(
+            parsed_args.evaluate_verdicts,
+            parsed_args.verdict_report_json,
+            parsed_args.verdict_output_json,
+            parsed_args.markdown_output,
+            parsed_args.csv_output,
+        )
+
+    if parsed_args.precision_report or parsed_args.rule_quality_report:
+        return precision_report_cli(
+            parsed_args.precision_report or parsed_args.rule_quality_report,
+            parsed_args.json_output,
+            parsed_args.markdown_output,
+            parsed_args.csv_output,
+        )
+
+    if parsed_args.compare_human_review:
+        return compare_human_review_cli(
+            parsed_args.compare_human_review,
+            parsed_args.verdict_report_json,
+            parsed_args.json_output or parsed_args.verdict_output_json,
             parsed_args.markdown_output,
         )
 
