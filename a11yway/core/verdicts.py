@@ -206,6 +206,98 @@ def _finalize_precision(bucket: dict[str, Any]) -> None:
         )
 
 
+def build_rule_reliability_profiles(
+    reviewed_reports: list[dict[str, Any]],
+    *,
+    min_sample_size: int = 5,
+    min_precision: float = 0.5,
+    max_unable_to_reproduce_rate: float = 0.4,
+) -> dict[str, dict[str, Any]]:
+    """Build per-rule reliability profiles from reviewed reports.
+
+    Profiles are advisory. They never suppress findings by themselves; callers
+    may use ``confidence_cap`` to downgrade historically noisy rules to
+    needs_review while the rule remains visible in reports.
+    """
+    stats = build_precision_stats(reviewed_reports)
+    return _build_rule_reliability_profiles_from_buckets(
+        stats.get("by_rule", {}),
+        min_sample_size=min_sample_size,
+        min_precision=min_precision,
+        max_unable_to_reproduce_rate=max_unable_to_reproduce_rate,
+    )
+
+
+def _build_rule_reliability_profiles_from_buckets(
+    by_rule: dict[str, dict[str, Any]],
+    *,
+    min_sample_size: int = 5,
+    min_precision: float = 0.5,
+    max_unable_to_reproduce_rate: float = 0.4,
+) -> dict[str, dict[str, Any]]:
+    """Build reliability profiles from finalized per-rule precision buckets."""
+    profiles: dict[str, dict[str, Any]] = {}
+    for rule, bucket in sorted(by_rule.items()):
+        reviewed = int(bucket.get("reviewed", 0) or 0)
+        decided = int(bucket.get("decided", 0) or 0)
+        precision = bucket.get("precision")
+        unable_rate = bucket.get("unable_to_reproduce_rate")
+        enough_data = reviewed >= min_sample_size and decided > 0
+        confidence_cap = None
+        reason = ""
+        if enough_data and precision is not None and precision < min_precision:
+            confidence_cap = "needs_review"
+            reason = (
+                f"Historical reviewer precision for {rule} is {precision}, "
+                f"below the {min_precision} calibration threshold."
+            )
+        if (
+            enough_data
+            and unable_rate is not None
+            and unable_rate >= max_unable_to_reproduce_rate
+        ):
+            confidence_cap = "needs_review"
+            reason = (
+                f"Historical unable-to-reproduce rate for {rule} is "
+                f"{unable_rate}, at or above the "
+                f"{max_unable_to_reproduce_rate} calibration threshold."
+            )
+        profiles[rule] = {
+            "sample_size": reviewed,
+            "decided": decided,
+            "confirmed_count": bucket.get("confirmed", 0)
+            + bucket.get("partially_confirmed", 0)
+            + bucket.get("fixed", 0),
+            "false_positive_count": bucket.get("false_positive", 0)
+            + bucket.get("duplicate", 0)
+            + bucket.get("not_applicable", 0),
+            "unable_to_reproduce_count": bucket.get("unable_to_reproduce", 0),
+            "needs_review_count": bucket.get("needs_review", 0),
+            "precision": precision,
+            "false_positive_rate": bucket.get("false_positive_rate"),
+            "unable_to_reproduce_rate": unable_rate,
+            "confidence_cap": confidence_cap,
+            "calibration_status": (
+                "review_only_recommended"
+                if confidence_cap
+                else "insufficient_sample" if not enough_data else "stable"
+            ),
+            "calibration_reason": reason,
+        }
+    return profiles
+
+
+def review_only_rules_from_reliability_profiles(
+    profiles: dict[str, dict[str, Any]]
+) -> set[str]:
+    """Return rules whose historical profile recommends review-only handling."""
+    return {
+        rule
+        for rule, profile in profiles.items()
+        if profile.get("confidence_cap") == "needs_review"
+    }
+
+
 def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, Any]:
     """Compute reviewer precision per rule, WCAG criterion, and detection mode.
 
@@ -274,7 +366,7 @@ def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, A
     ]:
         _finalize_precision(bucket)
 
-    return {
+    stats = {
         "overall": total,
         "missed_issue_count": missed_issue_count,
         "by_rule": by_rule,
@@ -294,6 +386,10 @@ def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, A
             "issues affect recall, not precision."
         ),
     }
+    stats["rule_reliability_profiles"] = _build_rule_reliability_profiles_from_buckets(
+        by_rule
+    )
+    return stats
 
 
 def build_verdict_summary_markdown(summary: dict[str, Any]) -> str:
@@ -390,6 +486,29 @@ def build_precision_report_markdown(stats: dict[str, Any]) -> str:
                 )
             )
         lines.append("")
+    profiles = stats.get("rule_reliability_profiles", {})
+    lines.extend(
+        [
+            "## Rule Reliability Profiles",
+            "",
+            "| Rule | Sample | Precision | Unable to reproduce | Calibration | Confidence cap |",
+            "| --- | ---: | --- | --- | --- | --- |",
+        ]
+    )
+    if not profiles:
+        lines.append("| None | 0 | n/a | n/a | n/a |  |")
+    for rule, profile in sorted(profiles.items()):
+        lines.append(
+            "| {rule} | {sample} | {precision} | {utr} | {status} | {cap} |".format(
+                rule=rule,
+                sample=profile.get("sample_size", 0),
+                precision=profile.get("precision", "n/a"),
+                utr=profile.get("unable_to_reproduce_rate", "n/a"),
+                status=profile.get("calibration_status", ""),
+                cap=profile.get("confidence_cap") or "",
+            )
+        )
+    lines.append("")
     if stats.get("note"):
         lines.extend(["## Notes", "", str(stats["note"]), ""])
     return "\n".join(lines)
@@ -418,6 +537,8 @@ def save_precision_report_csv(stats: dict[str, Any], path: str | Path) -> None:
                 "false_positive_rate",
                 "confirmation_rate",
                 "unable_to_reproduce_rate",
+                "calibration_status",
+                "confidence_cap",
             ],
         )
         writer.writeheader()
@@ -429,6 +550,7 @@ def save_precision_report_csv(stats: dict[str, Any], path: str | Path) -> None:
             ("site", "by_site"),
         ]:
             for name, bucket in sorted((stats.get(key) or {}).items()):
+                profile = (stats.get("rule_reliability_profiles") or {}).get(name, {})
                 writer.writerow(
                     {
                         "bucket_type": bucket_type,
@@ -439,6 +561,12 @@ def save_precision_report_csv(stats: dict[str, Any], path: str | Path) -> None:
                         "false_positive_rate": bucket.get("false_positive_rate"),
                         "confirmation_rate": bucket.get("confirmation_rate"),
                         "unable_to_reproduce_rate": bucket.get("unable_to_reproduce_rate"),
+                        "calibration_status": profile.get("calibration_status", "")
+                        if bucket_type == "rule"
+                        else "",
+                        "confidence_cap": profile.get("confidence_cap", "")
+                        if bucket_type == "rule"
+                        else "",
                     }
                 )
 

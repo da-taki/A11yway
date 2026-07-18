@@ -41,7 +41,7 @@ reports/web_demo_runs/*
 !reports/web_demo_runs/.gitkeep
 
 # Temporary end-to-end validation reports
-reports/_e2e.*
+reports/_e2e*
 reports/web_demo_validation/
 
 # Report archives and bulk visual output
@@ -59,6 +59,8 @@ reports/ngo_email_outreach*
 reports/university_accessibility_25*
 reports/ivy_hypsm_wcag_10_smoke*
 reports/ivy_hypsm_wcag_50*
+reports/cornell_precision_regression/
+reports/visionaid_precision_regression/
 reports/run_batch4_ngo_30_outreach.ps1
 reports/run_batch5_public_service_31_outreach.ps1
 reports/run_ngo_email_outreach_batch.ps1

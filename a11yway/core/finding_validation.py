@@ -27,6 +27,7 @@ CONFIDENCE_SUPPRESSED = "suppressed"
 
 AI_SOURCES = {"ai_scout", "ai"}
 WEAK_HEURISTIC_RULES = {
+    "axe_tabindex",
     "generic_link_text",
     "image_empty_alt_suspicious",
     "multiple_h1",

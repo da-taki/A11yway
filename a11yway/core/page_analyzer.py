@@ -1294,6 +1294,22 @@ def analyze_label_in_name(html: str) -> list[AccessibilityIssue]:
             continue
         if visible_norm in aria_norm:
             continue
+        functional_menu_names = {
+            "up one menu level",
+            "close menu",
+            "open menu",
+            "toggle menu",
+            "expand menu",
+            "collapse menu",
+            "previous menu",
+            "back",
+        }
+        # Menus and breadcrumbs often put section text inside a button whose
+        # actual visible affordance is an icon or short functional control.
+        # If the aria-label is a known functional action, inherited/nested
+        # descendant text should not become a strong label-in-name finding.
+        if aria_norm in functional_menu_names:
+            continue
         issues.append(
             _issue(
                 title="Visible label is missing from the accessible name",
