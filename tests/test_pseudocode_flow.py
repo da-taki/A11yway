@@ -383,11 +383,12 @@ def test_build_json_report_returns_expected_top_level_keys() -> None:
         "report_schema_version",
         "extended_result_schema_version",
         "source_file",
-        "summary",
-        "issues",
-        "wcag_coverage",
-        "limitations",
-    }
+            "summary",
+            "issues",
+            "issue_clusters",
+            "wcag_coverage",
+            "limitations",
+        }
 
 
 def test_build_json_report_has_correct_issue_count() -> None:
@@ -711,6 +712,8 @@ def test_batch_csv_has_expected_headers(tmp_path: Path) -> None:
             "task",
             "status",
             "issues_found",
+            "raw_occurrences",
+            "unique_root_issues",
             "task_blockers",
             "browser_status",
             "browser_issue_count",

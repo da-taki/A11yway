@@ -15,6 +15,7 @@ source file/url
   -> workflow packs
   -> optional future AI scout suggestions
   -> deterministic verification
+  -> finding validation / deduplication / clustering
   -> optional reviewer verdicts / re-audit diff
   -> report builder
   -> JSON / Markdown / HTML / CSV outputs
@@ -78,9 +79,25 @@ Loads deterministic JSON workflow templates for education, college applications,
 
 Future AI scout mode may propose likely workflows and accessibility risks. It should never mark a finding as confirmed by itself. Deterministic static, browser, or task checks must verify a finding before reports call it confirmed.
 
+### Finding Validation - `a11yway/core/finding_validation.py`
+
+Runs after raw findings are collected and element-level duplicates are
+merged. It normalizes page URLs, adds rule/category/source metadata,
+records selector/snippet/name/role evidence, assigns reviewer-facing
+confidence levels, and builds root issue clusters with raw occurrence and
+unique-root counts. AI Scout suggestions are never used as validation.
+
 ### Reviewer Verdicts - `a11yway/core/verdicts.py`
 
-Applies human reviewer verdicts to existing JSON reports and summarizes feedback. Verdicts can mark findings as confirmed, false positive, needs review, fixed, or missed issue. Organization names and quotes should only be used when permission fields allow it.
+Applies human reviewer verdicts to existing JSON reports and summarizes feedback. Verdicts can mark findings as confirmed, false positive, partially confirmed, needs review, fixed, missed issue, duplicate, not applicable, or unable to reproduce. Precision metrics are calculated by rule, category, engine, severity, site, WCAG criterion, unique root issue, and raw occurrence. Organization names and quotes should only be used when permission fields allow it.
+
+### Human Comparison - `a11yway/core/human_compare.py`
+
+Compares an A11yway report with a structured human-tester finding file.
+Human findings do not need A11yway rule IDs; descriptions, selectors, WCAG
+criteria, components, and notes are used to identify likely matches,
+false positives, missed human findings, partial matches, and disagreement
+areas.
 
 ### Re-Audit Diff - `a11yway/core/report_diff.py`
 

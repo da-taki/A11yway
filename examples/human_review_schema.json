@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "reviewer": {
+    "role": "trained accessibility tester",
+    "testing_environment": "manual review lab",
+    "browser": "Chrome",
+    "operating_system": "Windows",
+    "assistive_technology": "optional",
+    "permission_to_quote": false,
+    "permission_to_name_reviewer": false
+  },
+  "findings": [
+    {
+      "description": "Human-readable issue description. A11yway rule IDs are optional.",
+      "selector": "CSS selector or plain element description",
+      "component": "search form, navigation, footer, etc.",
+      "wcag_criteria": ["3.3.2"],
+      "severity": "high",
+      "actual_behavior": "What the tester observed.",
+      "expected_behavior": "What should happen.",
+      "testing_method": "Keyboard, screen reader, Axe DevTools, bookmarklet, etc.",
+      "screenshot": "optional/path-or-url.png",
+      "notes": "Reviewer notes and reproduction details."
+    }
+  ]
+}

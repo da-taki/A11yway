@@ -140,7 +140,9 @@ Screen-reader mode defaults to Chromium accessibility-tree evidence; it does not
 
 ## Confidence and Deduplication
 
-Every finding carries a confidence level. Deterministic browser blockage (a blocked task step, an observed keyboard trap) is `confirmed`; strong single-source evidence is `likely`; heuristic patterns (sensory language, unresolved contrast over images) are `needs_review`; pure review context (multiple h1 headings) is `informational`. Findings that the static analyzer, rendered-DOM re-check, browser interaction, accessibility tree, or axe-core all discover on the same element are merged into one primary finding listing every evidence source.
+Every finding keeps the original compatibility confidence (`confirmed`, `likely`, `needs_review`, or `informational`) and also gets a reviewer-facing `confidence_level`: `confirmed_by_multiple_engines`, `strong`, `likely`, `needs_review`, `weak_heuristic`, or `suppressed`. Deterministic browser blockage (a blocked task step, an observed keyboard trap) ranks above single-source static evidence; weak heuristics are kept visible but separated from stronger findings. AI Scout suggestions do not validate a finding.
+
+Findings that the static analyzer, rendered-DOM re-check, browser interaction, accessibility tree, or axe-core discover on the same element are merged into one primary finding listing every evidence source. Reports also include root-issue clusters, raw occurrence counts, and unique root issue counts so a repeated navigation, footer, cookie banner, or shared component problem does not dominate triage.
 
 Rules with poor reviewer precision can be downgraded (not disabled) per run:
 
@@ -348,15 +350,21 @@ These checks are conservative browser observations. They do not prove full WCAG 
 
 ## Reviewer Verdicts
 
-Reviewer verdicts let humans mark findings as `confirmed`, `false_positive`, `needs_review`, `fixed`, or `missed_issue`. This helps measure precision and usefulness before outreach claims are made.
+Reviewer verdicts let humans mark findings as `confirmed`, `false_positive`, `partially_confirmed`, `needs_review`, `fixed`, `missed_issue`, `duplicate`, `not_applicable`, or `unable_to_reproduce`. Verdicts can record reviewer role, browser, operating system, assistive technology, manual testing method, WCAG criteria, severity adjustments, corrected evidence, and quote/name permissions. This helps measure precision and usefulness before outreach claims are made.
 
 ```bash
 python -m a11yway.main --apply-verdicts reports/sample_verdicts.json --to reports/task_execution_report.json --out reports/task_execution_report_reviewed.json
 
 python -m a11yway.main --summarize-verdicts reports/sample_verdicts.json --markdown reports/verdict_summary.md
+
+python -m a11yway.main --evaluate-verdicts reports/sample_verdicts.json --to reports/task_execution_report.json --out reports/task_execution_report_reviewed.json --markdown reports/precision.md --csv reports/precision.csv
+
+python -m a11yway.main --precision-report reports/task_execution_report_reviewed.json --markdown reports/precision.md --json reports/precision.json --csv reports/precision.csv
+
+python -m a11yway.main --compare-human-review examples/human_review_sample.json --to reports/task_execution_report.json --json reports/human_comparison.json --markdown reports/human_comparison.md
 ```
 
-Applying verdicts also computes precision statistics (confirmed + fixed vs false positives) per rule, per WCAG Success Criterion, and per detection mode, stored under `precision_stats` in the reviewed report and printed to the console. Rules that turn out imprecise can be demoted with `--review-only-rules` instead of being silently disabled.
+Applying verdicts also computes precision statistics per rule, category, engine, severity, site, WCAG Success Criterion, unique root issue, and raw occurrence. Precision treats `confirmed`, `partially_confirmed`, and `fixed` as true positives; `false_positive`, `duplicate`, `not_applicable`, and `unable_to_reproduce` as false positives; and leaves `needs_review` undecided. Rules that turn out imprecise can be demoted with `--review-only-rules` instead of being silently disabled.
 
 Do not publicly name reviewers or organizations unless permission was granted in the verdict file.
 

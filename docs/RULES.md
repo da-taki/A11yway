@@ -22,8 +22,9 @@ use a separate namespace and are never merged with accessibility findings.
 
 ## Confidence Model
 
-Every finding carries a confidence level so reviewers know how much weight
-to give it:
+Every finding carries a backward-compatible confidence value and a richer
+reviewer-facing `confidence_level` so reviewers know how much weight to give
+it. Compatibility confidence remains:
 
 - `confirmed`: deterministic observed blockage or state (for example, a
   scripted task step failed under keyboard-only interaction, or Tab was
@@ -35,6 +36,22 @@ to give it:
   sensory-language pattern match or unresolved contrast over an image).
 - `informational`: context for reviewers, not a suspected failure (for
   example, multiple h1 headings, which are valid HTML).
+
+The post-collection validation pass also adds one of:
+
+- `confirmed_by_multiple_engines`: the same root concern was found by more
+  than one deterministic source, such as native checks and axe-core.
+- `strong`: deterministic browser, accessibility-tree, or task evidence
+  strongly supports the finding.
+- `likely`: single-source deterministic evidence supports the finding.
+- `needs_review`: the result needs human judgment before it is treated as a
+  failure.
+- `weak_heuristic`: useful review signal, but too weak to prioritize as a
+  confirmed barrier by itself.
+- `suppressed`: retained for audit transparency when a finding is
+  intentionally downgraded or removed from priority views.
+
+AI Scout suggestions never upgrade or validate deterministic findings.
 
 Rules define a default confidence (shown by `--rule <issue_type>`); checks
 can override it per finding when their evidence is weaker or stronger.
@@ -50,6 +67,12 @@ share a stable fingerprint (rule + normalized element identity) are merged
 into one primary finding whose evidence lists every `evidence_sources`
 entry and a `merged_finding_count`. Merged confidence is the strongest of
 the sources, because independent detection strengthens the evidence.
+
+After element-level merging, reports also calculate root issue clusters.
+Each issue gets `occurrence_count`, `affected_page_count`, a
+`component_signature` when available, and a `deduplication_fingerprint`.
+Reports show both raw occurrences and unique root issues so repeated shared
+components do not overwhelm the reviewer queue.
 
 ## WCAG 2.2 Mapping Language
 
