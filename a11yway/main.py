@@ -1,4 +1,4 @@
-"""Command-line entry point for the A11yway prototype."""
+
 
 import argparse
 import json
@@ -96,7 +96,7 @@ DEFAULT_TASKS_PATH = Path("examples/sample_tasks.json")
 
 
 def analyze_html_source(source: str) -> tuple[list[AccessibilityIssue], dict]:
-    """Load a file or URL source and return static accessibility issues."""
+
     source_result = load_html_source(source)
     if source_result["error"]:
         return [], source_result
@@ -113,13 +113,13 @@ def analyze_html_source(source: str) -> tuple[list[AccessibilityIssue], dict]:
 
 
 def analyze_html_file(path: Path) -> list[AccessibilityIssue]:
-    """Read a local HTML file and return static accessibility issues."""
+
     issues, _source_result = analyze_html_source(path.as_posix())
     return issues
 
 
 def print_summary(source: str | Path, issues: list[AccessibilityIssue]) -> None:
-    """Print a readable command-line summary."""
+
     print("A11yway static HTML accessibility audit")
     print(f"Source analyzed: {source}")
     print(f"Issues found: {len(issues)}")
@@ -149,7 +149,7 @@ def print_summary(source: str | Path, issues: list[AccessibilityIssue]) -> None:
 
 
 def format_evidence_for_cli(evidence: str | dict) -> str:
-    """Format string or structured evidence for a compact CLI line."""
+
     if isinstance(evidence, str):
         return evidence
 
@@ -173,7 +173,7 @@ def print_browser_summary(
     static_issue_count: int,
     total_issue_count: int,
 ) -> None:
-    """Print a short breakdown of the optional browser audit."""
+
     print()
     print("Browser interaction audit")
     if not browser_result.get("success"):
@@ -200,7 +200,7 @@ def print_browser_summary(
 
 
 def print_low_vision_summary(low_vision_result: dict, total_issue_count: int) -> None:
-    """Print a short breakdown of low-vision browser checks."""
+
     print()
     print("Low-vision checks")
     if not low_vision_result.get("success"):
@@ -213,7 +213,7 @@ def print_low_vision_summary(low_vision_result: dict, total_issue_count: int) ->
 
 
 def print_task_execution_summary(task_execution: dict) -> None:
-    """Print the outcome of a deterministic keyboard task attempt."""
+
     print()
     print(f"Task execution: {task_execution.get('task_name', '')}")
     if not task_execution.get("success"):
@@ -239,7 +239,7 @@ def print_task_execution_summary(task_execution: dict) -> None:
 
 
 def print_task_summary(task: AccessibilityTask, blockers: list[dict]) -> None:
-    """Print task context and likely blockers for the static findings."""
+
     print()
     print(f"Task: {task.name}")
     print(f"Student profile: {task.student_profile}")
@@ -257,7 +257,7 @@ def print_task_summary(task: AccessibilityTask, blockers: list[dict]) -> None:
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    """Parse CLI arguments for the current prototype."""
+
     parser = argparse.ArgumentParser(
         description="Run A11yway's static HTML accessibility audit.",
     )
@@ -391,8 +391,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         dest="wcag_coverage",
         action="store_true",
         help=(
-            "Print the WCAG 2.2 coverage map (direct/partial/supporting/"
-            "axe-only/manual-only counts per Success Criterion) and exit. "
+            "Print the WCAG 2.2 A/AA coverage inventory "
+            "(automated/partially automated/manual only/unsupported) and exit. "
             "Coverage is not a conformance claim."
         ),
     )
@@ -673,7 +673,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 def print_rule_list() -> None:
-    """Print a short listing of every registered static check."""
+
     rules = list_rules()
     print("A11yway static checks")
     print(f"Rules registered: {len(rules)}")
@@ -686,7 +686,7 @@ def print_rule_list() -> None:
 
 
 def print_rule_details(issue_type: str) -> int:
-    """Print full documentation for one rule; return a CLI exit code."""
+
     rule = get_rule(issue_type)
     if rule is None:
         print(f'Unknown rule: "{issue_type}".')
@@ -724,7 +724,7 @@ def print_rule_details(issue_type: str) -> int:
 
 
 def print_workflow_pack_list() -> None:
-    """Print a compact listing of deterministic workflow packs."""
+
     packs = list_workflow_packs()
     print("A11yway workflow packs")
     print(f"Packs available: {len(packs)}")
@@ -738,7 +738,7 @@ def print_workflow_pack_list() -> None:
 
 
 def print_workflow_pack_details(pack_id: str) -> int:
-    """Print responsible-use notes and workflow details for one pack."""
+
     pack = load_workflow_pack(pack_id)
     if pack is None:
         print(f'Unknown workflow pack: "{pack_id}".')
@@ -769,7 +769,7 @@ def print_workflow_pack_details(pack_id: str) -> int:
 
 
 def print_workflow_suggestions(pack_id: str, source: str | None = None) -> int:
-    """Print workflow templates that can guide deterministic task planning."""
+
     pack = load_workflow_pack(pack_id)
     if pack is None:
         print(f'Unknown workflow pack: "{pack_id}".')
@@ -803,7 +803,7 @@ def print_workflow_suggestions(pack_id: str, source: str | None = None) -> int:
 
 
 def apply_verdicts_cli(verdicts_path: str | None, report_path: str | None, output_path: str | None) -> int:
-    """Apply reviewer verdicts from the CLI."""
+
     if not verdicts_path or not report_path or not output_path:
         print("--apply-verdicts requires --to REPORT_JSON and --out OUTPUT_JSON.")
         return 1
@@ -841,7 +841,7 @@ def apply_verdicts_cli(verdicts_path: str | None, report_path: str | None, outpu
 
 
 def summarize_verdicts_cli(verdicts_path: str | None, markdown_path: str | None) -> int:
-    """Summarize reviewer verdicts from the CLI."""
+
     if not verdicts_path or not markdown_path:
         print("--summarize-verdicts requires --markdown OUTPUT_MD.")
         return 1
@@ -863,7 +863,7 @@ def evaluate_verdicts_cli(
     markdown_path: str | None,
     csv_path: str | None,
 ) -> int:
-    """Apply verdicts and write optional precision artifacts."""
+
     if not verdicts_path or not report_path:
         print("--evaluate-verdicts requires VERDICTS_JSON and --to REPORT_JSON.")
         return 1
@@ -896,7 +896,7 @@ def precision_report_cli(
     markdown_path: str | None,
     csv_path: str | None,
 ) -> int:
-    """Calculate precision from one or more reviewed reports."""
+
     if not report_paths:
         print("--precision-report requires at least one reviewed report JSON.")
         return 1
@@ -923,7 +923,7 @@ def precision_report_cli(
 
 
 def load_report_for_human_comparison(path: str | Path) -> dict:
-    """Load a single report or expand a batch index into one combined report."""
+
     report_path = Path(path)
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if report.get("issues") or not report.get("sources"):
@@ -964,7 +964,7 @@ def compare_human_review_cli(
     json_path: str | None,
     markdown_path: str | None,
 ) -> int:
-    """Compare an A11yway report with a human-review file."""
+
     if not human_review_path or not report_path:
         print("--compare-human-review requires HUMAN_REVIEW_JSON and --to REPORT_JSON.")
         return 1
@@ -985,7 +985,7 @@ def compare_human_review_cli(
 
 
 def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | None, json_path: str | None) -> int:
-    """Compare reports from the CLI."""
+
     if not report_paths:
         print("--compare-reports requires OLD_REPORT and NEW_REPORT.")
         return 1
@@ -1008,7 +1008,7 @@ def compare_reports_cli(report_paths: list[str] | None, markdown_path: str | Non
 
 
 def load_batch_item_reports(items: list[dict]) -> list[dict]:
-    """Load the per-item JSON reports a batch run wrote to disk."""
+
     reports = []
     for item in items:
         json_path = (item.get("reports") or {}).get("json")
@@ -1018,7 +1018,7 @@ def load_batch_item_reports(items: list[dict]) -> list[dict]:
 
 
 def _apply_all_accessibility_modules(parsed_args: argparse.Namespace) -> None:
-    """Expand --all-accessibility-modules without enabling passive security."""
+
     if not parsed_args.all_accessibility_modules:
         return
     parsed_args.screen_reader = True
@@ -1055,7 +1055,7 @@ def run_html_extended_modules(
     browser_result: dict | None = None,
     source_result: dict | None = None,
 ) -> tuple[list[AccessibilityIssue], list[dict]]:
-    """Run selected extended modules for one HTML source."""
+
     issues: list[AccessibilityIssue] = []
     results: list[dict] = []
     if parsed_args.screen_reader:
@@ -1108,13 +1108,13 @@ def run_html_extended_modules(
 
 
 def _make_console_safe() -> None:
-    """Keep console output from crashing on limited encodings.
 
-    Windows consoles often use legacy code pages that cannot show Indic
-    or other non-Latin scripts. Report files are always written as UTF-8;
-    this only makes the console summary replace unprintable characters
-    instead of raising UnicodeEncodeError.
-    """
+
+
+
+
+
+
     for stream in (sys.stdout, sys.stderr):
         try:
             stream.reconfigure(errors="replace")
@@ -1123,7 +1123,7 @@ def _make_console_safe() -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Analyze a sample or provided HTML file from the command line."""
+
     _make_console_safe()
     args = argv if argv is not None else sys.argv[1:]
     parsed_args = parse_args(args)
@@ -1133,7 +1133,7 @@ def main(argv: list[str] | None = None) -> int:
     if parsed_args.screen_reader and parsed_args.screen_reader_engine == "chromium":
         parsed_args.browser = True
 
-    # In CI mode, setup problems must be distinguishable from findings.
+
     setup_exit = EXIT_TOOL_ERROR if parsed_args.ci else 1
     if parsed_args.verbose:
         active_modes = [
@@ -1560,8 +1560,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         issues = issues + module_issues
 
-    # One barrier seen by several detection modes becomes one finding that
-    # lists every evidence source.
+
+
     issues = apply_reproducibility(issues, repeated_issue_runs, verify_runs)
     issues = deduplicate_issues(issues)
     downgrade_review_only_issues(

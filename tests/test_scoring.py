@@ -1,4 +1,4 @@
-"""Tests for cautious A11yway scoring."""
+
 
 from a11yway.core.scoring import score_report
 

@@ -1,4 +1,4 @@
-"""Local PDF, DOCX, and PPTX accessibility evidence."""
+
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def _pdf_audit(path: Path) -> tuple[list[AccessibilityIssue], dict]:
         return issues, module_result("documents", "pdf_accessibility", issues, status="unavailable", limitations=["pypdf is not installed."]).to_json()
     try:
         reader = PdfReader(str(path))
-    except Exception as error:  # noqa: BLE001 - malformed documents should report cleanly
+    except Exception as error:
         return _document_parse_failed(path, "pdf_accessibility", error)
     metadata = reader.metadata or {}
     root = reader.trailer.get("/Root", {})
@@ -140,7 +140,7 @@ def _docx_audit(path: Path) -> tuple[list[AccessibilityIssue], dict]:
         return issues, module_result("documents", "docx_accessibility", issues, status="unavailable", limitations=["python-docx is not installed."]).to_json()
     try:
         document = Document(str(path))
-    except Exception as error:  # noqa: BLE001 - malformed documents should report cleanly
+    except Exception as error:
         return _document_parse_failed(path, "docx_accessibility", error)
     if not document.core_properties.title:
         issues.append(extended_issue(module="documents", check_id="docx_title", title="DOCX title metadata is missing", issue_type="document_title_missing", severity="medium", source=str(path), observed="Core property title is empty.", expected="Set a meaningful document title.", manual="Confirm document properties and exported PDF title.", evidence_type=DETERMINISTIC, detection_source="python-docx"))
@@ -185,7 +185,7 @@ def _pptx_audit(path: Path) -> tuple[list[AccessibilityIssue], dict]:
         return issues, module_result("documents", "pptx_accessibility", issues, status="unavailable", limitations=["python-pptx is not installed."]).to_json()
     try:
         deck = Presentation(str(path))
-    except Exception as error:  # noqa: BLE001 - malformed documents should report cleanly
+    except Exception as error:
         return _document_parse_failed(path, "pptx_accessibility", error)
     titles = []
     for index, slide in enumerate(deck.slides, start=1):

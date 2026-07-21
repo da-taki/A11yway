@@ -1,4 +1,4 @@
-"""Batch audit runner for local static HTML files."""
+
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ DEFAULT_TASKS_PATH = Path("examples/sample_tasks.json")
 
 
 def load_batch_config(path: str | Path) -> list[dict]:
-    """Load a batch audit config file."""
+
     config_path = Path(path)
     with config_path.open("r", encoding="utf-8") as file:
         data = json.load(file)
@@ -48,7 +48,7 @@ def load_batch_config(path: str | Path) -> list[dict]:
 
 
 def safe_report_id(value: str) -> str:
-    """Return a filesystem-safe report id."""
+
     safe_value = re.sub(r"[^a-zA-Z0-9_-]+", "_", value.strip())
     return safe_value.strip("_") or "report"
 
@@ -69,13 +69,13 @@ def run_batch(
     verify_runs: int = 1,
     review_only_rules: set[str] | None = None,
 ) -> dict:
-    """Run a static HTML batch audit and write per-page plus index reports.
 
-    When browser is True and Playwright is installed, each page also gets a
-    keyboard interaction audit; with execute_tasks, items whose task defines
-    browser_steps also get a deterministic keyboard task attempt. A browser
-    failure on one page never stops the rest of the batch.
-    """
+
+
+
+
+
+
     batch_items = load_batch_config(config_path)
     output_dir = Path(out_dir)
     output_dir.mkdir(parents=True, exist_ok=True)

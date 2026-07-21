@@ -1,4 +1,4 @@
-"""Tests for the rule registry, enriched reports, and evaluation summaries."""
+
 
 import csv
 import json
@@ -43,8 +43,15 @@ EXPECTED_STATIC_ISSUE_TYPES = {
     "fake_heading",
     "sensory_instruction",
     "missing_autocomplete",
+    "invalid_autocomplete_token",
+    "contradictory_autocomplete",
+    "autocomplete_unsupported_control",
     "no_bypass_mechanism",
     "label_in_name_mismatch",
+    "accessible_authentication_barrier",
+    "redundant_entry_repeated_field",
+    "error_prevention_missing",
+    "status_message_not_live",
     "meaningful_sequence_reorder",
     "orientation_restriction",
     "color_only_indicator",
@@ -105,12 +112,12 @@ EXPECTED_ISSUE_TYPES = (
 
 
 def test_rule_registry_covers_all_expected_issue_types() -> None:
-    """The registry should document every current static issue type."""
+
     assert set(RULES) == EXPECTED_ISSUE_TYPES
 
 
 def test_every_rule_has_required_documentation_fields() -> None:
-    """Each rule should describe the check for reviewers."""
+
     required_fields = {
         "issue_type",
         "title",
@@ -126,12 +133,12 @@ def test_every_rule_has_required_documentation_fields() -> None:
         assert required_fields.issubset(rule), issue_type
         assert rule["issue_type"] == issue_type
         assert rule["default_severity"] in {"high", "medium", "low"}
-        # Static rules explain static limits; browser rules explain browser limits.
+
         assert "static_check_limitations" in rule or "browser_check_limitations" in rule
 
 
 def test_get_rule_returns_known_rule() -> None:
-    """get_rule should return the registry entry for a known issue type."""
+
     rule = get_rule("missing_form_label")
 
     assert rule is not None
@@ -140,12 +147,12 @@ def test_get_rule_returns_known_rule() -> None:
 
 
 def test_get_rule_returns_none_for_unknown_issue_type() -> None:
-    """Unknown issue types should return None, not raise."""
+
     assert get_rule("not_a_real_rule") is None
 
 
 def test_list_rules_returns_all_rules() -> None:
-    """list_rules should return one entry per registered issue type."""
+
     rules = list_rules()
 
     assert len(rules) == len(EXPECTED_ISSUE_TYPES)
@@ -153,7 +160,7 @@ def test_list_rules_returns_all_rules() -> None:
 
 
 def test_enrich_issue_with_rule_accepts_accessibility_issue() -> None:
-    """Enrichment should work directly on AccessibilityIssue objects."""
+
     issue = AccessibilityIssue(
         title="Form control is missing an accessible label",
         issue_type="missing_form_label",
@@ -170,7 +177,7 @@ def test_enrich_issue_with_rule_accepts_accessibility_issue() -> None:
 
 
 def test_enrich_issue_with_rule_leaves_unknown_types_unchanged() -> None:
-    """Unknown issue types should pass through without a rule block."""
+
     enriched = enrich_issue_with_rule({"issue_type": "future_check", "severity": "low"})
 
     assert "rule" not in enriched
@@ -178,7 +185,7 @@ def test_enrich_issue_with_rule_leaves_unknown_types_unchanged() -> None:
 
 
 def test_json_report_issues_include_rule_metadata() -> None:
-    """Every JSON report issue should carry rule metadata."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report("examples/sample_form.html", issues)
 
@@ -190,7 +197,7 @@ def test_json_report_issues_include_rule_metadata() -> None:
 
 
 def test_markdown_report_includes_rule_details() -> None:
-    """Markdown issues should show rule title, category, and why it matters."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report("examples/sample_form.html", issues)
 
@@ -203,7 +210,7 @@ def test_markdown_report_includes_rule_details() -> None:
 
 
 def test_cli_list_rules_prints_issue_types(capsys) -> None:
-    """--list-rules should print every issue type without running an audit."""
+
     exit_code = main(["--list-rules"])
 
     captured = capsys.readouterr()
@@ -214,7 +221,7 @@ def test_cli_list_rules_prints_issue_types(capsys) -> None:
 
 
 def test_cli_rule_details_for_known_rule(capsys) -> None:
-    """--rule should print full documentation for one rule."""
+
     exit_code = main(["--rule", "missing_form_label"])
 
     captured = capsys.readouterr()
@@ -225,7 +232,7 @@ def test_cli_rule_details_for_known_rule(capsys) -> None:
 
 
 def test_cli_rule_details_for_unknown_rule(capsys) -> None:
-    """--rule with an unknown type should fail gracefully with a message."""
+
     exit_code = main(["--rule", "not_a_real_rule"])
 
     captured = capsys.readouterr()
@@ -234,7 +241,7 @@ def test_cli_rule_details_for_unknown_rule(capsys) -> None:
 
 
 def test_batch_run_creates_evaluation_summary(tmp_path: Path) -> None:
-    """Batch mode should write evaluation_summary.md in the output directory."""
+
     out_dir = tmp_path / "batch_sample"
     result = run_batch("examples/sample_batch.json", out_dir)
 
@@ -244,7 +251,7 @@ def test_batch_run_creates_evaluation_summary(tmp_path: Path) -> None:
 
 
 def test_evaluation_summary_includes_totals_and_top_issue_types(tmp_path: Path) -> None:
-    """The evaluation summary should report totals and ranked issue types."""
+
     out_dir = tmp_path / "batch_sample"
     result = run_batch("examples/sample_batch.json", out_dir)
 
@@ -261,7 +268,7 @@ def test_evaluation_summary_includes_totals_and_top_issue_types(tmp_path: Path) 
 
 
 def test_evaluation_summary_lists_high_priority_findings(tmp_path: Path) -> None:
-    """High severity issues should appear with page names and evidence."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -272,7 +279,7 @@ def test_evaluation_summary_lists_high_priority_findings(tmp_path: Path) -> None
 
 
 def test_index_json_includes_new_summary_fields(tmp_path: Path) -> None:
-    """index.json should include evaluation summary path and page counts."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -282,13 +289,13 @@ def test_index_json_includes_new_summary_fields(tmp_path: Path) -> None:
     assert index["summary"]["successful_pages"] == 2
     assert index["summary"]["failed_pages"] == 0
     assert index["summary"]["total_task_blockers"] >= 1
-    # Existing fields must stay for backwards compatibility.
+
     assert index["summary"]["total_pages_tested"] == 2
     assert "counts_by_severity" in index["summary"]
 
 
 def test_index_counts_failed_pages(tmp_path: Path) -> None:
-    """Failed sources should be counted separately in the summary."""
+
     config_path = tmp_path / "batch_with_failure.json"
     config_path.write_text(
         json.dumps(
@@ -316,7 +323,7 @@ def test_index_counts_failed_pages(tmp_path: Path) -> None:
 
 
 def test_batch_still_creates_csv_alongside_summary(tmp_path: Path) -> None:
-    """The CSV benchmark index should still be generated with its old headers."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -327,7 +334,7 @@ def test_batch_still_creates_csv_alongside_summary(tmp_path: Path) -> None:
 
 
 def test_build_evaluation_summary_handles_empty_batch() -> None:
-    """The summary builder should not break on an empty index report."""
+
     markdown = build_evaluation_summary_markdown(
         {"summary": {}, "sources": [], "limitations": []}
     )
@@ -337,7 +344,7 @@ def test_build_evaluation_summary_handles_empty_batch() -> None:
 
 
 def test_cli_batch_mode_prints_evaluation_summary_path(tmp_path: Path, capsys) -> None:
-    """CLI batch output should point reviewers at the evaluation summary."""
+
     out_dir = tmp_path / "batch_sample"
 
     exit_code = main(
@@ -351,7 +358,7 @@ def test_cli_batch_mode_prints_evaluation_summary_path(tmp_path: Path, capsys) -
 
 
 def test_evaluation_batch_template_is_valid_config() -> None:
-    """The evaluation template should be a loadable batch config."""
+
     items = json.loads(
         Path("examples/evaluation_batch_template.json").read_text(encoding="utf-8")
     )

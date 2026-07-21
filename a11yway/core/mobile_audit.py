@@ -1,4 +1,4 @@
-"""Browser-based mobile accessibility evidence using Playwright emulation."""
+
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 try:
     from playwright.sync_api import sync_playwright
-except ImportError:  # optional
+except ImportError:
     sync_playwright = None
 
 
@@ -115,7 +115,7 @@ def run_mobile_audit(
                     page.goto(source_to_browser_url(source), wait_until="domcontentloaded")
                     page.wait_for_timeout(wait_ms)
                     data = page.evaluate(_MOBILE_SCRIPT)
-                except Exception as error:  # noqa: BLE001 - record per-orientation failure
+                except Exception as error:
                     data = {
                         "device": device,
                         "orientation": orientation,

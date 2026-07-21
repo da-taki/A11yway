@@ -1,0 +1,1081 @@
+{
+  "wcag_version": "2.2",
+  "scope": "Level A and AA Success Criteria only; 4.1.1 Parsing is obsolete and excluded.",
+  "allowed_coverage_statuses": [
+    "automated",
+    "partially_automated",
+    "manual_only",
+    "unsupported"
+  ],
+  "criteria": [
+    {
+      "criterion": "1.1.1",
+      "short_name": "Non-text Content",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "image_empty_alt_suspicious",
+        "missing_image_alt"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Cannot judge whether existing alt text is useful; decorative detection is heuristic.",
+        "Filename-based heuristic; an image named chart.png can still be decorative."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.2.1",
+      "short_name": "Audio-only and Video-only (Prerecorded)",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "missing_audio_transcript"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "The transcript search is a rough text heuristic; a transcript may exist on a linked page."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.2.2",
+      "short_name": "Captions (Prerecorded)",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "missing_video_captions"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Only sees <track> elements; player-level, platform, or burned-in captions are invisible."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.2.3",
+      "short_name": "Audio Description or Media Alternative (Prerecorded)",
+      "level": "A",
+      "coverage_status": "manual_only",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.2.4",
+      "short_name": "Captions (Live)",
+      "level": "AA",
+      "coverage_status": "unsupported",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.2.5",
+      "short_name": "Audio Description (Prerecorded)",
+      "level": "AA",
+      "coverage_status": "unsupported",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.3.1",
+      "short_name": "Info and Relationships",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "fake_heading",
+        "missing_form_label",
+        "missing_h1",
+        "multiple_h1",
+        "radio_group_missing_fieldset",
+        "skipped_heading_level",
+        "table_missing_headers",
+        "visual_required_not_programmatic"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "A table can be a layout table; the check skips role=presentation and single-row/column tables but cannot always tell intent.",
+        "Detects * or 'required' in an associated label without required/aria-required on the control.",
+        "Inline-style heuristic (large bold text in div/span); many false positives are possible in decorated content, so this is review evidence only.",
+        "Multiple h1 elements are valid HTML and often intentional; this is review evidence only.",
+        "Only checks fieldset/legend and role=radiogroup with an accessible name; other grouping idioms need review.",
+        "Only detects missing label association, not other relationship failures.",
+        "Skipped levels are not automatically WCAG failures; independent regions and embedded components can legitimately restart levels.",
+        "WCAG does not require an h1; this is structural review evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.3.2",
+      "short_name": "Meaningful Sequence",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "meaningful_sequence_reorder"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Detects inline CSS order/grid placement that can desynchronize visual and DOM order, but cannot determine intended meaning."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.3.3",
+      "short_name": "Sensory Characteristics",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "sensory_instruction"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Keyword pattern heuristic; the surrounding text may also give non-sensory identification."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.3.4",
+      "short_name": "Orientation",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "orientation_restriction"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Requires strong static restriction evidence such as rotate messaging, orientation-lock code, or orientation-specific hidden content."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.3.5",
+      "short_name": "Identify Input Purpose",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "autocomplete_unsupported_control",
+        "contradictory_autocomplete",
+        "invalid_autocomplete_token",
+        "missing_autocomplete"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Compares inferred purpose with the token; ambiguous labels and localized forms can require review.",
+        "Conservative token map for common personal-data fields; custom or ambiguous fields are skipped, and search/one-time-code fields are excluded.",
+        "Flags autocomplete metadata on controls that normally do not collect reusable personal data.",
+        "Validates known autocomplete detail tokens but cannot prove the field purpose."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.1",
+      "short_name": "Use of Color",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "color_only_indicator"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Looks for status/selection classes or inline color cues while excluding common non-color alternatives; final computed presentation is not measured."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.2",
+      "short_name": "Audio Control",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "autoplay_audio_no_control"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Detects native autoplay audio without controls; duration and custom controls require rendered-page review."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.3",
+      "short_name": "Contrast (Minimum)",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "contrast_unresolved_background",
+        "low_contrast_text"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Computed-color sampling; gradients, images, and overlays force a needs_review confidence instead.",
+        "The background stack includes an image, gradient, or transparency, so the ratio cannot be computed reliably."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.4",
+      "short_name": "Resize Text",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "reflow_clipped_content"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Viewport-based emulation approximates but does not equal text-only scaling to 200%."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.5",
+      "short_name": "Images of Text",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "image_of_text"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Uses SVG text or image filename evidence; it does not perform OCR or judge exceptions such as logos."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.10",
+      "short_name": "Reflow",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "reflow_clipped_content",
+        "reflow_horizontal_scroll",
+        "reflow_overlap",
+        "zoom_fixed_width_content",
+        "zoom_horizontal_overflow"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Bounding boxes from one run; animation and lazy layout can shift results.",
+        "Bounding-box intersection cannot judge visual intent; intentional stacking can be fine.",
+        "Legacy check kept for old reports; replaced by reflow_horizontal_scroll.",
+        "Legacy check kept for old reports; replaced by the reflow_* checks.",
+        "Zoom is emulated through equivalent viewport widths in one Chromium run; intentional scroll regions (data tables, maps) are allowed by WCAG."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.11",
+      "short_name": "Non-text Contrast",
+      "level": "AA",
+      "coverage_status": "manual_only",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.12",
+      "short_name": "Text Spacing",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "text_spacing_content_loss"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Applies the WCAG reference text-spacing overrides and compares clipping/overlap before and after; loss caused by JavaScript reacting to resize is not modeled."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "1.4.13",
+      "short_name": "Content on Hover or Focus",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "hover_focus_content"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Static event/CSS evidence cannot verify dismissible, hoverable, or persistent behavior."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.1.1",
+      "short_name": "Keyboard",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "browser_focus_not_moving",
+        "browser_no_focusable_elements",
+        "task_control_not_keyboard_reachable",
+        "task_step_blocked"
+      ],
+      "testing_engines_used": [
+        "browser_interaction",
+        "task_execution"
+      ],
+      "evidence_produced": [
+        "keyboard traversal and browser interaction evidence",
+        "safe keyboard workflow evidence"
+      ],
+      "limitations": [
+        "Counts common focusable selectors in one Chromium run.",
+        "Headless Tab behavior can differ from a desktop browser session.",
+        "Proves one scripted path failed under keyboard-only interaction, not that every path fails.",
+        "The Tab search has a fixed press budget and may miss controls on very long pages."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.1.2",
+      "short_name": "No Keyboard Trap",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "browser_repeated_focus",
+        "keyboard_trap"
+      ],
+      "testing_engines_used": [
+        "browser_interaction"
+      ],
+      "evidence_produced": [
+        "keyboard traversal and browser interaction evidence"
+      ],
+      "limitations": [
+        "Observed Tab-only behavior; a documented escape mechanism (Escape, arrow keys) would not be seen.",
+        "Repeated focus suggests but does not prove a trap."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.1.4",
+      "short_name": "Character Key Shortcuts",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "single_character_shortcut"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Script heuristic for unmodified single-character key listeners; minified code and typing-field exceptions require manual testing."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.2.1",
+      "short_name": "Timing Adjustable",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "timing_adjustable_missing"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Detects meta refresh, timeout scripts, and countdown language, but not all timing exceptions or custom adjustment controls."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.2.2",
+      "short_name": "Pause, Stop, Hide",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "moving_content_no_pause"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Detects common auto-moving/update patterns and visible pause/stop/hide controls; duration and process exceptions require review."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.3.1",
+      "short_name": "Three Flashes or Below Threshold",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "possible_flashing_content"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "CSS keyframe/duration evidence suggests rapid flashing but does not measure luminance area or precise flash thresholds."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.1",
+      "short_name": "Bypass Blocks",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "no_bypass_mechanism"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Fires only for pages with a substantial repeated navigation block and no skip link, main landmark, or heading-based structure; other bypass mechanisms may exist."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.2",
+      "short_name": "Page Titled",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "missing_page_title"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Titles set by JavaScript are only visible in browser mode."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.3",
+      "short_name": "Focus Order",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "browser_focus_on_hidden_element",
+        "focus_lost",
+        "task_control_not_keyboard_reachable"
+      ],
+      "testing_engines_used": [
+        "browser_interaction",
+        "task_execution"
+      ],
+      "evidence_produced": [
+        "keyboard traversal and browser interaction evidence",
+        "safe keyboard workflow evidence"
+      ],
+      "limitations": [
+        "One headless run; focus handling can differ with browser UI present.",
+        "Reachability failure often indicates focus-order problems too.",
+        "Visibility is estimated from size and CSS; skip links that appear on focus are a valid pattern."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.4",
+      "short_name": "Link Purpose (In Context)",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "generic_link_text",
+        "missing_link_name"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Generic visible text can still be acceptable when programmatic context (aria-labelledby, list context) disambiguates it.",
+        "Only detects empty names, not misleading ones."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.5",
+      "short_name": "Multiple Ways",
+      "level": "AA",
+      "coverage_status": "unsupported",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.6",
+      "short_name": "Headings and Labels",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "missing_h1"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Absence of an h1 is not itself a 2.4.6 failure."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.7",
+      "short_name": "Focus Visible",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "browser_focus_on_hidden_element",
+        "focus_indicator_missing"
+      ],
+      "testing_engines_used": [
+        "browser_interaction",
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "keyboard traversal and browser interaction evidence",
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "An invisible focused element usually has no visible indicator, but the pattern needs human judgment.",
+        "Compares focused and unfocused computed styles (outline, box-shadow, border, background, text-decoration, transform, pseudo-elements, parent styles) in one Chromium run; animated or canvas-drawn indicators can still be missed."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.4.11",
+      "short_name": "Focus Not Obscured (Minimum)",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "focus_obscured"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Bounding-box and hit-test sampling against sticky/fixed overlays in one run; overlays that appear only after user actions are not seen."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.1",
+      "short_name": "Pointer Gestures",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "pointer_gesture_no_alternative"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Event-name heuristic for swipe, pinch, path, or pointer-move interactions; visible alternatives are inferred from control text."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.2",
+      "short_name": "Pointer Cancellation",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "pointer_down_activation"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Requires down-event evidence and no obvious up/cancel handler, but cannot verify final activation behavior."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.3",
+      "short_name": "Label in Name",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "label_in_name_mismatch"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Normalized substring comparison of visible text vs aria-label; icon-only and very short labels are skipped."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.4",
+      "short_name": "Motion Actuation",
+      "level": "A",
+      "coverage_status": "manual_only",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.7",
+      "short_name": "Dragging Movements",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "dragging_no_alternative"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Detects draggable markup or drag/drop script names and common non-drag alternatives; cannot prove dragging is required."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "2.5.8",
+      "short_name": "Target Size (Minimum)",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "small_target_size"
+      ],
+      "testing_engines_used": [
+        "low_vision"
+      ],
+      "evidence_produced": [
+        "rendered geometry and computed style evidence"
+      ],
+      "limitations": [
+        "Measured in one Chromium run at default zoom; inline text links and targets with sufficient surrounding spacing are excluded, but equivalent-control and essential exceptions need human judgment."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.1.1",
+      "short_name": "Language of Page",
+      "level": "A",
+      "coverage_status": "automated",
+      "implemented_rule_ids": [
+        "missing_html_lang",
+        "missing_lang_indic"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Direct for static HTML; a lang attribute added by JavaScript would be missed in static mode.",
+        "Unicode-range script detection; languages sharing a script cannot be told apart."
+      ],
+      "human_review_required": false
+    },
+    {
+      "criterion": "3.1.2",
+      "short_name": "Language of Parts",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "lang_mismatch",
+        "missing_lang_indic",
+        "mixed_script_element"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Conservative heuristic; may flag intentional bilingual lines.",
+        "Fires only when the script itself contradicts the declaration.",
+        "Same script heuristic; transliterated text is invisible."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.2.1",
+      "short_name": "On Focus",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "focus_context_change"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Inline onfocus-handler evidence only; external scripts and actual browser state changes require interaction testing."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.2.2",
+      "short_name": "On Input",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "input_context_change"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Inline input/change-handler evidence only; external scripts and warning mechanisms may be missed."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.2.3",
+      "short_name": "Consistent Navigation",
+      "level": "AA",
+      "coverage_status": "unsupported",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.2.4",
+      "short_name": "Consistent Identification",
+      "level": "AA",
+      "coverage_status": "unsupported",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.2.6",
+      "short_name": "Consistent Help",
+      "level": "A",
+      "coverage_status": "manual_only",
+      "implemented_rule_ids": [],
+      "testing_engines_used": [],
+      "evidence_produced": [],
+      "limitations": [
+        "No implemented A11yway rule currently produces criterion-specific evidence."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.1",
+      "short_name": "Error Identification",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "error_not_identified"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Static error markup is inspected for aria-invalid/aria-describedby association; runtime validation may be different."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.2",
+      "short_name": "Labels or Instructions",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "missing_form_label",
+        "visual_required_not_programmatic"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Static HTML only; labels added by JavaScript are seen only in browser mode.",
+        "The visible instruction exists; only the programmatic exposure is missing."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.3",
+      "short_name": "Error Suggestion",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "error_suggestion_missing"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Checks static error text for common correction guidance words; it cannot judge all useful suggestions."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.4",
+      "short_name": "Error Prevention (Legal, Financial, Data)",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "error_prevention_missing"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Keyword heuristic for high-consequence public forms; it does not submit forms or inspect later workflow steps."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.7",
+      "short_name": "Redundant Entry",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "redundant_entry_repeated_field"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Single-page repeated-field inference only; full redundant-entry testing needs a controlled workflow."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "3.3.8",
+      "short_name": "Accessible Authentication (Minimum)",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "accessible_authentication_barrier"
+      ],
+      "testing_engines_used": [
+        "static"
+      ],
+      "evidence_produced": [
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Public-page heuristic for paste blocking and CAPTCHA-like challenge text; authentication is never attempted."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "4.1.2",
+      "short_name": "Name, Role, Value",
+      "level": "A",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "browser_focused_control_missing_name",
+        "missing_button_name",
+        "missing_form_label",
+        "missing_link_name",
+        "unnamed_focus_stop"
+      ],
+      "testing_engines_used": [
+        "accessibility_tree",
+        "browser_interaction",
+        "static"
+      ],
+      "evidence_produced": [
+        "computed accessibility-tree evidence",
+        "keyboard traversal and browser interaction evidence",
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "A missing label usually means a missing accessible name, but the browser may compute one from other sources.",
+        "Chromium's computed tree in one run; real screen readers apply their own rules.",
+        "Heuristic name estimate; only used when accessibility tree data is unavailable.",
+        "Static heuristic on source HTML.",
+        "Static heuristic; icon fonts and JavaScript-injected names are invisible statically."
+      ],
+      "human_review_required": true
+    },
+    {
+      "criterion": "4.1.3",
+      "short_name": "Status Messages",
+      "level": "AA",
+      "coverage_status": "partially_automated",
+      "implemented_rule_ids": [
+        "status_message_not_live",
+        "task_expected_content_missing"
+      ],
+      "testing_engines_used": [
+        "static",
+        "task_execution"
+      ],
+      "evidence_produced": [
+        "safe keyboard workflow evidence",
+        "source markup and parsed element evidence"
+      ],
+      "limitations": [
+        "Compares normalized visible text only; the status may exist but use different wording.",
+        "Static status-like content only; dynamic before/after accessibility-tree behavior is not reproduced."
+      ],
+      "human_review_required": true
+    }
+  ]
+}

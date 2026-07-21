@@ -1,4 +1,4 @@
-"""Tests for finding deduplication, confidence, downgrades, and precision."""
+
 
 import json
 from pathlib import Path
@@ -45,7 +45,7 @@ def test_same_finding_from_two_sources_merges() -> None:
 
 
 def test_fingerprint_survives_attribute_reordering() -> None:
-    """Static source order and browser DOM serialization must match."""
+
     first = make_issue(snippet='<input type="text" name="student_name">')
     second = make_issue(snippet='<input name="student_name" type="text" />')
 
@@ -113,11 +113,11 @@ def test_merge_upgrades_to_strongest_confidence() -> None:
     merged = deduplicate_issues(
         [
             make_issue(confidence="needs_review"),
-            make_issue(detected_in="browser_interaction", confidence="confirmed"),
+            make_issue(detected_in="browser_interaction", confidence="strong"),
         ]
     )
     assert len(merged) == 1
-    assert merged[0].confidence == "confirmed"
+    assert merged[0].confidence == "strong"
 
 
 def test_dedup_keeps_first_occurrence_order() -> None:
@@ -221,7 +221,7 @@ def test_precision_stats_per_rule_and_mode() -> None:
 
     auto_bucket = stats["by_rule"]["missing_autocomplete"]
     assert auto_bucket["needs_review"] == 1
-    assert auto_bucket["precision"] is None  # undecided reviews only
+    assert auto_bucket["precision"] is None
 
     assert stats["overall"]["reviewed"] == 3
     assert stats["overall"]["precision"] == 0.5
@@ -233,7 +233,7 @@ def test_precision_stats_per_wcag_sc() -> None:
     reviewed = _reviewed_report()
     by_sc = reviewed["precision_stats"]["by_wcag_sc"]
 
-    # missing_form_label maps to 3.3.2 among others; both reviewed findings count.
+
     assert by_sc["3.3.2"]["reviewed"] == 2
     assert by_sc["1.3.5"]["needs_review"] == 1
 

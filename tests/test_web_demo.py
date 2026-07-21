@@ -1,4 +1,4 @@
-"""Tests for the A11yway Flask web demo helpers."""
+
 
 from __future__ import annotations
 
@@ -76,7 +76,7 @@ def test_landing_page_renders_accessible_form_controls() -> None:
     assert "Public website URL" in body
     assert "Audit preset" in body
     assert "Select A11yway modules" in body
-    assert 'aria-live="polite"' not in body
+    assert 'role="status" aria-live="polite"' in body
 
 
 def test_selected_modules_from_form_forces_static_and_dedupes() -> None:
