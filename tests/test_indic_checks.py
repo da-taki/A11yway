@@ -1,8 +1,8 @@
-"""Tests for the static Indic-language checks.
 
-These checks run on HTML source only: no browser, no external
-dependencies, so every test here runs everywhere.
-"""
+
+
+
+
 
 from pathlib import Path
 
@@ -26,7 +26,7 @@ TAMIL = "உதவித்தொகைக்கு விண்ணப்பி�
 
 
 def page(body: str, html_lang: str | None = "en") -> str:
-    """Wrap a body fragment in a minimal document."""
+
     lang_attr = f' lang="{html_lang}"' if html_lang else ""
     return (
         f"<!doctype html><html{lang_attr}><head><meta charset='utf-8'>"
@@ -35,18 +35,18 @@ def page(body: str, html_lang: str | None = "en") -> str:
 
 
 def issue_types(html: str) -> set[str]:
-    """Run only the Indic checks and return the issue types found."""
+
     return {issue.issue_type for issue in analyze_indic_language(html)}
 
 
 def test_script_detection_basics() -> None:
-    """Unicode ranges should classify Indic and Latin letters."""
+
     assert script_of_char("क") == "Devanagari"
     assert script_of_char("ਸ") == "Gurmukhi"
     assert script_of_char("த") == "Tamil"
     assert script_of_char("a") == "Latin"
     assert script_of_char("5") is None
-    assert script_of_char("।") is None  # danda is punctuation
+    assert script_of_char("।") is None
 
     counts = script_counts("Hello क्षेत्र")
     assert counts["Latin"] == 5
@@ -54,7 +54,7 @@ def test_script_detection_basics() -> None:
 
 
 def test_expected_script_handles_subtags() -> None:
-    """Region subtags and case must not confuse the mapping."""
+
     assert expected_script_for_lang("hi") == "Devanagari"
     assert expected_script_for_lang("pa-IN") == "Gurmukhi"
     assert expected_script_for_lang("TA") == "Tamil"
@@ -63,13 +63,13 @@ def test_expected_script_handles_subtags() -> None:
 
 
 def test_substantial_latin_words_filters_noise() -> None:
-    """Numbers, short acronyms, and single letters do not count."""
+
     words = substantial_latin_words("PDF 2026 a Please bring certificate")
     assert words == ["Please", "bring", "certificate"]
 
 
 def test_indic_text_under_english_lang_is_flagged() -> None:
-    """Gurmukhi under lang=en is the canonical missing_lang_indic case."""
+
     issues = analyze_indic_language(page(f"<p>{GURMUKHI}</p>"))
 
     assert [issue.issue_type for issue in issues] == ["missing_lang_indic"]
@@ -81,25 +81,25 @@ def test_indic_text_under_english_lang_is_flagged() -> None:
 
 
 def test_indic_text_with_no_lang_anywhere_is_flagged() -> None:
-    """A document with no lang at all also fails."""
+
     types = issue_types(page(f"<p>{HINDI}</p>", html_lang=None))
 
     assert types == {"missing_lang_indic"}
 
 
 def test_properly_tagged_indic_text_is_clean() -> None:
-    """Matching lang attributes must not be flagged."""
+
     body = f'<p lang="hi">{HINDI}</p><p lang="pa">{GURMUKHI}</p>'
     assert issue_types(page(body)) == set()
 
 
 def test_inherited_matching_lang_is_clean() -> None:
-    """A matching document-level lang covers the whole page."""
+
     assert issue_types(page(f"<p>{HINDI}</p>", html_lang="hi")) == set()
 
 
 def test_declared_lang_contradicting_script_is_mismatch() -> None:
-    """Tamil declared over Devanagari text must be lang_mismatch."""
+
     issues = analyze_indic_language(page(f'<p lang="ta">{HINDI}</p>'))
 
     assert [issue.issue_type for issue in issues] == ["lang_mismatch"]
@@ -108,13 +108,13 @@ def test_declared_lang_contradicting_script_is_mismatch() -> None:
 
 
 def test_transliterated_text_cannot_be_detected() -> None:
-    """Latin-script Hindi under lang=hi is a documented blind spot."""
+
     body = '<p lang="hi">Chhatravritti ke liye aavedan karein</p>'
     assert issue_types(page(body)) == set()
 
 
 def test_mixed_script_text_node_is_flagged() -> None:
-    """Several Latin words beside Indic text in one node is a mix."""
+
     body = f'<p lang="hi">Please bring your certificate {HINDI}</p>'
     issues = analyze_indic_language(page(body))
 
@@ -123,25 +123,25 @@ def test_mixed_script_text_node_is_flagged() -> None:
 
 
 def test_single_loanword_and_numbers_are_not_a_mix() -> None:
-    """The conservative filters must ignore harmless mixes."""
+
     assert issue_types(page(f'<p lang="hi">{HINDI} PDF 2026</p>')) == set()
     assert issue_types(page(f'<p lang="hi">{HINDI} Whatsapp</p>')) == set()
 
 
 def test_lang_boundary_prevents_the_mix_flag() -> None:
-    """Separate lang-tagged spans are separate text nodes: no mix."""
+
     body = f'<p>Please bring your income certificate <span lang="hi">{HINDI}</span></p>'
     assert issue_types(page(body)) == set()
 
 
 def test_script_and_style_text_is_ignored() -> None:
-    """Indic characters inside scripts are not page content."""
+
     body = f"<script>var s = '{HINDI}';</script>"
     assert issue_types(page(body)) == set()
 
 
 def test_indic_checks_run_in_static_mode() -> None:
-    """The rule pack is part of the standard static analysis."""
+
     assert "indic_language_checks" in STATIC_CHECKS_RUN
     types = {
         issue.issue_type
@@ -154,7 +154,7 @@ def test_indic_checks_run_in_static_mode() -> None:
     "issue_type", ["missing_lang_indic", "mixed_script_element", "lang_mismatch"]
 )
 def test_indic_rules_exist_in_registry(issue_type: str) -> None:
-    """Each new finding type should be documented."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -164,7 +164,7 @@ def test_indic_rules_exist_in_registry(issue_type: str) -> None:
 
 
 def test_sample_indic_page_seeds_all_three_types() -> None:
-    """The seeded example must demonstrate every finding type."""
+
     issues = analyze_html_file(Path("examples/sample_indic_page.html"))
 
     types = {issue.issue_type for issue in issues}
@@ -175,7 +175,7 @@ def test_sample_indic_page_seeds_all_three_types() -> None:
 
 
 def test_cli_survives_indic_output_on_limited_consoles(tmp_path: Path) -> None:
-    """The CLI must not crash printing Indic evidence to any console."""
+
     from a11yway.main import main
 
     markdown_path = tmp_path / "indic_report.md"
@@ -188,7 +188,7 @@ def test_cli_survives_indic_output_on_limited_consoles(tmp_path: Path) -> None:
 
 
 def test_sample_indic_clean_page_has_no_language_findings() -> None:
-    """The clean twin must pass all Indic-language checks."""
+
     issues = analyze_html_file(Path("examples/sample_indic_page_clean.html"))
 
     types = {issue.issue_type for issue in issues}

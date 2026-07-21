@@ -1,8 +1,8 @@
-"""Tests for the real zoom reflow checks in low-vision mode.
 
-These tests must pass whether or not Playwright is installed. The real
-browser integration tests skip themselves when the browser cannot run.
-"""
+
+
+
+
 
 from pathlib import Path
 
@@ -24,7 +24,7 @@ from a11yway.core.rules import get_rule
 
 
 def level(zoom_percent: int, **overrides) -> dict:
-    """Build one synthetic zoom-level measurement."""
+
     data = {
         "zoom_percent": zoom_percent,
         "viewport_width": int(ZOOM_BASE_VIEWPORT["width"] / (zoom_percent / 100)),
@@ -40,7 +40,7 @@ def level(zoom_percent: int, **overrides) -> dict:
 
 
 def test_zoom_levels_match_the_wcag_reference() -> None:
-    """400% of the 1280 base must be the WCAG 1.4.10 width of 320 px."""
+
     assert ZOOM_LEVELS == [200, 400]
     assert int(ZOOM_BASE_VIEWPORT["width"] / 4) == 320
 
@@ -50,7 +50,7 @@ def test_zoom_levels_match_the_wcag_reference() -> None:
     ["reflow_horizontal_scroll", "reflow_clipped_content", "reflow_overlap"],
 )
 def test_reflow_rules_exist(issue_type: str) -> None:
-    """The new reflow finding types should be documented."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -60,7 +60,7 @@ def test_reflow_rules_exist(issue_type: str) -> None:
 
 
 def test_horizontal_scroll_at_400_without_content_loss_is_review_only() -> None:
-    """Bare overflow at the WCAG reference width needs review."""
+
     issues = _reflow_issues(
         [
             level(200, overflow_amount=260, document_scroll_width=900),
@@ -77,7 +77,7 @@ def test_horizontal_scroll_at_400_without_content_loss_is_review_only() -> None:
 
 
 def test_horizontal_scroll_with_content_loss_is_high_severity() -> None:
-    """Overflow plus clipped content at 400% is a high-confidence barrier."""
+
     issues = _reflow_issues(
         [
             level(200, overflow_amount=260, document_scroll_width=900),
@@ -104,7 +104,7 @@ def test_horizontal_scroll_with_content_loss_is_high_severity() -> None:
 
 
 def test_small_horizontal_overflow_is_treated_as_noise() -> None:
-    """Scrollbars and subpixel noise below the tolerance are ignored."""
+
     issues = _reflow_issues(
         [level(400, overflow_amount=20, document_scroll_width=340)]
     )
@@ -113,7 +113,7 @@ def test_small_horizontal_overflow_is_treated_as_noise() -> None:
 
 
 def test_horizontal_scroll_only_at_200_is_medium() -> None:
-    """Overflow that clears at 320 px is below the WCAG reference."""
+
     issues = _reflow_issues(
         [
             level(200, overflow_amount=60, document_scroll_width=700),
@@ -127,14 +127,14 @@ def test_horizontal_scroll_only_at_200_is_medium() -> None:
 
 
 def test_no_overflow_produces_no_scroll_finding() -> None:
-    """Clean measurements must stay clean."""
+
     issues = _reflow_issues([level(200), level(400)])
 
     assert issues == []
 
 
 def test_clipped_and_overlap_findings_carry_boxes_and_zoom() -> None:
-    """Evidence must include element, bounding boxes, and zoom level."""
+
     clipped = {
         "tag": "p",
         "id": "",
@@ -177,7 +177,7 @@ def test_clipped_and_overlap_findings_carry_boxes_and_zoom() -> None:
 
 
 def test_clipped_elements_are_deduped_across_levels() -> None:
-    """The same clipped element at both levels is one finding."""
+
     clipped = {
         "tag": "p",
         "id": "note",
@@ -196,7 +196,7 @@ def test_clipped_elements_are_deduped_across_levels() -> None:
 
 
 def test_reports_render_zoom_level_table() -> None:
-    """Markdown and HTML reports show the per-level measurements."""
+
     low_vision_result = {
         "success": True,
         "error": None,
@@ -231,7 +231,7 @@ def test_reports_render_zoom_level_table() -> None:
 
 
 def test_zoom_reflow_example_pages_exist() -> None:
-    """The paired zoom reflow sample pages should be present."""
+
     assert Path("examples/sample_zoom_reflow.html").exists()
     assert Path("examples/sample_zoom_reflow_fixed.html").exists()
 
@@ -240,7 +240,7 @@ def test_zoom_reflow_example_pages_exist() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_zoom_checks_flag_the_broken_sample() -> None:
-    """Integration: the seeded page should trigger all three findings."""
+
     result = run_low_vision_audit_for_source("examples/sample_zoom_reflow.html")
 
     if not result["success"]:
@@ -260,7 +260,7 @@ def test_zoom_checks_flag_the_broken_sample() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_zoom_checks_pass_the_fixed_sample() -> None:
-    """Integration: the responsive twin should produce no reflow findings."""
+
     result = run_low_vision_audit_for_source(
         "examples/sample_zoom_reflow_fixed.html"
     )

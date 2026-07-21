@@ -1,4 +1,4 @@
-"""Capability detection for optional A11yway modules."""
+
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ def _playwright_browser_status(browser_name: str) -> dict[str, Any]:
             browser = browser_type.launch(headless=True)
             browser.close()
         return {"status": "available_verified", "detail": f"{browser_name} launched successfully."}
-    except Exception as error:  # noqa: BLE001 - capability detection must degrade
+    except Exception as error:
         return {"status": "unavailable", "detail": str(error)}
 
 
@@ -59,7 +59,7 @@ def _adb_devices(adb_path: str | None) -> list[str]:
             timeout=5,
             check=False,
         )
-    except Exception:  # noqa: BLE001 - optional tool
+    except Exception:
         return []
     devices = []
     for line in completed.stdout.splitlines()[1:]:
@@ -70,7 +70,7 @@ def _adb_devices(adb_path: str | None) -> list[str]:
 
 
 def detect_capabilities(verify_browsers: bool = False) -> dict[str, Any]:
-    """Return optional-tool capability status without requiring any dependency."""
+
     system = platform.system()
     is_windows = system.lower() == "windows"
     adb_path = _which("adb", "adb.exe")
@@ -158,7 +158,7 @@ def detect_capabilities(verify_browsers: bool = False) -> dict[str, Any]:
 
 
 def format_capabilities_cli(capabilities: dict[str, Any]) -> str:
-    """Render capability detection as readable CLI text."""
+
     lines = ["A11yway capability detection", ""]
     lines.append(f"Platform: {capabilities['platform']['platform']}")
     lines.append(f"Python: {capabilities['platform']['python']}")

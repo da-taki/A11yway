@@ -1,4 +1,4 @@
-"""Tests for workflow packs and optional AI scout configuration."""
+
 
 from pathlib import Path
 
@@ -22,7 +22,7 @@ EXPECTED_PACK_IDS = {
 
 
 def test_env_example_exists_with_groq_placeholder() -> None:
-    """The future optional AI config example should be present and safe."""
+
     env_example = Path(".env.example")
 
     assert env_example.exists()
@@ -33,7 +33,7 @@ def test_env_example_exists_with_groq_placeholder() -> None:
 
 
 def test_gitignore_keeps_env_example_trackable() -> None:
-    """Real env files should be ignored, but the example should not be."""
+
     lines = Path(".gitignore").read_text(encoding="utf-8").splitlines()
 
     assert ".env" in lines
@@ -43,20 +43,20 @@ def test_gitignore_keeps_env_example_trackable() -> None:
 
 
 def test_workflow_pack_files_exist() -> None:
-    """Every expected workflow pack should have a JSON file."""
+
     for pack_id in EXPECTED_PACK_IDS:
         assert Path("a11yway/workflow_packs", f"{pack_id}.json").exists()
 
 
 def test_list_workflow_packs_returns_expected_packs() -> None:
-    """The loader should return all valid built-in packs."""
+
     packs = list_workflow_packs()
 
     assert {pack["pack_id"] for pack in packs} == EXPECTED_PACK_IDS
 
 
 def test_load_workflow_pack_returns_known_pack() -> None:
-    """A known pack id should load its pack metadata and workflows."""
+
     pack = load_workflow_pack("college_applications")
 
     assert pack is not None
@@ -65,13 +65,13 @@ def test_load_workflow_pack_returns_known_pack() -> None:
 
 
 def test_load_workflow_pack_returns_none_for_invalid_pack() -> None:
-    """Unknown or unsafe pack ids should not raise."""
+
     assert load_workflow_pack("not_a_real_pack") is None
     assert load_workflow_pack("../education") is None
 
 
 def test_each_pack_has_required_workflow_shape() -> None:
-    """Workflow templates should expose stable task-planning fields."""
+
     required_fields = {
         "id",
         "name",
@@ -93,7 +93,7 @@ def test_each_pack_has_required_workflow_shape() -> None:
 
 
 def test_cli_list_packs_works(capsys) -> None:
-    """--list-packs should print pack ids without running an audit."""
+
     exit_code = main(["--list-packs"])
 
     captured = capsys.readouterr()
@@ -104,7 +104,7 @@ def test_cli_list_packs_works(capsys) -> None:
 
 
 def test_cli_show_pack_works(capsys) -> None:
-    """--show-pack should print pack details and required actions."""
+
     exit_code = main(["--show-pack", "ngo_services"])
 
     captured = capsys.readouterr()
@@ -116,7 +116,7 @@ def test_cli_show_pack_works(capsys) -> None:
 
 
 def test_cli_suggest_tasks_works(capsys) -> None:
-    """--suggest-tasks should print templates and relevant issue types."""
+
     exit_code = main(["--suggest-tasks", "ai_products"])
 
     captured = capsys.readouterr()
@@ -129,7 +129,7 @@ def test_cli_suggest_tasks_works(capsys) -> None:
 
 
 def test_cli_suggest_tasks_with_source_does_not_run_audit(capsys) -> None:
-    """A provided source should be acknowledged without triggering analysis."""
+
     exit_code = main(["https://example.org", "--suggest-tasks", "ngo_services"])
 
     captured = capsys.readouterr()

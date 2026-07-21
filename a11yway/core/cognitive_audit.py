@@ -1,4 +1,4 @@
-"""Cognitive-accessibility heuristic evidence."""
+
 
 from __future__ import annotations
 

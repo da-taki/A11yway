@@ -1,8 +1,8 @@
-"""Flask interface for the public A11yway web audit demo.
 
-The web app runs one validated public URL per audit, reuses the existing
-A11yway audit modules, and stores generated reports under reports/web_demo_runs.
-"""
+
+
+
+
 
 from __future__ import annotations
 
@@ -76,7 +76,7 @@ BLOCKED_HOST_SUFFIXES = (
 
 @dataclass(frozen=True)
 class ReviewType:
-    """Backwards-compatible review mode used by older tests and docs."""
+
 
     key: str
     label: str
@@ -90,7 +90,7 @@ class ReviewType:
 
 @dataclass(frozen=True)
 class AuditModule:
-    """Selectable web audit module metadata."""
+
 
     key: str
     label: str
@@ -176,7 +176,7 @@ ACTIVE_JOBS: dict[str, threading.Thread] = {}
 
 
 def create_app() -> Flask:
-    """Build the Flask app for local and Render deployments."""
+
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("A11YWAY_WEB_SECRET", "a11yway-local-demo")
 
@@ -325,7 +325,7 @@ def _resolve_host_ips(hostname: str) -> list[str]:
 
 
 def validate_public_url(url: str, resolver=_resolve_host_ips) -> dict[str, Any]:
-    """Validate that a URL points to an allowed public http(s) target."""
+
     candidate = str(url or "").strip()
     if not candidate:
         return {"ok": False, "error": "Enter a website URL.", "url": ""}
@@ -367,12 +367,12 @@ def validate_public_url(url: str, resolver=_resolve_host_ips) -> dict[str, Any]:
 
 
 class _NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: N803 - urllib signature
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
 
 
 def validate_redirect_chain(url: str) -> dict[str, Any]:
-    """Validate redirect targets before the audit fetch follows them."""
+
     current = url
     opener = build_opener(_NoRedirect)
     for _index in range(MAX_REDIRECTS + 1):
@@ -382,7 +382,7 @@ def validate_redirect_chain(url: str) -> dict[str, Any]:
         request_obj = Request(current, method="HEAD", headers={"User-Agent": "A11ywayWebDemo/1.0"})
         try:
             response = opener.open(request_obj, timeout=8)
-        except Exception as error:  # noqa: BLE001 - retry with GET or inspect redirect response
+        except Exception as error:
             code = getattr(error, "code", None)
             headers = getattr(error, "headers", None)
             if code in {301, 302, 303, 307, 308} and headers:
@@ -413,7 +413,7 @@ def _looks_like_ip(hostname: str) -> bool:
 
 
 def slug_for_url(url: str, label: str = "") -> str:
-    """Return a readable filesystem slug for a run."""
+
     if label.strip():
         return safe_report_id(label)[:60]
     parsed = urlparse(url)
@@ -429,7 +429,7 @@ def make_run_id(url: str, label: str = "") -> str:
 
 
 def selected_modules_from_form(module_keys: list[str], preset: str = "standard") -> list[str]:
-    """Return a sanitized selected-module list, always including static."""
+
     selected = list(module_keys or PRESETS.get(preset, PRESETS["standard"])["modules"])
     selected.append("static")
     sanitized = []
@@ -445,7 +445,7 @@ def create_web_batch_config(
     review_type: ReviewType,
     config_path: Path = WEB_DEMO_CONFIG_PATH,
 ) -> dict[str, Any]:
-    """Write the required single-target batch config and return its item."""
+
     item_id = slug_for_url(url, label)
     item = {
         "id": item_id,
@@ -470,7 +470,7 @@ def run_web_review(
     passive_security: bool = False,
     run_id: str | None = None,
 ) -> dict[str, Any]:
-    """Run A11yway for a public URL and save web metadata."""
+
     modules = selected_modules or list(REVIEW_TYPE_TO_MODULES.get(review_type_key, PRESETS["quick"]["modules"]))
     run_id = run_id or make_run_id(url, label)
     status = initial_status(run_id, url, label, modules, passive_security)
@@ -513,7 +513,7 @@ def _run_job(run_id: str, url: str, label: str, modules: list[str], passive_secu
     status = load_status(run_id) or initial_status(run_id, url, label, modules, passive_security)
     try:
         execute_review(run_id, url, label, modules, passive_security, status)
-    except Exception as error:  # noqa: BLE001 - keep the public UI clean
+    except Exception as error:
         error_id = uuid.uuid4().hex[:10]
         (run_dir / f"error_{error_id}.log").write_text(traceback.format_exc(), encoding="utf-8")
         update_status(
@@ -531,7 +531,7 @@ def _run_job(run_id: str, url: str, label: str, modules: list[str], passive_secu
 
 
 def execute_review(run_id: str, url: str, label: str, modules: list[str], passive_security: bool, status: dict[str, Any]) -> dict[str, Any]:
-    """Run selected existing modules and build the web-facing summary."""
+
     start_time = time.monotonic()
     run_dir = WEB_DEMO_RUNS_DIR / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -802,7 +802,7 @@ def build_run_summary(
     duration_seconds: float = 0,
     passive_security: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build a web-facing run summary from A11yway report files."""
+
     report_path = run_dir / f"{item_id}.json"
     report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}
     score = report.get("score") or score_report(report)
@@ -934,7 +934,7 @@ def visual_links_for_report(report: dict[str, Any]) -> dict[str, str]:
 
 
 def sanitize_visual_proof_paths(report: dict[str, Any]) -> None:
-    """Keep public report paths relative to the repository root."""
+
     visual = report.get("visual_proof")
     if not isinstance(visual, dict):
         return
@@ -1003,7 +1003,7 @@ def url_for_safe_result(run_id: str) -> str:
 
 
 def report_link(path: Path) -> str:
-    """Return a Flask URL for a report file under the web demo run folder."""
+
     try:
         resolved = path.resolve()
         relative = resolved.relative_to(WEB_DEMO_RUNS_DIR.resolve()).as_posix()
@@ -1016,7 +1016,7 @@ def report_link(path: Path) -> str:
 
 
 def safe_report_path(relative_path: str) -> Path | None:
-    """Resolve a report path while keeping file access inside web demo runs."""
+
     if any(part in {"..", ""} for part in Path(relative_path).parts):
         return None
     try:
@@ -1029,7 +1029,7 @@ def safe_report_path(relative_path: str) -> Path | None:
 
 
 def request_path_has_traversal() -> bool:
-    """Return whether the raw request URL contains a traversal segment."""
+
     raw_values = [
         request.environ.get("RAW_URI", ""),
         request.environ.get("REQUEST_URI", ""),
@@ -1045,7 +1045,7 @@ def request_path_has_traversal() -> bool:
 
 
 def load_run_summary(run_id: str) -> dict[str, Any] | None:
-    """Load one run summary by folder name."""
+
     if safe_report_id(run_id) != run_id:
         return None
     path = WEB_DEMO_RUNS_DIR / run_id / "web_run.json"
@@ -1058,7 +1058,7 @@ def load_run_summary(run_id: str) -> dict[str, Any] | None:
 
 
 def list_recent_runs(limit: int = 20) -> list[dict[str, Any]]:
-    """Return recent local web demo runs without using a database."""
+
     if not WEB_DEMO_RUNS_DIR.exists():
         return []
     runs = []
@@ -1076,7 +1076,7 @@ def list_recent_runs(limit: int = 20) -> list[dict[str, Any]]:
 
 
 def guardrail_notes() -> list[str]:
-    """Return short responsible-use notes shown in the web UI."""
+
     return [
         "Tests one public URL per run.",
         "Blocks localhost, private IPs, metadata IPs, internal hostnames, non-http schemes, embedded credentials, unsafe ports, and unsafe redirect targets.",
@@ -1092,7 +1092,7 @@ app = create_app()
 
 
 def main() -> None:
-    """Run the local Flask development server."""
+
     host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "5000"))
     app.run(host=host, port=port)

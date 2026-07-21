@@ -1,4 +1,4 @@
-"""Generate visual proof artifacts from browser focus traces."""
+
 
 from __future__ import annotations
 
@@ -14,16 +14,16 @@ VISUAL_PROOF_LIMITATIONS = [
 
 
 def _clean_path(path: str | Path) -> str:
-    """Return a stable report path string."""
+
     return Path(path).as_posix()
 
 
 def _legend_transcript_lines(focus_points: list[dict[str, Any]]) -> list[str]:
-    """Render the announce transcript inside the overlay legend.
 
-    Returns no lines when no focus point carries announce data, so overlays
-    from runs without accessibility tree access stay unchanged.
-    """
+
+
+
+
     announced = [point for point in focus_points if point.get("announcement")]
     if not announced:
         return []
@@ -46,7 +46,7 @@ def build_focus_overlay_html(
     source: str = "",
     viewport: dict[str, Any] | None = None,
 ) -> str:
-    """Build an HTML focus-path overlay using CSS over a screenshot."""
+
     screenshot_name = Path(screenshot_path).name
     viewport_text = ""
     if viewport:
@@ -144,7 +144,7 @@ def save_focus_overlay_html(
     source: str = "",
     viewport: dict[str, Any] | None = None,
 ) -> None:
-    """Write a focus path overlay HTML file."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -164,7 +164,7 @@ def build_visual_proof_metadata(
     focus_points: list[dict[str, Any]],
     viewport: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Return report-safe visual proof metadata without image bytes."""
+
     return {
         "enabled": True,
         "screenshot_path": _clean_path(screenshot_path),

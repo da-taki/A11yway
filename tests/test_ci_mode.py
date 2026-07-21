@@ -1,8 +1,8 @@
-"""Tests for CI mode: exit codes, SARIF output, and JUnit XML.
 
-These tests must pass whether or not Playwright is installed. The real
-browser integration tests skip themselves when the browser cannot run.
-"""
+
+
+
+
 
 import json
 import xml.etree.ElementTree as ET
@@ -28,7 +28,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 
 def report_with_issue(severity: str) -> dict:
-    """Build a small enriched report containing one issue."""
+
     issue = AccessibilityIssue(
         title="Form control is missing an accessible label",
         issue_type="missing_form_label",
@@ -41,7 +41,7 @@ def report_with_issue(severity: str) -> dict:
 
 
 def report_with_execution(completed: bool, success: bool = True) -> dict:
-    """Build a report carrying a task execution block."""
+
     execution = {
         "task_id": "submit_scholarship_application",
         "task_name": "Submit scholarship application",
@@ -86,7 +86,7 @@ def report_with_execution(completed: bool, success: bool = True) -> dict:
 
 
 def test_exit_codes_follow_the_documented_contract() -> None:
-    """0 clean, 1 findings, 2 blocked, 3 tool error (which wins)."""
+
     clean = build_json_report("examples/sample_form.html", [])
     high = report_with_issue("high")
     blocked = report_with_execution(completed=False)
@@ -101,7 +101,7 @@ def test_exit_codes_follow_the_documented_contract() -> None:
 
 
 def test_fail_severity_threshold() -> None:
-    """Findings below the threshold must not fail the run."""
+
     medium = report_with_issue("medium")
     low = report_with_issue("low")
 
@@ -112,21 +112,21 @@ def test_fail_severity_threshold() -> None:
 
 
 def test_blocked_without_flag_does_not_use_exit_two() -> None:
-    """Without fail_on_blocked, a blocked task is not exit code 2."""
+
     blocked = report_with_execution(completed=False)
 
     assert compute_ci_exit_code([blocked], fail_on_blocked=False) == EXIT_OK
 
 
 def test_unrun_execution_is_not_treated_as_blocked() -> None:
-    """A task that could not run is a tool problem, not a blocked task."""
+
     unrun = report_with_execution(completed=False, success=False)
 
     assert compute_ci_exit_code([unrun], fail_on_blocked=True) == EXIT_OK
 
 
 def test_sarif_structure_matches_the_2_1_0_shape() -> None:
-    """A lightweight structural validation of the SARIF document."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report("examples/sample_form.html", issues)
 
@@ -156,7 +156,7 @@ def test_sarif_structure_matches_the_2_1_0_shape() -> None:
 
 
 def test_sarif_maps_severities_to_levels() -> None:
-    """high=error, medium=warning, low=note."""
+
     assert SEVERITY_TO_SARIF_LEVEL == {
         "high": "error",
         "medium": "warning",
@@ -168,7 +168,7 @@ def test_sarif_maps_severities_to_levels() -> None:
 
 
 def test_sarif_includes_line_regions_when_available() -> None:
-    """Findings with an approximate line get a startLine region."""
+
     sarif = build_sarif_report([report_with_issue("high")])
 
     location = sarif["runs"][0]["results"][0]["locations"][0]["physicalLocation"]
@@ -176,7 +176,7 @@ def test_sarif_includes_line_regions_when_available() -> None:
 
 
 def test_junit_xml_has_one_test_case_per_step() -> None:
-    """Blocked steps become failures with the evidence as the message."""
+
     blocked = report_with_execution(completed=False)
 
     root = ET.fromstring(build_junit_xml([blocked]))
@@ -194,7 +194,7 @@ def test_junit_xml_has_one_test_case_per_step() -> None:
 
 
 def test_junit_xml_marks_unrun_execution_as_error() -> None:
-    """A task that could not run becomes an error test case, not a failure."""
+
     unrun = report_with_execution(completed=False, success=False)
 
     root = ET.fromstring(build_junit_xml([unrun]))
@@ -206,7 +206,7 @@ def test_junit_xml_marks_unrun_execution_as_error() -> None:
 
 
 def test_cli_ci_mode_fails_on_findings(tmp_path: Path) -> None:
-    """--ci should exit 1 on the sample form's high findings and write SARIF."""
+
     sarif_path = tmp_path / "findings.sarif"
 
     exit_code = main(
@@ -220,14 +220,14 @@ def test_cli_ci_mode_fails_on_findings(tmp_path: Path) -> None:
 
 
 def test_cli_ci_mode_passes_on_clean_page() -> None:
-    """--ci should exit 0 when the page has no findings at the threshold."""
+
     exit_code = main(["examples/sample_announce_transcript.html", "--ci"])
 
     assert exit_code == EXIT_OK
 
 
 def test_cli_sarif_without_ci_keeps_exit_zero(tmp_path: Path) -> None:
-    """--sarif alone is an export, not a gate."""
+
     sarif_path = tmp_path / "export.sarif"
 
     exit_code = main(["examples/sample_form.html", "--sarif", str(sarif_path)])
@@ -237,7 +237,7 @@ def test_cli_sarif_without_ci_keeps_exit_zero(tmp_path: Path) -> None:
 
 
 def test_cli_ci_mode_reports_setup_errors_as_three(monkeypatch) -> None:
-    """Missing Playwright in --ci mode must exit 3, not 1."""
+
     monkeypatch.setattr(main_module, "is_playwright_available", lambda: False)
 
     exit_code = main(["examples/sample_form.html", "--browser", "--ci"])
@@ -246,14 +246,14 @@ def test_cli_ci_mode_reports_setup_errors_as_three(monkeypatch) -> None:
 
 
 def test_cli_ci_mode_missing_source_is_setup_error() -> None:
-    """An unreadable source in --ci mode must exit 3."""
+
     exit_code = main(["examples/does_not_exist.html", "--ci"])
 
     assert exit_code == EXIT_TOOL_ERROR
 
 
 def test_cli_ci_batch_mode_fails_on_findings(tmp_path: Path) -> None:
-    """Batch --ci runs aggregate findings across items."""
+
     out_dir = tmp_path / "batch"
     sarif_path = tmp_path / "batch.sarif"
     junit_path = tmp_path / "batch-junit.xml"
@@ -280,7 +280,7 @@ def test_cli_ci_batch_mode_fails_on_findings(tmp_path: Path) -> None:
 
 
 def test_example_workflow_file_exists_and_is_dispatch_only() -> None:
-    """The GitHub Action example must not run on this repo's CI."""
+
     workflow = Path(".github/workflows/a11yway-example.yml").read_text(
         encoding="utf-8"
     )
@@ -296,7 +296,7 @@ def test_example_workflow_file_exists_and_is_dispatch_only() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_cli_ci_blocked_task_exits_two(tmp_path: Path) -> None:
-    """Integration: a keyboard-blocked workflow fails the build with 2."""
+
     junit_path = tmp_path / "trap-junit.xml"
 
     exit_code = main(
@@ -323,7 +323,7 @@ def test_cli_ci_blocked_task_exits_two(tmp_path: Path) -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_cli_ci_completed_task_exits_zero() -> None:
-    """Integration: the accessible sample workflow passes CI."""
+
     exit_code = main(
         [
             "examples/sample_task_execution_form.html",

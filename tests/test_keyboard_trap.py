@@ -1,15 +1,16 @@
-"""Tests for keyboard trap and focus-loop detection.
 
-These tests must pass whether or not Playwright is installed. The real
-headless-browser integration tests skip themselves when the browser cannot
-run, following the same pattern as the other browser tests.
-"""
+
+
+
+
+
 
 from pathlib import Path
 
 import pytest
 
 from a11yway.core.browser_runner import (
+    _focus_signature,
     _loop_sequence_label,
     find_focus_cycle,
     is_playwright_available,
@@ -26,7 +27,7 @@ from a11yway.models.task import AccessibilityTask
 
 
 def test_find_focus_cycle_confirms_repeated_tail() -> None:
-    """A cycle only counts when the same sequence repeats twice in a row."""
+
     a, b, c = ("a",), ("b",), ("c",)
 
     assert find_focus_cycle([a, b, c, a, b, c]) == 3
@@ -39,14 +40,14 @@ def test_find_focus_cycle_confirms_repeated_tail() -> None:
 
 
 def test_find_focus_cycle_prefers_shortest_period() -> None:
-    """A single stuck element should report a period of one, not two."""
+
     a = ("a",)
 
     assert find_focus_cycle([a, a, a, a]) == 1
 
 
 def test_loop_sequence_label_is_readable() -> None:
-    """Loop evidence should describe elements compactly."""
+
     entries = [
         {"tag": "select", "id": "rating"},
         {"tag": "button", "id": None, "name": None, "text": "Send feedback"},
@@ -58,9 +59,31 @@ def test_loop_sequence_label_is_readable() -> None:
     assert label == 'select#rating -> button "Send feedback" -> button'
 
 
+def test_focus_signature_separates_same_name_controls_by_label() -> None:
+
+    first = _focus_signature(
+        {
+            "tag": "input",
+            "name": "modules",
+            "type": "checkbox",
+            "labelledby_text": "Browser evidence",
+        }
+    )
+    second = _focus_signature(
+        {
+            "tag": "input",
+            "name": "modules",
+            "type": "checkbox",
+            "labelledby_text": "Low vision checks",
+        }
+    )
+
+    assert first != second
+
+
 @pytest.mark.parametrize("issue_type", ["keyboard_trap", "focus_lost"])
 def test_trap_rules_exist_in_registry(issue_type: str) -> None:
-    """Both new finding types should be documented in the rule registry."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -70,14 +93,14 @@ def test_trap_rules_exist_in_registry(issue_type: str) -> None:
 
 
 def test_keyboard_trap_rule_references_wcag_212() -> None:
-    """The trap rule should point reviewers at WCAG 2.1.2."""
+
     rule = get_rule("keyboard_trap")
 
     assert "2.1.2" in rule["standard_hint"]
 
 
 def test_reports_show_blocked_reason() -> None:
-    """A trap-blocked execution should surface the reason in all formats."""
+
     execution = {
         "mode": "browser_task_execution",
         "source": "examples/sample_keyboard_trap.html",
@@ -119,7 +142,7 @@ def test_reports_show_blocked_reason() -> None:
 
 
 def test_blocked_report_without_reason_stays_unchanged() -> None:
-    """Executions without a blocked reason must not grow the suffix."""
+
     execution = {
         "success": True,
         "completed": False,
@@ -141,13 +164,13 @@ def test_blocked_report_without_reason_stays_unchanged() -> None:
 
 
 def test_trap_example_pages_exist() -> None:
-    """The paired keyboard trap sample pages should be present."""
+
     assert Path("examples/sample_keyboard_trap.html").exists()
     assert Path("examples/sample_keyboard_trap_fixed.html").exists()
 
 
 def _survey_task() -> AccessibilityTask:
-    """A task that needs the control behind the trap on the sample pages."""
+
     return AccessibilityTask(
         id="fill_course_survey",
         name="Fill the course survey",
@@ -173,7 +196,7 @@ def _survey_task() -> AccessibilityTask:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_browser_audit_detects_keyboard_trap() -> None:
-    """Integration: the trap sample should produce a keyboard_trap finding."""
+
     result = run_browser_audit("examples/sample_keyboard_trap.html")
 
     if not result["success"]:
@@ -193,7 +216,7 @@ def test_browser_audit_detects_keyboard_trap() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_browser_audit_passes_fixed_trap_page() -> None:
-    """Integration: the fixed sample should produce no trap findings."""
+
     result = run_browser_audit("examples/sample_keyboard_trap_fixed.html")
 
     if not result["success"]:
@@ -202,7 +225,7 @@ def test_browser_audit_passes_fixed_trap_page() -> None:
     issue_types = {issue.issue_type for issue in result["issues"]}
     assert "keyboard_trap" not in issue_types
     assert "focus_lost" not in issue_types
-    # The whole page should be reachable: the survey form appears in the trace.
+
     trace_ids = {entry.get("id") for entry in result["focus_trace"]}
     assert "favorite_topic" in trace_ids
 
@@ -211,7 +234,7 @@ def test_browser_audit_passes_fixed_trap_page() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_task_execution_blocked_by_keyboard_trap() -> None:
-    """Integration: a step behind the trap must block with reason keyboard_trap."""
+
     result = run_task_execution("examples/sample_keyboard_trap.html", _survey_task())
 
     if not result["success"]:
@@ -233,7 +256,7 @@ def test_task_execution_blocked_by_keyboard_trap() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_task_execution_completes_on_fixed_trap_page() -> None:
-    """Integration: the same task completes once the trap is removed."""
+
     result = run_task_execution(
         "examples/sample_keyboard_trap_fixed.html", _survey_task()
     )
@@ -249,7 +272,7 @@ def test_task_execution_completes_on_fixed_trap_page() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_browser_audit_detects_focus_lost(tmp_path: Path) -> None:
-    """Integration: repeated body landings should produce focus_lost."""
+
     page = tmp_path / "focus_lost.html"
     page.write_text(
         """<!doctype html>

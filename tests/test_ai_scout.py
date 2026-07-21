@@ -1,4 +1,4 @@
-"""Tests for the optional Groq-backed AI Scout."""
+
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from a11yway.core.ai_scout import (
 
 
 def sample_report() -> dict:
-    """Return a compact deterministic report shape for AI Scout tests."""
+
     return {
         "tool": "A11yway",
         "version": "prototype",

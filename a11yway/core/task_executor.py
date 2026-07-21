@@ -1,15 +1,15 @@
-"""Deterministic browser task execution.
 
-This module attempts a task's browser_steps in headless Chromium using
-keyboard-only interaction wherever possible: focus moves with the Tab key,
-text is typed with the keyboard, and controls are activated with Enter.
-The goal is honest evidence for one question: can a keyboard-only student
-complete this education workflow?
 
-The step runner is intentionally small and deterministic: no AI, no
-crawling, and conservative heuristics. Playwright is optional; everything
-degrades gracefully when it is missing.
-"""
+
+
+
+
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ SUPPORTED_ACTIONS = [
     "assert_url_contains",
 ]
 
-# Tags a keyboard user can activate with Enter once focused.
+
 _ACTIVATABLE_TAGS = {"button", "a", "input"}
 
 _BODY_TEXT_SCRIPT = "() => document.body ? document.body.innerText : ''"
@@ -62,19 +62,19 @@ _ACTIVE_VALUE_SCRIPT = (
 
 
 def _normalize(value: str | None) -> str:
-    """Normalize text for conservative matching."""
+
     if not value:
         return ""
     return " ".join(value.replace("_", " ").replace("-", " ").lower().split())
 
 
 def _matches_target(info: dict, target: str) -> bool:
-    """Return whether a focused element matches a step target.
 
-    Strong signals (labels, accessible name, text) are checked first;
-    id/name attributes are a weak fallback so tasks can still find fields
-    the page failed to label; the missing label is reported separately.
-    """
+
+
+
+
+
     target_norm = _normalize(target)
     if not target_norm:
         return False
@@ -105,7 +105,7 @@ def _execution_issue(
     reason: str,
     extra: dict[str, Any] | None = None,
 ) -> AccessibilityIssue:
-    """Create a task execution issue with step evidence."""
+
     evidence: dict[str, Any] = {
         "detected_in": "browser_task_execution",
         "step_id": step.get("id", ""),
@@ -128,37 +128,37 @@ def _execution_issue(
 
 
 class _StepRunner:
-    """Runs one task's browser steps on an open Playwright page."""
+
 
     def __init__(self, page, max_tabs: int, announce_session=None) -> None:
         self.page = page
         self.max_tabs = max_tabs
         self.announce_session = announce_session
         self.issues: list[AccessibilityIssue] = []
-        # Set by tab_search when the last search failed inside a focus loop.
+
         self.last_search_trap: dict | None = None
 
     def focus_info(self) -> dict:
-        """Return details about the currently focused element."""
+
         return self.page.evaluate(_FOCUS_INFO_SCRIPT)
 
     def body_text(self) -> str:
-        """Return normalized visible page text."""
+
         return " ".join(str(self.page.evaluate(_BODY_TEXT_SCRIPT)).split())
 
     def text_visible(self, target: str) -> bool:
-        """Return whether target text appears in the visible page text."""
+
         return _normalize(target) in _normalize(self.body_text())
 
     def tab_search(self, target: str) -> dict | None:
-        """Tab through the page looking for an element matching target.
 
-        Starts from the current focus position and presses Tab up to
-        max_tabs times, which allows a full wrap-around of typical pages.
-        When the search fails inside a confirmed focus loop that never
-        passes through the body, last_search_trap records the looping
-        elements so the step can report a keyboard trap.
-        """
+
+
+
+
+
+
+
         self.last_search_trap = None
         info = self.focus_info()
         if not info.get("is_body") and _matches_target(info, target):
@@ -191,14 +191,14 @@ class _StepRunner:
         return None
 
     def focus_by_selectors(self, selectors: list[str]) -> dict | None:
-        """Programmatically focus the first selector that works."""
+
         for selector in selectors:
             try:
                 handle = self.page.query_selector(selector)
                 if handle is None:
                     continue
                 handle.focus()
-            except Exception:  # noqa: BLE001 - a bad selector should not stop the task
+            except Exception:
                 continue
             info = self.focus_info()
             if not info.get("is_body"):
@@ -206,7 +206,7 @@ class _StepRunner:
         return None
 
     def run_step(self, step: dict) -> dict:
-        """Run one step and return its result record."""
+
         action = step.get("action", "")
         result = {
             "id": step.get("id", ""),
@@ -242,11 +242,11 @@ class _StepRunner:
         return result
 
     def _announced_after_step(self) -> str | None:
-        """Return what the accessibility tree announces for the element
-        focused when the step finished, or None when unavailable."""
+
+
         try:
             info = self.focus_info()
-        except Exception:  # noqa: BLE001 - announce data must never fail a step
+        except Exception:
             return None
         if info.get("is_body"):
             return None
@@ -272,7 +272,7 @@ class _StepRunner:
 
     def _do_wait_for_text(self, step: dict, result: dict) -> None:
         target = step.get("target", "")
-        for _attempt in range(6):  # up to ~3 seconds
+        for _attempt in range(6):
             if self.text_visible(target):
                 result["status"] = "passed"
                 result["detail"] = "Text appeared on the page."
@@ -450,7 +450,7 @@ class _StepRunner:
             self._record_blocked(step, "The page URL does not show the expected task progress.")
 
     def _record_blocked(self, step: dict, reason: str) -> None:
-        """Record the high-severity issue for a blocking step failure."""
+
         self.issues.append(
             _execution_issue(
                 title="Task step could not be completed with the keyboard",
@@ -462,11 +462,11 @@ class _StepRunner:
         )
 
     def _record_trap_if_seen(self, step: dict) -> bool:
-        """Record a keyboard_trap issue when the last Tab search looped.
 
-        Returns whether a trap was recorded, so callers can mark the step
-        as blocked with reason keyboard_trap.
-        """
+
+
+
+
         if not self.last_search_trap:
             return False
         self.issues.append(
@@ -486,13 +486,13 @@ class _StepRunner:
         return True
 
 
-# Viewport-sized recording keeps video files small enough for evidence.
+
 _VIDEO_SIZE = {"width": 1280, "height": 720}
 _VIDEO_FILENAME = "task_execution.webm"
 
 
 def _video_caption(task: AccessibilityTask, source: str) -> str:
-    """Build the caption stating what run the recording shows."""
+
     return (
         f'Keyboard-only task execution of "{task.name}" on {source} in one '
         "headless Chromium run. An evidence aid for human reviewers, not "
@@ -501,7 +501,7 @@ def _video_caption(task: AccessibilityTask, source: str) -> str:
 
 
 def _finalize_video(video_handle, video_dir: str | Path) -> dict[str, Any]:
-    """Move the finished recording to a stable name and return metadata."""
+
     raw_path = Path(video_handle.path())
     final_path = Path(video_dir) / _VIDEO_FILENAME
     if raw_path.resolve() != final_path.resolve():
@@ -519,13 +519,13 @@ def run_task_execution(
     wait_ms: int = 500,
     video_dir: str | Path | None = None,
 ) -> dict:
-    """Attempt a task's browser steps and return step-by-step evidence.
 
-    Always returns a result dict; on any environment failure success is
-    False with an error message so batch mode can keep going. With
-    video_dir set, the browser session is recorded and the video saved
-    there; recording failures never break the task run.
-    """
+
+
+
+
+
+
     result: dict[str, Any] = {
         "mode": "browser_task_execution",
         "source": source,
@@ -569,7 +569,7 @@ def run_task_execution(
                         )
                         page = context.new_page()
                         video_handle = page.video
-                    except Exception as error:  # noqa: BLE001 - recording is optional
+                    except Exception as error:
                         result["video"] = {
                             "enabled": False,
                             "error": str(error).strip().splitlines()[0][:300],
@@ -619,23 +619,23 @@ def run_task_execution(
             finally:
                 if context is not None:
                     try:
-                        context.close()  # finalizes the video file
-                    except Exception:  # noqa: BLE001 - cleanup only
+                        context.close()
+                    except Exception:
                         pass
                 if video_handle is not None and video_dir is not None:
-                    # The video path is only readable while Playwright is
-                    # still running, so finalize before the browser closes.
+
+
                     try:
                         video = _finalize_video(video_handle, video_dir)
                         video["caption"] = _video_caption(task, source)
                         result["video"] = video
-                    except Exception as error:  # noqa: BLE001 - recording is optional
+                    except Exception as error:
                         result["video"] = {
                             "enabled": False,
                             "error": str(error).strip().splitlines()[0][:300],
                         }
                 browser.close()
-    except Exception as error:  # noqa: BLE001 - batch mode must survive any browser failure
+    except Exception as error:
         message = str(error).strip().splitlines()
         result["error"] = message[0][:300] if message else "Unknown browser error"
 

@@ -1,4 +1,4 @@
-"""Screen-reader evidence based on Chromium accessibility tree data."""
+
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def run_screen_reader_audit(
     engine: str = "chromium",
     include_transcript: bool = False,
 ) -> tuple[list[AccessibilityIssue], dict]:
-    """Create screen-reader evidence from browser focus/announce data."""
+
     issues: list[AccessibilityIssue] = []
     capabilities = detect_capabilities(verify_browsers=False)
     if engine != "chromium":

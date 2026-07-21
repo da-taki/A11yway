@@ -38,11 +38,11 @@ def test_extended_issue_severity_normalization_matrix(severity: str, expected: s
 @pytest.mark.parametrize(
     ("confidence", "expected"),
     [
-        ("confirmed", "confirmed"),
+        ("confirmed", "strong"),
         ("likely", "likely"),
         ("needs_review", "needs_review"),
         ("informational", "informational"),
-        ("CONFIRMED", "confirmed"),
+        ("CONFIRMED", "strong"),
         ("Likely", "likely"),
         ("NEEDS_REVIEW", "needs_review"),
         ("INFORMATIONAL", "informational"),
@@ -65,4 +65,3 @@ def test_extended_issue_confidence_normalization_matrix(confidence: str, expecte
 
     assert issue.confidence == expected
     assert issue.evidence["review_status"] == expected
-

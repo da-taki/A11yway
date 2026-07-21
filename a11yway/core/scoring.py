@@ -1,8 +1,8 @@
-"""Cautious scoring helpers for A11yway reports.
 
-The score is an issue-burden indicator for public-interest review. It is not a
-WCAG conformance score and must not be presented as legal or compliance advice.
-"""
+
+
+
+
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ RISK_FAMILY_RULES = [
 
 
 def severity_counts_from_issues(issues: list[dict[str, Any]]) -> dict[str, int]:
-    """Return normalized severity counts for report issues."""
+
     counts = Counter(str(issue.get("severity", "low")).lower() for issue in issues)
     return {
         "critical": counts.get("critical", 0),
@@ -57,7 +57,7 @@ def severity_counts_from_issues(issues: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def weighted_score_from_counts(severity_counts: dict[str, int]) -> int:
-    """Return the weighted issue-burden score."""
+
     return sum(
         int(severity_counts.get(severity, 0)) * weight
         for severity, weight in SEVERITY_WEIGHTS.items()
@@ -65,7 +65,7 @@ def weighted_score_from_counts(severity_counts: dict[str, int]) -> int:
 
 
 def has_blocked_task(report: dict[str, Any]) -> bool:
-    """Return whether deterministic task data suggests a blocked workflow."""
+
     execution = report.get("task_execution") or {}
     if execution.get("success") and execution.get("completed") is False:
         return True
@@ -78,7 +78,7 @@ def classify_issue_burden(
     severity_counts: dict[str, int],
     task_blocked: bool = False,
 ) -> str:
-    """Classify the review result with cautious, non-compliance language."""
+
     if task_blocked or severity_counts.get("critical", 0) > 0:
         return CLASSIFICATION_BLOCKED
     if weighted_score >= 80:
@@ -99,7 +99,7 @@ def _issue_family(issue_type: str) -> str:
 
 
 def top_risk_areas(issues: list[dict[str, Any]], limit: int = 4) -> list[str]:
-    """Return the highest-weighted risk family labels."""
+
     family_scores: dict[str, int] = {}
     for issue in issues:
         family = _issue_family(str(issue.get("issue_type", "")))
@@ -110,7 +110,7 @@ def top_risk_areas(issues: list[dict[str, Any]], limit: int = 4) -> list[str]:
 
 
 def plain_language_summary(classification: str, risk_areas: list[str], total_issues: int) -> str:
-    """Build a short public-facing summary without compliance claims."""
+
     if total_issues == 0:
         return "This page did not show review points in the current deterministic checks."
     if risk_areas:
@@ -123,7 +123,7 @@ def plain_language_summary(classification: str, risk_areas: list[str], total_iss
 
 
 def score_report(report: dict[str, Any]) -> dict[str, Any]:
-    """Score a single-page or batch report using existing issue summaries."""
+
     issues = report.get("issues")
     if issues is None:
         issues = []

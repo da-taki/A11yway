@@ -1,4 +1,4 @@
-"""Compare A11yway JSON reports for re-audit tracking."""
+
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def _task_status(report: dict[str, Any]) -> dict[str, Any]:
 
 
 def compare_reports(old_report: dict[str, Any], new_report: dict[str, Any]) -> dict[str, Any]:
-    """Compare two JSON reports and return fixed/remaining/new changes."""
+
     old_issues = _issue_map(old_report)
     new_issues = _issue_map(new_report)
     old_keys = set(old_issues)
@@ -99,7 +99,7 @@ def _issue_summary(fingerprint: str, issue: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_diff_markdown(diff: dict[str, Any]) -> str:
-    """Build a Markdown re-audit diff summary."""
+
     summary = diff.get("summary", {})
     lines = [
         "# A11yway Re-Audit Diff",
@@ -148,14 +148,14 @@ def build_diff_markdown(diff: dict[str, Any]) -> str:
 
 
 def save_diff_json(diff: dict[str, Any], path: str | Path) -> None:
-    """Write a JSON re-audit diff."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(diff, indent=2), encoding="utf-8")
 
 
 def save_diff_markdown(diff: dict[str, Any], path: str | Path) -> None:
-    """Write a Markdown re-audit diff."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(build_diff_markdown(diff), encoding="utf-8")

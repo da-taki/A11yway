@@ -1,4 +1,4 @@
-"""Tests for HTML reports and visual proof overlays."""
+
 
 import csv
 import json
@@ -18,13 +18,13 @@ from a11yway.main import analyze_html_file, main
 
 
 def sample_report() -> dict:
-    """Build a small realistic report with issues."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     return build_json_report("examples/sample_form.html", issues)
 
 
 def test_build_html_report_includes_title_summary_and_issues() -> None:
-    """HTML reports should render the core static report sections."""
+
     html = build_html_report(sample_report())
 
     assert "<title>A11yway Accessibility Report</title>" in html
@@ -34,7 +34,7 @@ def test_build_html_report_includes_title_summary_and_issues() -> None:
 
 
 def test_save_html_report_writes_file(tmp_path: Path) -> None:
-    """HTML reports should be written to disk."""
+
     output_path = tmp_path / "report.html"
 
     save_html_report(sample_report(), output_path)
@@ -44,7 +44,7 @@ def test_save_html_report_writes_file(tmp_path: Path) -> None:
 
 
 def test_html_report_includes_task_execution_section() -> None:
-    """Task execution blocks should appear in HTML reports when present."""
+
     report = build_json_report(
         "examples/sample_task_execution_form.html",
         [],
@@ -76,7 +76,7 @@ def test_html_report_includes_task_execution_section() -> None:
 
 
 def test_html_report_includes_visual_proof_section() -> None:
-    """Visual proof metadata should render as links and counts."""
+
     report = build_json_report(
         "examples/sample_dynamic_form.html",
         [],
@@ -105,7 +105,7 @@ def test_html_report_includes_visual_proof_section() -> None:
 
 
 def test_focus_overlay_html_from_fake_focus_points() -> None:
-    """The overlay helper should work without Playwright."""
+
     html = build_focus_overlay_html(
         "page.png",
         [
@@ -130,7 +130,7 @@ def test_focus_overlay_html_from_fake_focus_points() -> None:
 
 
 def test_save_focus_overlay_html_writes_file(tmp_path: Path) -> None:
-    """The overlay writer should create parent directories."""
+
     output_path = tmp_path / "visual" / "focus_path.html"
 
     save_focus_overlay_html(
@@ -145,7 +145,7 @@ def test_save_focus_overlay_html_writes_file(tmp_path: Path) -> None:
 
 @pytest.mark.skipif(not is_playwright_available(), reason="Playwright is not installed")
 def test_browser_visual_proof_generates_artifacts(tmp_path: Path) -> None:
-    """Browser visual proof should produce a screenshot and overlay when available."""
+
     visual_dir = tmp_path / "visual"
 
     result = run_browser_audit(
@@ -164,7 +164,7 @@ def test_browser_visual_proof_generates_artifacts(tmp_path: Path) -> None:
 
 
 def test_cli_html_writes_report(tmp_path: Path, capsys) -> None:
-    """--html should write an HTML report without requiring browser mode."""
+
     html_path = tmp_path / "sample_form_report.html"
 
     exit_code = main(["examples/sample_form.html", "--html", str(html_path)])
@@ -177,7 +177,7 @@ def test_cli_html_writes_report(tmp_path: Path, capsys) -> None:
 
 
 def test_cli_visual_proof_requires_browser(capsys) -> None:
-    """Visual proof should fail clearly without --browser."""
+
     exit_code = main(["examples/sample_form.html", "--visual-proof", "reports/visual"])
 
     captured = capsys.readouterr()
@@ -186,7 +186,7 @@ def test_cli_visual_proof_requires_browser(capsys) -> None:
 
 
 def test_batch_html_reports_add_index_and_csv_columns(tmp_path: Path) -> None:
-    """Batch HTML report mode should add report paths to index and CSV."""
+
     out_dir = tmp_path / "batch"
 
     result = run_batch("examples/sample_batch.json", out_dir, html_reports=True)
@@ -204,7 +204,7 @@ def test_batch_html_reports_add_index_and_csv_columns(tmp_path: Path) -> None:
 
 
 def test_batch_html_reports_are_reflected_in_index_json(tmp_path: Path) -> None:
-    """Saved index JSON should include the HTML report paths."""
+
     out_dir = tmp_path / "batch"
 
     run_batch("examples/sample_batch.json", out_dir, html_reports=True)

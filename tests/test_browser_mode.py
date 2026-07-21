@@ -1,8 +1,8 @@
-"""Tests for the optional browser interaction mode.
 
-These tests must pass whether or not Playwright is installed. The real
-headless-browser integration test skips itself when the browser cannot run.
-"""
+
+
+
+
 
 import csv
 import json
@@ -35,7 +35,7 @@ BROWSER_ISSUE_TYPES = [
 
 
 def fake_browser_result(**overrides) -> dict:
-    """Build a small successful browser result for report tests."""
+
     result = {
         "mode": "browser",
         "source": "examples/sample_form.html",
@@ -65,23 +65,23 @@ def fake_browser_result(**overrides) -> dict:
 
 
 def test_browser_runner_imports_without_playwright() -> None:
-    """Importing the module must never require Playwright."""
+
     assert hasattr(browser_runner, "run_browser_audit")
 
 
 def test_is_playwright_available_returns_bool() -> None:
-    """Availability should be a plain boolean either way."""
+
     assert isinstance(is_playwright_available(), bool)
 
 
 def test_source_to_browser_url_keeps_urls() -> None:
-    """http/https sources should pass through unchanged."""
+
     assert source_to_browser_url("https://example.org/page") == "https://example.org/page"
     assert source_to_browser_url("http://example.org") == "http://example.org"
 
 
 def test_source_to_browser_url_converts_local_files() -> None:
-    """Local paths should become absolute file:// URLs."""
+
     url = source_to_browser_url("examples/sample_form.html")
 
     assert url.startswith("file:///")
@@ -90,7 +90,7 @@ def test_source_to_browser_url_converts_local_files() -> None:
 
 @pytest.mark.parametrize("issue_type", BROWSER_ISSUE_TYPES)
 def test_browser_issue_rules_exist_in_registry(issue_type: str) -> None:
-    """Every browser issue type should be documented in the rule registry."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -100,7 +100,7 @@ def test_browser_issue_rules_exist_in_registry(issue_type: str) -> None:
 
 
 def test_json_report_includes_analysis_modes_with_browser_data() -> None:
-    """Reports built with browser data should record both analysis modes."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report(
         "examples/sample_form.html", issues, browser_result=fake_browser_result()
@@ -114,7 +114,7 @@ def test_json_report_includes_analysis_modes_with_browser_data() -> None:
 
 
 def test_json_report_without_browser_data_is_unchanged() -> None:
-    """Static reports must not grow browser keys."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report("examples/sample_form.html", issues)
 
@@ -123,7 +123,7 @@ def test_json_report_without_browser_data_is_unchanged() -> None:
 
 
 def test_markdown_report_includes_browser_trace() -> None:
-    """Markdown should show the browser summary and interaction trace."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
     report = build_json_report(
         "examples/sample_form.html", issues, browser_result=fake_browser_result()
@@ -138,7 +138,7 @@ def test_markdown_report_includes_browser_trace() -> None:
 
 
 def test_markdown_report_truncates_long_traces() -> None:
-    """Only the first 20 trace steps should be rendered."""
+
     trace = [
         {
             "step": step,
@@ -166,7 +166,7 @@ def test_markdown_report_truncates_long_traces() -> None:
 
 
 def test_cli_browser_without_playwright_exits_gracefully(monkeypatch, capsys) -> None:
-    """--browser without Playwright should print setup help, not crash."""
+
     monkeypatch.setattr(main_module, "is_playwright_available", lambda: False)
 
     exit_code = main(["examples/sample_form.html", "--browser"])
@@ -178,7 +178,7 @@ def test_cli_browser_without_playwright_exits_gracefully(monkeypatch, capsys) ->
 
 
 def test_run_browser_audit_reports_missing_playwright(monkeypatch) -> None:
-    """The runner itself should degrade instead of raising."""
+
     monkeypatch.setattr(browser_runner, "sync_playwright", None)
 
     result = browser_runner.run_browser_audit("examples/sample_form.html")
@@ -189,7 +189,7 @@ def test_run_browser_audit_reports_missing_playwright(monkeypatch) -> None:
 
 
 def test_merge_browser_issues_keeps_static_when_browser_failed() -> None:
-    """A failed browser audit must not change the static issue list."""
+
     issues = analyze_html_file(Path("examples/sample_form.html"))
 
     merged = merge_browser_issues(
@@ -200,7 +200,7 @@ def test_merge_browser_issues_keeps_static_when_browser_failed() -> None:
 
 
 def test_merge_browser_issues_dedupes_dom_recheck() -> None:
-    """DOM re-check findings that match static findings should not repeat."""
+
     static_issue = AccessibilityIssue(
         title="Form control is missing an accessible label",
         issue_type="missing_form_label",
@@ -240,13 +240,13 @@ def test_merge_browser_issues_dedupes_dom_recheck() -> None:
 
 
 def test_sample_dynamic_form_fixture_exists() -> None:
-    """The dynamic sample page and browser batch config should be present."""
+
     assert Path("examples/sample_dynamic_form.html").exists()
     assert Path("examples/sample_browser_batch.json").exists()
 
 
 def test_static_batch_csv_includes_browser_columns(tmp_path: Path) -> None:
-    """Browser columns should exist in the CSV even for static-only runs."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -259,7 +259,7 @@ def test_static_batch_csv_includes_browser_columns(tmp_path: Path) -> None:
 
 
 def test_static_batch_index_includes_browser_fields(tmp_path: Path) -> None:
-    """Index items should carry analysis modes and browser fields."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -273,7 +273,7 @@ def test_static_batch_index_includes_browser_fields(tmp_path: Path) -> None:
 
 
 def test_cli_rule_details_for_browser_rule(capsys) -> None:
-    """--rule should document browser issue types too."""
+
     exit_code = main(["--rule", "browser_focus_not_moving"])
 
     captured = capsys.readouterr()
@@ -286,7 +286,7 @@ def test_cli_rule_details_for_browser_rule(capsys) -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_browser_audit_finds_dynamic_issues() -> None:
-    """Integration: browser mode should catch JS-added unlabeled controls."""
+
     result = run_browser_audit("examples/sample_dynamic_form.html")
 
     if not result["success"]:
@@ -300,10 +300,10 @@ def test_browser_audit_finds_dynamic_issues() -> None:
     }
 
     assert result["focus_trace"], "Tab traversal should visit page controls"
-    assert "missing_form_label" in issue_types  # JS-added unlabeled input
-    assert "missing_button_name" in issue_types  # JS-added unnamed button
+    assert "missing_form_label" in issue_types
+    assert "missing_button_name" in issue_types
     assert "browser_dom" in detected_in
-    # The static source of the dynamic page has none of these issues.
+
     static_issues = analyze_html_file(Path("examples/sample_dynamic_form.html"))
     static_types = {issue.issue_type for issue in static_issues}
     assert "missing_form_label" not in static_types
