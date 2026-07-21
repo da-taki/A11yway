@@ -1,4 +1,4 @@
-"""Optional browser-based low-vision accessibility checks."""
+
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 try:
     from playwright.sync_api import sync_playwright
-except ImportError:  # Browser mode is optional.
+except ImportError:
     sync_playwright = None
 
 
@@ -33,8 +33,8 @@ LOW_VISION_LIMITATIONS = [
     "Text-spacing checks apply the WCAG 1.4.12 reference overrides once; JavaScript reacting to layout changes is not modeled.",
 ]
 
-# Zoom passes: browser zoom at N% lays a page out at base_width / N CSS px,
-# which is how WCAG 1.4.10 defines its 320 px reflow reference (1280 / 4).
+
+
 ZOOM_BASE_VIEWPORT = {"width": 1280, "height": 1024}
 ZOOM_LEVELS = [200, 400]
 REFLOW_MIN_OVERFLOW_PX = 24
@@ -462,7 +462,7 @@ _TARGET_SIZE_SCRIPT = r"""
 }
 """
 
-# WCAG 1.4.12 reference overrides. Applied once, then removed.
+
 _TEXT_SPACING_CSS = (
     "* { line-height: 1.5 !important; letter-spacing: 0.12em !important; "
     "word-spacing: 0.16em !important; } "
@@ -570,7 +570,7 @@ _TEXT_LOSS_MEASURE_SCRIPT = r"""
 
 
 def _parse_color(value: str) -> tuple[float, float, float, float] | None:
-    """Parse common CSS rgb/rgba/hex colors."""
+
     if not value:
         return None
     text = value.strip().lower()
@@ -605,7 +605,7 @@ def _parse_color(value: str) -> tuple[float, float, float, float] | None:
 
 
 def _relative_luminance(color: tuple[float, float, float, float]) -> float:
-    """Return WCAG-style relative luminance for an sRGB color."""
+
     channels = []
     for channel in color[:3]:
         value = channel / 255
@@ -617,7 +617,7 @@ def _relative_luminance(color: tuple[float, float, float, float]) -> float:
 
 
 def calculate_contrast_ratio(foreground: str, background: str) -> float | None:
-    """Calculate a contrast ratio for two CSS colors."""
+
     fg = _parse_color(foreground)
     bg = _parse_color(background)
     if fg is None or bg is None or fg[3] == 0 or bg[3] == 0:
@@ -634,7 +634,7 @@ def _low_vision_issue(
     evidence: dict[str, Any],
     suggested_fix: str,
 ) -> AccessibilityIssue:
-    """Create a low-vision issue with consistent evidence."""
+
     evidence = dict(evidence)
     evidence["detected_in"] = "low_vision"
     return AccessibilityIssue(
@@ -648,7 +648,7 @@ def _low_vision_issue(
 
 
 def _sample_background_unresolved(sample: dict[str, Any]) -> bool:
-    """Return whether a sample's background stack cannot be trusted."""
+
     if sample.get("background_resolved") is False:
         return True
     try:
@@ -659,13 +659,13 @@ def _sample_background_unresolved(sample: dict[str, Any]) -> bool:
 
 
 def _contrast_issues(samples: list[dict[str, Any]]) -> list[AccessibilityIssue]:
-    """Return contrast issues from computed style samples.
 
-    When the background stack contains images, gradients, or transparency,
-    the ratio cannot be computed reliably, so those samples become
-    needs_review observations instead of suspected failures. Disabled
-    controls are exempt from contrast requirements and skipped.
-    """
+
+
+
+
+
+
     issues: list[AccessibilityIssue] = []
     seen: set[tuple[str, str]] = set()
     for sample in samples:
@@ -680,9 +680,9 @@ def _contrast_issues(samples: list[dict[str, Any]]) -> list[AccessibilityIssue]:
         if not unresolved and ratio >= 4.5:
             continue
         if unresolved and (ratio is not None and ratio >= 4.5):
-            # The computable part of the stack already passes; the image or
-            # gradient could only need review if it sat behind the text with
-            # similar tones, which a human should judge from the screenshot.
+
+
+
             continue
         key = (sample.get("selector", ""), sample.get("text", ""))
         if key in seen:
@@ -738,12 +738,12 @@ def _contrast_issues(samples: list[dict[str, Any]]) -> list[AccessibilityIssue]:
 
 
 def _apply_zoom(page, zoom_percent: int) -> None:
-    """Lay the page out as browser zoom at zoom_percent would.
 
-    Browser zoom at N% renders the layout at base_width * 100 / N CSS
-    pixels, which is exactly how WCAG 1.4.10 defines its 320 px reflow
-    reference (1280 at 400%).
-    """
+
+
+
+
+
     factor = zoom_percent / 100
     page.set_viewport_size(
         {
@@ -754,7 +754,7 @@ def _apply_zoom(page, zoom_percent: int) -> None:
 
 
 def _element_label(element: dict[str, Any]) -> str:
-    """Describe one measured element compactly for evidence."""
+
     tag = element.get("tag") or "element"
     if element.get("id"):
         return f"{tag}#{element['id']}"
@@ -765,12 +765,12 @@ def _element_label(element: dict[str, Any]) -> str:
 
 
 def _overflow_is_intentional(level: dict[str, Any]) -> bool:
-    """Return whether a level's overflow comes only from allowed regions.
 
-    WCAG 1.4.10 allows two-dimensional content (data tables, code blocks,
-    maps) to scroll horizontally, so overflow attributed entirely to such
-    regions is not reported as a reflow failure.
-    """
+
+
+
+
+
     sources = level.get("overflow_sources") or []
     return bool(sources) and all(
         source.get("allowed_scroll_region") for source in sources
@@ -778,7 +778,7 @@ def _overflow_is_intentional(level: dict[str, Any]) -> bool:
 
 
 def _overflow_is_meaningful(level: dict[str, Any]) -> bool:
-    """Return whether document-wide overflow exceeds noise tolerances."""
+
     overflow = int(level.get("overflow_amount", 0) or 0)
     viewport = int(level.get("viewport_width", 0) or 0)
     if overflow <= REFLOW_MIN_OVERFLOW_PX:
@@ -789,7 +789,7 @@ def _overflow_is_meaningful(level: dict[str, Any]) -> bool:
 
 
 def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
-    """Build reflow findings from the per-zoom-level measurements."""
+
     issues: list[AccessibilityIssue] = []
 
     overflowing = [
@@ -913,7 +913,7 @@ def _reflow_issues(levels: list[dict[str, Any]]) -> list[AccessibilityIssue]:
 
 
 def _has_visible_focus_style(info: dict[str, Any]) -> bool:
-    """Heuristic fallback used when style comparison was unavailable."""
+
     outline_style = (info.get("outline_style") or "").lower()
     outline_width = (info.get("outline_width") or "").lower()
     box_shadow = (info.get("box_shadow") or "").lower()
@@ -928,13 +928,13 @@ def _has_visible_focus_style(info: dict[str, Any]) -> bool:
 
 
 def _meaningful_focus_differences(info: dict[str, Any]) -> list[dict[str, Any]]:
-    """Filter style differences down to ones a user could actually see.
 
-    Chromium's UA stylesheet changes outline-offset (and outline-color) on
-    :focus-visible even when the page removed the outline with
-    outline: none, so outline-family differences only count when the
-    focused outline is actually drawn.
-    """
+
+
+
+
+
+
     differences = info.get("focus_style_differences") or []
     outline_style = (info.get("outline_style") or "").lower()
     outline_width = (info.get("outline_width") or "").lower()
@@ -949,13 +949,13 @@ def _meaningful_focus_differences(info: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _focus_indicator_visible(info: dict[str, Any]) -> tuple[bool, str]:
-    """Decide whether a focus stop shows any visible indicator.
 
-    Preferred evidence is the focused-vs-unfocused computed style comparison,
-    which recognizes outline, border, box-shadow, background, text
-    decoration, transform, pseudo-element, and parent-highlight indicators.
-    The older single-snapshot heuristic only runs as a fallback.
-    """
+
+
+
+
+
+
     if info.get("comparison_available"):
         if _meaningful_focus_differences(info):
             return True, "style_comparison"
@@ -964,7 +964,7 @@ def _focus_indicator_visible(info: dict[str, Any]) -> tuple[bool, str]:
 
 
 def _focus_obscured_issue(info: dict[str, Any]) -> AccessibilityIssue | None:
-    """Build a focus_obscured finding from one focus stop, if warranted."""
+
     obscured = info.get("obscured") or {}
     if not obscured.get("in_viewport"):
         return None
@@ -1012,7 +1012,7 @@ def _focus_obscured_issue(info: dict[str, Any]) -> AccessibilityIssue | None:
 
 
 def _focus_visibility_check(page, max_tabs: int = 40) -> tuple[dict[str, Any], list[AccessibilityIssue]]:
-    """Tab through the page; flag missing indicators and obscured focus."""
+
     issues: list[AccessibilityIssue] = []
     checked: list[dict[str, Any]] = []
     flagged: set[tuple[str, str, str]] = set()
@@ -1080,7 +1080,7 @@ def _focus_visibility_check(page, max_tabs: int = 40) -> tuple[dict[str, Any], l
 def _circle_intersects_rect(
     center_x: float, center_y: float, radius: float, box: dict[str, Any]
 ) -> bool:
-    """Return whether a circle intersects a bounding box."""
+
     closest_x = max(box["x"], min(center_x, box["x"] + box["width"]))
     closest_y = max(box["y"], min(center_y, box["y"] + box["height"]))
     distance_sq = (center_x - closest_x) ** 2 + (center_y - closest_y) ** 2
@@ -1088,14 +1088,14 @@ def _circle_intersects_rect(
 
 
 def _target_size_issues(targets: list[dict[str, Any]]) -> list[AccessibilityIssue]:
-    """Flag undersized interactive targets without the spacing exception.
 
-    WCAG 2.5.8 requires 24x24 CSS px targets unless a 24 px circle centered
-    on the target does not intersect another target (spacing exception),
-    the target is an inline text link, or another documented exception
-    applies. Inline links and adequately spaced targets are excluded here;
-    the equivalent-control and essential exceptions need human review.
-    """
+
+
+
+
+
+
+
     issues: list[AccessibilityIssue] = []
     for index, target in enumerate(targets):
         if len(issues) >= 5:
@@ -1117,7 +1117,7 @@ def _target_size_issues(targets: list[dict[str, Any]]) -> list[AccessibilityIssu
                 neighbor = other
                 break
         if neighbor is None:
-            # Spacing exception: the 24 px circle is clear of other targets.
+
             continue
         label = target.get("text") or target.get("id") or target.get("tag")
         neighbor_label = neighbor.get("text") or neighbor.get("id") or neighbor.get("tag")
@@ -1154,7 +1154,7 @@ def _target_size_issues(targets: list[dict[str, Any]]) -> list[AccessibilityIssu
 
 
 def _measurement_labels(measurement: dict[str, Any]) -> tuple[set[str], set[tuple[str, str]]]:
-    """Return comparable identities for clipped and overlap measurements."""
+
     clipped = {item.get("label", "") for item in measurement.get("clipped", [])}
     overlaps = {
         tuple(sorted([pair.get("first", ""), pair.get("second", "")]))
@@ -1166,11 +1166,11 @@ def _measurement_labels(measurement: dict[str, Any]) -> tuple[set[str], set[tupl
 def _text_spacing_issues(
     before: dict[str, Any], after: dict[str, Any]
 ) -> list[AccessibilityIssue]:
-    """Compare measurements before/after WCAG text-spacing overrides.
 
-    Only regressions count: clipping or overlap already present without the
-    overrides is a pre-existing condition, not a 1.4.12 failure.
-    """
+
+
+
+
     issues: list[AccessibilityIssue] = []
     before_clipped, before_overlaps = _measurement_labels(before)
 
@@ -1244,7 +1244,7 @@ def _text_spacing_issues(
 
 
 def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
-    """Run low-vision checks against an already-loaded Playwright page."""
+
     result: dict[str, Any] = {
         "mode": "low_vision",
         "source": source,
@@ -1273,8 +1273,8 @@ def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
             measurements["zoom_percent"] = zoom_percent
             levels.append(measurements)
 
-        # Legacy top-level keys mirror the 400% pass, the WCAG 1.4.10
-        # reference (320 CSS px), so older report consumers keep working.
+
+
         reference = levels[-1]
         result["zoom_reflow"] = {
             "method": "browser_zoom_equivalent_viewports",
@@ -1289,7 +1289,7 @@ def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
         page.set_viewport_size(original_viewport)
         page.wait_for_timeout(100)
 
-        # Target size (WCAG 2.5.8) at default zoom.
+
         targets = page.evaluate(_TARGET_SIZE_SCRIPT)
         target_issues = _target_size_issues(targets)
         result["target_size"] = {
@@ -1298,7 +1298,7 @@ def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
         }
         issues.extend(target_issues)
 
-        # Text spacing (WCAG 1.4.12): measure, apply overrides, re-measure.
+
         spacing_before = page.evaluate(_TEXT_LOSS_MEASURE_SCRIPT)
         page.evaluate(_APPLY_TEXT_SPACING_SCRIPT, _TEXT_SPACING_CSS)
         page.wait_for_timeout(150)
@@ -1316,14 +1316,14 @@ def run_low_vision_audit(page, source: str | None = None) -> dict[str, Any]:
         }
         issues.extend(spacing_issues)
 
-        # Focus visibility and focus-not-obscured share one Tab pass.
+
         focus_visibility, focus_issues = _focus_visibility_check(page)
         result["focus_visibility"] = focus_visibility
         issues.extend(focus_issues)
 
         result["issues"] = issues
         result["success"] = True
-    except Exception as error:  # noqa: BLE001 - browser batch mode must survive failures
+    except Exception as error:
         result["error"] = str(error).strip().splitlines()[0][:300]
         result["success"] = False
     return result
@@ -1333,7 +1333,7 @@ def run_low_vision_audit_for_source(
     source: str,
     wait_ms: int = 500,
 ) -> dict[str, Any]:
-    """Open a source in Chromium and run low-vision checks."""
+
     if not is_playwright_available() or sync_playwright is None:
         return {
             "mode": "low_vision",
@@ -1360,7 +1360,7 @@ def run_low_vision_audit_for_source(
                 return run_low_vision_audit(page, source=source)
             finally:
                 browser.close()
-    except Exception as error:  # noqa: BLE001
+    except Exception as error:
         return {
             "mode": "low_vision",
             "source": source,

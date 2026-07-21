@@ -1,10 +1,10 @@
-"""Merge duplicate findings discovered through different evidence sources.
 
-Static analysis, the rendered-DOM re-check, browser interaction, the
-accessibility tree, and axe-core can all report the same underlying problem
-on the same element. Reports should show one primary finding that lists
-every evidence source, not the same barrier several times.
-"""
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -15,9 +15,9 @@ import re
 from a11yway.core.finding_validation import cluster_repeated_findings, validate_findings
 from a11yway.models.issue import AccessibilityIssue
 
-# Evidence keys that identify the element a finding is about, strongest
-# identity first. Text-like values are normalized so a static snippet and a
-# browser-rendered snippet of the same element compare equal.
+
+
+
 _IDENTITY_KEYS = ["snippet", "id", "selector", "name", "text", "href", "src"]
 
 _CANONICAL_ISSUE_TYPES = {
@@ -44,7 +44,7 @@ _STABLE_HTML_ATTRS = [
 
 
 class _FirstElementParser(HTMLParser):
-    """Capture the first element tag and attributes from a snippet."""
+
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -75,9 +75,12 @@ class _FirstElementParser(HTMLParser):
             self.text_parts.append(data)
 
 _CONFIDENCE_RANK = {
-    "confirmed": 3,
+    "confirmed_by_multiple_engines": 5,
+    "repeat_verified": 4,
+    "strong": 3,
     "likely": 2,
     "needs_review": 1,
+    "weak_heuristic": 0,
     "informational": 0,
 }
 
@@ -85,20 +88,20 @@ DEFAULT_EVIDENCE_SOURCE = "static"
 
 
 def _normalize_identity_text(value: str) -> str:
-    """Normalize snippets and text for cross-source comparison."""
+
     lowered = str(value).casefold()
-    # Attribute order and self-closing slashes can differ between the source
-    # HTML and the browser-serialized DOM; strip syntax that varies.
+
+
     cleaned = re.sub(r"[<>/\"'=]", " ", lowered)
     return " ".join(sorted(cleaned.split()))
 
 
 def _normalize_html_snippet(value: str) -> str:
-    """Return a stable element identity from an HTML snippet when possible."""
+
     parser = _FirstElementParser()
     try:
         parser.feed(str(value or ""))
-    except Exception:  # noqa: BLE001 - malformed snippets fall back below
+    except Exception:
         return _normalize_identity_text(value)
 
     if not parser.tag:
@@ -118,12 +121,12 @@ def _normalize_html_snippet(value: str) -> str:
 
 
 def _canonical_issue_type(issue_type: str) -> str:
-    """Map equivalent third-party rules to the native A11yway rule family."""
+
     return _CANONICAL_ISSUE_TYPES.get(issue_type, issue_type)
 
 
 def _issue_identity(issue: AccessibilityIssue) -> str:
-    """Return the strongest element identity available in the evidence."""
+
     if not isinstance(issue.evidence, dict):
         return _normalize_identity_text(str(issue.evidence))
     for key in _IDENTITY_KEYS:
@@ -134,40 +137,40 @@ def _issue_identity(issue: AccessibilityIssue) -> str:
             if key in {"snippet", "text"}:
                 return f"{key}:{_normalize_identity_text(value)}"
             return f"{key}:{value}"
-    # Page-level findings (missing title, missing h1) identify by reason.
+
     return f"reason:{_normalize_identity_text(issue.evidence.get('reason', ''))}"
 
 
 def finding_fingerprint(issue: AccessibilityIssue) -> str:
-    """Return a stable fingerprint for one finding.
 
-    Built from the rule and the normalized element identity, so the same
-    barrier found statically and in the browser produces the same value.
-    """
+
+
+
+
     raw = "|".join([_canonical_issue_type(issue.issue_type), _issue_identity(issue)])
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
 def _evidence_source(issue: AccessibilityIssue) -> str:
-    """Return where a finding was detected."""
+
     if isinstance(issue.evidence, dict):
         return issue.evidence.get("detected_in") or DEFAULT_EVIDENCE_SOURCE
     return DEFAULT_EVIDENCE_SOURCE
 
 
 def deduplicate_issues(issues: list[AccessibilityIssue]) -> list[AccessibilityIssue]:
-    """Merge findings that share a fingerprint across evidence sources.
 
-    The first occurrence (list order puts static findings first) becomes the
-    primary finding. Its evidence gains:
 
-    - ``evidence_sources``: every detection mode that saw the problem
-    - ``merged_finding_count``: how many raw findings were merged
-    - ``fingerprint``: the stable finding fingerprint
 
-    Confidence is upgraded to the strongest confidence among the merged
-    findings, because independent detection strengthens the evidence.
-    """
+
+
+
+
+
+
+
+
+
     merged: dict[str, AccessibilityIssue] = {}
     order: list[str] = []
     sources: dict[str, list[str]] = {}

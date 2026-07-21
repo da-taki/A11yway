@@ -1,4 +1,4 @@
-"""Shared helpers for extended accessibility modules."""
+
 
 from __future__ import annotations
 
@@ -20,7 +20,15 @@ RESULT_STATUSES = {
     "scaffolded",
 }
 SEVERITIES = {"high", "medium", "low"}
-CONFIDENCE_VALUES = {"confirmed", "likely", "needs_review", "informational"}
+CONFIDENCE_VALUES = {
+    "confirmed_by_multiple_engines",
+    "repeat_verified",
+    "strong",
+    "likely",
+    "needs_review",
+    "weak_heuristic",
+    "informational",
+}
 REVIEW_STATUSES = {"confirmed", "likely", "needs_review", "informational"}
 EVIDENCE_TYPES = {"deterministic", "heuristic"}
 DETERMINISTIC = "deterministic"
@@ -28,12 +36,12 @@ HEURISTIC = "heuristic"
 
 
 def current_timestamp() -> str:
-    """Return a report timestamp in an explicit, timezone-safe format."""
+
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def json_safe(value: Any) -> Any:
-    """Normalize values so extended module output is JSON-stable."""
+
     if isinstance(value, Path):
         return value.as_posix()
     if isinstance(value, dict):
@@ -47,11 +55,13 @@ def json_safe(value: Any) -> Any:
 
 def _normalized_choice(value: str | None, allowed: set[str], fallback: str) -> str:
     normalized = (value or "").strip().lower()
+    if normalized == "confirmed" and "strong" in allowed:
+        return "strong"
     return normalized if normalized in allowed else fallback
 
 
 def validate_extended_result(data: dict[str, Any]) -> list[str]:
-    """Return schema problems for an extended module result."""
+
     problems = []
     for key in ("schema_version", "created_at", "module", "check_id", "status"):
         if not data.get(key):
@@ -71,7 +81,7 @@ def validate_extended_result(data: dict[str, Any]) -> list[str]:
 
 @dataclass
 class ExtendedCheckResult:
-    """Report-ready metadata for non-core A11yway modules."""
+
 
     module: str
     check_id: str
@@ -123,7 +133,7 @@ def extended_issue(
     wcag: list[dict[str, str]] | None = None,
     limitations: list[str] | None = None,
 ) -> AccessibilityIssue:
-    """Create a consistent issue for extended module findings."""
+
     evidence_type = _normalized_choice(evidence_type, EVIDENCE_TYPES, HEURISTIC)
     severity = _normalized_choice(severity, SEVERITIES, "low")
     effective_confidence = confidence or (
@@ -181,7 +191,7 @@ def module_result(
     artifacts: dict[str, Any] | None = None,
     capability: dict[str, Any] | None = None,
 ) -> ExtendedCheckResult:
-    """Build report metadata from module issues."""
+
     return ExtendedCheckResult(
         module=module,
         check_id=check_id,

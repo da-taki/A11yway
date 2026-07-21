@@ -1,4 +1,4 @@
-"""Conservative multilingual and bidirectional-language checks."""
+
 
 from __future__ import annotations
 

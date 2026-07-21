@@ -1,9 +1,9 @@
-"""Tests for deterministic browser task execution.
 
-These tests must pass whether or not Playwright is installed. Real
-headless-browser integration tests skip themselves when the browser
-cannot run.
-"""
+
+
+
+
+
 
 import csv
 import json
@@ -35,7 +35,7 @@ TASK_EXECUTION_ISSUE_TYPES = [
 
 
 def scholarship_task() -> AccessibilityTask:
-    """Load the sample task that defines browser steps."""
+
     tasks = load_tasks("examples/sample_tasks.json")
     task = find_task(tasks, "submit_scholarship_application")
     assert task is not None
@@ -43,7 +43,7 @@ def scholarship_task() -> AccessibilityTask:
 
 
 def fake_execution_result(**overrides) -> dict:
-    """Build a small execution result for report tests."""
+
     result = {
         "mode": "browser_task_execution",
         "source": "examples/sample_task_execution_form.html",
@@ -83,7 +83,7 @@ def fake_execution_result(**overrides) -> dict:
 
 
 def test_task_model_loads_browser_steps() -> None:
-    """The extended task schema should load browser steps from JSON."""
+
     task = scholarship_task()
 
     assert len(task.browser_steps) == 11
@@ -92,7 +92,7 @@ def test_task_model_loads_browser_steps() -> None:
 
 
 def test_tasks_without_browser_steps_stay_compatible() -> None:
-    """Tasks that do not define browser_steps should default to an empty list."""
+
     tasks = load_tasks("examples/sample_tasks.json")
     other_task = find_task(tasks, "access_learning_resources")
 
@@ -101,7 +101,7 @@ def test_tasks_without_browser_steps_stay_compatible() -> None:
 
 
 def test_sample_task_steps_use_only_supported_actions() -> None:
-    """Every sample step action must be implemented by the runner."""
+
     task = scholarship_task()
 
     for step in task.browser_steps:
@@ -109,14 +109,14 @@ def test_sample_task_steps_use_only_supported_actions() -> None:
 
 
 def test_normalize_handles_underscores_and_case() -> None:
-    """Matching normalization should be forgiving but deterministic."""
+
     assert _normalize("Student_Name") == "student name"
     assert _normalize("  Submit   application ") == "submit application"
     assert _normalize(None) == ""
 
 
 def test_matches_target_prefers_labels_and_accepts_name_fallback() -> None:
-    """Target matching should use labels first and id/name as weak fallback."""
+
     labeled = {"label_text": "Student name", "tag": "input"}
     named_only = {"name": "student_name", "tag": "input"}
     unrelated = {"label_text": "School", "tag": "select"}
@@ -127,13 +127,13 @@ def test_matches_target_prefers_labels_and_accepts_name_fallback() -> None:
 
 
 def test_matches_target_rejects_empty_target() -> None:
-    """An empty target should never match anything."""
+
     assert not _matches_target({"label_text": "Email"}, "")
 
 
 @pytest.mark.parametrize("issue_type", TASK_EXECUTION_ISSUE_TYPES)
 def test_task_execution_rules_exist(issue_type: str) -> None:
-    """Task execution issue types should be documented in the registry."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -143,7 +143,7 @@ def test_task_execution_rules_exist(issue_type: str) -> None:
 
 
 def test_json_report_includes_task_execution_block() -> None:
-    """Reports should carry the execution verdict and step evidence."""
+
     report = build_json_report(
         "examples/sample_task_execution_form.html",
         [],
@@ -158,14 +158,14 @@ def test_json_report_includes_task_execution_block() -> None:
 
 
 def test_json_report_without_execution_is_unchanged() -> None:
-    """Reports built without execution data must not grow the new key."""
+
     report = build_json_report("examples/sample_form.html", [])
 
     assert "task_execution" not in report
 
 
 def test_markdown_report_shows_completed_verdict() -> None:
-    """Markdown should state the keyboard-only completion verdict."""
+
     report = build_json_report(
         "examples/sample_task_execution_form.html",
         [],
@@ -181,7 +181,7 @@ def test_markdown_report_shows_completed_verdict() -> None:
 
 
 def test_markdown_report_shows_blocked_verdict() -> None:
-    """Markdown should name the blocking step when the task fails."""
+
     report = build_json_report(
         "examples/sample_task_execution_form_broken.html",
         [],
@@ -198,7 +198,7 @@ def test_markdown_report_shows_blocked_verdict() -> None:
 
 
 def test_run_task_execution_without_playwright(monkeypatch) -> None:
-    """The executor should degrade gracefully when Playwright is missing."""
+
     monkeypatch.setattr(task_executor, "is_playwright_available", lambda: False)
 
     result = run_task_execution("examples/sample_task_execution_form.html", scholarship_task())
@@ -209,7 +209,7 @@ def test_run_task_execution_without_playwright(monkeypatch) -> None:
 
 
 def test_run_task_execution_requires_browser_steps() -> None:
-    """A task without browser_steps should return a clear error."""
+
     task = AccessibilityTask(id="empty_task", name="Empty task")
 
     result = run_task_execution("examples/sample_form.html", task)
@@ -219,7 +219,7 @@ def test_run_task_execution_requires_browser_steps() -> None:
 
 
 def test_cli_execute_task_requires_browser_flag(capsys) -> None:
-    """--execute-task without --browser should fail with a clear message."""
+
     exit_code = main(
         ["examples/sample_task_execution_form.html", "--execute-task", "submit_scholarship_application"]
     )
@@ -230,7 +230,7 @@ def test_cli_execute_task_requires_browser_flag(capsys) -> None:
 
 
 def test_cli_execute_tasks_requires_browser_flag(capsys) -> None:
-    """Batch --execute-tasks without --browser should fail the same way."""
+
     exit_code = main(
         ["--batch", "examples/sample_task_execution_batch.json", "--execute-tasks"]
     )
@@ -241,7 +241,7 @@ def test_cli_execute_tasks_requires_browser_flag(capsys) -> None:
 
 
 def test_cli_execute_task_unknown_task(monkeypatch, capsys) -> None:
-    """An unknown task id should exit before any browser work."""
+
     import a11yway.main as main_module
 
     monkeypatch.setattr(main_module, "is_playwright_available", lambda: True)
@@ -255,14 +255,14 @@ def test_cli_execute_task_unknown_task(monkeypatch, capsys) -> None:
 
 
 def test_sample_task_execution_fixtures_exist() -> None:
-    """Both sample forms and the batch config should be present."""
+
     assert Path("examples/sample_task_execution_form.html").exists()
     assert Path("examples/sample_task_execution_form_broken.html").exists()
     assert Path("examples/sample_task_execution_batch.json").exists()
 
 
 def test_static_batch_includes_task_execution_columns(tmp_path: Path) -> None:
-    """CSV and index should carry execution fields even without execution."""
+
     out_dir = tmp_path / "batch_sample"
     run_batch("examples/sample_batch.json", out_dir)
 
@@ -278,7 +278,7 @@ def test_static_batch_includes_task_execution_columns(tmp_path: Path) -> None:
 
 @pytest.mark.skipif(not is_playwright_available(), reason="Playwright is not installed")
 def test_accessible_form_task_completes() -> None:
-    """Integration: the accessible sample form should complete every step."""
+
     result = run_task_execution("examples/sample_task_execution_form.html", scholarship_task())
 
     if not result["success"]:
@@ -292,7 +292,7 @@ def test_accessible_form_task_completes() -> None:
 
 @pytest.mark.skipif(not is_playwright_available(), reason="Playwright is not installed")
 def test_broken_form_task_is_blocked_at_submit() -> None:
-    """Integration: the click-only submit div should block the task."""
+
     result = run_task_execution(
         "examples/sample_task_execution_form_broken.html", scholarship_task()
     )
@@ -311,7 +311,7 @@ def test_broken_form_task_is_blocked_at_submit() -> None:
 
 @pytest.mark.skipif(not is_playwright_available(), reason="Playwright is not installed")
 def test_batch_task_execution_records_statuses(tmp_path: Path) -> None:
-    """Integration: batch execution should record per-item verdicts."""
+
     out_dir = tmp_path / "task_execution_batch"
     result = run_batch(
         "examples/sample_task_execution_batch.json",

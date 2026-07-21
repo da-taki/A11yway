@@ -1,11 +1,11 @@
-"""Optional browser interaction audit built on Playwright.
 
-This module is safe to import when Playwright is not installed: everything
-degrades gracefully so static audits keep working without any browser
-dependency. Browser mode approximates keyboard navigation with the Tab key
-and re-checks the JavaScript-rendered DOM. It does not simulate a full
-screen reader, does not crawl sites, and does not log into private pages.
-"""
+
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 try:
     from playwright.sync_api import sync_playwright
-except ImportError:  # Playwright is optional; static mode must keep working.
+except ImportError:
     sync_playwright = None
 
 
@@ -45,13 +45,13 @@ PLAYWRIGHT_SETUP_MESSAGE = (
 
 BROWSER_CHECKS_RUN = ["keyboard_focus_traversal", "browser_dom_snapshot"]
 
-# Tags whose focused instances should always have an accessible name.
+
 CONTROL_TAGS = {"a", "button", "input", "select", "textarea"}
 
-# How many identical focus stops in a row look like a stuck Tab key.
+
 REPEATED_FOCUS_THRESHOLD = 3
 
-# How many consecutive body landings mean focus never re-enters the page.
+
 FOCUS_LOST_THRESHOLD = 3
 
 _PAGE_STATS_SCRIPT = r"""
@@ -146,23 +146,23 @@ _FOCUS_INFO_SCRIPT = r"""
 
 
 def is_playwright_available() -> bool:
-    """Return whether the optional Playwright dependency can be used."""
+
     return sync_playwright is not None
 
 
 def source_to_browser_url(source: str) -> str:
-    """Convert a local file path to a file:// URL; leave real URLs alone."""
+
     if is_url(source):
         return source
     return Path(source).resolve().as_uri()
 
 
 def _accessible_name_guess(info: dict) -> str:
-    """Estimate an accessible name from the strongest available signal.
 
-    The id/name attributes are intentionally excluded: they help reviewers
-    identify the element but are not real accessible names.
-    """
+
+
+
+
     for key in [
         "aria_label",
         "labelledby_text",
@@ -179,23 +179,24 @@ def _accessible_name_guess(info: dict) -> str:
 
 
 def _focus_signature(info: dict) -> tuple:
-    """Return a comparable identity for one focus stop."""
+
     return (
         info.get("tag"),
         info.get("id"),
         info.get("name"),
         info.get("href"),
         info.get("text"),
+        _accessible_name_guess(info),
     )
 
 
 def find_focus_cycle(signatures: list[tuple]) -> int | None:
-    """Return the length of a confirmed repeating cycle at the trace tail.
 
-    A cycle counts as confirmed only when the same signature sequence was
-    observed at least twice in a row, so one accidental revisit is never
-    reported as a trap. Returns the shortest confirmed period, or None.
-    """
+
+
+
+
+
     count = len(signatures)
     for period in range(1, count // 2 + 1):
         if signatures[-period:] == signatures[-2 * period : -period]:
@@ -204,7 +205,7 @@ def find_focus_cycle(signatures: list[tuple]) -> int | None:
 
 
 def _short_element_label(entry: dict) -> str:
-    """Describe one trace entry compactly for loop evidence."""
+
     tag = entry.get("tag") or "element"
     for key in ["id", "name"]:
         value = entry.get(key)
@@ -217,12 +218,12 @@ def _short_element_label(entry: dict) -> str:
 
 
 def _loop_sequence_label(entries: list[dict]) -> str:
-    """Render the looping element sequence as readable evidence."""
+
     return " -> ".join(_short_element_label(entry) for entry in entries)
 
 
 def _trace_entry(step: int, info: dict) -> dict:
-    """Build one focus trace entry for reports."""
+
     return {
         "step": step,
         "tag": info.get("tag"),
@@ -249,7 +250,7 @@ def _browser_issue(
     evidence: dict[str, Any],
     suggested_fix: str,
 ) -> AccessibilityIssue:
-    """Create a keyboard interaction issue with browser evidence."""
+
     evidence = dict(evidence)
     evidence["detected_in"] = "browser_interaction"
     return AccessibilityIssue(
@@ -263,7 +264,7 @@ def _browser_issue(
 
 
 def _element_evidence_from_entry(entry: dict, reason: str) -> dict[str, Any]:
-    """Build evidence for an issue about one focused element."""
+
     evidence: dict[str, Any] = {"step": entry.get("step"), "reason": reason}
     for key in ["tag", "id", "name", "type", "href", "src", "text", "role"]:
         value = entry.get(key)
@@ -278,7 +279,7 @@ def _run_keyboard_traversal(
     max_tabs: int,
     announce_session=None,
 ) -> tuple[list[dict], list[AccessibilityIssue]]:
-    """Press Tab repeatedly and collect a focus trace plus interaction issues."""
+
     trace: list[dict] = []
     issues: list[AccessibilityIssue] = []
     focusable_count = stats.get("focusable_count", 0)
@@ -307,9 +308,9 @@ def _run_keyboard_traversal(
         return trace, issues
 
     signatures: list[tuple] = []
-    # Parallel to signatures: whether a body stop happened right before the
-    # entry. A repeating cycle that passes through the body is a normal page
-    # wrap; a cycle that never touches the body is a trap.
+
+
+
     body_passed: list[bool] = []
     consecutive_repeats = 1
     worst_repeat_count = 1
@@ -330,7 +331,7 @@ def _run_keyboard_traversal(
             pending_body_pass = True
             if body_streak >= FOCUS_LOST_THRESHOLD:
                 focus_lost = True
-                break  # Focus keeps landing on the body and never re-enters.
+                break
             continue
         body_streak = 0
 
@@ -342,9 +343,9 @@ def _run_keyboard_traversal(
         )
         if wrapped and len(set(signatures)) >= focusable_count:
             full_pass = True
-            break  # Focus wrapped after visiting every focusable element.
-        # On an early wrap, keep pressing Tab: a real trap shows up below as
-        # the same subset repeating without a pass through the body.
+            break
+
+
 
         if signatures and signature == signatures[-1]:
             consecutive_repeats += 1
@@ -474,8 +475,8 @@ def _run_keyboard_traversal(
     for entry, signature in zip(trace, signatures):
         announce = entry.get("announce")
         if announce is not None:
-            # The computed accessibility tree is available for this stop, so
-            # it supersedes the heuristic name guess below.
+
+
             if is_unnamed_announcement(announce) and signature not in flagged_unnamed:
                 flagged_unnamed.add(signature)
                 evidence = _element_evidence_from_entry(
@@ -547,7 +548,7 @@ def _run_keyboard_traversal(
 
 
 def _rendered_dom_issues(rendered_html: str) -> list[AccessibilityIssue]:
-    """Re-run the static checks on the JavaScript-rendered DOM."""
+
     issues = analyze_html_static(rendered_html)
     for issue in issues:
         if isinstance(issue.evidence, dict):
@@ -556,7 +557,7 @@ def _rendered_dom_issues(rendered_html: str) -> list[AccessibilityIssue]:
 
 
 def _short_error(error: Exception) -> str:
-    """Return a short, friendly error message for browser failures."""
+
     message = str(error)
     if "Executable doesn't exist" in message or "playwright install" in message:
         return (
@@ -568,7 +569,7 @@ def _short_error(error: Exception) -> str:
 
 
 def _focus_points_from_trace(trace: list[dict]) -> list[dict[str, Any]]:
-    """Return overlay-ready focus points from the browser trace."""
+
     points: list[dict[str, Any]] = []
     for entry in trace:
         points.append(
@@ -596,7 +597,7 @@ def _collect_visual_proof(
     output_dir: str | Path,
     focus_trace: list[dict],
 ) -> dict[str, Any]:
-    """Save screenshot and focus overlay files for a browser run."""
+
     visual_dir = Path(output_dir)
     visual_dir.mkdir(parents=True, exist_ok=True)
     screenshot_path = visual_dir / "page.png"
@@ -626,12 +627,12 @@ def run_browser_audit(
     visual_proof_dir: str | Path | None = None,
     include_axe: bool = False,
 ) -> dict:
-    """Load a page in headless Chromium and run keyboard/DOM checks.
 
-    With include_axe, the axe-core rule set also runs against the rendered
-    page. Always returns a result dict; on any failure success is False and
-    the error field explains what happened, so batch mode can keep going.
-    """
+
+
+
+
+
     result: dict[str, Any] = {
         "mode": "browser",
         "source": source,
@@ -675,7 +676,7 @@ def run_browser_audit(
                             visual_proof_dir,
                             trace,
                         )
-                    except Exception as error:  # noqa: BLE001 - visual proof must not break audit
+                    except Exception as error:
                         result["visual_proof"] = {
                             "enabled": False,
                             "error": _short_error(error),
@@ -695,7 +696,7 @@ def run_browser_audit(
                 result["success"] = True
             finally:
                 browser.close()
-    except Exception as error:  # noqa: BLE001 - batch mode must survive any browser failure
+    except Exception as error:
         result["error"] = _short_error(error)
         result["success"] = False
 
@@ -703,7 +704,7 @@ def run_browser_audit(
 
 
 def _issue_snippet_key(issue: AccessibilityIssue) -> tuple[str, str]:
-    """Return a dedupe key using issue type and evidence snippet."""
+
     snippet = ""
     if isinstance(issue.evidence, dict):
         snippet = issue.evidence.get("snippet", "") or ""
@@ -714,12 +715,12 @@ def merge_browser_issues(
     static_issues: list[AccessibilityIssue],
     browser_result: dict | None,
 ) -> list[AccessibilityIssue]:
-    """Combine static and browser issues without duplicating DOM re-checks.
 
-    Issues the browser DOM re-check found that match a static finding (same
-    issue type and evidence snippet) are dropped, so pages that render the
-    same HTML statically and in the browser are not reported twice.
-    """
+
+
+
+
+
     merged = list(static_issues)
     if not browser_result or not browser_result.get("success"):
         return merged

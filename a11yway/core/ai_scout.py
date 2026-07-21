@@ -1,9 +1,9 @@
-"""Suggest-only Groq-backed AI Scout for A11yway reports.
 
-AI Scout is intentionally secondary to deterministic evidence. It receives a
-compact report summary and returns possible barriers for human review; it must
-not confirm compliance, legal risk, or assistive-technology behavior.
-"""
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ REPLACEMENTS = {
 
 @dataclass
 class AIScoutConfig:
-    """Runtime configuration loaded from environment or local .env."""
+
 
     enabled: bool = False
     mode: str = DEFAULT_MODE
@@ -70,7 +70,7 @@ def _truthy(value: str | None) -> bool:
 
 
 def _read_dotenv(path: str | Path = ".env") -> dict[str, str]:
-    """Read simple KEY=VALUE lines from a local .env without logging values."""
+
     env_path = Path(path)
     values: dict[str, str] = {}
     if not env_path.exists():
@@ -94,7 +94,7 @@ def load_ai_scout_config(
     environ: dict[str, str] | None = None,
     dotenv_path: str | Path = ".env",
 ) -> AIScoutConfig:
-    """Load AI Scout config from process environment, with .env fallback."""
+
     env = dict(environ or os.environ)
     dotenv = _read_dotenv(dotenv_path)
 
@@ -115,7 +115,7 @@ def load_ai_scout_config(
 
 
 def redact_secrets(value: Any, secrets: list[str] | None = None) -> Any:
-    """Return value with known secret strings redacted."""
+
     secret_values = [secret for secret in (secrets or []) if secret]
     if isinstance(value, str):
         redacted = value
@@ -147,7 +147,7 @@ def _base_result(config: AIScoutConfig) -> dict:
 
 
 def unavailable_result(reason: str, config: AIScoutConfig | None = None) -> dict:
-    """Build a structured unavailable/failed result without raising."""
+
     cfg = config or AIScoutConfig()
     result = _base_result(cfg)
     result["status"] = "unavailable" if not cfg.enabled else "failed"
@@ -185,18 +185,18 @@ def _issue_summary(issue: dict) -> dict:
 
 
 def _severity_rank(issue: dict) -> int:
-    """Return a stable severity rank for AI Scout evidence ordering."""
+
     severity = str(issue.get("severity", "") or "").strip().lower()
     return {"high": 0, "medium": 1, "low": 2}.get(severity, 3)
 
 
 def _evidence_group_rank(issue: dict) -> int:
-    """Rank deterministic evidence by usefulness for AI Scout.
 
-    AI Scout should see the strongest, most reviewable evidence first:
-    axe-core results, browser interaction/accessibility-tree evidence,
-    rendered browser DOM evidence, low-vision evidence, then static findings.
-    """
+
+
+
+
+
     evidence = issue.get("evidence", {})
     if not isinstance(evidence, dict):
         return 4
@@ -225,7 +225,7 @@ def select_ai_scout_findings(
     issues: list[dict],
     limit: int = MAX_AI_SCOUT_FINDINGS,
 ) -> list[dict]:
-    """Select the most useful deterministic findings for AI Scout."""
+
     indexed = list(enumerate(issues or []))
     indexed.sort(
         key=lambda item: (
@@ -244,7 +244,7 @@ def build_ai_scout_payload(
     outreach_tone: str = "",
     workflow_pack: str = "",
 ) -> dict:
-    """Create a compact, public-data-only payload for Groq."""
+
     issues = select_ai_scout_findings(report.get("issues", []))
     browser = report.get("browser") or {}
     focus_trace = browser.get("focus_trace", [])[:12]
@@ -377,7 +377,7 @@ def _sanitize_output(value: Any) -> Any:
 
 
 def normalize_ai_scout_output(parsed: dict, config: AIScoutConfig) -> dict:
-    """Normalize model JSON into the public AI Scout report schema."""
+
     safe = _sanitize_output(parsed)
     result = _base_result(config)
     result["enabled"] = True
@@ -414,7 +414,7 @@ def normalize_ai_scout_output(parsed: dict, config: AIScoutConfig) -> dict:
 
 
 def _default_client_factory(api_key: str) -> Any:
-    from groq import Groq  # type: ignore
+    from groq import Groq
 
     return Groq(api_key=api_key)
 
@@ -428,7 +428,7 @@ def run_ai_scout(
     config: AIScoutConfig | None = None,
     client_factory: Callable[[str], Any] | None = None,
 ) -> dict:
-    """Run Groq-backed AI Scout and return structured suggest-only output."""
+
     cfg = config or load_ai_scout_config()
     if not cfg.enabled:
         return unavailable_result("AI Scout is disabled by configuration.", cfg)
@@ -464,7 +464,7 @@ def run_ai_scout(
         return unavailable_result(
             "The official groq Python package is not installed.", cfg
         )
-    except Exception as error:  # noqa: BLE001 - AI Scout must not crash audits
+    except Exception as error:
         return unavailable_result(
             redact_secrets(str(error).strip().splitlines()[0], [cfg.api_key])
             or "Groq request failed.",
@@ -475,7 +475,7 @@ def run_ai_scout(
 
 
 def build_ai_scout_markdown(result: dict) -> str:
-    """Build the required AI Scout Markdown sidecar."""
+
     lines = [
         "### What the AI Found",
         "",
@@ -525,7 +525,7 @@ def build_ai_scout_markdown(result: dict) -> str:
 
 
 def save_ai_scout_outputs(result: dict, base_path: str | Path) -> dict[str, str]:
-    """Save AI Scout JSON and Markdown sidecars using a shared basename."""
+
     base = Path(base_path)
     base.parent.mkdir(parents=True, exist_ok=True)
     json_path = base.with_name(f"{base.name}_ai_scout.json")

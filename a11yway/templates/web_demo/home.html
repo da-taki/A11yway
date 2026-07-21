@@ -30,7 +30,7 @@
             <p class="eyebrow">Tool status</p>
             <h2 id="status-heading">Ready checks</h2>
           </div>
-          <span class="status-pill {% if browser_available %}complete{% else %}running{% endif %}">
+          <span class="status-pill {% if browser_available %}complete{% else %}running{% endif %}" role="status" aria-live="polite">
             {% if browser_available %}Browser ready{% else %}Static ready{% endif %}
           </span>
         </div>

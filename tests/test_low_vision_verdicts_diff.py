@@ -1,4 +1,4 @@
-"""Tests for low-vision checks, reviewer verdicts, and re-audit diffs."""
+
 
 from pathlib import Path
 import csv
@@ -26,7 +26,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 
 def sample_issue(issue_type: str = "missing_form_label") -> dict:
-    """Return a report-style issue dict."""
+
     return {
         "issue_type": issue_type,
         "severity": "high",
@@ -40,12 +40,12 @@ def sample_issue(issue_type: str = "missing_form_label") -> dict:
 
 
 def test_contrast_ratio_black_white_is_about_21() -> None:
-    """Black on white should have the maximum common contrast ratio."""
+
     assert calculate_contrast_ratio("rgb(0, 0, 0)", "rgb(255, 255, 255)") == 21
 
 
 def test_contrast_ratio_low_contrast_is_below_threshold() -> None:
-    """Similar grays should be below the normal text review threshold."""
+
     ratio = calculate_contrast_ratio("rgb(180, 180, 180)", "rgb(255, 255, 255)")
     assert ratio is not None
     assert ratio < 4.5
@@ -61,7 +61,7 @@ def test_contrast_ratio_low_contrast_is_below_threshold() -> None:
     ],
 )
 def test_low_vision_rules_exist(issue_type: str) -> None:
-    """Low-vision issue types should be documented in the rule registry."""
+
     rule = get_rule(issue_type)
 
     assert rule is not None
@@ -70,7 +70,7 @@ def test_low_vision_rules_exist(issue_type: str) -> None:
 
 
 def test_json_report_can_include_low_vision_block() -> None:
-    """JSON reports should carry low-vision metadata when provided."""
+
     report = build_json_report(
         "examples/sample_low_vision_page.html",
         [],
@@ -90,7 +90,7 @@ def test_json_report_can_include_low_vision_block() -> None:
 
 
 def test_markdown_and_html_include_low_vision_section() -> None:
-    """Rendered reports should include low-vision summaries."""
+
     report = build_json_report(
         "examples/sample_low_vision_page.html",
         [],
@@ -109,7 +109,7 @@ def test_markdown_and_html_include_low_vision_section() -> None:
 
 
 def test_cli_low_vision_requires_browser(capsys) -> None:
-    """--low-vision without --browser should fail clearly."""
+
     exit_code = main(["examples/sample_low_vision_page.html", "--low-vision"])
 
     captured = capsys.readouterr()
@@ -118,7 +118,7 @@ def test_cli_low_vision_requires_browser(capsys) -> None:
 
 
 def test_batch_csv_and_index_include_low_vision_columns(tmp_path: Path) -> None:
-    """Batch output should include low-vision columns even in static-only runs."""
+
     out_dir = tmp_path / "batch"
 
     result = run_batch("examples/sample_batch.json", out_dir)
@@ -132,7 +132,7 @@ def test_batch_csv_and_index_include_low_vision_columns(tmp_path: Path) -> None:
 
 @pytest.mark.skipif(not is_playwright_available(), reason="Playwright is not installed")
 def test_sample_low_vision_page_reports_expected_issue_types() -> None:
-    """Integration: the sample page should trigger low-vision issues."""
+
     result = run_low_vision_audit_for_source("examples/sample_low_vision_page.html")
 
     if not result["success"]:
@@ -149,14 +149,14 @@ def test_sample_low_vision_page_reports_expected_issue_types() -> None:
 
 
 def test_issue_fingerprint_is_stable() -> None:
-    """Fingerprints should be stable for the same issue content."""
+
     issue = sample_issue()
 
     assert issue_fingerprint(issue, source="sample.html") == issue_fingerprint(issue, source="sample.html")
 
 
 def test_apply_verdicts_to_report_attaches_review_data() -> None:
-    """Applying verdicts should attach review metadata to matching issues."""
+
     report = {"source_file": "sample.html", "issues": [sample_issue()]}
     fingerprint = issue_fingerprint(report["issues"][0], source="sample.html")
     verdicts = {
@@ -178,7 +178,7 @@ def test_apply_verdicts_to_report_attaches_review_data() -> None:
 
 
 def test_summarize_verdicts_counts_outcomes() -> None:
-    """Verdict summaries should count outcomes and missed issues."""
+
     summary = summarize_verdicts(
         {
             "verdicts": [
@@ -196,7 +196,7 @@ def test_summarize_verdicts_counts_outcomes() -> None:
 
 
 def test_compare_reports_detects_fixed_remaining_and_new() -> None:
-    """Report diffs should categorize issue changes."""
+
     old_report = {
         "source_file": "sample.html",
         "issues": [sample_issue("missing_form_label"), sample_issue("missing_button_name")],
@@ -214,7 +214,7 @@ def test_compare_reports_detects_fixed_remaining_and_new() -> None:
 
 
 def test_compare_reports_detects_task_execution_status_change() -> None:
-    """Report diffs should capture blocked-to-completed task changes."""
+
     old_report = {
         "issues": [],
         "task_execution": {
@@ -244,7 +244,7 @@ def test_compare_reports_detects_task_execution_status_change() -> None:
 
 
 def test_diff_markdown_and_writers(tmp_path: Path) -> None:
-    """Diff helpers should render and write JSON/Markdown outputs."""
+
     diff = compare_reports({"issues": [sample_issue()]}, {"issues": []})
     json_path = tmp_path / "diff.json"
     markdown_path = tmp_path / "diff.md"

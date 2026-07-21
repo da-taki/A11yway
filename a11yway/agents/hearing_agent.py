@@ -1,4 +1,4 @@
-"""Hearing-impaired student agent pseudocode."""
+
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from a11yway.models.task import AccessibilityTask
 
 
 class HearingAgent(BaseAccessibilityAgent):
-    """Simulates a student who needs non-audio alternatives."""
+
 
     name = "Hearing-impaired student"
     description = "Checks captions, transcripts, and audio-only instructions."
@@ -20,12 +20,12 @@ class HearingAgent(BaseAccessibilityAgent):
         task: AccessibilityTask,
         page_context: dict[str, Any],
     ) -> List[AccessibilityIssue]:
-        """Return placeholder hearing accessibility findings."""
+
         findings = []
 
-        # TODO: Detect videos without captions.
-        # TODO: Detect audio lessons without transcripts.
-        # TODO: Check whether important instructions are audio-only.
+
+
+
         if "video" in task.goal.lower() or "lesson" in task.goal.lower():
             findings.append(
                 AccessibilityIssue(

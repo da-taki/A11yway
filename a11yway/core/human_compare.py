@@ -1,4 +1,4 @@
-"""Compare A11yway findings with structured human-tester findings."""
+
 
 from __future__ import annotations
 
@@ -9,12 +9,12 @@ from typing import Any
 
 
 def load_human_review(path: str | Path) -> dict[str, Any]:
-    """Load a human-review comparison file."""
+
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def normalize_compare_text(value: Any) -> str:
-    """Normalize free text for rough matching."""
+
     lowered = str(value or "").casefold()
     cleaned = re.sub(r"[^\w\s#.-]", " ", lowered, flags=re.UNICODE)
     return " ".join(cleaned.split())
@@ -102,7 +102,7 @@ def compare_human_review(
     *,
     match_threshold: float = 0.42,
 ) -> dict[str, Any]:
-    """Match likely equivalent A11yway and human findings."""
+
     a11yway_issues = list(a11yway_report.get("issues", []))
     human_findings = list(
         human_review.get("findings")
@@ -199,7 +199,7 @@ def compare_human_review(
 
 
 def build_human_comparison_markdown(comparison: dict[str, Any]) -> str:
-    """Build a readable human-comparison report."""
+
     summary = comparison.get("summary", {})
     lines = [
         "# A11yway Human-Tester Comparison",
@@ -250,7 +250,7 @@ def save_human_comparison(
     json_path: str | Path | None = None,
     markdown_path: str | Path | None = None,
 ) -> None:
-    """Save human-comparison outputs."""
+
     if json_path:
         path = Path(json_path)
         path.parent.mkdir(parents=True, exist_ok=True)

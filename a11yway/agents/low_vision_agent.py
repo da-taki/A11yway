@@ -1,4 +1,4 @@
-"""Low-vision student agent pseudocode."""
+
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from a11yway.models.task import AccessibilityTask
 
 
 class LowVisionAgent(BaseAccessibilityAgent):
-    """Simulates a student with low vision."""
+
 
     name = "Low-vision student"
     description = "Checks contrast, zoom behavior, small text, and layout overflow."
@@ -20,13 +20,13 @@ class LowVisionAgent(BaseAccessibilityAgent):
         task: AccessibilityTask,
         page_context: dict[str, Any],
     ) -> List[AccessibilityIssue]:
-        """Return placeholder low-vision findings."""
+
         findings = []
 
-        # TODO: Check text and control contrast.
-        # TODO: Test browser zoom at 200 percent and 400 percent.
-        # TODO: Flag small text that is difficult to read.
-        # TODO: Detect horizontal scrolling or content overlap after zoom.
+
+
+
+
         findings.append(
             AccessibilityIssue(
                 title="Low-vision checks are not implemented yet",
