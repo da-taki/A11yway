@@ -59,6 +59,33 @@
     </div>
   </section>
 
+  <section class="dashboard review-lanes" aria-labelledby="lanes-heading">
+    <div class="card-title-row">
+      <div>
+        <p class="eyebrow">Triage lanes</p>
+        <h2 id="lanes-heading">Strongest findings and review calls</h2>
+      </div>
+      <span class="mini-metric">{{ run.top_findings | length }} highlighted</span>
+    </div>
+    {% if run.top_findings %}
+      <div class="lane-grid">
+        {% for finding in run.top_findings[:4] %}
+          <article class="lane-card {{ finding.display_severity | lower | replace(' ', '_') }}">
+            <span class="badge">{{ finding.display_severity }}</span>
+            <h3>{{ finding.title }}</h3>
+            <dl class="finding-quick-meta">
+              <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
+              <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+              <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
+            </dl>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-state compact">No highlighted findings were generated for this run.</p>
+    {% endif %}
+  </section>
+
   <section class="dashboard" aria-labelledby="modules-heading">
     <div class="card-title-row">
       <h2 id="modules-heading">Module status</h2>
@@ -105,6 +132,7 @@
               <dl class="finding-quick-meta">
                 <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
                 <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+                <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
               </dl>
             </div>
             <details open>
@@ -116,6 +144,7 @@
                     <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
                     <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
                     <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
+                    <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
                     <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
                     {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
                   </dl>
