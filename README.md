@@ -1,5 +1,7 @@
 # A11yway
 
+Demo: https://a11yway-soq0.onrender.com/#audit
+
 Current release: `0.8.0-beta.1` (`0.8.0b1` for Python packaging).
 
 A11yway audits essential web workflows for accessibility barriers that block real tasks. It began with education pages and now supports a broader public-interest accessibility stress-testing direction, with static HTML checks by default, an optional headless-browser keyboard audit, and deterministic task execution that proves whether a keyboard-only user can finish a declared workflow.
