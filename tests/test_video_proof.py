@@ -1,8 +1,8 @@
-"""Tests for video proof recording of task executions.
 
-These tests must pass whether or not Playwright is installed. The real
-browser integration tests skip themselves when the browser cannot run.
-"""
+
+
+
+
 
 from pathlib import Path
 
@@ -21,7 +21,7 @@ from a11yway.main import main
 
 
 def scholarship_task():
-    """Load the accessible sample task used across the test suite."""
+
     tasks = load_tasks("examples/sample_tasks.json")
     task = find_task(tasks, "submit_scholarship_application")
     assert task is not None
@@ -29,7 +29,7 @@ def scholarship_task():
 
 
 def execution_with_video(video: dict | None) -> dict:
-    """Build a small execution result carrying video metadata."""
+
     return {
         "task_id": "submit_scholarship_application",
         "task_name": "Submit scholarship application",
@@ -48,7 +48,7 @@ def execution_with_video(video: dict | None) -> dict:
 
 
 def test_cli_video_requires_task_and_visual_proof(capsys) -> None:
-    """--video without its companions should fail clearly."""
+
     exit_code = main(["examples/sample_form.html", "--video"])
 
     captured = capsys.readouterr()
@@ -57,14 +57,14 @@ def test_cli_video_requires_task_and_visual_proof(capsys) -> None:
 
 
 def test_cli_video_guard_is_setup_error_in_ci_mode() -> None:
-    """The same misuse in --ci mode must exit 3."""
+
     exit_code = main(["examples/sample_form.html", "--video", "--ci"])
 
     assert exit_code == 3
 
 
 def test_execution_without_playwright_stays_graceful(monkeypatch, tmp_path: Path) -> None:
-    """Asking for video without Playwright degrades like everything else."""
+
     monkeypatch.setattr(task_executor, "is_playwright_available", lambda: False)
 
     result = run_task_execution(
@@ -79,7 +79,7 @@ def test_execution_without_playwright_stays_graceful(monkeypatch, tmp_path: Path
 
 
 def test_reports_link_the_video_with_caption() -> None:
-    """All report formats should carry the video path and caption."""
+
     video = {
         "enabled": True,
         "path": "reports/visual_task_execution/task_execution.webm",
@@ -109,7 +109,7 @@ def test_reports_link_the_video_with_caption() -> None:
 
 
 def test_reports_show_video_errors_honestly() -> None:
-    """A failed recording must be reported, not hidden."""
+
     report = build_json_report(
         "examples/sample_task_execution_form.html",
         [],
@@ -125,7 +125,7 @@ def test_reports_show_video_errors_honestly() -> None:
 
 
 def test_reports_without_video_stay_unchanged() -> None:
-    """Executions that did not record must not grow video keys."""
+
     report = build_json_report(
         "examples/sample_task_execution_form.html",
         [],
@@ -139,7 +139,7 @@ def test_reports_without_video_stay_unchanged() -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_video_recording_produces_a_webm_file(tmp_path: Path) -> None:
-    """Integration: the recording lands in the requested directory."""
+
     result = run_task_execution(
         "examples/sample_task_execution_form.html",
         scholarship_task(),
@@ -164,7 +164,7 @@ def test_video_recording_produces_a_webm_file(tmp_path: Path) -> None:
     not is_playwright_available(), reason="Playwright is not installed"
 )
 def test_cli_video_end_to_end(tmp_path: Path) -> None:
-    """Integration: --video saves the recording and links it in HTML."""
+
     proof_dir = tmp_path / "visual"
     html_path = tmp_path / "report.html"
 

@@ -1,4 +1,4 @@
-"""HTML media accessibility evidence."""
+
 
 from __future__ import annotations
 
@@ -142,7 +142,7 @@ def analyze_media(html: str, source: str) -> tuple[list[AccessibilityIssue], dic
 
 
 def analyze_media_file(source: str) -> tuple[list[AccessibilityIssue], dict]:
-    """Inspect local media metadata when optional libraries are available."""
+
     issues: list[AccessibilityIssue] = []
     path = Path(source)
     if path.suffix.lower() not in MEDIA_EXTENSIONS:
@@ -176,7 +176,7 @@ def analyze_media_file(source: str) -> tuple[list[AccessibilityIssue], dict]:
         ).to_json()
     try:
         media = mutagen.File(source)
-    except Exception as error:  # noqa: BLE001 - unreadable media should report cleanly
+    except Exception as error:
         issue = extended_issue(
             module="media",
             check_id="media_metadata_read_error",

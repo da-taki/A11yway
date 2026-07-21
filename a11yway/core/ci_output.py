@@ -1,11 +1,11 @@
-"""CI-friendly outputs: exit codes, SARIF 2.1.0, and JUnit XML.
 
-This module turns A11yway JSON reports into artifacts a pipeline can act
-on: a meaningful exit code, a SARIF file so findings render inline on
-GitHub, and a JUnit XML file where each task execution step is a test
-case. Everything here uses only the standard library and works the same
-for single audits and batch runs (a batch is just a list of reports).
-"""
+
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from typing import Any
 
 from a11yway import __version__
 
-# Exit codes for --ci mode.
+
 EXIT_OK = 0
 EXIT_FINDINGS = 1
 EXIT_BLOCKED = 2
@@ -34,7 +34,7 @@ SARIF_VERSION = "2.1.0"
 
 
 def count_findings_at_or_above(reports: list[dict], fail_severity: str) -> int:
-    """Count issues across reports whose severity meets the threshold."""
+
     threshold = SEVERITY_RANK.get(fail_severity, SEVERITY_RANK["high"])
     count = 0
     for report in reports:
@@ -45,7 +45,7 @@ def count_findings_at_or_above(reports: list[dict], fail_severity: str) -> int:
 
 
 def find_blocked_tasks(reports: list[dict]) -> list[dict]:
-    """Return task execution blocks that ran but did not complete."""
+
     blocked = []
     for report in reports:
         execution = report.get("task_execution")
@@ -60,12 +60,12 @@ def compute_ci_exit_code(
     fail_on_blocked: bool = True,
     tool_error: bool = False,
 ) -> int:
-    """Map audit outcomes onto CI exit codes.
 
-    3 = tool or setup error (results are incomplete, so it wins),
-    2 = a task execution was blocked, 1 = findings at or above the
-    severity threshold, 0 = neither.
-    """
+
+
+
+
+
     if tool_error:
         return EXIT_TOOL_ERROR
     if fail_on_blocked and find_blocked_tasks(reports):
@@ -76,7 +76,7 @@ def compute_ci_exit_code(
 
 
 def _source_uri(report: dict) -> str:
-    """Return a SARIF artifact URI for the report's source."""
+
     source = ""
     if isinstance(report.get("source"), dict):
         source = report["source"].get("input") or ""
@@ -87,7 +87,7 @@ def _source_uri(report: dict) -> str:
 
 
 def _result_message(issue: dict) -> str:
-    """Build a readable SARIF result message from one issue."""
+
     parts = [issue.get("message") or issue.get("issue_type", "Accessibility finding")]
     evidence = issue.get("evidence")
     if isinstance(evidence, dict):
@@ -101,7 +101,7 @@ def _result_message(issue: dict) -> str:
 
 
 def build_sarif_report(reports: list[dict]) -> dict:
-    """Build a SARIF 2.1.0 document from one or more A11yway reports."""
+
     rules: list[dict] = []
     rule_indexes: dict[str, int] = {}
     results: list[dict] = []
@@ -192,7 +192,7 @@ def build_sarif_report(reports: list[dict]) -> dict:
 
 
 def save_sarif_report(reports: list[dict], output_path: str | Path) -> None:
-    """Write a SARIF file, creating parent directories if needed."""
+
     import json
 
     path = Path(output_path)
@@ -203,7 +203,7 @@ def save_sarif_report(reports: list[dict], output_path: str | Path) -> None:
 
 
 def _junit_step_message(step: dict) -> str:
-    """Build the failure message for one blocked or failed step."""
+
     parts = [step.get("detail") or "Step failed."]
     target = step.get("target")
     if target:
@@ -214,7 +214,7 @@ def _junit_step_message(step: dict) -> str:
 
 
 def build_junit_xml(reports: list[dict]) -> str:
-    """Build JUnit XML where each task execution step is a test case."""
+
     testsuites = ET.Element("testsuites", name="A11yway task execution")
     total_tests = 0
     total_failures = 0
@@ -286,7 +286,7 @@ def build_junit_xml(reports: list[dict]) -> str:
 
 
 def save_junit_xml(reports: list[dict], output_path: str | Path) -> None:
-    """Write a JUnit XML file, creating parent directories if needed."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_junit_xml(reports), encoding="utf-8")

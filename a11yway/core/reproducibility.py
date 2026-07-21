@@ -1,4 +1,4 @@
-"""Repeat-verification helpers for dynamic browser findings."""
+
 
 from __future__ import annotations
 
@@ -51,12 +51,12 @@ def apply_reproducibility(
     repeated_issue_runs: list[list[AccessibilityIssue]],
     verify_runs: int,
 ) -> list[AccessibilityIssue]:
-    """Annotate primary issues with repeat-verification evidence.
 
-    ``verify_runs`` is the total requested run count, including the primary
-    run. Repeated runs are additional attempts using the same public page and
-    passive browser checks.
-    """
+
+
+
+
+
     if verify_runs <= 1:
         return primary_issues
 
@@ -84,7 +84,7 @@ def apply_reproducibility(
         }
 
         if successful >= verify_runs:
-            issue.confidence = "confirmed"
+            issue.confidence = "repeat_verified"
             issue.evidence["confidence_level"] = "strong"
             issue.evidence["verification_status"] = "repeat_verified"
         elif successful >= max(2, verify_runs - 1):

@@ -1,8 +1,8 @@
-"""Tests for the WCAG 2.2 static checks added to the page analyzer.
 
-Each rule gets at least: one true positive, one clean pass, one known
-exception, and (where relevant) an ambiguity/review-only case.
-"""
+
+
+
+
 
 from pathlib import Path
 
@@ -25,7 +25,7 @@ def wrap(body: str) -> str:
     return f'<html lang="en"><head><title>T</title></head><body>{body}</body></html>'
 
 
-# --- radio_group_missing_fieldset (1.3.1) ---
+
 
 RADIOS = (
     '<input type="radio" name="plan" id="a"><label for="a">A</label>'
@@ -60,14 +60,14 @@ def test_single_radio_is_not_a_group() -> None:
 
 
 def test_fieldset_without_legend_still_flags() -> None:
-    """A fieldset alone does not name the group; a legend is required."""
+
     html = wrap(f"<form><fieldset>{RADIOS}</fieldset></form>")
     assert "radio_group_missing_fieldset" in issue_types(
         analyze_structure_relationships(html)
     )
 
 
-# --- table_missing_headers (1.3.1) ---
+
 
 DATA_ROWS = (
     "<tr><td>Mon</td><td>9:00</td></tr>"
@@ -95,7 +95,7 @@ def test_presentation_table_is_exempt() -> None:
 
 
 def test_single_column_table_is_not_flagged() -> None:
-    """One-column tables are usually layout or lists; too ambiguous."""
+
     html = wrap("<table><tr><td>a</td></tr><tr><td>b</td></tr></table>")
     assert "table_missing_headers" not in issue_types(
         analyze_structure_relationships(html)
@@ -112,7 +112,7 @@ def test_headers_attribute_association_passes() -> None:
     )
 
 
-# --- visual_required_not_programmatic (1.3.1 / 3.3.2) ---
+
 
 
 def test_visual_required_marker_without_required_attr_is_flagged() -> None:
@@ -139,14 +139,14 @@ def test_aria_required_satisfies_marker() -> None:
 
 
 def test_not_required_label_is_exempt() -> None:
-    """Labels saying 'not required' or 'optional' must not match."""
+
     html = wrap('<form><label for="n">Nickname (not required)</label><input type="text" id="n"></form>')
     assert "visual_required_not_programmatic" not in issue_types(
         analyze_structure_relationships(html)
     )
 
 
-# --- fake_heading (1.3.1, review-only) ---
+
 
 
 def test_large_bold_styled_div_is_flagged_for_review() -> None:
@@ -174,13 +174,13 @@ def test_div_with_heading_role_is_exempt() -> None:
 
 
 def test_long_bold_paragraph_text_is_ambiguous_and_skipped() -> None:
-    """Long decorated text is likely a callout, not a heading."""
+
     long_text = "word " * 40
     html = wrap(f'<div style="font-size: 28px; font-weight: bold;">{long_text}</div>')
     assert "fake_heading" not in issue_types(analyze_structure_relationships(html))
 
 
-# --- sensory_instruction (1.3.3, review-only) ---
+
 
 
 def test_click_the_red_button_is_flagged_for_review() -> None:
@@ -211,12 +211,12 @@ def test_plain_instruction_passes() -> None:
 
 
 def test_color_mention_without_instruction_verb_is_not_flagged() -> None:
-    """Descriptive prose about colors is not an instruction."""
+
     html = wrap("<p>Our logo features a red circle above a blue box of text.</p>")
     assert analyze_sensory_instructions(html) == []
 
 
-# --- missing_autocomplete (1.3.5) ---
+
 
 
 def test_email_input_without_autocomplete_is_flagged() -> None:
@@ -237,6 +237,71 @@ def test_autocomplete_present_passes() -> None:
     assert analyze_input_purposes(html) == []
 
 
+def test_invalid_autocomplete_token_is_flagged() -> None:
+    html = wrap('<form><label for="e">Email</label><input type="email" id="e" autocomplete="mailbox"></form>')
+    assert issue_types(analyze_input_purposes(html)) == {"invalid_autocomplete_token"}
+
+
+def test_contradictory_autocomplete_token_is_flagged() -> None:
+    html = wrap('<form><label for="e">Email</label><input type="email" id="e" autocomplete="postal-code"></form>')
+    assert issue_types(analyze_input_purposes(html)) == {"contradictory_autocomplete"}
+
+
+def test_autocomplete_on_unsupported_control_is_flagged() -> None:
+    html = wrap('<form><input type="checkbox" name="agree" autocomplete="email"></form>')
+    assert issue_types(analyze_input_purposes(html)) == {"autocomplete_unsupported_control"}
+
+
+def test_search_box_with_autocomplete_off_is_not_flagged() -> None:
+    html = wrap('<form><label for="q">Search</label><input type="search" id="q" autocomplete="off"></form>')
+    assert analyze_input_purposes(html) == []
+
+
+def test_section_and_shipping_autocomplete_tokens_pass() -> None:
+    html = wrap('<form><label for="e">Email</label><input type="email" id="e" autocomplete="section-a shipping email"></form>')
+    assert analyze_input_purposes(html) == []
+
+
+def test_accessible_authentication_barrier_is_flagged() -> None:
+    html = wrap('<form><label for="p">Password</label><input id="p" type="password" onpaste="return false"><p>CAPTCHA</p></form>')
+    assert "accessible_authentication_barrier" in issue_types(analyze_html_static(html))
+
+
+def test_accessible_authentication_with_alternative_passes() -> None:
+    html = wrap('<form><label for="p">Password</label><input id="p" type="password"><p>Use a passkey or one-time code alternative.</p></form>')
+    assert "accessible_authentication_barrier" not in issue_types(analyze_html_static(html))
+
+
+def test_redundant_entry_repeated_field_is_flagged() -> None:
+    html = wrap('<form><label for="e1">Email</label><input id="e1" type="email"><label for="e2">Confirm email</label><input id="e2" type="email"></form>')
+    assert "redundant_entry_repeated_field" in issue_types(analyze_html_static(html))
+
+
+def test_high_consequence_form_without_review_is_flagged() -> None:
+    html = wrap('<form><p>Final exam application payment</p><label for="n">Name</label><input id="n" name="name"><button>Submit</button></form>')
+    assert "error_prevention_missing" in issue_types(analyze_html_static(html))
+
+
+def test_high_consequence_form_with_review_passes() -> None:
+    html = wrap('<form><p>Final exam application payment</p><p>Review and confirm before submit.</p><label for="n">Name</label><input id="n" name="name"><button>Submit</button></form>')
+    assert "error_prevention_missing" not in issue_types(analyze_html_static(html))
+
+
+def test_status_message_without_live_region_is_flagged() -> None:
+    html = wrap('<div class="toast success">Saved successfully</div>')
+    assert "status_message_not_live" in issue_types(analyze_html_static(html))
+
+
+def test_status_message_with_live_region_passes() -> None:
+    html = wrap('<div class="toast success" role="status">Saved successfully</div>')
+    assert "status_message_not_live" not in issue_types(analyze_html_static(html))
+
+
+def test_status_heading_is_not_treated_as_dynamic_status() -> None:
+    html = wrap('<section aria-labelledby="status-heading"><h2 id="status-heading">Ready checks</h2><p>Static HTML parser</p></section>')
+    assert "status_message_not_live" not in issue_types(analyze_html_static(html))
+
+
 def test_search_box_is_exempt() -> None:
     html = wrap('<form><label for="q">Search</label><input type="search" id="q" name="q"></form>')
     assert analyze_input_purposes(html) == []
@@ -248,7 +313,7 @@ def test_one_time_code_is_exempt() -> None:
 
 
 def test_ambiguous_text_field_is_skipped() -> None:
-    """A field whose purpose cannot be inferred confidently is not flagged."""
+
     html = wrap('<form><label for="x">Project reference</label><input type="text" id="x"></form>')
     assert analyze_input_purposes(html) == []
 
@@ -267,7 +332,7 @@ def test_input_outside_form_is_skipped() -> None:
     assert analyze_input_purposes(html) == []
 
 
-# --- no_bypass_mechanism (2.4.1) ---
+
 
 NAV_LINKS = "".join(f'<a href="/p{i}">Page {i}</a>' for i in range(6))
 BODY_LINKS = "".join(f'<a href="/d{i}">Doc {i}</a>' for i in range(6))
@@ -305,7 +370,7 @@ def test_small_page_without_repeated_blocks_is_not_flagged() -> None:
     assert analyze_bypass_blocks(html) == []
 
 
-# --- label_in_name_mismatch (2.5.3) ---
+
 
 
 def test_aria_label_missing_visible_text_is_flagged() -> None:
@@ -320,7 +385,7 @@ def test_functional_menu_control_label_is_not_treated_as_page_copy() -> None:
 
 
 def test_aria_label_containing_visible_text_passes() -> None:
-    """Exact equality is not required; containment after normalization is."""
+
     html = wrap('<a href="/g" aria-label="Learn more about scholarships">Learn More!</a>')
     assert analyze_label_in_name(html) == []
 
@@ -340,7 +405,7 @@ def test_input_button_value_is_compared() -> None:
     assert issue_types(analyze_label_in_name(html)) == {"label_in_name_mismatch"}
 
 
-# --- fixtures ---
+
 
 
 def test_seeded_structure_sample_reports_all_new_checks() -> None:
@@ -375,7 +440,7 @@ def test_clean_structure_sample_passes_new_checks() -> None:
     )
 
 
-# --- additional WCAG static evidence checks ---
+
 
 
 def wcag_types(html: str) -> set[str]:

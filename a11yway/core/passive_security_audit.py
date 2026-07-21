@@ -1,9 +1,9 @@
-"""Opt-in passive security observations.
 
-This module never attacks, fuzzes, authenticates, or validates exploits. It
-only inspects the provided public HTML/source metadata and optional response
-headers already available from normal fetching.
-"""
+
+
+
+
+
 
 from __future__ import annotations
 

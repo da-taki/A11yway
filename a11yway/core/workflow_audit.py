@@ -1,4 +1,4 @@
-"""Safe multi-page workflow testing."""
+
 
 from __future__ import annotations
 
@@ -194,7 +194,7 @@ def run_workflow_audit(config_path: str | Path, *, safe_public_mode: bool = True
                         page.reload(wait_until="domcontentloaded")
                     else:
                         raise AssertionError(f"Unsupported safe action: {action}")
-                except Exception as error:  # noqa: BLE001 - record blocker
+                except Exception as error:
                     result["status"] = "failed"
                     result["reason"] = str(error)
                     issues.append(

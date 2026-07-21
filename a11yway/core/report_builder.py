@@ -1,4 +1,4 @@
-"""Build structured A11yway reports."""
+
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ REPORT_SCHEMA_VERSION = "1.0"
 
 
 def _count_by(items: list[str]) -> dict[str, int]:
-    """Count string values while keeping the report builder dependency-free."""
+
     counts: dict[str, int] = {}
     for item in items:
         counts[item] = counts.get(item, 0) + 1
@@ -38,13 +38,13 @@ def _count_by(items: list[str]) -> dict[str, int]:
 
 
 def merge_counts(target: dict[str, int], source: dict[str, int]) -> None:
-    """Merge count dictionaries in place."""
+
     for key, value in source.items():
         target[key] = target.get(key, 0) + value
 
 
 def _format_evidence_for_json(evidence: str | dict) -> dict:
-    """Return evidence as a JSON-ready object."""
+
     if isinstance(evidence, dict):
         return evidence
     return {"description": evidence}
@@ -62,7 +62,7 @@ TASK_EXECUTION_LIMITATIONS = [
 
 
 def _visual_proof_for_report(visual_proof: dict | None) -> dict | None:
-    """Return compact visual proof metadata suitable for JSON reports."""
+
     if not visual_proof:
         return None
     if visual_proof.get("enabled") is False:
@@ -94,7 +94,7 @@ def build_json_report(
     ai_scout_result: dict | None = None,
     extended_results: list[dict] | None = None,
 ) -> dict:
-    """Build the prototype JSON report shape for CLI exports."""
+
     page_url = ""
     if source_metadata:
         page_url = (
@@ -296,7 +296,7 @@ def build_json_report(
 
 
 def save_json_report(report: dict, output_path: str | Path) -> None:
-    """Write a prototype JSON report, creating parent directories if needed."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -305,7 +305,7 @@ def save_json_report(report: dict, output_path: str | Path) -> None:
 
 
 def _format_count_items(counts: dict) -> list[str]:
-    """Format report count dictionaries for Markdown output."""
+
     if not counts:
         return ["- None"]
     return [f"- {key}: {value}" for key, value in counts.items()]
@@ -401,7 +401,7 @@ _EVIDENCE_KEYS = [
 
 
 def _format_evidence_lines(evidence: dict) -> list[str]:
-    """Format structured evidence for Markdown output."""
+
     lines = []
     for key in _EVIDENCE_KEYS:
         value = evidence.get(key)
@@ -416,7 +416,7 @@ def _format_evidence_lines(evidence: dict) -> list[str]:
 
 
 def build_markdown_report(report: dict) -> str:
-    """Build a readable Markdown report from a JSON-style report dict."""
+
     summary = report.get("summary", {})
     source = report.get("source", {})
     source_label = source.get("input") or report.get("source_file", "")
@@ -849,16 +849,14 @@ def build_markdown_report(report: dict) -> str:
                 "## WCAG 2.2 Coverage Snapshot",
                 "",
                 "How A11yway's checks relate to the "
-                f"{coverage.get('total_criteria', 86)} WCAG "
+                f"{coverage.get('total_criteria', 55)} WCAG "
                 f"{coverage.get('wcag_version', '2.2')} Success Criteria. "
                 "This describes tool coverage, not the conformance of the "
                 "audited page.",
                 "",
-                f"- Direct native coverage: {counts.get('direct', 0)}",
-                f"- Partial native coverage: {counts.get('partial', 0)}",
-                f"- Supporting evidence only: {counts.get('supporting_evidence', 0)}",
-                f"- Covered only through the optional axe-core scan: {counts.get('axe_only', 0)}",
-                f"- Manual review only: {counts.get('manual_only', 0)}",
+                f"- Automated: {counts.get('automated', 0)}",
+                f"- Partially automated: {counts.get('partially_automated', 0)}",
+                f"- Manual only: {counts.get('manual_only', 0)}",
                 f"- Unsupported: {counts.get('unsupported', 0)}",
                 "",
                 f"{coverage.get('note', '')}",
@@ -874,21 +872,21 @@ def build_markdown_report(report: dict) -> str:
 
 
 def save_markdown_report(report: dict, output_path: str | Path) -> None:
-    """Write a Markdown report, creating parent directories if needed."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_markdown_report(report), encoding="utf-8")
 
 
 def _html_list(items: list[str]) -> str:
-    """Render a simple HTML list."""
+
     if not items:
         return "<p>None.</p>"
     return "<ul>" + "".join(f"<li>{escape(str(item))}</li>" for item in items) + "</ul>"
 
 
 def _html_count_list(counts: dict) -> str:
-    """Render count dictionaries as an HTML list."""
+
     if not counts:
         return "<p>None.</p>"
     return "<ul>" + "".join(
@@ -898,7 +896,7 @@ def _html_count_list(counts: dict) -> str:
 
 
 def _html_evidence(evidence: dict) -> str:
-    """Render structured evidence for the HTML report."""
+
     rows = []
     for key in _EVIDENCE_KEYS:
         value = evidence.get(key)
@@ -917,7 +915,7 @@ def _html_evidence(evidence: dict) -> str:
 
 
 def build_html_report(report: dict) -> str:
-    """Build a self-contained HTML report from a JSON-style report dict."""
+
     summary = report.get("summary", {})
     source = report.get("source", {})
     source_label = source.get("input") or report.get("source_file", "")
@@ -1366,16 +1364,14 @@ def build_html_report(report: dict) -> str:
                 "<section>",
                 "<h2>WCAG 2.2 Coverage Snapshot</h2>",
                 "<p>How A11yway's checks relate to the "
-                f"{coverage.get('total_criteria', 86)} WCAG "
+                f"{coverage.get('total_criteria', 55)} WCAG "
                 f"{escape(str(coverage.get('wcag_version', '2.2')))} Success "
                 "Criteria. This describes tool coverage, not the conformance "
                 "of the audited page.</p>",
                 "<ul>",
-                f"<li>Direct native coverage: {counts.get('direct', 0)}</li>",
-                f"<li>Partial native coverage: {counts.get('partial', 0)}</li>",
-                f"<li>Supporting evidence only: {counts.get('supporting_evidence', 0)}</li>",
-                f"<li>Covered only through the optional axe-core scan: {counts.get('axe_only', 0)}</li>",
-                f"<li>Manual review only: {counts.get('manual_only', 0)}</li>",
+                f"<li>Automated: {counts.get('automated', 0)}</li>",
+                f"<li>Partially automated: {counts.get('partially_automated', 0)}</li>",
+                f"<li>Manual only: {counts.get('manual_only', 0)}</li>",
                 f"<li>Unsupported: {counts.get('unsupported', 0)}</li>",
                 "</ul>",
                 f"<p class=\"meta\">{escape(str(coverage.get('note', '')))}</p>",
@@ -1398,14 +1394,14 @@ def build_html_report(report: dict) -> str:
 
 
 def save_html_report(report: dict, output_path: str | Path) -> None:
-    """Write a self-contained HTML report, creating parent directories."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_html_report(report), encoding="utf-8")
 
 
 def build_batch_index_report(items: list[dict]) -> dict:
-    """Build a JSON-ready index for a batch audit run."""
+
     counts_by_severity: dict[str, int] = {}
     counts_by_issue_type: dict[str, int] = {}
 
@@ -1469,7 +1465,7 @@ def build_batch_index_report(items: list[dict]) -> dict:
 
 
 def build_batch_index_markdown(index_report: dict) -> str:
-    """Build a readable Markdown index for a batch audit run."""
+
     summary = index_report.get("summary", {})
     lines = [
         "# A11yway Batch Accessibility Index",
@@ -1525,14 +1521,14 @@ def build_batch_index_markdown(index_report: dict) -> str:
 
 
 def save_batch_index_markdown(index_report: dict, output_path: str | Path) -> None:
-    """Write a Markdown batch index, creating parent directories if needed."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_batch_index_markdown(index_report), encoding="utf-8")
 
 
 def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
-    """Write a spreadsheet-friendly CSV index for a batch audit."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
@@ -1602,12 +1598,12 @@ def save_batch_index_csv(index_report: dict, output_path: str | Path) -> None:
 
 
 def _sorted_issue_type_counts(counts: dict[str, int]) -> list[tuple[str, int]]:
-    """Return issue type counts sorted by count (highest first), then name."""
+
     return sorted(counts.items(), key=lambda pair: (-pair[1], pair[0]))
 
 
 def build_evaluation_summary_markdown(index_report: dict, config_path: str = "") -> str:
-    """Build a reviewer-friendly Markdown summary for a whole batch run."""
+
     summary = index_report.get("summary", {})
     sources = index_report.get("sources", [])
     severity_counts = summary.get("counts_by_severity", {})
@@ -1762,7 +1758,7 @@ def save_evaluation_summary_markdown(
     output_path: str | Path,
     config_path: str = "",
 ) -> None:
-    """Write the batch evaluation summary, creating parent directories if needed."""
+
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -1772,7 +1768,7 @@ def save_evaluation_summary_markdown(
 
 
 class ReportBuilder:
-    """Converts agent findings into report objects and export formats."""
+
 
     def build_report(
         self,
@@ -1780,7 +1776,7 @@ class ReportBuilder:
         agents_used: List[str],
         issues: List[AccessibilityIssue],
     ) -> AccessibilityReport:
-        """Create an accessibility report object."""
+
         return AccessibilityReport(
             task=task,
             agents_used=agents_used,
@@ -1789,18 +1785,18 @@ class ReportBuilder:
         )
 
     def export_json(self, report: AccessibilityReport, path: Path) -> None:
-        """Export a report as JSON.
 
-        TODO: Decide final report schema before using this in production.
-        """
+
+
+
         with path.open("w", encoding="utf-8") as file:
             json.dump(asdict(report), file, indent=2)
 
     def export_markdown(self, report: AccessibilityReport, path: Path) -> None:
-        """Export a simple Markdown report.
 
-        TODO: Replace this with a better report template later.
-        """
+
+
+
         lines = [
             f"# A11yway Report: {report.task.title}",
             "",

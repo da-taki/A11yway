@@ -1,4 +1,4 @@
-"""Complex component pattern checks."""
+
 
 from __future__ import annotations
 

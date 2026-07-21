@@ -1,144 +1,136 @@
-"""Tests for the WCAG 2.2 coverage registry and CLI command."""
+import json
+from pathlib import Path
 
 from a11yway.core.rules import RULES, enrich_issue_with_rule
 from a11yway.core.wcag_coverage import (
-    AXE_COVERED_CRITERIA,
-    CONFIDENCE_LEVELS,
-    COVERAGE_LEVELS,
-    DETECTION_MODES,
     RULE_WCAG_MAP,
     WCAG_2_2_CRITERIA,
-    best_native_coverage,
     build_coverage_markdown,
     build_coverage_matrix,
     coverage_summary,
     format_coverage_cli,
+    load_coverage_registry,
+    rule_coverage_index,
     wcag_mappings_for_issue_type,
 )
 from a11yway.main import main
 
 
-def test_wcag_2_2_has_86_criteria() -> None:
-    """WCAG 2.2 defines 86 Success Criteria (4.1.1 was removed)."""
-    assert len(WCAG_2_2_CRITERIA) == 86
-    assert "4.1.1" not in WCAG_2_2_CRITERIA
-    assert WCAG_2_2_CRITERIA["2.5.8"]["name"] == "Target Size (Minimum)"
-    assert all(
-        info["level"] in {"A", "AA", "AAA"} for info in WCAG_2_2_CRITERIA.values()
-    )
+def test_wcag22_registry_scope_and_schema() -> None:
+    registry = load_coverage_registry()
+    criteria = registry["criteria"]
+    assert registry["allowed_coverage_statuses"] == [
+        "automated",
+        "partially_automated",
+        "manual_only",
+        "unsupported",
+    ]
+    assert len(criteria) == 55
+    assert "4.1.1" not in {row["criterion"] for row in criteria}
+    for row in criteria:
+        assert row["criterion"] in WCAG_2_2_CRITERIA
+        assert WCAG_2_2_CRITERIA[row["criterion"]]["level"] in {"A", "AA"}
+        assert row["short_name"] == WCAG_2_2_CRITERIA[row["criterion"]]["name"]
+        assert row["level"] in {"A", "AA"}
+        assert row["coverage_status"] in registry["allowed_coverage_statuses"]
+        assert isinstance(row["implemented_rule_ids"], list)
+        assert isinstance(row["testing_engines_used"], list)
+        assert isinstance(row["evidence_produced"], list)
+        assert row["limitations"]
+        assert isinstance(row["human_review_required"], bool)
 
 
-def test_every_rule_has_a_wcag_mapping_and_vice_versa() -> None:
-    """The rule registry and the coverage map must stay in sync."""
+def test_rule_registry_and_mapping_stay_synchronized() -> None:
     assert set(RULES) == set(RULE_WCAG_MAP)
-
-
-def test_mappings_reference_valid_criteria_and_vocabulary() -> None:
-    """Every mapping must use known criteria, levels, and modes."""
+    assert len(RULES) == len(set(RULES))
     for issue_type, mappings in RULE_WCAG_MAP.items():
         assert mappings, issue_type
         for mapping in mappings:
-            assert mapping["sc"] in WCAG_2_2_CRITERIA, issue_type
-            assert mapping["coverage"] in COVERAGE_LEVELS[:3], issue_type
-            assert mapping["detection_mode"] in DETECTION_MODES, issue_type
-            assert mapping["confidence"] in CONFIDENCE_LEVELS, issue_type
-            assert mapping["limitations"], issue_type
-            assert mapping["manual_check"], issue_type
+            assert mapping["sc"] in WCAG_2_2_CRITERIA
+            assert mapping["sc"] != "4.1.1"
+            assert mapping["coverage"] in {"direct", "partial", "supporting_evidence"}
+            assert mapping["detection_mode"]
+            assert mapping["limitations"]
+            assert mapping["manual_check"]
 
 
-def test_axe_covered_criteria_are_valid() -> None:
-    """Axe coverage hints must reference real WCAG 2.2 criteria."""
-    assert AXE_COVERED_CRITERIA <= set(WCAG_2_2_CRITERIA)
-
-
-def test_summary_counts_each_criterion_once() -> None:
-    """A criterion mapped by several rules must not be double counted."""
+def test_coverage_summary_counts_required_statuses() -> None:
     summary = coverage_summary()
-    counts = summary["counts"]
+    assert summary["total_criteria"] == 55
+    assert summary["counts"] == {
+        "automated": 1,
+        "partially_automated": 45,
+        "manual_only": 4,
+        "unsupported": 5,
+    }
     buckets = [
-        set(summary["direct"]),
-        set(summary["partial"]),
-        set(summary["supporting_evidence"]),
-        set(summary["axe_only"]),
+        set(summary["automated"]),
+        set(summary["partially_automated"]),
         set(summary["manual_only"]),
         set(summary["unsupported"]),
     ]
-    # Buckets are disjoint and cover all 86 criteria exactly once.
     combined: set[str] = set()
     for bucket in buckets:
         assert not (combined & bucket)
         combined |= bucket
-    assert combined == set(WCAG_2_2_CRITERIA)
-    assert sum(counts.values()) == 86
-    # 4.1.2 is mapped by several rules but appears in exactly one bucket.
-    appearances = sum(1 for bucket in buckets if "4.1.2" in bucket)
-    assert appearances == 1
+    assert combined == {row["criterion"] for row in load_coverage_registry()["criteria"]}
 
 
-def test_best_native_coverage_prefers_strongest_level() -> None:
-    """2.1.1 has partial task-execution coverage, which beats supporting."""
-    best = best_native_coverage()
-    assert best["2.1.1"]["coverage"] == "partial"
-    # 1.3.3 only has a review-only heuristic.
-    assert best["1.3.3"]["coverage"] == "supporting_evidence"
-
-
-def test_coverage_matrix_has_one_row_per_criterion() -> None:
-    """The matrix must cover every criterion, sorted numerically."""
+def test_coverage_matrix_and_markdown_are_generated_from_json() -> None:
+    registry = load_coverage_registry()
     rows = build_coverage_matrix()
-    assert len(rows) == 86
-    scs = [row["sc"] for row in rows]
-    assert scs.index("1.4.9") < scs.index("1.4.10")
-    manual = [row for row in rows if row["coverage_type"] == "manual_only"]
-    assert all(not row["native_rules"] for row in manual)
-    assert all(row["native_coverage"] != "none" for row in rows if row["native_rules"])
+    assert rows == sorted(registry["criteria"], key=lambda row: tuple(int(part) for part in row["criterion"].split(".")))
+    markdown = build_coverage_markdown()
+    docs = Path("docs/WCAG22_COVERAGE.md").read_text(encoding="utf-8")
+    assert markdown == docs
+    assert "| Criterion | Short name | Level | Status | Rules | Engines | Evidence | Human review required | Limitations |" in markdown
+    assert "This figure is not WCAG conformance" in markdown
 
 
-def test_cli_output_avoids_conformance_claims() -> None:
-    """Coverage text must never read as a conformance claim."""
-    for text in [format_coverage_cli(), build_coverage_markdown()]:
-        lowered = text.lower()
-        assert "not a" in lowered and "conformance" in lowered
-        assert "wcag compliant" not in lowered
-        assert "certified" not in lowered
+def test_coverage_json_file_matches_loader() -> None:
+    raw = json.loads(Path("a11yway/data/wcag22_coverage.json").read_text(encoding="utf-8"))
+    assert raw == load_coverage_registry()
 
 
-def test_wcag_coverage_cli_flag(capsys) -> None:
-    """--wcag-coverage prints the summary and exits cleanly."""
+def test_cli_output_uses_honest_a_aa_labels(capsys) -> None:
     exit_code = main(["--wcag-coverage"])
     captured = capsys.readouterr()
-
     assert exit_code == 0
-    assert "Total WCAG 2.2 Success Criteria: 86" in captured.out
-    assert "Direct native coverage" in captured.out
-    assert "Manual review only" in captured.out
-    assert "Unsupported" in captured.out
+    assert "Total WCAG 2.2 Level A and AA Success Criteria: 55" in captured.out
+    assert "Automated: 1" in captured.out
+    assert "Partially automated: 45" in captured.out
+    assert "Manual only: 4" in captured.out
+    assert "Unsupported: 5" in captured.out
+    assert "Automated or partially automated rule coverage" in captured.out
+    assert "This figure is not WCAG conformance" in captured.out
+    assert "Automated or partially automated rule coverage" in captured.out
+    assert "Criteria covered by each A11yway rule" in captured.out
 
 
-def test_wcag_coverage_markdown_flag(tmp_path, capsys) -> None:
-    """--wcag-coverage-markdown writes the full matrix."""
+def test_wcag_coverage_markdown_flag(tmp_path) -> None:
     output = tmp_path / "coverage.md"
-    exit_code = main(["--wcag-coverage-markdown", str(output)])
+    assert main(["--wcag-coverage-markdown", str(output)]) == 0
+    assert output.read_text(encoding="utf-8") == build_coverage_markdown()
 
-    assert exit_code == 0
-    text = output.read_text(encoding="utf-8")
-    assert "| WCAG Success Criterion | Name | Level | Native coverage | Axe-only coverage | Coverage type | A11yway rules | Evidence mode | Limitations | Manual testing needed |" in text
-    assert "| 2.5.8 | Target Size (Minimum) | AA | partial | no | partial |" in text
-    assert "manual_only" in text
+
+def test_rule_coverage_index_does_not_double_count_criteria() -> None:
+    index = rule_coverage_index()
+    assert index["missing_autocomplete"] == ["1.3.5"]
+    assert index["invalid_autocomplete_token"] == ["1.3.5"]
+    assert index["accessible_authentication_barrier"] == ["3.3.8"]
+    assert len(set(index["missing_form_label"])) == len(index["missing_form_label"])
 
 
 def test_enriched_issue_carries_wcag_and_confidence() -> None:
-    """Report issues expose WCAG mappings and a confidence level."""
     enriched = enrich_issue_with_rule(
         {
-            "issue_type": "missing_autocomplete",
+            "issue_type": "invalid_autocomplete_token",
             "severity": "medium",
             "message": "x",
             "evidence": {},
             "suggested_fix": "",
         }
     )
-
     assert enriched["confidence"] == "likely"
     assert [m["sc"] for m in enriched["wcag"]] == ["1.3.5"]
     assert enriched["wcag"][0]["coverage"] == "partial"
@@ -146,19 +138,15 @@ def test_enriched_issue_carries_wcag_and_confidence() -> None:
 
 
 def test_unknown_issue_type_gets_fallback_confidence() -> None:
-    """Unknown checks never break enrichment."""
     enriched = enrich_issue_with_rule(
         {"issue_type": "future_rule", "severity": "low", "evidence": {}}
     )
-
     assert enriched["confidence"] == "needs_review"
     assert "wcag" not in enriched
 
 
 def test_wcag_mappings_are_copies() -> None:
-    """Callers must not be able to mutate the registry."""
     first = wcag_mappings_for_issue_type("keyboard_trap")
     first[0]["coverage"] = "mutated"
     second = wcag_mappings_for_issue_type("keyboard_trap")
-
     assert second[0]["coverage"] == "partial"

@@ -1,26 +1,28 @@
-"""WCAG 2.2 coverage registry for A11yway.
 
-This module maps every A11yway rule to the WCAG 2.2 Success Criteria it
-relates to, states how strong that relationship is, and computes honest
-coverage statistics. It exists so reports and documentation can say what
-A11yway actually checks without implying WCAG conformance.
 
-Coverage levels (per rule-to-criterion mapping):
 
-- ``direct``: the rule deterministically observes the specific failure the
-  criterion describes, within the rule's documented scope.
-- ``partial``: the rule observes a meaningful slice of the criterion, but
-  common failure modes remain undetected.
-- ``supporting_evidence``: the rule produces evidence a human reviewer can
-  use when judging the criterion, but does not itself test it.
-- ``manual_only``: no A11yway rule produces evidence; a human must test.
 
-Nothing here is a conformance claim. Even a criterion listed as ``direct``
-is only covered for the narrow situations the rule documents.
-"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
 
@@ -38,10 +40,18 @@ DETECTION_MODES = [
     "axe_core",
 ]
 
-CONFIDENCE_LEVELS = ["confirmed", "likely", "needs_review", "informational"]
+CONFIDENCE_LEVELS = [
+    "confirmed_by_multiple_engines",
+    "repeat_verified",
+    "strong",
+    "likely",
+    "needs_review",
+    "weak_heuristic",
+    "informational",
+]
 
 
-# All 86 WCAG 2.2 Success Criteria (4.1.1 Parsing was removed in WCAG 2.2).
+
 WCAG_2_2_CRITERIA: dict[str, dict[str, str]] = {
     "1.1.1": {"name": "Non-text Content", "level": "A"},
     "1.2.1": {"name": "Audio-only and Video-only (Prerecorded)", "level": "A"},
@@ -140,7 +150,7 @@ def _mapping(
     limitations: str,
     manual_check: str,
 ) -> dict[str, str]:
-    """Build one rule-to-criterion mapping entry."""
+
     return {
         "sc": sc,
         "name": WCAG_2_2_CRITERIA[sc]["name"],
@@ -153,9 +163,9 @@ def _mapping(
     }
 
 
-# What each A11yway rule actually proves, per Success Criterion. The mapping
-# reflects rule behavior, not rule names: a rule maps to a criterion only when
-# its evidence is usable for that criterion.
+
+
+
 RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
     "missing_form_label": [
         _mapping(
@@ -343,7 +353,7 @@ RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
     ],
     "keyboard_trap": [
         _mapping(
-            "2.1.2", "partial", "browser_interaction", "confirmed",
+            "2.1.2", "partial", "browser_interaction", "strong",
             "Observed Tab-only behavior; a documented escape mechanism (Escape, arrow keys) would not be seen.",
             "Confirm the loop by hand and check for documented escape mechanisms.",
         ),
@@ -357,14 +367,14 @@ RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
     ],
     "task_step_blocked": [
         _mapping(
-            "2.1.1", "partial", "task_execution", "confirmed",
+            "2.1.1", "partial", "task_execution", "strong",
             "Proves one scripted path failed under keyboard-only interaction, not that every path fails.",
             "Repeat the step manually with a keyboard.",
         ),
     ],
     "task_control_not_keyboard_reachable": [
         _mapping(
-            "2.1.1", "partial", "task_execution", "confirmed",
+            "2.1.1", "partial", "task_execution", "strong",
             "The Tab search has a fixed press budget and may miss controls on very long pages.",
             "Tab through the page manually and confirm the control is unreachable.",
         ),
@@ -489,6 +499,27 @@ RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
             "Confirm the field collects information about the user and add the matching autocomplete token.",
         ),
     ],
+    "invalid_autocomplete_token": [
+        _mapping(
+            "1.3.5", "partial", "static", "likely",
+            "Validates known autocomplete detail tokens but cannot prove the field purpose.",
+            "Confirm the field collects information about the user and replace the invalid token with a matching valid one.",
+        ),
+    ],
+    "contradictory_autocomplete": [
+        _mapping(
+            "1.3.5", "partial", "static", "likely",
+            "Compares inferred purpose with the token; ambiguous labels and localized forms can require review.",
+            "Confirm the intended field purpose and use the matching autocomplete token.",
+        ),
+    ],
+    "autocomplete_unsupported_control": [
+        _mapping(
+            "1.3.5", "supporting_evidence", "static", "needs_review",
+            "Flags autocomplete metadata on controls that normally do not collect reusable personal data.",
+            "Confirm the control is not a user-information field and remove misleading autocomplete metadata.",
+        ),
+    ],
     "no_bypass_mechanism": [
         _mapping(
             "2.4.1", "partial", "static", "needs_review",
@@ -501,6 +532,34 @@ RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
             "2.5.3", "partial", "static", "likely",
             "Normalized substring comparison of visible text vs aria-label; icon-only and very short labels are skipped.",
             "Say the visible label to a speech-input tool and check whether the control activates.",
+        ),
+    ],
+    "accessible_authentication_barrier": [
+        _mapping(
+            "3.3.8", "supporting_evidence", "static", "needs_review",
+            "Public-page heuristic for paste blocking and CAPTCHA-like challenge text; authentication is never attempted.",
+            "Inspect the authentication flow manually and verify accessible alternatives without logging in.",
+        ),
+    ],
+    "redundant_entry_repeated_field": [
+        _mapping(
+            "3.3.7", "supporting_evidence", "static", "needs_review",
+            "Single-page repeated-field inference only; full redundant-entry testing needs a controlled workflow.",
+            "Confirm whether repeated fields request already-entered information or a legitimate second person's information.",
+        ),
+    ],
+    "error_prevention_missing": [
+        _mapping(
+            "3.3.4", "supporting_evidence", "static", "needs_review",
+            "Keyword heuristic for high-consequence public forms; it does not submit forms or inspect later workflow steps.",
+            "Review the permitted workflow for confirmation, correction, reversal, or review mechanisms.",
+        ),
+    ],
+    "status_message_not_live": [
+        _mapping(
+            "4.1.3", "supporting_evidence", "static", "needs_review",
+            "Static status-like content only; dynamic before/after accessibility-tree behavior is not reproduced.",
+            "Trigger the update and inspect whether the status message is exposed through role=status, role=alert, or aria-live.",
         ),
     ],
     "small_target_size": [
@@ -658,9 +717,9 @@ RULE_WCAG_MAP: dict[str, list[dict[str, str]]] = {
 }
 
 
-# Success Criteria that the optional axe-core scan produces findings for.
-# This is an approximation of axe-core's own rule-to-WCAG tags for the rules
-# that run in A11yway's default axe pass; axe coverage is itself partial.
+
+
+
 AXE_COVERED_CRITERIA: set[str] = {
     "1.1.1", "1.2.2", "1.3.1", "1.3.4", "1.3.5", "1.4.1", "1.4.2", "1.4.3",
     "1.4.4", "1.4.12", "2.1.1", "2.2.1", "2.2.2", "2.4.1", "2.4.2", "2.4.4",
@@ -669,16 +728,16 @@ AXE_COVERED_CRITERIA: set[str] = {
 
 
 def wcag_mappings_for_issue_type(issue_type: str) -> list[dict[str, str]]:
-    """Return the WCAG mappings for one issue type (empty when unmapped)."""
+
     return [dict(item) for item in RULE_WCAG_MAP.get(issue_type, [])]
 
 
 def best_native_coverage() -> dict[str, dict[str, Any]]:
-    """Return the strongest native coverage per Success Criterion.
 
-    Each criterion is counted once at its best coverage level, no matter
-    how many rules map to it.
-    """
+
+
+
+
     best: dict[str, dict[str, Any]] = {}
     for issue_type, mappings in RULE_WCAG_MAP.items():
         for mapping in mappings:
@@ -696,258 +755,189 @@ def best_native_coverage() -> dict[str, dict[str, Any]]:
     return best
 
 
-def coverage_summary() -> dict[str, Any]:
-    """Compute WCAG 2.2 coverage statistics without double counting."""
-    best = best_native_coverage()
-    direct = sorted(sc for sc, info in best.items() if info["coverage"] == "direct")
-    partial = sorted(sc for sc, info in best.items() if info["coverage"] == "partial")
-    supporting = sorted(
-        sc for sc, info in best.items() if info["coverage"] == "supporting_evidence"
-    )
-    natively_touched = set(best)
-    axe_only = sorted(AXE_COVERED_CRITERIA - natively_touched)
-    manual_only = sorted(
-        sc
-        for sc in WCAG_2_2_CRITERIA
-        if sc not in natively_touched and sc not in AXE_COVERED_CRITERIA
-    )
-    unsupported: list[str] = []
+
+def _coverage_registry_path() -> Path:
+    return Path(__file__).resolve().parents[1] / "data" / "wcag22_coverage.json"
+
+
+def load_coverage_registry() -> dict[str, Any]:
+    return json.loads(_coverage_registry_path().read_text(encoding="utf-8"))
+
+
+def aa_criteria() -> dict[str, dict[str, str]]:
     return {
-        "total_criteria": len(WCAG_2_2_CRITERIA),
-        "direct": direct,
-        "partial": partial,
-        "supporting_evidence": supporting,
-        "axe_only": axe_only,
-        "manual_only": manual_only,
-        "unsupported": unsupported,
-        "counts": {
-            "direct": len(direct),
-            "partial": len(partial),
-            "supporting_evidence": len(supporting),
-            "axe_only": len(axe_only),
-            "manual_only": len(manual_only),
-            "unsupported": len(unsupported),
-        },
+        sc: info
+        for sc, info in WCAG_2_2_CRITERIA.items()
+        if info["level"] in {"A", "AA"}
+    }
+
+
+def coverage_summary() -> dict[str, Any]:
+    registry = load_coverage_registry()
+    rows = registry["criteria"]
+    buckets = {status: [] for status in registry["allowed_coverage_statuses"]}
+    for row in rows:
+        buckets[row["coverage_status"]].append(row["criterion"])
+    for values in buckets.values():
+        values.sort(key=_sc_sort_key)
+    counts = {key: len(value) for key, value in buckets.items()}
+    legacy = best_native_coverage()
+    return {
+        "wcag_version": registry["wcag_version"],
+        "total_criteria": len(rows),
+        "automated": buckets["automated"],
+        "partially_automated": buckets["partially_automated"],
+        "manual_only": buckets["manual_only"],
+        "unsupported": buckets["unsupported"],
+        "counts": counts,
+        "registry_scope": registry["scope"],
+        "direct": sorted([sc for sc, item in legacy.items() if item["coverage"] == "direct" and sc in aa_criteria()], key=_sc_sort_key),
+        "partial": sorted([sc for sc, item in legacy.items() if item["coverage"] == "partial" and sc in aa_criteria()], key=_sc_sort_key),
+        "supporting_evidence": sorted([sc for sc, item in legacy.items() if item["coverage"] == "supporting_evidence" and sc in aa_criteria()], key=_sc_sort_key),
+        "axe_only": [],
     }
 
 
 def coverage_summary_for_report() -> dict[str, Any]:
-    """Return a compact coverage summary block for JSON reports."""
     summary = coverage_summary()
     return {
         "wcag_version": "2.2",
+        "scope": "Level A and AA Success Criteria; 4.1.1 Parsing is obsolete and excluded.",
         "total_criteria": summary["total_criteria"],
         "counts": summary["counts"],
-        "note": (
-            "WCAG evidence coverage is not the same as WCAG conformance "
-            "coverage. Coverage describes what A11yway's checks relate to, "
-            "not whether a page conforms. Even directly covered criteria are "
-            "only checked within each rule's documented scope; manual review "
-            "is required."
-        ),
+        "note": "WCAG evidence coverage is not WCAG conformance, certification, scoring, or a legal claim. Automated and partially automated rule coverage still requires manual review.",
     }
 
 
 def _sc_sort_key(sc: str) -> tuple[int, ...]:
-    """Sort Success Criterion numbers numerically (1.4.10 after 1.4.9)."""
     return tuple(int(part) for part in sc.split("."))
 
 
 def build_coverage_matrix() -> list[dict[str, Any]]:
-    """Return one row per WCAG 2.2 Success Criterion for docs and reports."""
-    best = best_native_coverage()
-    rules_by_sc: dict[str, list[str]] = {}
-    for issue_type, mappings in RULE_WCAG_MAP.items():
-        for mapping in mappings:
-            rules_by_sc.setdefault(mapping["sc"], [])
-            if issue_type not in rules_by_sc[mapping["sc"]]:
-                rules_by_sc[mapping["sc"]].append(issue_type)
+    registry = load_coverage_registry()
+    return sorted(registry["criteria"], key=lambda row: _sc_sort_key(row["criterion"]))
 
-    rows = []
-    summary = coverage_summary()
-    axe_only = set(summary["axe_only"])
-    manual_only = set(summary["manual_only"])
-    unsupported = set(summary["unsupported"])
-    for sc in sorted(WCAG_2_2_CRITERIA, key=_sc_sort_key):
-        info = WCAG_2_2_CRITERIA[sc]
-        native = best.get(sc)
-        mappings = []
-        for rule, rule_mappings in RULE_WCAG_MAP.items():
-            for mapping in rule_mappings:
-                if mapping["sc"] == sc:
-                    mappings.append({**mapping, "rule": rule})
 
-        if native:
-            coverage_type = native["coverage"]
-        elif sc in axe_only:
-            coverage_type = "axe_only"
-        elif sc in manual_only:
-            coverage_type = "manual_only"
-        elif sc in unsupported:
-            coverage_type = "unsupported"
-        else:
-            coverage_type = "manual_only"
+def rule_coverage_index() -> dict[str, list[str]]:
+    index: dict[str, list[str]] = {}
+    for row in build_coverage_matrix():
+        for rule in row["implemented_rule_ids"]:
+            index.setdefault(rule, []).append(row["criterion"])
+    return {rule: sorted(criteria, key=_sc_sort_key) for rule, criteria in sorted(index.items())}
 
-        rows.append(
-            {
-                "sc": sc,
-                "name": info["name"],
-                "level": info["level"],
-                "native_coverage": native["coverage"] if native else "none",
-                "axe_only_coverage": "yes" if sc in axe_only else "no",
-                "coverage_type": coverage_type,
-                "native_rules": sorted(rules_by_sc.get(sc, [])),
-                "axe_covered": sc in AXE_COVERED_CRITERIA,
-                "evidence_mode": ", ".join(
-                    sorted({mapping["detection_mode"] for mapping in mappings})
-                )
-                or ("axe_core" if sc in axe_only else "manual"),
-                "limitations": "; ".join(
-                    sorted({mapping["limitations"] for mapping in mappings})
-                )
-                if mappings
-                else "No automated A11yway evidence for this Success Criterion.",
-                "manual_testing_needed": "; ".join(
-                    sorted({mapping["manual_check"] for mapping in mappings})
-                )
-                if mappings
-                else "Manual WCAG testing is required.",
-            }
-        )
-    return rows
+
+def _criterion_label(sc: str) -> str:
+    info = aa_criteria()[sc]
+    return f"{sc} {info['name']} (Level {info['level']})"
 
 
 def format_coverage_cli() -> str:
-    """Render the coverage summary for the --wcag-coverage CLI command."""
     summary = coverage_summary()
     counts = summary["counts"]
+    total = summary["total_criteria"]
+    covered = counts["automated"] + counts["partially_automated"]
+    percent = covered / total * 100 if total else 0
     lines = [
-        "A11yway WCAG 2.2 coverage map",
+        "A11yway WCAG 2.2 A/AA coverage inventory",
         "",
-        f"Total WCAG 2.2 Success Criteria: {summary['total_criteria']}",
-        f"Direct native coverage:          {counts['direct']}",
-        f"Partial native coverage:         {counts['partial']}",
-        f"Supporting evidence only:        {counts['supporting_evidence']}",
-        f"Covered only through axe-core:   {counts['axe_only']}",
-        f"Manual review only:              {counts['manual_only']}",
-        f"Unsupported:                     {counts['unsupported']}",
+        f"Total WCAG 2.2 Level A and AA Success Criteria: {total}",
+        f"Automated: {counts['automated']}",
+        f"Partially automated: {counts['partially_automated']}",
+        f"Manual only: {counts['manual_only']}",
+        f"Unsupported: {counts['unsupported']}",
+        f"Automated or partially automated rule coverage: {percent:.1f}%",
         "",
-        "Each criterion is counted once at its strongest native coverage",
-        "level, even when several rules map to it.",
+        "This figure is not WCAG conformance, certification, scoring, or a legal claim.",
         "",
+        "Criteria covered by each A11yway rule:",
     ]
+    for rule, criteria in rule_coverage_index().items():
+        lines.append(f"   {rule}: {', '.join(criteria)}")
+    lines.extend(["", "Criteria that still need implementation:"])
+    for sc in summary["unsupported"]:
+        lines.append(f"   {_criterion_label(sc)}")
+    lines.extend(["", "Criteria that fundamentally require human judgment or permitted workflow testing:"])
+    for sc in summary["manual_only"]:
+        lines.append(f"   {_criterion_label(sc)}")
     for label, key in [
-        ("Direct", "direct"),
-        ("Partial", "partial"),
-        ("Supporting evidence", "supporting_evidence"),
-        ("Axe-core only", "axe_only"),
+        ("Automated", "automated"),
+        ("Partially automated", "partially_automated"),
         ("Manual only", "manual_only"),
         ("Unsupported", "unsupported"),
     ]:
-        criteria = summary[key]
-        lines.append(f"{label} ({len(criteria)}):")
-        if criteria:
-            for sc in sorted(criteria, key=_sc_sort_key):
-                info = WCAG_2_2_CRITERIA[sc]
-                lines.append(f"   {sc} {info['name']} (Level {info['level']})")
+        lines.append("")
+        lines.append(f"{label} criteria ({len(summary[key])}):")
+        if summary[key]:
+            for sc in summary[key]:
+                lines.append(f"   {_criterion_label(sc)}")
         else:
             lines.append("   none")
-        lines.append("")
-    lines.extend(
-        [
-            "WCAG evidence coverage is not the same as WCAG conformance",
-            "coverage. Coverage describes what A11yway's checks relate to,",
-            "not whether a page conforms. This is not a WCAG conformance",
-            "claim, and manual review is always required.",
-            "See docs/WCAG_2_2_COVERAGE.md for the full matrix.",
-        ]
-    )
+    lines.extend([
+        "",
+        "Coverage describes A11yway rule evidence only. Axe-core evidence is treated as partial and is never counted as full criterion coverage.",
+        "Docs: docs/WCAG22_COVERAGE.md",
+    ])
     return "\n".join(lines)
 
 
 def build_coverage_markdown() -> str:
-    """Render the full coverage matrix as Markdown (docs/WCAG_2_2_COVERAGE.md)."""
     summary = coverage_summary()
     counts = summary["counts"]
+    total = summary["total_criteria"]
+    covered = counts["automated"] + counts["partially_automated"]
+    percent = covered / total * 100 if total else 0
     lines = [
-        "# A11yway WCAG 2.2 Coverage",
+        "# A11yway WCAG 2.2 A/AA Coverage Inventory",
         "",
-        "This matrix maps every WCAG 2.2 Success Criterion to the A11yway",
-        "rules that produce related evidence. It is generated from",
-        "`a11yway/core/wcag_coverage.py` (regenerate with",
-        "`python -m a11yway.main --wcag-coverage-markdown docs/WCAG_2_2_COVERAGE.md`).",
+        "This document is generated from `a11yway/data/wcag22_coverage.json`.",
         "",
-        "**WCAG evidence coverage is not the same as WCAG conformance coverage.**",
-        "A criterion marked `direct` is",
-        "only checked within the narrow scope its rules document. Every audit",
-        "still requires manual review, and many criteria can only be tested",
-        "by a human.",
+        "This figure is not WCAG conformance, certification, scoring, or a legal claim.",
         "",
         "## Summary",
         "",
-        f"- Total WCAG 2.2 Success Criteria: {summary['total_criteria']}",
-        f"- Direct native coverage: {counts['direct']}",
-        f"- Partial native coverage: {counts['partial']}",
-        f"- Supporting evidence only: {counts['supporting_evidence']}",
-        f"- Covered only through the optional axe-core scan: {counts['axe_only']}",
-        f"- Manual review only: {counts['manual_only']}",
+        f"- Total WCAG 2.2 Level A and AA Success Criteria: {total}",
+        f"- Automated: {counts['automated']}",
+        f"- Partially automated: {counts['partially_automated']}",
+        f"- Manual only: {counts['manual_only']}",
         f"- Unsupported: {counts['unsupported']}",
+        f"- Automated or partially automated rule coverage: {percent:.1f}%",
         "",
-        "Each criterion is counted once at its strongest native coverage",
-        "level, even when several rules map to it.",
+        "## Coverage Statuses",
         "",
-        "## Coverage levels",
-        "",
-        "- `direct`: a rule deterministically observes the specific failure,",
-        "  within its documented scope.",
-        "- `partial`: a rule observes a meaningful slice of the criterion.",
-        "- `supporting_evidence`: rules produce evidence a reviewer can use,",
-        "  but do not test the criterion themselves.",
-        "- `manual_only`: no A11yway rule produces evidence.",
+        "- `automated`: deterministic A11yway rule evidence for a narrow criterion slice with fixtures and actionable output.",
+        "- `partially_automated`: A11yway or axe-core evidence helps evaluate the criterion but does not fully decide it.",
+        "- `manual_only`: the criterion fundamentally needs human judgment or a permitted workflow.",
+        "- `unsupported`: A11yway does not currently implement criterion-specific evidence.",
         "",
         "## Matrix",
         "",
-        "| WCAG Success Criterion | Name | Level | Native coverage | Axe-only coverage | Coverage type | A11yway rules | Evidence mode | Limitations | Manual testing needed |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| Criterion | Short name | Level | Status | Rules | Engines | Evidence | Human review required | Limitations |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
-
-    def cell(value: str) -> str:
+    def cell(value: object) -> str:
+        if isinstance(value, list):
+            value = ", ".join(str(item) for item in value) or "none"
         return str(value).replace("|", "\\|")
-
     for row in build_coverage_matrix():
         lines.append(
-            "| {sc} | {name} | {level} | {native} | {axe_only} | {coverage_type} | {rules} | {evidence} | {limitations} | {manual} |".format(
-                sc=cell(row["sc"]),
-                name=cell(row["name"]),
+            "| {criterion} | {name} | {level} | {status} | {rules} | {engines} | {evidence} | {human} | {limitations} |".format(
+                criterion=cell(row["criterion"]),
+                name=cell(row["short_name"]),
                 level=cell(row["level"]),
-                native=cell(row["native_coverage"]),
-                axe_only=cell(row["axe_only_coverage"]),
-                coverage_type=cell(row["coverage_type"]),
-                rules=", ".join(f"`{rule}`" for rule in row["native_rules"]) or "none",
-                evidence=cell(row["evidence_mode"]),
+                status=cell(row["coverage_status"]),
+                rules=cell([f"`{rule}`" for rule in row["implemented_rule_ids"]]),
+                engines=cell(row["testing_engines_used"]),
+                evidence=cell(row["evidence_produced"]),
+                human="yes" if row["human_review_required"] else "no",
                 limitations=cell(row["limitations"]),
-                manual=cell(row["manual_testing_needed"]),
             )
         )
-    lines.extend(
-        [
-            "",
-            "## Manual verification guidance",
-            "",
-            "For every criterion with native or axe coverage, the related",
-            "rules carry per-mapping manual_check guidance available through",
-            "`python -m a11yway.main --rule <issue_type>` and in report",
-            "issue entries. Criteria marked manual_only need a human test",
-            "plan; the W3C's *Understanding WCAG 2.2* documents describe",
-            "procedures for each.",
-            "",
-            "## Axe-core note",
-            "",
-            "The optional `--axe` scan maps to WCAG through axe-core's own",
-            "rule tags. Axe coverage of a criterion is itself partial;",
-            "'covered by axe-core' means axe has at least one automated rule",
-            "related to the criterion, not that the criterion is fully tested.",
-            "",
-        ]
-    )
-    return "\n".join(lines)
+    lines.extend([
+        "",
+        "## Rules by Criterion",
+        "",
+    ])
+    for row in build_coverage_matrix():
+        rules = ", ".join(f"`{rule}`" for rule in row["implemented_rule_ids"]) or "none"
+        lines.append(f"- {row['criterion']} {row['short_name']}: {rules}")
+    return "\n".join(lines) + "\n"

@@ -1,4 +1,4 @@
-"""Tests for the false-positive reductions in existing static checks."""
+
 
 from a11yway.core.page_analyzer import (
     analyze_heading_structure,
@@ -12,11 +12,11 @@ def issue_types(issues: list) -> set[str]:
     return {issue.issue_type for issue in issues}
 
 
-# --- decorative images ---
+
 
 
 def test_plain_empty_alt_is_respected_as_decorative() -> None:
-    """alt='' is the standard decorative marker and must not be flagged."""
+
     assert analyze_images('<img src="divider.png" alt="">') == []
 
 
@@ -25,7 +25,7 @@ def test_empty_alt_with_presentation_role_passes() -> None:
 
 
 def test_empty_alt_inside_named_link_is_not_flagged() -> None:
-    """The control already has a usable name; the image is decoration."""
+
     html = '<a href="/home" aria-label="Home"><img src="logo.png" alt=""></a>'
     assert analyze_images(html) == []
 
@@ -65,7 +65,7 @@ def test_hidden_image_is_ignored() -> None:
     assert analyze_images('<div hidden><img src="photo.jpg"></div>') == []
 
 
-# --- hidden and non-user-facing form controls ---
+
 
 
 def test_hidden_attribute_control_is_ignored() -> None:
@@ -88,14 +88,14 @@ def test_visible_unlabeled_control_is_still_flagged() -> None:
 
 
 def test_placeholder_only_is_still_flagged_with_note() -> None:
-    """A placeholder is weak evidence, not a valid label."""
+
     issues = analyze_html_forms('<input type="text" name="q2" placeholder="Your name">')
     assert issue_types(issues) == {"missing_form_label"}
     assert issues[0].evidence.get("placeholder_only") is True
     assert "placeholder" in issues[0].evidence["reason"]
 
 
-# --- generic links with specific accessible names ---
+
 
 
 def test_generic_text_with_specific_aria_label_passes() -> None:
@@ -112,7 +112,7 @@ def test_generic_text_with_aria_labelledby_passes() -> None:
 
 
 def test_generic_aria_label_is_still_flagged() -> None:
-    """An aria-label that is itself generic does not rescue the link."""
+
     html = '<a href="/x" aria-label="read more">something specific</a>'
     assert "generic_link_text" in issue_types(analyze_interactive_names(html))
 
@@ -127,7 +127,7 @@ def test_hidden_link_is_ignored() -> None:
     assert analyze_interactive_names(html) == []
 
 
-# --- heading structure ---
+
 
 
 def test_multiple_h1_is_informational() -> None:
@@ -148,7 +148,7 @@ def test_heading_skip_within_one_flow_is_flagged() -> None:
 
 
 def test_heading_restart_inside_article_is_not_a_skip() -> None:
-    """Independent regions legitimately restart their heading levels."""
+
     html = (
         "<h1>Feed</h1><h2>Today</h2>"
         "<article><h4>Embedded card title</h4></article>"
@@ -165,6 +165,6 @@ def test_heading_restart_inside_labeled_region_is_not_a_skip() -> None:
 
 
 def test_skip_inside_same_article_is_still_flagged() -> None:
-    """Region awareness must not disable the check within one region."""
+
     html = "<article><h2>Story</h2><h5>Fine print</h5></article>"
     assert "skipped_heading_level" in issue_types(analyze_heading_structure(html))

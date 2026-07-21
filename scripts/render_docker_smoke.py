@@ -1,10 +1,3 @@
-"""Smoke checks for the Render Docker runtime.
-
-This script is intended to run inside the built Docker image. It verifies the
-runtime imports, Chromium launch, Flask routes, report download links, browser
-mode, axe mode, and AI Scout missing-key fallback without requiring secrets.
-"""
-
 from __future__ import annotations
 
 import json
@@ -65,8 +58,8 @@ def main() -> int:
     print(f"python_version={sys.version.split()[0]}")
     _assert(sys.version_info >= (3, 12), "Render image must use Python 3.12+")
 
-    import flask  # noqa: F401, PLC0415
-    import playwright  # noqa: F401, PLC0415
+    import flask
+    import playwright
 
     print(f"flask={version('Flask')}")
     print(f"playwright={version('playwright')}")
