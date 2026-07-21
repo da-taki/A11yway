@@ -187,6 +187,8 @@ def create_app() -> Flask:
             modules=AUDIT_MODULES,
             presets=PRESETS,
             default_modules=set(PRESETS["standard"]["modules"]),
+            recent_runs=list_recent_runs(limit=4),
+            browser_available=is_playwright_available(),
             submitted={},
             error="",
         )
@@ -293,6 +295,8 @@ def render_home_error(error: str, submitted: dict[str, Any], status_code: int):
             modules=AUDIT_MODULES,
             presets=PRESETS,
             default_modules=set(selected_modules_from_form(submitted.get("modules", []), submitted.get("preset", "standard"))),
+            recent_runs=list_recent_runs(limit=4),
+            browser_available=is_playwright_available(),
             submitted=submitted,
             error=error,
         ),

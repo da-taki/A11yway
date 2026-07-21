@@ -1,31 +1,74 @@
 {% extends "web_demo/base.html" %}
 {% block title %}A11yway public accessibility audit{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-inner hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow">Public-page accessibility evidence</p>
-      <h1>Find barriers before users are forced to report them.</h1>
-      <p class="lede">A11yway combines deterministic analysis, real-browser evidence, keyboard traversal, reflow checks, and human review guidance for public web pages.</p>
+<section class="dash-hero">
+  <div class="section-inner hero-layout">
+    <div class="hero-copy comic-panel panel-orange">
+      <span class="sticker sticker-blue" aria-hidden="true">OPEN SOURCE</span>
+      <p class="eyebrow">Public accessibility evidence</p>
+      <h1>A11yway</h1>
+      <p class="product-line">An open-source accessibility stress-testing toolkit for essential public web workflows.</p>
+      <p class="lede">Audit public URLs, follow keyboard workflows, check rendered pages, capture accessibility-tree evidence, verify zoom and reflow, group repeated root issues, and separate stronger findings from items that need human review.</p>
       <div class="hero-actions">
         <a class="primary-button" href="#audit">Start an audit <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></a>
-        <a class="text-link" href="#how">See methodology</a>
-        <a class="text-link" href="https://github.com/da-taki/A11yway" rel="noreferrer">GitHub</a>
+        <a class="secondary-button" href="{{ url_for('past_runs') }}">Open reports</a>
       </div>
-      <div class="cred-strip" aria-label="A11yway credibility metrics">
-        <div><strong>651</strong><span>automated tests</span></div>
-        <div><strong>45 / 86</strong><span>WCAG 2.2 criteria with native evidence</span></div>
-        <div><strong>Linux + Windows</strong><span>CI coverage</span></div>
-        <div><strong>Render</strong><span>Docker validation</span></div>
-      </div>
-      <ul class="scope-tags" aria-label="Public demo scope">
-        <li>Public pages only</li>
-        <li>No logins or form submissions</li>
-        <li>Server-side AI Scout</li>
+      <ul class="scope-tags" aria-label="A11yway scope">
+        <li>Public URLs</li>
+        <li>Keyboard paths</li>
+        <li>Rendered DOM</li>
+        <li>Human review required</li>
       </ul>
+      <span class="burst burst-one" aria-hidden="true">!</span>
+      <span class="zigzag" aria-hidden="true"></span>
     </div>
 
-    <form id="audit" class="audit-panel audit-console" method="post" action="{{ url_for('run_review') }}">
+    <aside class="side-stack" aria-label="A11yway dashboard summary">
+      <section class="comic-panel panel-blue quick-status" aria-labelledby="status-heading">
+        <div class="card-title-row">
+          <div>
+            <p class="eyebrow">Tool status</p>
+            <h2 id="status-heading">Ready checks</h2>
+          </div>
+          <span class="status-pill {% if browser_available %}complete{% else %}running{% endif %}">
+            {% if browser_available %}Browser ready{% else %}Static ready{% endif %}
+          </span>
+        </div>
+        <ul class="mini-checks">
+          <li><span aria-hidden="true">OK</span> Static HTML parser</li>
+          <li><span aria-hidden="true">{% if browser_available %}OK{% else %}!{% endif %}</span> Browser evidence {% if not browser_available %}when Playwright is installed{% endif %}</li>
+          <li><span aria-hidden="true">OK</span> Reports: HTML, Markdown, JSON, CSV, SARIF, JUnit</li>
+        </ul>
+      </section>
+
+      <section class="comic-panel panel-white recent-card" aria-labelledby="recent-heading">
+        <div class="card-title-row">
+          <div>
+            <p class="eyebrow">Recent audits</p>
+            <h2 id="recent-heading">Last runs</h2>
+          </div>
+          <a class="small-link" href="{{ url_for('past_runs') }}">All reports</a>
+        </div>
+        {% if recent_runs %}
+          <ul class="recent-list">
+            {% for run in recent_runs %}
+              <li>
+                <a href="{{ url_for('result', run_id=run.run_id) }}">{{ run.target_name }}</a>
+                <span>{{ run.total_issues }} findings - {{ run.status }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty-state compact">No runs yet. Your first report will land here after an audit completes.</p>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+</section>
+
+<section class="dashboard-band audit-band">
+  <div class="section-inner app-grid">
+    <form id="audit" class="audit-panel audit-console comic-panel panel-white" method="post" action="{{ url_for('run_review') }}">
       <div class="console-head">
         <div>
           <p class="eyebrow">Audit console</p>
@@ -42,7 +85,7 @@
         <div class="field-grow">
           <label for="url">Public website URL</label>
           <input id="url" name="url" type="url" required autocomplete="url" inputmode="url" placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}" aria-describedby="url-help">
-          <p id="url-help" class="field-help">Try a public, non-login page such as example.org.</p>
+          <p id="url-help" class="field-help">Use a public, non-login page. Private hosts, unsafe schemes, credentials, and unsafe redirects are blocked.</p>
           <button class="link-button sample-button" type="button" data-sample-url="https://example.org">Use https://example.org</button>
         </div>
         <div>
@@ -66,33 +109,109 @@
 
       <div class="selection-summary" id="module-summary">Modules selected.</div>
 
-      <fieldset class="module-field">
-        <legend>Select A11yway modules</legend>
-        <p class="field-help">Presets only select existing A11yway capabilities. Static HTML analysis is always included.</p>
-        <div class="module-grid">
-          {% for key, module in modules.items() %}
-            {% if key != 'ai_scout' and not module.unavailable_for_url %}
-              <label class="module-card">
-                <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="{% if module.requires_browser %}Browser evidence{% elif module.always_on %}Always on{% else %}Deterministic review{% endif %}" {% if key in default_modules %}checked{% endif %} {% if module.always_on %}checked disabled{% endif %}>
-                {% if module.always_on %}<input type="hidden" name="modules" value="{{ key }}">{% endif %}
-                <span class="module-icon" aria-hidden="true"><svg><use href="#icon-grid"></use></svg></span>
-                <span class="module-kicker">{{ module.category }}</span>
-                <span class="module-title">{{ module.label }}</span>
-                <span class="module-text">{{ module.description }}</span>
-                <span class="module-purpose">{% if module.requires_browser %}Browser evidence{% elif module.always_on %}Always on{% else %}Deterministic review{% endif %}</span>
-              </label>
-            {% endif %}
-          {% endfor %}
-          <label class="module-card accent-card">
-            <input type="checkbox" name="modules" value="ai_scout" data-module="ai_scout" data-purpose="Suggest-only review" {% if 'ai_scout' in default_modules %}checked{% endif %}>
-            <span class="module-icon" aria-hidden="true"><svg><use href="#icon-spark"></use></svg></span>
-            <span class="module-kicker">Suggest-only review</span>
-            <span class="module-title">AI Scout</span>
-            <span class="module-text">Server-side AI Scout summarizes deterministic findings. It does not invent issues or make legal conclusions.</span>
-            <span class="module-purpose">Server side only</span>
-          </label>
-        </div>
-      </fieldset>
+      <details class="advanced-panel" open>
+        <summary><span>Advanced options</span><span class="summary-hint">Choose exact modules</span></summary>
+        <fieldset class="module-field">
+          <legend>Select A11yway modules</legend>
+          <p class="field-help">Static HTML analysis is always included. Browser-dependent checks run when Playwright is available.</p>
+          <div class="module-groups">
+            <section class="module-group" aria-labelledby="group-browser">
+              <h3 id="group-browser">Browser testing</h3>
+              <div class="module-grid">
+                {% for key in ['browser', 'axe', 'screenshots', 'focus_path'] %}
+                  {% set module = modules[key] %}
+                  <label class="module-card">
+                    <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="Browser evidence" {% if key in default_modules %}checked{% endif %}>
+                    <span class="module-kicker">{{ module.category }}</span>
+                    <span class="module-title">{{ module.label }}</span>
+                    <span class="module-text">{{ module.description }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-keyboard">
+              <h3 id="group-keyboard">Keyboard and focus</h3>
+              <div class="module-grid">
+                {% for key in ['keyboard', 'focus_trap'] %}
+                  {% set module = modules[key] %}
+                  <label class="module-card">
+                    <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="Browser evidence" {% if key in default_modules %}checked{% endif %}>
+                    <span class="module-kicker">{{ module.category }}</span>
+                    <span class="module-title">{{ module.label }}</span>
+                    <span class="module-text">{{ module.description }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-screenreader">
+              <h3 id="group-screenreader">Screen-reader checks</h3>
+              <div class="module-grid">
+                {% set module = modules['screen_reader'] %}
+                <label class="module-card">
+                  <input type="checkbox" name="modules" value="screen_reader" data-module="screen_reader" data-purpose="Browser evidence" {% if 'screen_reader' in default_modules %}checked{% endif %}>
+                  <span class="module-kicker">{{ module.category }}</span>
+                  <span class="module-title">{{ module.label }}</span>
+                  <span class="module-text">{{ module.description }}</span>
+                </label>
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-lowvision">
+              <h3 id="group-lowvision">Low-vision and zoom</h3>
+              <div class="module-grid">
+                {% for key in ['low_vision', 'mobile'] %}
+                  {% set module = modules[key] %}
+                  <label class="module-card">
+                    <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="Browser evidence" {% if key in default_modules %}checked{% endif %}>
+                    <span class="module-kicker">{{ module.category }}</span>
+                    <span class="module-title">{{ module.label }}</span>
+                    <span class="module-text">{{ module.description }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-forms">
+              <h3 id="group-forms">Forms and language</h3>
+              <div class="module-grid">
+                {% for key in ['static', 'forms', 'language', 'indic'] %}
+                  {% set module = modules[key] %}
+                  <label class="module-card">
+                    <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="{% if module.always_on %}Always on{% else %}Deterministic review{% endif %}" {% if key in default_modules %}checked{% endif %} {% if module.always_on %}checked disabled{% endif %}>
+                    {% if module.always_on %}<input type="hidden" name="modules" value="{{ key }}">{% endif %}
+                    <span class="module-kicker">{{ module.category }}</span>
+                    <span class="module-title">{{ module.label }}</span>
+                    <span class="module-text">{{ module.description }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-media">
+              <h3 id="group-media">Media and components</h3>
+              <div class="module-grid">
+                {% for key in ['media', 'components'] %}
+                  {% set module = modules[key] %}
+                  <label class="module-card">
+                    <input type="checkbox" name="modules" value="{{ key }}" data-module="{{ key }}" data-purpose="Deterministic review" {% if key in default_modules %}checked{% endif %}>
+                    <span class="module-kicker">{{ module.category }}</span>
+                    <span class="module-title">{{ module.label }}</span>
+                    <span class="module-text">{{ module.description }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </section>
+            <section class="module-group" aria-labelledby="group-evidence">
+              <h3 id="group-evidence">Evidence and reporting</h3>
+              <div class="module-grid">
+                <label class="module-card accent-card">
+                  <input type="checkbox" name="modules" value="ai_scout" data-module="ai_scout" data-purpose="Suggest-only review" {% if 'ai_scout' in default_modules %}checked{% endif %}>
+                  <span class="module-kicker">Suggest-only review</span>
+                  <span class="module-title">AI Scout</span>
+                  <span class="module-text">Server-side AI Scout summarizes deterministic findings. It does not invent issues or make legal conclusions.</span>
+                </label>
+              </div>
+            </section>
+          </div>
+        </fieldset>
+      </details>
 
       <section class="passive-box" aria-labelledby="passive-heading">
         <div>
@@ -106,41 +225,46 @@
       </section>
 
       <label class="check-row">
-        <input name="permission" type="checkbox" required>
+        <input name="permission" type="checkbox" required aria-describedby="permission-help">
         <span>I confirm this is a public page or I have permission to review it. I will not use this demo for logins, private systems, payments, form submissions, exploitation, or scraping.</span>
       </label>
-
-      <div class="availability-grid" aria-label="Execution boundaries">
-        <div><svg aria-hidden="true"><use href="#icon-status"></use></svg><strong>Browser evidence</strong><span>Enabled when Playwright is available.</span></div>
-        <div><svg aria-hidden="true"><use href="#icon-spark"></use></svg><strong>AI Scout</strong><span>Organizes existing evidence on the server.</span></div>
-      </div>
+      <p id="permission-help" class="field-help permission-help">Required before an audit can start. The demo only reviews public pages and never submits public forms.</p>
 
       <div class="actions">
-        <button class="primary-button" type="submit">Run accessibility audit <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></button>
+        <button class="primary-button audit-button" type="submit">Run accessibility audit <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></button>
         <p class="safety-note">No API keys or local filesystem paths are sent to browser JavaScript.</p>
       </div>
     </form>
+
+    <aside class="workflow-column" aria-label="Audit workflow and reports">
+      <section id="workflow" class="comic-panel panel-green">
+        <p class="eyebrow">Workflow cards</p>
+        <h2>Pick the evidence rhythm</h2>
+        <div class="workflow-cards">
+          <article><span aria-hidden="true">01</span><h3>Quick public check</h3><p>Static HTML, language, and repeatable parser evidence.</p></article>
+          <article><span aria-hidden="true">02</span><h3>Keyboard path</h3><p>Focus trace, loops, screenshots, and rendered controls.</p></article>
+          <article><span aria-hidden="true">03</span><h3>Low-vision sweep</h3><p>Zoom, reflow, mobile overflow, contrast, and focus visibility.</p></article>
+        </div>
+      </section>
+      <section class="comic-panel panel-purple">
+        <p class="eyebrow">Reports</p>
+        <h2>Evidence stays inspectable</h2>
+        <ul class="report-access">
+          <li><strong>Strong findings</strong><span>Grouped with severity, WCAG, selectors, snippets, and fixes.</span></li>
+          <li><strong>Needs review</strong><span>Kept separate when confidence requires a human call.</span></li>
+          <li><strong>Artifacts</strong><span>Screenshots, focus paths, and machine-readable outputs stay linked.</span></li>
+        </ul>
+      </section>
+    </aside>
   </div>
 </section>
 
-<section id="how" class="band process-band">
+<section id="checks" class="dashboard-band checks-band">
   <div class="section-inner">
-    <p class="eyebrow">How it works</p>
-    <h2>From public URL to review-ready evidence</h2>
-    <ol class="process-flow">
-      <li><span>1</span><strong>Enter a public URL</strong><p>Unsafe schemes, private hosts, credentials, unsafe ports, and unsafe redirects are rejected.</p></li>
-      <li><span>2</span><strong>Select modules</strong><p>Choose quick static checks, browser evidence, keyboard traversal, reflow, mobile, and AI Scout.</p></li>
-      <li><span>3</span><strong>Collect evidence</strong><p>The server runs deterministic modules and records module status without unsafe actions.</p></li>
-      <li><span>4</span><strong>Review findings</strong><p>Selectors, snippets, WCAG mappings, screenshots, focus paths, and observations stay traceable.</p></li>
-      <li><span>5</span><strong>Download reports</strong><p>Use generated HTML, Markdown, JSON, CSV, SARIF, and JUnit files when available.</p></li>
-    </ol>
-  </div>
-</section>
-
-<section id="checks" class="band subtle">
-  <div class="section-inner">
-    <p class="eyebrow">What A11yway checks</p>
-    <h2>Practical modules for public-page review</h2>
+    <div class="section-heading">
+      <p class="eyebrow">Supported checks</p>
+      <h2>Serious coverage, loud wrapper</h2>
+    </div>
     <div class="capability-grid">
       <article><svg aria-hidden="true"><use href="#icon-grid"></use></svg><h3>Structure and semantics</h3><p>Headings, landmarks, labels, language, alt text, and HTML patterns are checked from fetched source.</p></article>
       <article><svg aria-hidden="true"><use href="#icon-check"></use></svg><h3>Forms and controls</h3><p>Inputs, grouping, instructions, errors, and recovery patterns are reviewed without submitting forms.</p></article>
@@ -154,14 +278,14 @@
   </div>
 </section>
 
-<section class="band dark-band">
+<section id="about" class="dashboard-band about-band">
   <div class="section-inner split">
-    <div>
+    <div class="comic-panel panel-yellow">
       <p class="eyebrow">Safety and scope</p>
       <h2>Responsible public testing only</h2>
       <p>A11yway does not log in, submit forms, test payments, scan networks, bypass authentication, exploit weaknesses, or claim legal compliance certification.</p>
     </div>
-    <ul class="scope-list">
+    <ul class="scope-list comic-panel panel-white">
       <li>Public pages only</li>
       <li>No private systems</li>
       <li>No form submissions</li>
