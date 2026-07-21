@@ -1,5 +1,3 @@
-"""Verify an A11yway wheel from a clean virtual environment."""
-
 from __future__ import annotations
 
 import argparse
@@ -8,6 +6,9 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+
+DESCRIPTION = "Verify an A11yway wheel from a clean virtual environment."
 
 
 def _run(command: list[str], *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -33,7 +34,6 @@ def _venv_script(venv: Path, name: str) -> Path:
 
 
 def verify_wheel(wheel: Path, *, keep_env: bool = False) -> dict[str, str]:
-    """Install a wheel in a temporary venv and run release smoke checks."""
     if not wheel.exists():
         raise FileNotFoundError(wheel)
 
@@ -77,7 +77,7 @@ def verify_wheel(wheel: Path, *, keep_env: bool = False) -> dict[str, str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument("wheel", type=Path)
     parser.add_argument("--keep-env", action="store_true")
     args = parser.parse_args(argv)
@@ -91,4 +91,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

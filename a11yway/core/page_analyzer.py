@@ -1,9 +1,9 @@
-"""Static HTML analysis helpers.
 
-Future versions can use this module to inspect browser state, computed
-styles, PDF files, and accessibility trees. For now, these checks use the
-Python standard library and intentionally stay conservative.
-"""
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -20,28 +20,28 @@ from a11yway.models.issue import AccessibilityIssue
 IGNORED_INPUT_TYPES = {"hidden", "submit", "button", "reset"}
 GENERIC_LINK_TEXT = {"click here", "here", "read more", "more", "link", "learn more"}
 
-# Filenames that almost always mean a decorative or spacer image.
+
 DECORATIVE_SRC_PATTERN = re.compile(
     r"(spacer|pixel|blank|transparent|divider|shim|corner|dot|bullet)[^/]*\.(gif|png|svg|webp|jpg)",
     re.IGNORECASE,
 )
 
-# Filenames that suggest an image carries information a reviewer should see.
+
 INFORMATIVE_SRC_PATTERN = re.compile(
     r"(chart|diagram|graph|infographic|screenshot|map|figure)[^/]*\.(gif|png|svg|webp|jpg|jpeg)",
     re.IGNORECASE,
 )
 
-# Tags browsers close implicitly when a new tag of the same name starts.
-# Real pages often omit these end tags; without this rule one unclosed
-# <label> or <a> would wrap the rest of the document and hide findings.
+
+
+
 IMPLICITLY_CLOSED_TAGS = {
     "a", "button", "label", "select", "textarea", "option",
     "p", "li", "td", "th", "tr",
     "h1", "h2", "h3", "h4", "h5", "h6",
 }
 
-# Elements whose raw text browsers never render as page content.
+
 NON_RENDERED_TEXT_TAGS = {"script", "style", "template"}
 STATIC_CHECKS_RUN = [
     "html_form_labels",
@@ -56,13 +56,14 @@ STATIC_CHECKS_RUN = [
     "input_purpose",
     "bypass_blocks",
     "label_in_name",
+    "authentication_and_error_prevention",
     "wcag_static_evidence",
 ]
 
 
 @dataclass
 class HTMLElement:
-    """Small parsed element record used by static checks."""
+
 
     tag: str
     attrs: dict[str, str]
@@ -73,19 +74,19 @@ class HTMLElement:
     wrapped_by_label: bool = False
     line: int | None = None
     start_tag_snippet: str = ""
-    # References to the open ancestor elements at parse time. Ancestors keep
-    # collecting text after this element is created, so post-parse checks can
-    # read final ancestor state (attributes, text) through these references.
+
+
+
     ancestors: list["HTMLElement"] = field(default_factory=list)
 
     @property
     def text(self) -> str:
-        """Return normalized visible text collected inside this element."""
+
         return normalize_text(" ".join(self.text_parts))
 
 
 class _StaticHTMLParser(HTMLParser):
-    """Tiny parser that records enough HTML structure for static checks."""
+
 
     def __init__(self, source_html: str) -> None:
         super().__init__()
@@ -150,9 +151,9 @@ class _StaticHTMLParser(HTMLParser):
 
         for index in range(len(self._open_elements) - 1, -1, -1):
             if self._open_elements[index].tag == tag_name:
-                # Elements above the match never got an end tag; browsers
-                # close them here too, so drop them instead of letting them
-                # wrap the rest of the document.
+
+
+
                 closed = self._open_elements[index:]
                 del self._open_elements[index:]
                 for element in closed:
@@ -183,36 +184,36 @@ class _StaticHTMLParser(HTMLParser):
 
     @property
     def document_text(self) -> str:
-        """Return normalized document text."""
+
         return normalize_text(" ".join(self.document_text_parts))
 
 
 def normalize_text(value: str) -> str:
-    """Collapse whitespace for simple static comparisons."""
+
     return " ".join(value.split())
 
 
 def _parse_html(html: str) -> _StaticHTMLParser:
-    """Parse HTML into a small reusable snapshot.
 
-    Severely malformed markup must never crash a static audit, so any
-    parser error keeps whatever was parsed before the failure.
-    """
+
+
+
+
     parser = _StaticHTMLParser(html)
     try:
         parser.feed(html)
         parser.close()
-    except Exception:  # noqa: BLE001 - degrade to partial results, never crash
+    except Exception:
         pass
     return parser
 
 
 def estimate_line_number(source_html: str, snippet: str) -> int | None:
-    """Estimate the 1-based line number for a snippet in source HTML.
 
-    This is approximate. Static parsing does not know the rendered DOM or
-    browser-repaired markup, so reports should treat this as a helpful pointer.
-    """
+
+
+
+
     if not snippet:
         return None
 
@@ -223,7 +224,7 @@ def estimate_line_number(source_html: str, snippet: str) -> int | None:
 
 
 def _shorten(value: str, max_length: int = 200) -> str:
-    """Keep evidence snippets compact."""
+
     normalized = normalize_text(value)
     if len(normalized) <= max_length:
         return normalized
@@ -231,7 +232,7 @@ def _shorten(value: str, max_length: int = 200) -> str:
 
 
 def build_start_tag_snippet(tag: str, attrs: dict[str, str]) -> str:
-    """Build a readable start-tag snippet from parsed attributes."""
+
     attr_parts = []
     for name, value in attrs.items():
         if value == "":
@@ -244,7 +245,7 @@ def build_start_tag_snippet(tag: str, attrs: dict[str, str]) -> str:
 
 
 def _element_snippet(element: HTMLElement) -> str:
-    """Return a short element snippet for evidence."""
+
     start_tag = element.start_tag_snippet or build_start_tag_snippet(
         element.tag,
         element.attrs,
@@ -259,7 +260,7 @@ def _element_evidence(
     reason: str,
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build structured evidence for an element-level issue."""
+
     evidence: dict[str, Any] = {
         "tag": element.tag,
         "line": element.line,
@@ -291,7 +292,7 @@ def _page_evidence(
     snippet: str = "",
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build structured evidence for a page-level issue."""
+
     evidence: dict[str, Any] = {
         "tag": tag,
         "line": line,
@@ -305,7 +306,7 @@ def _page_evidence(
 
 
 def _has_accessible_name(element: HTMLElement) -> bool:
-    """Return whether an element has a simple static accessible name."""
+
     if element.attrs.get("aria-label") or element.attrs.get("aria-labelledby"):
         return True
     if element.attrs.get("title"):
@@ -324,7 +325,7 @@ _HIDDEN_STYLE_PATTERN = re.compile(r"display\s*:\s*none|visibility\s*:\s*hidden"
 
 
 def _attrs_mark_hidden(attrs: dict[str, str]) -> bool:
-    """Return whether one element's attributes hide it from all users."""
+
     if "hidden" in attrs:
         return True
     if attrs.get("aria-hidden", "").lower() == "true":
@@ -334,18 +335,18 @@ def _attrs_mark_hidden(attrs: dict[str, str]) -> bool:
 
 
 def _element_is_hidden(element: HTMLElement) -> bool:
-    """Return whether an element or any ancestor is statically hidden.
 
-    Hidden templates, inert helpers, and offscreen implementation controls
-    should not produce findings: users never reach them.
-    """
+
+
+
+
     if _attrs_mark_hidden(element.attrs):
         return True
     return any(_attrs_mark_hidden(ancestor.attrs) for ancestor in element.ancestors)
 
 
 def _element_is_inactive(element: HTMLElement) -> bool:
-    """Return whether static evidence says an element is not active content."""
+
     if _element_is_hidden(element):
         return True
     if element.tag == "template" or "template" in element.parent_tags:
@@ -356,7 +357,7 @@ def _element_is_inactive(element: HTMLElement) -> bool:
 
 
 def _nearest_ancestor(element: HTMLElement, tags: set[str]) -> HTMLElement | None:
-    """Return the closest ancestor whose tag is in tags, if any."""
+
     for ancestor in reversed(element.ancestors):
         if ancestor.tag in tags:
             return ancestor
@@ -364,14 +365,14 @@ def _nearest_ancestor(element: HTMLElement, tags: set[str]) -> HTMLElement | Non
 
 
 def _normalize_name_text(value: str) -> str:
-    """Normalize label text for name comparisons (casing, punctuation, space)."""
+
     lowered = value.casefold()
     cleaned = re.sub(r"[^\w\s]", " ", lowered, flags=re.UNICODE)
     return " ".join(cleaned.split())
 
 
 def _control_identity(control: HTMLElement) -> str:
-    """Return a short control identity for evidence."""
+
     identity_parts = []
     control_id = control.attrs.get("id", "")
     control_name = control.attrs.get("name", "")
@@ -392,7 +393,7 @@ def _issue(
     suggested_fix: str,
     agent_name: str = "Page Analyzer",
 ) -> AccessibilityIssue:
-    """Create a static analyzer issue."""
+
     return AccessibilityIssue(
         title=title,
         issue_type=issue_type,
@@ -404,7 +405,7 @@ def _issue(
 
 
 def analyze_html_forms(html: str) -> list[AccessibilityIssue]:
-    """Detect form controls that appear to be missing accessible labels."""
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -416,8 +417,8 @@ def analyze_html_forms(html: str) -> list[AccessibilityIssue]:
         if control.tag == "input" and input_type in IGNORED_INPUT_TYPES:
             continue
 
-        # Hidden or non-user-facing controls (templates, inert helpers,
-        # implementation details) never reach users, so they are not flagged.
+
+
         if _element_is_hidden(control):
             continue
 
@@ -471,7 +472,7 @@ def analyze_html_forms(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_interactive_names(html: str) -> list[AccessibilityIssue]:
-    """Detect links and buttons with missing or weak accessible names."""
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -511,9 +512,9 @@ def analyze_interactive_names(html: str) -> list[AccessibilityIssue]:
             )
             continue
 
-        # The accessible name, not the visible phrase, is what link lists
-        # announce. A generic visible phrase is acceptable when aria-label
-        # or aria-labelledby gives the link a specific computed name.
+
+
+
         if element.attrs.get("aria-labelledby"):
             continue
         accessible_name = (element.attrs.get("aria-label") or element.text).lower().strip()
@@ -535,7 +536,7 @@ def analyze_interactive_names(html: str) -> list[AccessibilityIssue]:
 
 
 def _action_has_name_besides_image(action: HTMLElement, image: HTMLElement) -> bool:
-    """Return whether a link/button has an accessible name beyond this image."""
+
     if action.attrs.get("aria-label") or action.attrs.get("aria-labelledby"):
         return True
     if action.attrs.get("title"):
@@ -543,15 +544,15 @@ def _action_has_name_besides_image(action: HTMLElement, image: HTMLElement) -> b
     if action.text:
         return True
     for child in action.child_images:
-        # child_images stores the same attrs dict object created at parse
-        # time, so identity distinguishes this image from sibling images.
+
+
         if child is not image.attrs and child.get("alt"):
             return True
     return False
 
 
 def _looks_decorative(image: HTMLElement) -> bool:
-    """Return whether static evidence says the image is decorative."""
+
     src = image.attrs.get("src", "")
     if DECORATIVE_SRC_PATTERN.search(src):
         return True
@@ -564,12 +565,12 @@ def _looks_decorative(image: HTMLElement) -> bool:
 
 
 def analyze_images(html: str) -> list[AccessibilityIssue]:
-    """Detect images that appear to be missing useful alt text.
 
-    alt="" is the standard decorative marker, so it is respected by default.
-    An empty alt is flagged only when the image appears interactive (the only
-    content of an unnamed link or button) or looks informative by filename.
-    """
+
+
+
+
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -628,8 +629,8 @@ def analyze_images(html: str) -> list[AccessibilityIssue]:
         if alt != "" or explicitly_decorative:
             continue
 
-        # alt="" cases: respect the decorative declaration unless the image
-        # is clearly load-bearing.
+
+
         if action_needs_this_image:
             issues.append(
                 _issue(
@@ -669,7 +670,7 @@ def analyze_images(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_heading_structure(html: str) -> list[AccessibilityIssue]:
-    """Detect simple heading structure problems."""
+
     parser = _parse_html(html)
     headings = [
         (int(element.tag[1]), element)
@@ -714,9 +715,9 @@ def analyze_heading_structure(html: str) -> list[AccessibilityIssue]:
     previous_region: tuple | None = None
     for level, element in headings:
         region = _independent_region_signature(element)
-        # Headings inside a different independent region (article, named
-        # region/complementary landmark) legitimately restart their levels,
-        # so consecutive headings are only compared within one region.
+
+
+
         if region != previous_region:
             previous_level = None
             previous_region = region
@@ -740,12 +741,12 @@ def analyze_heading_structure(html: str) -> list[AccessibilityIssue]:
 
 
 def _independent_region_signature(element: HTMLElement) -> tuple:
-    """Return an identity for the independent region a heading belongs to.
 
-    Articles and labeled landmark regions are treated as independent
-    components whose headings restart; plain sections and divs are not,
-    because they usually continue the page outline.
-    """
+
+
+
+
+
     for ancestor in reversed(element.ancestors):
         role = ancestor.attrs.get("role", "").lower()
         if ancestor.tag == "article":
@@ -758,7 +759,7 @@ def _independent_region_signature(element: HTMLElement) -> tuple:
 
 
 def analyze_page_metadata(html: str) -> list[AccessibilityIssue]:
-    """Detect missing page title and document language metadata."""
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -796,7 +797,7 @@ def analyze_page_metadata(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_media_accessibility(html: str) -> list[AccessibilityIssue]:
-    """Detect basic media accessibility gaps."""
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
     has_transcript_text = "transcript" in parser.document_text.lower()
@@ -836,10 +837,10 @@ def analyze_media_accessibility(html: str) -> list[AccessibilityIssue]:
 
 
 def _radio_group_is_named(radio: HTMLElement) -> bool:
-    """Return whether a radio button sits inside a named group container."""
+
     for ancestor in reversed(radio.ancestors):
         if ancestor.tag == "fieldset":
-            # A legend parsed anywhere inside this fieldset marks it named.
+
             return True if getattr(ancestor, "_has_legend", False) else False
         role = ancestor.attrs.get("role", "").lower()
         if role == "radiogroup":
@@ -850,23 +851,23 @@ def _radio_group_is_named(radio: HTMLElement) -> bool:
 
 
 def analyze_structure_relationships(html: str) -> list[AccessibilityIssue]:
-    """Detect structural relationships conveyed visually but not in markup.
 
-    Conservative checks for WCAG 2.2 SC 1.3.1: radio groups without a named
-    group container, data tables without header cells, required markers that
-    are visual only, and (review-only) large bold text acting as a heading.
-    """
+
+
+
+
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
-    # Mark fieldsets that contain a legend so radio checks can see it.
+
     for element in parser.elements:
         if element.tag == "legend":
             fieldset = _nearest_ancestor(element, {"fieldset"})
             if fieldset is not None:
-                fieldset._has_legend = True  # noqa: SLF001 - parser-internal marker
+                fieldset._has_legend = True
 
-    # Radio groups: two or more radios sharing a name need a group label.
+
     radios_by_name: dict[str, list[HTMLElement]] = {}
     for element in parser.elements:
         if (
@@ -901,7 +902,7 @@ def analyze_structure_relationships(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # Data tables without any header cells.
+
     tables = [element for element in parser.elements if element.tag == "table"]
     for table in tables:
         role = table.attrs.get("role", "").lower()
@@ -949,7 +950,7 @@ def analyze_structure_relationships(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # Required markers shown in a label but not exposed programmatically.
+
     controls_by_id = {
         element.attrs.get("id"): element
         for element in parser.elements
@@ -992,7 +993,7 @@ def analyze_structure_relationships(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # Review-only: large bold inline-styled div/span text acting as a heading.
+
     fake_heading_style = re.compile(
         r"font-size\s*:\s*(?:(2[4-9]|[3-9]\d)(?:\.\d+)?px|(1\.[5-9]\d*|[2-9](?:\.\d+)?)(?:em|rem))",
         re.IGNORECASE,
@@ -1051,12 +1052,12 @@ _SENSORY_TEXT_TAGS = {"p", "li", "td", "th", "label", "figcaption", "dd", "dt"}
 
 
 def analyze_sensory_instructions(html: str) -> list[AccessibilityIssue]:
-    """Flag instructions that appear to rely only on shape, color, or position.
 
-    Review-only heuristic for WCAG 2.2 SC 1.3.3: keyword presence alone is
-    never treated as a confirmed issue, because the sentence may also name
-    the target.
-    """
+
+
+
+
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
     seen_texts: set[str] = set()
@@ -1098,9 +1099,9 @@ def analyze_sensory_instructions(html: str) -> list[AccessibilityIssue]:
     return issues
 
 
-# Conservative field-purpose inference for WCAG 2.2 SC 1.3.5. Keys are
-# regexes matched against a normalized bundle of name, id, and label text;
-# order matters (first match wins).
+
+
+
 _AUTOCOMPLETE_TOKEN_RULES: list[tuple[re.Pattern, str]] = [
     (re.compile(r"\b(e ?mail|email address)\b"), "email"),
     (re.compile(r"\b(phone|telephone|mobile|tel)\b"), "tel"),
@@ -1113,14 +1114,69 @@ _AUTOCOMPLETE_TOKEN_RULES: list[tuple[re.Pattern, str]] = [
     (re.compile(r"\b(street address|address line ?1?)\b"), "street-address"),
 ]
 
-# Fields whose purpose is ambiguous or explicitly out of scope for 1.3.5.
+
 _AUTOCOMPLETE_SKIP = re.compile(
     r"\b(search|query|otp|one time|code|token|captcha|coupon|promo|voucher|company|organization|org)\b"
 )
 
+_AUTOCOMPLETE_VALID_TOKENS = {
+    "name", "honorific-prefix", "given-name", "additional-name", "family-name",
+    "honorific-suffix", "nickname", "username", "new-password",
+    "current-password", "one-time-code", "organization-title",
+    "organization", "street-address", "address-line1", "address-line2",
+    "address-line3", "address-level4", "address-level3", "address-level2",
+    "address-level1", "country", "country-name", "postal-code",
+    "cc-name", "cc-given-name", "cc-additional-name", "cc-family-name",
+    "cc-number", "cc-exp", "cc-exp-month", "cc-exp-year", "cc-csc",
+    "cc-type", "transaction-currency", "transaction-amount", "language",
+    "bday", "bday-day", "bday-month", "bday-year", "sex", "url",
+    "photo", "tel", "tel-country-code", "tel-national", "tel-area-code",
+    "tel-local", "tel-local-prefix", "tel-local-suffix", "tel-extension",
+    "email", "impp", "webauthn",
+}
+
+_AUTOCOMPLETE_GROUP_TOKENS = {"shipping", "billing", "home", "work", "mobile", "fax", "pager"}
+
+
+def _autocomplete_detail_tokens(value: str) -> list[str]:
+    return [
+        token
+        for token in value.casefold().split()
+        if token not in {"on", "off"}
+        and not token.startswith("section-")
+        and token not in _AUTOCOMPLETE_GROUP_TOKENS
+    ]
+
+
+def _autocomplete_expected_token(input_type: str, haystack: str) -> str | None:
+    if input_type == "email":
+        return "email"
+    if input_type == "tel":
+        return "tel"
+    if input_type == "password":
+        if re.search(r"\b(new|confirm|repeat|create)\b", haystack):
+            return "new-password"
+        if re.search(r"\b(current|existing|login|sign ?in|password)\b", haystack) and re.search(r"\b(user ?name|email|login|sign ?in|account)\b", haystack):
+            return "current-password"
+        return None
+    if input_type == "text" or not input_type:
+        for pattern, mapped_token in _AUTOCOMPLETE_TOKEN_RULES:
+            if pattern.search(haystack):
+                return mapped_token
+    return None
+
+
+def _autocomplete_token_compatible(expected: str, tokens: list[str]) -> bool:
+    if expected in tokens:
+        return True
+    if expected in {"current-password", "new-password"} and any(token.endswith("password") for token in tokens):
+        return True
+    if expected == "name" and {"given-name", "family-name"} & set(tokens):
+        return True
+    return False
+
 
 def analyze_input_purposes(html: str) -> list[AccessibilityIssue]:
-    """Detect common user-information inputs missing autocomplete tokens."""
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -1133,9 +1189,23 @@ def analyze_input_purposes(html: str) -> list[AccessibilityIssue]:
         if control.tag != "input" or _element_is_hidden(control):
             continue
         input_type = control.attrs.get("type", "text").lower()
-        if input_type in IGNORED_INPUT_TYPES or input_type in {"search", "checkbox", "radio", "file"}:
+        autocomplete = control.attrs.get("autocomplete", "").strip()
+        if autocomplete and input_type in IGNORED_INPUT_TYPES | {"checkbox", "radio", "file"}:
+            issues.append(
+                _issue(
+                    title="Autocomplete token is on an unsupported control",
+                    issue_type="autocomplete_unsupported_control",
+                    severity="low",
+                    evidence=_element_evidence(
+                        control,
+                        "This control type does not collect reusable personal information for autocomplete.",
+                        {"autocomplete": autocomplete, "type": input_type},
+                    ),
+                    suggested_fix="Remove autocomplete from controls that do not collect reusable personal information.",
+                )
+            )
             continue
-        if control.attrs.get("autocomplete"):
+        if input_type in IGNORED_INPUT_TYPES or input_type in {"search", "checkbox", "radio", "file"}:
             continue
         if _nearest_ancestor(control, {"form"}) is None:
             continue
@@ -1156,22 +1226,52 @@ def analyze_input_purposes(html: str) -> list[AccessibilityIssue]:
         if _AUTOCOMPLETE_SKIP.search(haystack):
             continue
 
-        token = None
-        if input_type == "email":
-            token = "email"
-        elif input_type == "tel":
-            token = "tel"
-        elif input_type == "password":
-            if re.search(r"\b(new|confirm|repeat|create)\b", haystack):
-                token = "new-password"
-            elif re.search(r"\b(current|old|existing)\b", haystack):
-                token = "current-password"
-        elif input_type == "text" or not control.attrs.get("type"):
-            for pattern, mapped_token in _AUTOCOMPLETE_TOKEN_RULES:
-                if pattern.search(haystack):
-                    token = mapped_token
-                    break
+        token = _autocomplete_expected_token(input_type, haystack)
         if token is None:
+            continue
+
+        if autocomplete:
+            detail_tokens = _autocomplete_detail_tokens(autocomplete)
+            invalid_tokens = [
+                item for item in detail_tokens if item not in _AUTOCOMPLETE_VALID_TOKENS
+            ]
+            if invalid_tokens:
+                issues.append(
+                    _issue(
+                        title="Autocomplete token is invalid",
+                        issue_type="invalid_autocomplete_token",
+                        severity="medium",
+                        evidence=_element_evidence(
+                            control,
+                            "The autocomplete attribute contains tokens that are not recognized HTML autofill detail tokens.",
+                            {
+                                "autocomplete": autocomplete,
+                                "invalid_tokens": invalid_tokens,
+                                "suggested_token": token,
+                            },
+                        ),
+                        suggested_fix=f'Use a valid autocomplete token such as "{token}", or remove the attribute if the field is not for the user\'s own information.',
+                    )
+                )
+                continue
+            if detail_tokens and not _autocomplete_token_compatible(token, detail_tokens):
+                issues.append(
+                    _issue(
+                        title="Autocomplete token contradicts the field purpose",
+                        issue_type="contradictory_autocomplete",
+                        severity="medium",
+                        evidence=_element_evidence(
+                            control,
+                            f'The field appears to collect "{token}", but autocomplete is set to "{autocomplete}".',
+                            {
+                                "autocomplete": autocomplete,
+                                "expected_token": token,
+                                "identity": _control_identity(control),
+                            },
+                        ),
+                        suggested_fix=f'Use autocomplete="{token}" if the field collects the user\'s own information.',
+                    )
+                )
             continue
 
         issues.append(
@@ -1193,15 +1293,149 @@ def analyze_input_purposes(html: str) -> list[AccessibilityIssue]:
     return issues
 
 
+def analyze_authentication_and_error_prevention(html: str) -> list[AccessibilityIssue]:
+    parser = _parse_html(html)
+    issues: list[AccessibilityIssue] = []
+    document_text = parser.document_text.casefold()
+    forms = [element for element in parser.elements if element.tag == "form" and not _element_is_hidden(element)]
+    controls = [element for element in parser.elements if element.tag in {"input", "select", "textarea"} and not _element_is_hidden(element)]
+
+    password_controls = [
+        control for control in controls if control.attrs.get("type", "").casefold() == "password"
+    ]
+    if password_controls:
+        blocked_paste = any(
+            re.search(r"paste|copy", control.attrs.get("onpaste", "") + control.attrs.get("oncopy", ""), re.IGNORECASE)
+            or control.attrs.get("onpaste", "").strip().casefold() == "return false"
+            for control in password_controls
+        )
+        captcha_text = re.search(r"\b(captcha|recaptcha|type the characters|security code)\b", document_text)
+        has_accessible_alternative = re.search(r"\b(audio challenge|email link|magic link|passkey|webauthn|one-time code|otp|alternative)\b", document_text)
+        if blocked_paste or (captcha_text and not has_accessible_alternative):
+            issues.append(
+                _issue(
+                    title="Authentication flow may require a cognitive function test without an accessible alternative",
+                    issue_type="accessible_authentication_barrier",
+                    severity="medium",
+                    evidence=_page_evidence(
+                        "form",
+                        "The public authentication interface shows evidence such as blocked paste or CAPTCHA text without an obvious accessible alternative.",
+                        snippet=_element_snippet(password_controls[0]),
+                        extra={
+                            "blocked_paste": blocked_paste,
+                            "captcha_text": captcha_text.group(0) if captcha_text else "",
+                        },
+                    ),
+                    suggested_fix="Support password managers and paste, and provide an accessible authentication alternative such as passkeys, one-time links, or accessible challenge options.",
+                )
+            )
+
+    seen_fields: dict[str, HTMLElement] = {}
+    repeat_candidates = {"email", "tel", "name", "given-name", "family-name", "postal-code", "street-address"}
+    for control in controls:
+        input_type = control.attrs.get("type", "text").casefold()
+        haystack = _normalize_name_text(
+            " ".join(
+                [
+                    control.attrs.get("name", "").replace("_", " ").replace("-", " "),
+                    control.attrs.get("id", "").replace("_", " ").replace("-", " "),
+                    control.attrs.get("aria-label", ""),
+                    control.attrs.get("placeholder", ""),
+                ]
+            )
+        )
+        token = _autocomplete_expected_token(input_type, haystack)
+        if token not in repeat_candidates:
+            continue
+        previous = seen_fields.get(token)
+        if previous is not None:
+            issues.append(
+                _issue(
+                    title="Workflow may ask for the same information more than once",
+                    issue_type="redundant_entry_repeated_field",
+                    severity="low",
+                    evidence=_element_evidence(
+                        control,
+                        f'This form contains another field that appears to request "{token}" again.',
+                        {
+                            "repeated_purpose": token,
+                            "first_field": _control_identity(previous),
+                            "current_field": _control_identity(control),
+                        },
+                    ),
+                    suggested_fix="Avoid asking users to re-enter information already provided in the same workflow unless an exception applies.",
+                )
+            )
+            break
+        seen_fields[token] = control
+
+    consequence_text = re.search(r"\b(payment|pay|purchase|order|application|exam|submit final|delete|remove account|legal|financial|data)\b", document_text)
+    if forms and consequence_text:
+        has_review = re.search(r"\b(review|confirm|summary|edit|back|undo|cancel|verify)\b", document_text)
+        if not has_review:
+            issues.append(
+                _issue(
+                    title="High-consequence form may lack visible review or reversal steps",
+                    issue_type="error_prevention_missing",
+                    severity="medium",
+                    evidence=_page_evidence(
+                        "form",
+                        "The public form appears to involve legal, financial, test, or data-modifying consequences without visible review, confirmation, edit, undo, or cancellation language.",
+                        snippet=_element_snippet(forms[0]),
+                        extra={"consequence_keyword": consequence_text.group(0)},
+                    ),
+                    suggested_fix="Provide review, confirmation, correction, or reversal mechanisms before final high-consequence submission.",
+                )
+            )
+
+    broad_status_containers = {"html", "body", "main", "form", "section", "article", "nav", "header", "footer", "aside", "h1", "h2", "h3", "h4", "h5", "h6"}
+    statusish = [
+        element
+        for element in parser.elements
+        if not _element_is_hidden(element)
+        and element.tag not in broad_status_containers
+        and (
+            re.search(r"\b(status|message|toast|notification|alert|success|error|updated|saved)\b", element.attrs.get("class", "") + " " + element.attrs.get("id", ""), re.IGNORECASE)
+            or re.search(r"\b(saved|updated|loading|complete|error|success)\b", element.text, re.IGNORECASE)
+        )
+    ]
+    for element in statusish[:1]:
+        role = element.attrs.get("role", "").casefold()
+        live = element.attrs.get("aria-live", "").casefold()
+        ancestor_live = any(
+            ancestor.attrs.get("role", "").casefold() in {"status", "alert"}
+            or ancestor.attrs.get("aria-live", "").casefold() in {"polite", "assertive"}
+            for ancestor in element.ancestors
+        )
+        if role in {"status", "alert"} or live in {"polite", "assertive"} or ancestor_live:
+            continue
+        issues.append(
+            _issue(
+                title="Status message may not be exposed programmatically",
+                issue_type="status_message_not_live",
+                severity="medium",
+                evidence=_element_evidence(
+                    element,
+                    "Status-like content appears in the page without role=status, role=alert, or aria-live.",
+                    {"role": role, "aria_live": live},
+                ),
+                suggested_fix="Expose dynamic status text through role=\"status\", role=\"alert\", or an appropriate aria-live region when it appears without moving focus.",
+            )
+        )
+        break
+
+    return issues
+
+
 _SKIP_LINK_TEXT = re.compile(r"\b(skip|jump)\b.*\b(content|main|navigation)\b", re.IGNORECASE)
 
 
 def analyze_bypass_blocks(html: str) -> list[AccessibilityIssue]:
-    """Detect a substantial repeated navigation block with no bypass mechanism.
 
-    Conservative: small pages, pages with a main landmark, a skip link, or a
-    usable heading structure are never flagged.
-    """
+
+
+
+
     parser = _parse_html(html)
 
     links = [
@@ -1234,8 +1468,8 @@ def analyze_bypass_blocks(html: str) -> list[AccessibilityIssue]:
         if element.tag in {"h1", "h2", "h3", "h4", "h5", "h6"} and element.text
     )
     if heading_count >= 2:
-        # Heading navigation is a recognized bypass mechanism for assistive
-        # technology users; treat this as sufficient to stay conservative.
+
+
         return []
 
     for link in links[:5]:
@@ -1266,7 +1500,7 @@ def analyze_bypass_blocks(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_label_in_name(html: str) -> list[AccessibilityIssue]:
-    """Compare visible labels with aria-label overrides (WCAG 2.2 SC 2.5.3)."""
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
 
@@ -1288,8 +1522,8 @@ def analyze_label_in_name(html: str) -> list[AccessibilityIssue]:
 
         visible_norm = _normalize_name_text(visible)
         aria_norm = _normalize_name_text(aria_label)
-        # Icon-only or near-empty visible labels have nothing for speech
-        # input users to say, so there is nothing to mismatch.
+
+
         if len(visible_norm) < 3 or not re.search(r"[a-z]", visible_norm):
             continue
         if visible_norm in aria_norm:
@@ -1304,10 +1538,10 @@ def analyze_label_in_name(html: str) -> list[AccessibilityIssue]:
             "previous menu",
             "back",
         }
-        # Menus and breadcrumbs often put section text inside a button whose
-        # actual visible affordance is an icon or short functional control.
-        # If the aria-label is a known functional action, inherited/nested
-        # descendant text should not become a strong label-in-name finding.
+
+
+
+
         if aria_norm in functional_menu_names:
             continue
         issues.append(
@@ -1334,19 +1568,19 @@ def analyze_label_in_name(html: str) -> list[AccessibilityIssue]:
 
 
 def _raw_block_text(html: str, tag: str) -> str:
-    """Return raw script/style text for conservative static evidence scans."""
+
     pattern = re.compile(rf"<{tag}\b[^>]*>(.*?)</{tag}>", re.IGNORECASE | re.DOTALL)
     return "\n".join(match.group(1) for match in pattern.finditer(html))
 
 
 def _has_nearby_text(parser: _StaticHTMLParser, words: set[str]) -> bool:
-    """Return whether visible page text contains any whole-word cue."""
+
     text = parser.document_text.casefold()
     return any(re.search(rf"\b{re.escape(word)}\b", text) for word in words)
 
 
 def _has_control_text(parser: _StaticHTMLParser, words: set[str]) -> bool:
-    """Return whether visible controls provide an alternative by name."""
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1366,7 +1600,7 @@ def _has_control_text(parser: _StaticHTMLParser, words: set[str]) -> bool:
 
 
 def _has_reduced_motion_support(html: str) -> bool:
-    """Return whether CSS appears to include a reduced-motion accommodation."""
+
     return bool(re.search(r"prefers-reduced-motion", html, re.IGNORECASE))
 
 
@@ -1375,20 +1609,20 @@ def _script_has(pattern: str, scripts: str) -> bool:
 
 
 def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
-    """Collect conservative static evidence for additional WCAG criteria.
 
-    These checks intentionally produce partial or supporting evidence. They
-    look for concrete markup, CSS, or script patterns and include exceptions
-    for common accessible alternatives rather than mapping loose keywords.
-    """
+
+
+
+
+
     parser = _parse_html(html)
     issues: list[AccessibilityIssue] = []
     scripts = _raw_block_text(html, "script")
     styles = _raw_block_text(html, "style")
     combined_code = "\n".join([styles, scripts])
 
-    # 1.3.2 Meaningful Sequence: CSS order/grid placement can make visual
-    # order differ from DOM order. This is review evidence, not a conclusion.
+
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1415,7 +1649,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
             break
 
-    # 1.3.4 Orientation: require evidence of restriction, not responsive CSS.
+
     orientation_message = re.search(
         r"\b(rotate (?:your )?device|landscape mode required|portrait mode required|"
         r"please use (?:landscape|portrait))\b",
@@ -1454,7 +1688,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 1.4.1 Use of Color: require color-only cue plus lack of text/icon/state.
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1497,7 +1731,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
         )
         break
 
-    # 1.4.2 Audio Control.
+
     for audio in parser.elements:
         if audio.tag != "audio" or _element_is_inactive(audio):
             continue
@@ -1523,7 +1757,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
         )
         break
 
-    # 1.4.5 Images of Text: review evidence for SVG/image text labels.
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1556,7 +1790,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
             break
 
-    # 1.4.13 Content on Hover or Focus.
+
     hover_focus_css = re.search(r":(?:hover|focus(?:-within)?)[^{]+{[^}]*display\s*:\s*(?:block|flex|grid|inline)", styles, re.IGNORECASE | re.DOTALL)
     for element in parser.elements:
         if _element_is_inactive(element):
@@ -1586,7 +1820,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
         )
         break
 
-    # 2.1.4 Character Key Shortcuts.
+
     if _script_has(r"(?:keydown|keyup|keypress)", scripts) and re.search(
         r"(?:event|e)\.key\s*={2,3}\s*['\"][A-Za-z0-9]['\"]", scripts
     ) and not re.search(r"(ctrlKey|altKey|metaKey)", scripts):
@@ -1608,7 +1842,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 2.2.1 Timing Adjustable.
+
     meta_refresh = next(
         (
             element
@@ -1641,7 +1875,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
                 )
             )
 
-    # 2.2.2 Pause, Stop, Hide.
+
     moving_css = re.search(r"animation(?:-name)?\s*:[^;}]*(carousel|ticker|marquee|blink|scroll|slide)", combined_code, re.IGNORECASE)
     moving_markup = any(
         element.tag == "marquee"
@@ -1666,7 +1900,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
                 )
             )
 
-    # 2.3.1 Three flashes or below threshold.
+
     flash_css = re.search(r"@keyframes\s+[^{}]*(flash|blink|strobe)[^{]*{", styles, re.IGNORECASE)
     fast_animation = re.search(
         r"animation(?:-duration)?\s*:[^;}]*\b(?:0?\.[0-3]\d*s|[1-3]00ms)\b",
@@ -1688,7 +1922,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 2.3.3 Animation from interactions.
+
     interaction_motion = re.search(r":(?:hover|active|focus)[^{]*{[^}]*(transform|animation)", styles, re.IGNORECASE | re.DOTALL)
     if interaction_motion and not _has_reduced_motion_support(html):
         issues.append(
@@ -1705,7 +1939,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 2.5.1 Pointer Gestures.
+
     gesture_evidence = re.search(r"\b(touchstart|touchmove|pointermove|gesturestart|pinch|swipe)\b", combined_code, re.IGNORECASE)
     if gesture_evidence and not _has_control_text(parser, {"previous", "next", "zoom", "increase", "decrease", "move"}):
         issues.append(
@@ -1723,7 +1957,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 2.5.2 Pointer Cancellation.
+
     pointer_code = "\n".join([combined_code, html])
     down_event = re.search(r"\b(onmousedown|onpointerdown|ontouchstart|mousedown|pointerdown|touchstart)\b", pointer_code, re.IGNORECASE)
     if down_event and not re.search(r"\b(mouseup|pointerup|touchend|preventDefault|cancel)\b", pointer_code, re.IGNORECASE):
@@ -1742,7 +1976,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 2.5.7 Dragging Movements.
+
     drag_elements = [
         element
         for element in parser.elements
@@ -1766,7 +2000,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
         )
 
-    # 3.2.1 On Focus.
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1787,7 +2021,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
             break
 
-    # 3.2.2 On Input.
+
     for element in parser.elements:
         if _element_is_inactive(element):
             continue
@@ -1808,7 +2042,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
             )
             break
 
-    # 3.3.1 / 3.3.3 Error identification and suggestions.
+
     error_elements = [
         element
         for element in parser.elements
@@ -1862,7 +2096,7 @@ def analyze_wcag_static_evidence(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_html_static(html: str) -> list[AccessibilityIssue]:
-    """Run all current static HTML accessibility checks."""
+
     issues: list[AccessibilityIssue] = []
 
     for check in [
@@ -1878,6 +2112,7 @@ def analyze_html_static(html: str) -> list[AccessibilityIssue]:
         analyze_input_purposes,
         analyze_bypass_blocks,
         analyze_label_in_name,
+        analyze_authentication_and_error_prevention,
         analyze_wcag_static_evidence,
     ]:
         issues.extend(check(html))
@@ -1886,7 +2121,7 @@ def analyze_html_static(html: str) -> list[AccessibilityIssue]:
 
 
 def analyze_html(html: str) -> dict[str, Any]:
-    """Return a small summary for an HTML page."""
+
     issues = analyze_html_static(html)
 
     return {
@@ -1898,11 +2133,11 @@ def analyze_html(html: str) -> dict[str, Any]:
 
 
 def analyze_browser_page(url: str) -> dict[str, Any]:
-    """Return placeholder browser analysis for a URL.
 
-    TODO: Integrate Playwright or Selenium to load pages, run keyboard
-    navigation checks, inspect computed styles, and capture evidence.
-    """
+
+
+
+
     return {
         "url": url,
         "notes": "Browser automation is not implemented yet.",
@@ -1910,11 +2145,11 @@ def analyze_browser_page(url: str) -> dict[str, Any]:
 
 
 def analyze_pdf(path: str) -> dict[str, Any]:
-    """Return placeholder PDF analysis.
 
-    TODO: Add PDF text extraction, reading order checks, tags checks,
-    image alternative text checks, and form field checks.
-    """
+
+
+
+
     return {
         "path": path,
         "notes": "PDF analysis is not implemented yet.",

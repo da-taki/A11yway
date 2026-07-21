@@ -1,9 +1,9 @@
-"""Tests for the optional axe-core scan in browser mode.
 
-These tests must pass whether or not axe-playwright-python is installed.
-The real headless-browser integration test skips itself when the scan
-cannot run.
-"""
+
+
+
+
+
 
 from pathlib import Path
 
@@ -31,7 +31,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 
 def fake_violation(**overrides) -> dict:
-    """Build one raw axe-core violation like axe.run returns."""
+
     violation = {
         "id": "label",
         "impact": "critical",
@@ -51,13 +51,13 @@ def fake_violation(**overrides) -> dict:
 
 
 def test_axe_runner_imports_without_axe_package() -> None:
-    """Importing the module must never require axe-playwright-python."""
+
     assert hasattr(axe_runner, "run_axe_scan")
     assert isinstance(is_axe_available(), bool)
 
 
 def test_axe_impact_maps_to_project_severities() -> None:
-    """axe impacts map onto high/medium/low; unknown stays medium."""
+
     assert axe_impact_to_severity("critical") == "high"
     assert axe_impact_to_severity("serious") == "high"
     assert axe_impact_to_severity("moderate") == "medium"
@@ -67,7 +67,7 @@ def test_axe_impact_maps_to_project_severities() -> None:
 
 
 def test_violations_become_issues_with_reviewable_evidence() -> None:
-    """Each affected element becomes one issue with rule evidence."""
+
     issues = axe_violations_to_issues([fake_violation()])
 
     assert len(issues) == 1
@@ -84,7 +84,7 @@ def test_violations_become_issues_with_reviewable_evidence() -> None:
 
 
 def test_positive_tabindex_is_review_only_axe_evidence() -> None:
-    """Axe tabindex violations need human review until harmful order is proven."""
+
     issues = axe_violations_to_issues(
         [
             fake_violation(
@@ -110,7 +110,7 @@ def test_positive_tabindex_is_review_only_axe_evidence() -> None:
 
 
 def test_violation_nodes_are_capped_per_rule() -> None:
-    """A rule hitting many elements must not flood the report."""
+
     nodes = [
         {"html": f"<input id='f{i}'>", "target": [f"#f{i}"], "failureSummary": "x"}
         for i in range(25)
@@ -122,7 +122,7 @@ def test_violation_nodes_are_capped_per_rule() -> None:
 
 
 def test_violation_summary_is_json_safe() -> None:
-    """The per-rule summary keeps only compact JSON-safe fields."""
+
     summary = summarize_axe_violations([fake_violation()])
 
     assert summary == [
@@ -138,7 +138,7 @@ def test_violation_summary_is_json_safe() -> None:
 
 
 def test_run_axe_scan_reports_missing_dependency(monkeypatch) -> None:
-    """The scan itself should degrade instead of raising."""
+
     monkeypatch.setattr(axe_runner, "Axe", None)
 
     result = run_axe_scan(page=None)
@@ -149,7 +149,7 @@ def test_run_axe_scan_reports_missing_dependency(monkeypatch) -> None:
 
 
 def test_final_dedup_merges_equivalent_axe_findings() -> None:
-    """Native and axe evidence for the same element should report once."""
+
     static_issue = AccessibilityIssue(
         title="Form control is missing an accessible label",
         issue_type="missing_form_label",
@@ -178,7 +178,7 @@ def test_final_dedup_merges_equivalent_axe_findings() -> None:
 
 
 def test_cli_axe_without_browser_exits_with_guidance(capsys) -> None:
-    """--axe without --browser should explain the requirement."""
+
     exit_code = main(["examples/sample_form.html", "--axe"])
 
     captured = capsys.readouterr()
@@ -188,7 +188,7 @@ def test_cli_axe_without_browser_exits_with_guidance(capsys) -> None:
 
 
 def test_cli_axe_without_package_prints_setup_help(monkeypatch, capsys) -> None:
-    """--axe without the axe package should print install instructions."""
+
     monkeypatch.setattr(main_module, "is_playwright_available", lambda: True)
     monkeypatch.setattr(main_module, "is_axe_available", lambda: False)
 
@@ -201,7 +201,7 @@ def test_cli_axe_without_package_prints_setup_help(monkeypatch, capsys) -> None:
 
 
 def test_browser_audit_without_playwright_keeps_axe_field(monkeypatch) -> None:
-    """include_axe must not change the graceful no-Playwright behavior."""
+
     from a11yway.core import browser_runner
 
     monkeypatch.setattr(browser_runner, "sync_playwright", None)
@@ -213,7 +213,7 @@ def test_browser_audit_without_playwright_keeps_axe_field(monkeypatch) -> None:
 
 
 def test_reports_include_axe_section() -> None:
-    """JSON and Markdown reports should surface the axe scan summary."""
+
     browser_result = {
         "success": True,
         "error": None,
@@ -243,7 +243,7 @@ def test_reports_include_axe_section() -> None:
 
 
 def test_report_without_axe_scan_has_no_axe_key() -> None:
-    """Browser reports built without --axe must not grow an axe key."""
+
     browser_result = {
         "success": True,
         "error": None,
@@ -265,7 +265,7 @@ def test_report_without_axe_scan_has_no_axe_key() -> None:
     reason="Playwright or axe-playwright-python is not installed",
 )
 def test_axe_scan_finds_violations_on_sample_form() -> None:
-    """Integration: the sample form should trigger real axe violations."""
+
     result = run_browser_audit("examples/sample_form.html", include_axe=True)
 
     if not result["success"]:
@@ -284,5 +284,5 @@ def test_axe_scan_finds_violations_on_sample_form() -> None:
     ]
     assert axe_issues
     assert all(issue.issue_type.startswith("axe_") for issue in axe_issues)
-    # The unlabeled field in the sample form should be caught by axe too.
+
     assert any(issue.issue_type == "axe_label" for issue in axe_issues)

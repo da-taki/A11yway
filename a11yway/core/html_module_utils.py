@@ -1,4 +1,4 @@
-"""Small HTML helpers for extended modules."""
+
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ VOID_TAGS = {"br", "hr", "img", "input", "meta", "link", "source", "track", "are
 
 
 class SimpleElementParser(HTMLParser):
-    """Collect start tags and rough text content without external deps."""
+
 
     def __init__(self) -> None:
         super().__init__()

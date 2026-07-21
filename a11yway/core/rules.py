@@ -1,9 +1,9 @@
-"""Central registry describing every static issue type A11yway can report.
 
-Each rule documents what a check detects, why it matters for students, how
-to fix it, and what the static prototype cannot verify. Reports use this
-registry so reviewers can understand findings without reading the code.
-"""
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ from a11yway.core.wcag_coverage import wcag_mappings_for_issue_type
 from a11yway.models.issue import AccessibilityIssue
 
 
-# Rule fields copied into per-issue report metadata. The how_to_fix text is
-# intentionally excluded because issues already carry a suggested_fix.
-# Static rules document static_check_limitations; browser rules document
-# browser_check_limitations. Only fields present on a rule are copied.
+
+
+
+
 REPORT_RULE_FIELDS = [
     "title",
     "category",
@@ -24,11 +24,11 @@ REPORT_RULE_FIELDS = [
     "browser_check_limitations",
 ]
 
-# Confidence a finding carries when the check did not set one explicitly.
-# confirmed: deterministic observed blockage or state.
-# likely: strong single-source evidence with known blind spots.
-# needs_review: heuristic evidence a human must judge.
-# informational: context for reviewers, not a suspected failure.
+
+
+
+
+
 DEFAULT_CONFIDENCE_BY_RULE = {
     "missing_form_label": "likely",
     "missing_button_name": "likely",
@@ -52,18 +52,25 @@ DEFAULT_CONFIDENCE_BY_RULE = {
     "fake_heading": "needs_review",
     "sensory_instruction": "needs_review",
     "missing_autocomplete": "likely",
+    "invalid_autocomplete_token": "likely",
+    "contradictory_autocomplete": "likely",
+    "autocomplete_unsupported_control": "needs_review",
     "no_bypass_mechanism": "needs_review",
     "label_in_name_mismatch": "likely",
+    "accessible_authentication_barrier": "needs_review",
+    "redundant_entry_repeated_field": "needs_review",
+    "error_prevention_missing": "needs_review",
+    "status_message_not_live": "needs_review",
     "browser_no_focusable_elements": "likely",
     "browser_focus_not_moving": "likely",
     "browser_repeated_focus": "needs_review",
     "browser_focused_control_missing_name": "likely",
     "browser_focus_on_hidden_element": "needs_review",
     "unnamed_focus_stop": "likely",
-    "keyboard_trap": "confirmed",
+    "keyboard_trap": "strong",
     "focus_lost": "needs_review",
-    "task_step_blocked": "confirmed",
-    "task_control_not_keyboard_reachable": "confirmed",
+    "task_step_blocked": "strong",
+    "task_control_not_keyboard_reachable": "strong",
     "task_expected_content_missing": "needs_review",
     "low_contrast_text": "likely",
     "contrast_unresolved_background": "needs_review",
@@ -1109,6 +1116,39 @@ RULES: dict[str, dict] = {
             "Related to WCAG 2.2 SC 1.3.5 Identify Input Purpose."
         ),
     },
+    "invalid_autocomplete_token": {
+        "issue_type": "invalid_autocomplete_token",
+        "title": "Autocomplete token is invalid",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": "Invalid autofill tokens stop browsers and assistive tools from recognizing the field purpose.",
+        "how_to_fix": "Use a valid HTML autocomplete token that matches the information collected.",
+        "manual_review_notes": "Confirm the field collects information about the user before requiring an autofill token.",
+        "static_check_limitations": "Token validation is static and does not prove the form purpose.",
+        "standard_hint": "Partial evidence related to WCAG 2.2 SC 1.3.5 Identify Input Purpose.",
+    },
+    "contradictory_autocomplete": {
+        "issue_type": "contradictory_autocomplete",
+        "title": "Autocomplete token contradicts the field purpose",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": "A wrong autofill token can put user information into the wrong field and confuse assistive technologies.",
+        "how_to_fix": "Use the autocomplete token that matches the visible label and collected information.",
+        "manual_review_notes": "Review ambiguous or localized labels before treating the inferred purpose as final.",
+        "static_check_limitations": "Purpose inference is conservative and based on label, name, id, placeholder, and input type.",
+        "standard_hint": "Partial evidence related to WCAG 2.2 SC 1.3.5 Identify Input Purpose.",
+    },
+    "autocomplete_unsupported_control": {
+        "issue_type": "autocomplete_unsupported_control",
+        "title": "Autocomplete is set on an unsupported control",
+        "category": "Forms",
+        "default_severity": "low",
+        "why_it_matters": "Autocomplete metadata on controls that do not collect reusable personal information adds noise and can mislead review.",
+        "how_to_fix": "Remove autocomplete from controls such as buttons, checkboxes, file uploads, and hidden fields.",
+        "manual_review_notes": "Confirm the control really is not collecting reusable personal information.",
+        "static_check_limitations": "Static type inspection only.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 1.3.5 Identify Input Purpose.",
+    },
     "no_bypass_mechanism": {
         "issue_type": "no_bypass_mechanism",
         "title": "No apparent way to bypass repeated navigation",
@@ -1163,6 +1203,50 @@ RULES: dict[str, dict] = {
         "standard_hint": (
             "Related to WCAG 2.2 SC 2.5.3 Label in Name."
         ),
+    },
+    "accessible_authentication_barrier": {
+        "issue_type": "accessible_authentication_barrier",
+        "title": "Authentication flow may require a cognitive function test without an accessible alternative",
+        "category": "Authentication",
+        "default_severity": "medium",
+        "why_it_matters": "People with cognitive, memory, motor, or assistive-technology needs can be blocked by transcription-only challenges, paste blocking, or forced recall tasks.",
+        "how_to_fix": "Support paste and password managers, and provide accessible alternatives such as passkeys, one-time links, or usable challenge alternatives.",
+        "manual_review_notes": "Do not log in during public audits. Inspect the public authentication page and verify alternatives manually.",
+        "static_check_limitations": "Public-page heuristic; it does not attempt authentication or judge every CAPTCHA.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.3.8 Accessible Authentication (Minimum).",
+    },
+    "redundant_entry_repeated_field": {
+        "issue_type": "redundant_entry_repeated_field",
+        "title": "Workflow may ask for the same information more than once",
+        "category": "Forms",
+        "default_severity": "low",
+        "why_it_matters": "Repeated entry increases cognitive load and errors for users who already supplied the information.",
+        "how_to_fix": "Reuse previously entered information or let the user select it instead of typing it again.",
+        "manual_review_notes": "Confirm whether the duplicate field is genuinely redundant or asks for a separate person's information.",
+        "static_check_limitations": "Single-page heuristic; full 3.3.7 testing needs a controlled workflow.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.3.7 Redundant Entry.",
+    },
+    "error_prevention_missing": {
+        "issue_type": "error_prevention_missing",
+        "title": "High-consequence form may lack visible review or reversal steps",
+        "category": "Forms",
+        "default_severity": "medium",
+        "why_it_matters": "Legal, financial, test, or data-modifying submissions need ways to review, correct, or reverse mistakes.",
+        "how_to_fix": "Provide review, confirmation, correction, or reversal before final submission.",
+        "manual_review_notes": "Do not submit public forms. Confirm the consequence and the available safeguards in a permitted workflow.",
+        "static_check_limitations": "Keyword heuristic on public markup; final workflow behavior requires human review.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 3.3.4 Error Prevention.",
+    },
+    "status_message_not_live": {
+        "issue_type": "status_message_not_live",
+        "title": "Status message may not be exposed programmatically",
+        "category": "Dynamic Feedback",
+        "default_severity": "medium",
+        "why_it_matters": "Users of assistive technology can miss status updates that appear without moving focus unless they are exposed through a live region.",
+        "how_to_fix": "Use role=\"status\", role=\"alert\", or an appropriate aria-live region for dynamic status messages.",
+        "manual_review_notes": "Trigger the update in a browser and inspect the accessibility tree before and after.",
+        "static_check_limitations": "Static status-like content is only supporting evidence; dynamic behavior is not reproduced.",
+        "standard_hint": "Supporting evidence related to WCAG 2.2 SC 4.1.3 Status Messages.",
     },
     "contrast_unresolved_background": {
         "issue_type": "contrast_unresolved_background",
@@ -1474,8 +1558,8 @@ RULES: dict[str, dict] = {
     },
 }
 
-# Attach default confidence to every rule so --rule output and reports can
-# state it without repeating the table above.
+
+
 for _issue_type, _rule in RULES.items():
     _rule["default_confidence"] = DEFAULT_CONFIDENCE_BY_RULE.get(
         _issue_type, FALLBACK_CONFIDENCE
@@ -1483,22 +1567,22 @@ for _issue_type, _rule in RULES.items():
 
 
 def get_rule(issue_type: str) -> dict | None:
-    """Return the registry entry for an issue type, or None if unknown."""
+
     return RULES.get(issue_type)
 
 
 def list_rules() -> list[dict]:
-    """Return all registered rules in a stable order."""
+
     return list(RULES.values())
 
 
 def enrich_issue_with_rule(issue: AccessibilityIssue | dict) -> dict:
-    """Attach report-ready rule metadata to an issue.
 
-    Accepts either an AccessibilityIssue or an already-built issue dict and
-    returns a dict. Unknown issue types are returned unchanged so reports
-    never break on new checks.
-    """
+
+
+
+
+
     if isinstance(issue, AccessibilityIssue):
         issue_dict = {
             "issue_type": issue.issue_type,

@@ -1,16 +1,16 @@
-"""Static Indic-language markup checks.
 
-Text-to-speech and screen readers pick a voice from the declared language,
-so Indic-script text under a missing or wrong lang attribute is commonly
-read as garbled English. These checks detect Indic-script text (via
-Unicode ranges) whose language markup is missing, contradictory, or mixed
-with Latin text inside one text node.
 
-Everything here is a standard-library heuristic on the HTML source: no
-browser, no network, no external dependencies. Script detection cannot see
-transliterated text (for example Hindi written in Latin letters), and the
-mixed-script check is deliberately conservative to limit false positives.
-"""
+
+
+
+
+
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from a11yway.models.issue import AccessibilityIssue
 
 INDIC_CHECK_NAME = "indic_language_checks"
 
-# Unicode ranges for the major Indic scripts.
+
 INDIC_SCRIPT_RANGES = {
     "Devanagari": (0x0900, 0x097F),
     "Bengali": (0x0980, 0x09FF),
@@ -35,7 +35,7 @@ INDIC_SCRIPT_RANGES = {
     "Malayalam": (0x0D00, 0x0D7F),
 }
 
-# Primary language subtags mapped to the script their text normally uses.
+
 LANG_TO_SCRIPT = {
     "hi": "Devanagari",
     "mr": "Devanagari",
@@ -54,13 +54,13 @@ LANG_TO_SCRIPT = {
     "ml": "Malayalam",
 }
 
-# Thresholds keeping the heuristics conservative.
+
 _MIN_INDIC_CHARS = 3
 _MIN_LATIN_WORDS_FOR_MIX = 2
 
 _NON_RENDERED_TAGS = {"script", "style", "template"}
 
-# Void elements never wrap text, so they must not join the lang stack.
+
 _VOID_TAGS = {
     "area", "base", "br", "col", "embed", "hr", "img", "input",
     "link", "meta", "param", "source", "track", "wbr",
@@ -68,11 +68,11 @@ _VOID_TAGS = {
 
 
 def script_of_char(char: str) -> str | None:
-    """Return the script name for one letter, or None for non-letters.
 
-    Punctuation and digits inside a script block (like the Devanagari
-    danda) are not letters and do not count toward script detection.
-    """
+
+
+
+
     if not char.isalpha():
         return None
     code = ord(char)
@@ -85,7 +85,7 @@ def script_of_char(char: str) -> str | None:
 
 
 def script_counts(text: str) -> dict[str, int]:
-    """Count letters per script in a text."""
+
     counts: dict[str, int] = {}
     for char in text:
         script = script_of_char(char)
@@ -95,7 +95,7 @@ def script_counts(text: str) -> dict[str, int]:
 
 
 def dominant_indic_script(counts: dict[str, int]) -> str | None:
-    """Return the Indic script with the most letters, or None."""
+
     best_name = None
     best_count = 0
     for name in INDIC_SCRIPT_RANGES:
@@ -107,7 +107,7 @@ def dominant_indic_script(counts: dict[str, int]) -> str | None:
 
 
 def expected_script_for_lang(lang: str | None) -> str | None:
-    """Return the script a lang attribute promises, or None if unknown."""
+
     if not lang:
         return None
     primary = lang.split("-")[0].strip().lower()
@@ -115,12 +115,12 @@ def expected_script_for_lang(lang: str | None) -> str | None:
 
 
 def substantial_latin_words(text: str) -> list[str]:
-    """Return Latin words that matter for the mixed-script heuristic.
 
-    Numbers, single letters, short all-caps acronyms, and lone tokens are
-    the usual harmless mixes (years, "PDF", one loanword), so they are
-    filtered out before the caller applies its two-word minimum.
-    """
+
+
+
+
+
     words = []
     for token in re.findall(r"[A-Za-z][A-Za-z'\-]*", text):
         if len(token) <= 1:
@@ -132,7 +132,7 @@ def substantial_latin_words(text: str) -> list[str]:
 
 
 class _LangTextParser(HTMLParser):
-    """Collect text nodes with their effective lang and source line."""
+
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -192,7 +192,7 @@ def _indic_issue(
     reason: str,
     extra: dict | None = None,
 ) -> AccessibilityIssue:
-    """Create one Indic-language issue with text node evidence."""
+
     evidence = {
         "snippet": node["text"][:120],
         "tag": node["tag"],
@@ -212,12 +212,12 @@ def _indic_issue(
 
 
 def analyze_indic_language(html: str) -> list[AccessibilityIssue]:
-    """Run the static Indic-language checks over an HTML source."""
+
     parser = _LangTextParser()
     try:
         parser.feed(html)
         parser.close()
-    except Exception:  # noqa: BLE001 - degrade to partial results on tag soup
+    except Exception:
         pass
 
     issues: list[AccessibilityIssue] = []

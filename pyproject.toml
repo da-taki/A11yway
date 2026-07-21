@@ -92,6 +92,7 @@ include = ["a11yway*"]
 [tool.setuptools.package-data]
 a11yway = [
   "workflow_packs/*.json",
+  "data/*.json",
   "templates/web_demo/*.html",
   "static/web_demo/*.css",
 ]

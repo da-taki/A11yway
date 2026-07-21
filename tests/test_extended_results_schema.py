@@ -61,7 +61,7 @@ def test_extended_issue_normalizes_severity(bad_value: str, expected: str) -> No
     ("confidence", "expected"),
     [
         (None, "needs_review"),
-        ("confirmed", "confirmed"),
+        ("confirmed", "strong"),
         ("LIKELY", "likely"),
         ("unknown", "needs_review"),
     ],

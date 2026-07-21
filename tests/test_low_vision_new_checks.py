@@ -1,9 +1,9 @@
-"""Tests for the new low-vision decision logic and browser checks.
 
-Decision functions are pure and tested without a browser; a few integration
-tests run headless Chromium when Playwright is available (like the existing
-zoom-reflow tests).
-"""
+
+
+
+
+
 
 import pytest
 
@@ -27,7 +27,7 @@ def issue_types(issues: list) -> set[str]:
     return {issue.issue_type for issue in issues}
 
 
-# --- contrast: unresolved backgrounds become needs_review ---
+
 
 
 def _sample(**overrides) -> dict:
@@ -81,7 +81,7 @@ def test_translucent_element_opacity_is_unresolved() -> None:
     assert issue_types(issues) == {"contrast_unresolved_background"}
 
 
-# --- reflow: intentional scroll regions ---
+
 
 
 def test_overflow_from_data_table_only_is_intentional() -> None:
@@ -107,11 +107,11 @@ def test_overflow_from_broken_layout_is_not_intentional() -> None:
 
 
 def test_overflow_without_source_attribution_is_not_intentional() -> None:
-    """When attribution failed, stay on the reporting side."""
+
     assert not _overflow_is_intentional({"overflow_amount": 300, "overflow_sources": []})
 
 
-# --- focus indicator: style comparison ---
+
 
 
 def test_style_difference_counts_as_visible_focus() -> None:
@@ -144,7 +144,7 @@ def test_fallback_heuristic_used_when_comparison_unavailable() -> None:
     assert visible and method == "heuristic_fallback"
 
 
-# --- focus obscured ---
+
 
 
 def _stop(covered: int, total: int = 5, in_viewport: bool = True) -> dict:
@@ -193,7 +193,7 @@ def test_offscreen_element_is_not_judged() -> None:
     assert _focus_obscured_issue(_stop(covered=5, in_viewport=False)) is None
 
 
-# --- target size (2.5.8) ---
+
 
 
 def _target(x: float, y: float, width: float, height: float, **extra) -> dict:
@@ -241,7 +241,7 @@ def test_adequately_sized_targets_pass() -> None:
     assert issues == []
 
 
-# --- text spacing (1.4.12) ---
+
 
 
 def test_new_clipping_after_overrides_is_flagged_with_boxes() -> None:
@@ -291,7 +291,7 @@ def test_new_overlap_after_overrides_is_flagged() -> None:
     assert issues[0].evidence["first_element"] == "button#a"
 
 
-# --- browser integration (headless Chromium) ---
+
 
 
 @requires_browser

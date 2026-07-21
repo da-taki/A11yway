@@ -1,4 +1,4 @@
-"""Task loading and agent orchestration pseudocode."""
+
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ TASK_BLOCKER_EXPLANATIONS = {
 
 
 def load_tasks(path: str | Path) -> list[AccessibilityTask]:
-    """Load task scenario definitions from JSON."""
+
     task_path = Path(path)
     with task_path.open("r", encoding="utf-8") as file:
         raw_tasks = json.load(file)
@@ -41,7 +41,7 @@ def find_task(
     tasks: list[AccessibilityTask],
     task_id_or_name: str,
 ) -> AccessibilityTask | None:
-    """Find a task by id or case-insensitive name."""
+
     requested = task_id_or_name.casefold()
     for task in tasks:
         if task.id.casefold() == requested or task.name.casefold() == requested:
@@ -53,17 +53,17 @@ def filter_issues_for_task(
     task: AccessibilityTask,
     issues: list,
 ) -> list:
-    """Return issues whose issue types are relevant for a task."""
+
     relevant_types = set(task.relevant_issue_types)
     return [issue for issue in issues if issue.issue_type in relevant_types]
 
 
 def build_task_blockers(task: AccessibilityTask, issues: list) -> list[dict]:
-    """Build deterministic task blocker notes from relevant static issues.
 
-    TODO: Replace this with real step-by-step browser interaction evidence once
-    A11yway grows beyond static HTML analysis.
-    """
+
+
+
+
     blockers = []
     for issue in filter_issues_for_task(task, issues):
         blockers.append(
@@ -81,21 +81,21 @@ def build_task_blockers(task: AccessibilityTask, issues: list) -> list[dict]:
 
 
 class TaskRunner:
-    """Loads tasks, runs selected agents, and builds a report."""
+
 
     def __init__(self, agents: Iterable[BaseAccessibilityAgent]) -> None:
         self.agents = list(agents)
         self.report_builder = ReportBuilder()
 
     def load_tasks(self, path: Path) -> List[AccessibilityTask]:
-        """Load task definitions from JSON.
 
-        TODO: Add validation and helpful error messages once the format is stable.
-        """
+
+
+
         return load_tasks(path)
 
     def run_task(self, task: AccessibilityTask) -> AccessibilityReport:
-        """Run every configured agent against one task."""
+
         all_findings = []
 
         for agent in self.agents:

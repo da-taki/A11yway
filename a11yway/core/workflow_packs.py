@@ -1,4 +1,4 @@
-"""Load deterministic workflow pack templates."""
+
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ PACKS_DIR = Path(__file__).resolve().parent.parent / "workflow_packs"
 
 
 def _load_json_file(path: Path) -> dict[str, Any] | None:
-    """Return a workflow pack dictionary, or None when it cannot be loaded."""
+
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -27,7 +27,7 @@ def _load_json_file(path: Path) -> dict[str, Any] | None:
 
 
 def list_workflow_packs() -> list[dict[str, Any]]:
-    """List all loadable workflow packs."""
+
     try:
         pack_paths = sorted(PACKS_DIR.glob("*.json"))
     except OSError:
@@ -42,7 +42,7 @@ def list_workflow_packs() -> list[dict[str, Any]]:
 
 
 def load_workflow_pack(pack_id: str) -> dict[str, Any] | None:
-    """Load one workflow pack by id."""
+
     if not pack_id or any(part in pack_id for part in ("/", "\\", "..")):
         return None
 
@@ -56,7 +56,7 @@ def load_workflow_pack(pack_id: str) -> dict[str, Any] | None:
 
 
 def list_workflows(pack_id: str) -> list[dict[str, Any]]:
-    """Return workflow templates for a pack, or an empty list."""
+
     pack = load_workflow_pack(pack_id)
     if pack is None:
         return []
@@ -65,5 +65,5 @@ def list_workflows(pack_id: str) -> list[dict[str, Any]]:
 
 
 def suggest_workflows_from_pack(pack_id: str) -> list[dict[str, Any]]:
-    """Return deterministic workflow templates for reviewer task planning."""
+
     return list_workflows(pack_id)

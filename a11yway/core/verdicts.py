@@ -1,4 +1,4 @@
-"""Reviewer verdict ingestion for A11yway reports."""
+
 
 from __future__ import annotations
 
@@ -31,12 +31,12 @@ DECIDED_VERDICTS = TRUE_POSITIVE_VERDICTS | FALSE_POSITIVE_VERDICTS
 
 
 def load_verdicts(path: str | Path) -> dict[str, Any]:
-    """Load a reviewer verdict JSON file."""
+
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def _stable_source(report_or_issue: dict[str, Any]) -> str:
-    """Return source text without depending on absolute local paths."""
+
     source = report_or_issue.get("source_file") or report_or_issue.get("source") or ""
     if isinstance(source, dict):
         source = source.get("input") or source.get("final_url") or ""
@@ -44,7 +44,7 @@ def _stable_source(report_or_issue: dict[str, Any]) -> str:
 
 
 def issue_fingerprint(issue: dict[str, Any], source: str = "") -> str:
-    """Build a deterministic fingerprint from stable issue fields."""
+
     evidence = issue.get("evidence", {}) if isinstance(issue.get("evidence"), dict) else {}
     parts = [
         issue.get("issue_type", ""),
@@ -60,7 +60,7 @@ def issue_fingerprint(issue: dict[str, Any], source: str = "") -> str:
 
 
 def summarize_verdicts(verdicts: dict[str, Any]) -> dict[str, Any]:
-    """Count verdict outcomes and preserve reviewer context."""
+
     counts = {value: 0 for value in VERDICT_VALUES}
     for item in verdicts.get("verdicts", []):
         verdict = item.get("verdict", "needs_review")
@@ -78,7 +78,7 @@ def summarize_verdicts(verdicts: dict[str, Any]) -> dict[str, Any]:
 
 
 def apply_verdicts_to_report(report: dict[str, Any], verdicts: dict[str, Any]) -> dict[str, Any]:
-    """Attach reviewer verdicts to report issues and add a review summary."""
+
     updated = json.loads(json.dumps(report))
     source = _stable_source(updated)
     by_fingerprint = {
@@ -129,7 +129,7 @@ def apply_verdicts_to_report(report: dict[str, Any], verdicts: dict[str, Any]) -
 
 
 def _issue_detection_modes(issue: dict[str, Any]) -> list[str]:
-    """Return the detection modes recorded in one issue's evidence."""
+
     evidence = issue.get("evidence")
     if not isinstance(evidence, dict):
         return ["static"]
@@ -140,7 +140,7 @@ def _issue_detection_modes(issue: dict[str, Any]) -> list[str]:
 
 
 def _precision_bucket() -> dict[str, Any]:
-    """Return an empty precision accumulator."""
+
     return {
         "confirmed": 0,
         "partially_confirmed": 0,
@@ -160,7 +160,7 @@ def _precision_bucket() -> dict[str, Any]:
 
 
 def _record_verdict(bucket: dict[str, Any], verdict: str) -> None:
-    """Count one verdict into a precision accumulator."""
+
     if verdict in VERDICT_VALUES - {"missed_issue"}:
         bucket[verdict] += 1
         bucket["reviewed"] += 1
@@ -169,7 +169,7 @@ def _record_verdict(bucket: dict[str, Any], verdict: str) -> None:
 
 
 def _finalize_precision(bucket: dict[str, Any]) -> None:
-    """Compute precision as (confirmed + fixed) / decided reviews."""
+
     decided = bucket["decided"]
     if decided:
         bucket["precision"] = round(
@@ -213,12 +213,12 @@ def build_rule_reliability_profiles(
     min_precision: float = 0.5,
     max_unable_to_reproduce_rate: float = 0.4,
 ) -> dict[str, dict[str, Any]]:
-    """Build per-rule reliability profiles from reviewed reports.
 
-    Profiles are advisory. They never suppress findings by themselves; callers
-    may use ``confidence_cap`` to downgrade historically noisy rules to
-    needs_review while the rule remains visible in reports.
-    """
+
+
+
+
+
     stats = build_precision_stats(reviewed_reports)
     return _build_rule_reliability_profiles_from_buckets(
         stats.get("by_rule", {}),
@@ -235,7 +235,7 @@ def _build_rule_reliability_profiles_from_buckets(
     min_precision: float = 0.5,
     max_unable_to_reproduce_rate: float = 0.4,
 ) -> dict[str, dict[str, Any]]:
-    """Build reliability profiles from finalized per-rule precision buckets."""
+
     profiles: dict[str, dict[str, Any]] = {}
     for rule, bucket in sorted(by_rule.items()):
         reviewed = int(bucket.get("reviewed", 0) or 0)
@@ -290,7 +290,7 @@ def _build_rule_reliability_profiles_from_buckets(
 def review_only_rules_from_reliability_profiles(
     profiles: dict[str, dict[str, Any]]
 ) -> set[str]:
-    """Return rules whose historical profile recommends review-only handling."""
+
     return {
         rule
         for rule, profile in profiles.items()
@@ -299,13 +299,13 @@ def review_only_rules_from_reliability_profiles(
 
 
 def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, Any]:
-    """Compute reviewer precision per rule, WCAG criterion, and detection mode.
 
-    Precision counts confirmed and fixed verdicts as true positives and
-    false_positive verdicts as false positives; needs_review verdicts are
-    tracked but excluded from the ratio because they are undecided. Missed
-    issues affect recall, not precision, and are reported separately.
-    """
+
+
+
+
+
+
     by_rule: dict[str, dict[str, Any]] = {}
     by_category: dict[str, dict[str, Any]] = {}
     by_sc: dict[str, dict[str, Any]] = {}
@@ -393,7 +393,7 @@ def build_precision_stats(reviewed_reports: list[dict[str, Any]]) -> dict[str, A
 
 
 def build_verdict_summary_markdown(summary: dict[str, Any]) -> str:
-    """Build a Markdown summary of reviewer verdicts."""
+
     reviewer = summary.get("reviewer", {})
     counts = summary.get("counts", {})
     feedback = summary.get("overall_feedback", {})
@@ -443,7 +443,7 @@ def build_verdict_summary_markdown(summary: dict[str, Any]) -> str:
 
 
 def build_precision_report_markdown(stats: dict[str, Any]) -> str:
-    """Build a Markdown precision report from reviewed A11yway reports."""
+
     overall = stats.get("overall", {})
     lines = [
         "# A11yway Precision Report",
@@ -515,14 +515,14 @@ def build_precision_report_markdown(stats: dict[str, Any]) -> str:
 
 
 def save_precision_report_markdown(stats: dict[str, Any], path: str | Path) -> None:
-    """Write a Markdown precision report."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(build_precision_report_markdown(stats), encoding="utf-8")
 
 
 def save_precision_report_csv(stats: dict[str, Any], path: str | Path) -> None:
-    """Write rule-level precision metrics as CSV."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as file:
@@ -572,7 +572,7 @@ def save_precision_report_csv(stats: dict[str, Any], path: str | Path) -> None:
 
 
 def save_verdict_summary_markdown(summary: dict[str, Any], path: str | Path) -> None:
-    """Write a reviewer verdict summary."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(build_verdict_summary_markdown(summary), encoding="utf-8")

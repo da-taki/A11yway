@@ -1,4 +1,4 @@
-"""Tests for repeat-verification confidence annotation."""
+
 
 from a11yway.core.reproducibility import apply_reproducibility
 from a11yway.models.issue import AccessibilityIssue
@@ -25,12 +25,12 @@ def test_primary_only_dynamic_finding_becomes_needs_review() -> None:
     assert repro["failed_reproductions"] == 2
 
 
-def test_dynamic_finding_reproduced_in_every_run_is_confirmed() -> None:
+def test_dynamic_finding_reproduced_in_every_run_is_repeat_verified() -> None:
     issue = dynamic_issue()
     repeat = dynamic_issue()
 
     issues = apply_reproducibility([issue], [[repeat], [repeat]], 3)
 
-    assert issues[0].confidence == "confirmed"
+    assert issues[0].confidence == "repeat_verified"
     assert issues[0].evidence["verification_status"] == "repeat_verified"
     assert issues[0].evidence["reproducibility"]["reproduction_rate"] == 1.0

@@ -1,4 +1,4 @@
-"""Helpers for applying reviewer-backed rule calibration."""
+
 
 from __future__ import annotations
 
@@ -14,14 +14,14 @@ from a11yway.models.issue import AccessibilityIssue
 
 
 def parse_rule_list(value: str | None) -> set[str]:
-    """Parse a comma-separated rule list from the CLI."""
+
     if not value:
         return set()
     return {name.strip() for name in value.split(",") if name.strip()}
 
 
 def load_reviewed_reports(paths: list[str] | None) -> list[dict]:
-    """Load reviewed A11yway report JSON files for calibration."""
+
     return [
         json.loads(Path(path).read_text(encoding="utf-8"))
         for path in (paths or [])
@@ -29,7 +29,7 @@ def load_reviewed_reports(paths: list[str] | None) -> list[dict]:
 
 
 def review_only_rules_from_reports(paths: list[str] | None) -> set[str]:
-    """Return historically noisy rules that should be review-only."""
+
     if not paths:
         return set()
     profiles = build_rule_reliability_profiles(load_reviewed_reports(paths))
@@ -42,7 +42,7 @@ def downgrade_review_only_issues(
     *,
     reason: str = "Rule configured as review-only for this run.",
 ) -> None:
-    """Mark matching issues as needs_review while keeping them in reports."""
+
     if not review_only_rules:
         return
     for issue in issues:
@@ -51,7 +51,7 @@ def downgrade_review_only_issues(
         effective = issue.confidence or DEFAULT_CONFIDENCE_BY_RULE.get(
             issue.issue_type, FALLBACK_CONFIDENCE
         )
-        if effective in {"confirmed", "likely"}:
+        if effective in {"strong", "repeat_verified", "confirmed_by_multiple_engines", "likely"}:
             issue.confidence = "needs_review"
             if isinstance(issue.evidence, dict):
                 issue.evidence["downgraded_to_review_only"] = True

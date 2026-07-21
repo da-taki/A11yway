@@ -1,9 +1,3 @@
-"""Load static HTML from local files or exact URLs.
-
-This module intentionally fetches only the provided source. It does not crawl
-sites and does not execute JavaScript.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,12 +10,10 @@ USER_AGENT = "A11ywayPrototype/0.1"
 
 
 def is_url(source: str) -> bool:
-    """Return whether a source is an http or https URL."""
     return urlparse(source).scheme in {"http", "https"}
 
 
 def _empty_result(source: str, source_type: str) -> dict:
-    """Build the common source result shape."""
     return {
         "source": source,
         "source_type": source_type,
@@ -34,18 +26,12 @@ def _empty_result(source: str, source_type: str) -> dict:
 
 
 def load_html_source(source: str, timeout_seconds: int = 10) -> dict:
-    """Load static HTML from a local file or a single URL.
-
-    Errors are returned in the result dictionary instead of being raised so
-    batch mode can continue when one source fails.
-    """
     if is_url(source):
         return _load_url_source(source, timeout_seconds)
     return _load_file_source(source)
 
 
 def _load_file_source(source: str) -> dict:
-    """Load HTML from a local file path."""
     result = _empty_result(source, "file")
     result["content_type"] = "text/html"
 
@@ -58,7 +44,6 @@ def _load_file_source(source: str) -> dict:
 
 
 def _load_url_source(source: str, timeout_seconds: int) -> dict:
-    """Load static HTML from one URL using urllib."""
     result = _empty_result(source, "url")
     request = Request(source, headers={"User-Agent": USER_AGENT})
 

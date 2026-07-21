@@ -1,10 +1,10 @@
-"""Map issue types to practical accessibility fixes."""
+
 
 from __future__ import annotations
 
 
 class FixSuggester:
-    """Suggests plain-language fixes for common issue types."""
+
 
     def __init__(self) -> None:
         self.fix_map = {
@@ -36,7 +36,7 @@ class FixSuggester:
         }
 
     def suggest_fix(self, issue_type: str) -> str:
-        """Return a practical fix for an issue type."""
+
         return self.fix_map.get(
             issue_type,
             "Review this barrier manually and provide a clear accessible alternative.",

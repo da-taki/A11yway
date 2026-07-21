@@ -1,10 +1,10 @@
-"""Post-collection finding validation and clustering helpers.
 
-The raw rule checks intentionally stay small and conservative. This module
-adds a second pass after collection/deduplication so reports can explain how
-strong each finding is, which engines supported it, and whether repeated
-elements look like one shared root issue.
-"""
+
+
+
+
+
+
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ STRONG_BROWSER_RULES = {
 
 
 class _SnippetParser(HTMLParser):
-    """Capture a compact element signature from a snippet."""
+
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -84,14 +84,14 @@ class _SnippetParser(HTMLParser):
 
 
 def normalize_text(value: Any) -> str:
-    """Return stable lowercase text for fingerprints and summaries."""
+
     lowered = str(value or "").casefold()
     cleaned = re.sub(r"[^\w\s:/#.-]", " ", lowered, flags=re.UNICODE)
     return " ".join(cleaned.split())
 
 
 def normalize_page_url(url: str) -> str:
-    """Normalize a page URL without making network requests."""
+
     raw = str(url or "").strip()
     if not raw:
         return ""
@@ -108,7 +108,7 @@ def _parse_snippet(snippet: str) -> _SnippetParser:
     parser = _SnippetParser()
     try:
         parser.feed(snippet or "")
-    except Exception:  # noqa: BLE001 - snippets are best-effort evidence
+    except Exception:
         pass
     return parser
 
@@ -266,10 +266,14 @@ def _confidence_level(issue: AccessibilityIssue, evidence: dict[str, Any]) -> st
     if issue.issue_type in STRONG_BROWSER_RULES:
         return CONFIDENCE_STRONG
     effective = _effective_confidence(issue)
-    if effective == "confirmed":
+    if effective in {"confirmed", "strong", "repeat_verified"}:
         return CONFIDENCE_STRONG
+    if effective == CONFIDENCE_CONFIRMED_BY_MULTIPLE_ENGINES:
+        return CONFIDENCE_CONFIRMED_BY_MULTIPLE_ENGINES
     if issue.issue_type in WEAK_HEURISTIC_RULES:
         return CONFIDENCE_WEAK_HEURISTIC if effective in {"needs_review", "informational"} else CONFIDENCE_NEEDS_REVIEW
+    if effective == "weak_heuristic":
+        return CONFIDENCE_WEAK_HEURISTIC
     if effective == "likely":
         return CONFIDENCE_LIKELY
     if effective == "needs_review":
@@ -308,7 +312,7 @@ def validate_findings(
     issues: list[AccessibilityIssue],
     page_url: str = "",
 ) -> list[AccessibilityIssue]:
-    """Enrich findings with validation metadata while preserving compatibility."""
+
     normalized_url = normalize_page_url(page_url)
     for issue in issues:
         if not isinstance(issue.evidence, dict):
@@ -347,7 +351,7 @@ def validate_findings(
 
 
 def root_issue_key(issue: AccessibilityIssue) -> str:
-    """Return a stable key for the unique root issue represented by a finding."""
+
     evidence = issue.evidence if isinstance(issue.evidence, dict) else {}
     raw = "|".join(
         [
@@ -360,11 +364,11 @@ def root_issue_key(issue: AccessibilityIssue) -> str:
 
 
 def cluster_repeated_findings(issues: list[AccessibilityIssue]) -> list[AccessibilityIssue]:
-    """Merge repeated findings from an explicitly identified shared component.
 
-    This only collapses findings that already carry a component signature and
-    share the same rule. Findings without component evidence remain separate.
-    """
+
+
+
+
     validate_findings(issues)
     grouped: dict[tuple[str, str], AccessibilityIssue] = {}
     order: list[tuple[str, str]] = []
@@ -407,7 +411,7 @@ def cluster_repeated_findings(issues: list[AccessibilityIssue]) -> list[Accessib
 
 
 def issue_cluster_summary(issues: list[AccessibilityIssue]) -> list[dict[str, Any]]:
-    """Build compact component/root summaries for reports."""
+
     validate_findings(issues)
     clusters: dict[str, dict[str, Any]] = {}
     for issue in issues:
