@@ -103,63 +103,63 @@ class AuditModule:
 
 
 REVIEW_TYPES = {
-    "quick": ReviewType("quick", "Quick accessibility review", False, False, False, 20, 800, "Quick deterministic accessibility review"),
-    "full_low_vision": ReviewType("full_low_vision", "Full accessibility + low-vision review", True, True, False, 60, 1500, "Full accessibility and low-vision review"),
-    "keyboard_focus": ReviewType("keyboard_focus", "Keyboard/focus review", True, False, False, 60, 1500, "Keyboard and focus-path review"),
-    "ai_summary": ReviewType("ai_summary", "AI-assisted report summary", False, False, True, 20, 800, "AI-assisted suggest-only summary"),
-    "full_public_workflow": ReviewType("full_public_workflow", "Full public workflow review", True, True, True, 60, 1500, "Full public workflow accessibility review"),
+    "quick": ReviewType("quick", "Quick", False, False, False, 20, 800, "Quick review"),
+    "full_low_vision": ReviewType("full_low_vision", "Full + zoom", True, True, False, 60, 1500, "Full + zoom"),
+    "keyboard_focus": ReviewType("keyboard_focus", "Keyboard", True, False, False, 60, 1500, "Keyboard"),
+    "ai_summary": ReviewType("ai_summary", "Scout summary", False, False, True, 20, 800, "Scout summary"),
+    "full_public_workflow": ReviewType("full_public_workflow", "Full", True, True, True, 60, 1500, "Full"),
 }
 
 AUDIT_MODULES = {
-    "static": AuditModule("static", "Static HTML analysis", "Static", "Parses the fetched HTML for semantic structure, labels, headings, alt text, media cues, and Indic-language markup.", "Core", always_on=True),
-    "browser": AuditModule("browser", "Browser-rendered analysis", "Rendered DOM", "Loads the page in Chromium, waits for JavaScript, and re-checks the rendered DOM.", "Browser evidence", requires_browser=True),
-    "keyboard": AuditModule("keyboard", "Keyboard navigation", "Keyboard", "Tabs through reachable controls and records the focus trace.", "Browser evidence", requires_browser=True),
-    "focus_trap": AuditModule("focus_trap", "Keyboard trap and focus-loop detection", "Focus traps", "Uses the keyboard traversal evidence to identify focus loops, lost focus, and repeated stops.", "Browser evidence", requires_browser=True),
-    "axe": AuditModule("axe", "axe-core", "axe-core", "Runs axe-core against the rendered page when the optional integration is available.", "Browser evidence", requires_browser=True),
-    "screen_reader": AuditModule("screen_reader", "Chromium accessibility-tree evidence", "A11y tree", "Summarizes computed accessibility-tree announcements from browser focus evidence.", "Browser evidence", requires_browser=True),
-    "low_vision": AuditModule("low_vision", "Low-vision and reflow checks", "Low vision", "Checks contrast samples, focus indicators, and 200%/400% reflow behavior.", "Visual review", requires_browser=True),
-    "mobile": AuditModule("mobile", "Mobile emulation", "Mobile", "Runs Playwright device-emulation checks for mobile overflow, orientation, and touch target review.", "Visual review", requires_browser=True),
+    "static": AuditModule("static", "Static", "Static", "Source HTML checks.", "Core", always_on=True),
+    "browser": AuditModule("browser", "Browser", "Browser", "Rendered DOM checks.", "Browser", requires_browser=True),
+    "keyboard": AuditModule("keyboard", "Keyboard", "Keyboard", "Focus path.", "Browser", requires_browser=True),
+    "focus_trap": AuditModule("focus_trap", "Focus traps", "Focus traps", "Loops and lost focus.", "Browser", requires_browser=True),
+    "axe": AuditModule("axe", "Axe", "Axe", "axe-core checks.", "Browser", requires_browser=True),
+    "screen_reader": AuditModule("screen_reader", "A11y tree", "A11y tree", "Computed tree output.", "Browser", requires_browser=True),
+    "low_vision": AuditModule("low_vision", "Zoom", "Zoom", "Contrast and reflow.", "Visual", requires_browser=True),
+    "mobile": AuditModule("mobile", "Mobile", "Mobile", "Overflow and targets.", "Visual", requires_browser=True),
     "forms": AuditModule("forms", "Forms", "Forms", "Reviews labels, instructions, errors, grouping, and safe recovery patterns without submitting forms.", "HTML modules"),
     "components": AuditModule("components", "Components", "Components", "Reviews common custom component patterns such as dialogs, menus, disclosure controls, and tabs.", "HTML modules"),
     "media": AuditModule("media", "Media", "Media", "Checks embedded audio/video cues such as captions, controls, transcripts, and autoplay patterns.", "HTML modules"),
-    "language": AuditModule("language", "Language and cognitive checks", "Language", "Reviews multilingual, bidirectional, and cognitive-load signals for human follow-up.", "HTML modules"),
+    "language": AuditModule("language", "Language", "Language", "Language and direction.", "HTML"),
     "indic": AuditModule("indic", "Indic-language checks", "Indic", "Runs the static Indic script/language checks already included in the core parser.", "HTML modules"),
-    "screenshots": AuditModule("screenshots", "Screenshots", "Screenshots", "Captures a full-page screenshot when browser evidence is available.", "Evidence", requires_browser=True),
-    "focus_path": AuditModule("focus_path", "Focus-path overlays", "Focus path", "Creates an HTML overlay of the keyboard focus path when browser evidence is available.", "Evidence", requires_browser=True),
+    "screenshots": AuditModule("screenshots", "Evidence", "Evidence", "Screenshot evidence.", "Evidence", requires_browser=True),
+    "focus_path": AuditModule("focus_path", "Focus path", "Focus path", "Keyboard overlay.", "Evidence", requires_browser=True),
     "video": AuditModule("video", "Video proof", "Video", "Video proof is supported by CLI task execution, but is unavailable for this one-page public web flow.", "Evidence", requires_browser=True, unavailable_for_url=True),
     "document": AuditModule("document", "Document auditing", "Documents", "Document auditing is available for local files in the CLI, not public page URL audits.", "Evidence", unavailable_for_url=True),
-    "ai_scout": AuditModule("ai_scout", "AI Scout", "AI Scout", "Asks server-side AI Scout to summarize and prioritize deterministic findings in suggest-only mode.", "Review"),
+    "ai_scout": AuditModule("ai_scout", "Scout", "Scout", "Suggest-only summary.", "Review"),
 }
 
 PRESETS = {
     "quick": {
-        "label": "Quick Check",
+        "label": "Quick",
         "description": "Fast static review with the always-on parser and Indic checks.",
         "modules": ["static", "indic"],
     },
     "standard": {
-        "label": "Standard Audit",
+        "label": "Standard",
         "description": "Static, rendered DOM, keyboard, screenshots, forms, components, media, and language review.",
         "modules": ["static", "browser", "keyboard", "focus_trap", "forms", "components", "media", "language", "indic", "screenshots", "focus_path"],
     },
     "full": {
-        "label": "Full Accessibility Review",
+        "label": "Full",
         "description": "All applicable accessibility modules, including axe-core, low-vision, mobile, accessibility-tree evidence, and AI Scout.",
         "modules": ["static", "browser", "keyboard", "focus_trap", "axe", "screen_reader", "low_vision", "mobile", "forms", "components", "media", "language", "indic", "screenshots", "focus_path", "ai_scout"],
     },
     "keyboard_screen_reader": {
-        "label": "Keyboard and Screen Reader Evidence",
+        "label": "Keyboard",
         "description": "Focus traversal, focus-loop detection, accessibility-tree evidence, screenshots, and focus overlays.",
         "modules": ["static", "browser", "keyboard", "focus_trap", "screen_reader", "screenshots", "focus_path"],
     },
     "low_vision": {
-        "label": "Low-Vision Review",
+        "label": "Zoom",
         "description": "Rendered page, low-vision/reflow checks, mobile emulation, screenshots, and focus overlays.",
         "modules": ["static", "browser", "keyboard", "low_vision", "mobile", "screenshots", "focus_path"],
     },
     "custom": {
         "label": "Custom",
-        "description": "Choose the exact existing modules to run.",
+        "description": "Choose checks.",
         "modules": ["static", "indic"],
     },
 }
@@ -665,11 +665,11 @@ def execute_review(run_id: str, url: str, label: str, modules: list[str], passiv
 
     ai_scout_paths = {}
     if "ai_scout" in selected:
-        update_status(run_dir, status, current="Asking AI Scout", message="AI Scout is reviewing deterministic findings in suggest-only mode.", progress=82)
+        update_status(run_dir, status, current="Running Scout", message="Scout summary is optional and suggest-only.", progress=82)
         ai_result = run_ai_scout(report, target_name=item["name"], workflow_tested=review_type.workflow)
         report["ai_scout"] = ai_result
         ai_scout_paths = save_ai_scout_outputs(ai_result, run_dir / item["id"])
-        mark_module(status, "ai_scout", "complete" if ai_result.get("status") == "ok" else "unavailable", ai_result.get("summary", "AI Scout completed."))
+        mark_module(status, "ai_scout", "complete" if ai_result.get("status") == "ok" else "unavailable", ai_result.get("summary", "Scout complete."))
 
     score = score_report(report)
     report["score"] = score
@@ -1083,7 +1083,7 @@ def guardrail_notes() -> list[str]:
         "Does not log in, bypass authentication, submit forms, create accounts, send messages, or test payment flows.",
         "Does not run vulnerability scans, exploit checks, port scans, or private-data scraping.",
         "Passive security observations are opt-in and separate from accessibility scoring.",
-        "AI Scout is suggest-only, summarizes deterministic findings, and may be unavailable without a configured Groq key.",
+        "Scout summaries are optional and suggest-only.",
         "A11yway reports require human review and are not legal compliance certification.",
     ]
 
