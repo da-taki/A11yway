@@ -39,6 +39,10 @@ python -m a11yway.web_app
 pytest
 ```
 
+## Vibe coding
+
+Used AI for the UI.
+
 ## License
 
 No license is declared in this repository.
