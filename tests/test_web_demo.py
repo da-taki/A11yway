@@ -73,9 +73,9 @@ def test_landing_page_renders_accessible_form_controls() -> None:
 
     assert response.status_code == 200
     assert 'id="url"' in body
-    assert "Public website URL" in body
-    assert "Audit preset" in body
-    assert "Select A11yway modules" in body
+    assert "Audit a URL" in body
+    assert "Mode" in body
+    assert "Checks" in body
     assert 'role="status" aria-live="polite"' in body
 
 
@@ -122,8 +122,8 @@ def test_audit_request_status_result_and_download(tmp_path: Path, monkeypatch) -
     result_response = client.get(f"/runs/{run_id}")
     result_body = result_response.get_data(as_text=True)
     assert result_response.status_code == 200
-    assert "Executive summary" in result_body
-    assert "Report downloads" in result_body
+    assert "Summary" in result_body
+    assert "Downloads" in result_body
     assert 'id="page-filter"' in result_body
     assert 'id="clear-filters"' in result_body
     assert "<details open>" in result_body
