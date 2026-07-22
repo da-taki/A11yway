@@ -4,7 +4,7 @@ An open-source accessibility stress-testing toolkit for essential public web wor
 
 A11yway audits rendered websites, follows keyboard workflows, checks zoom and reflow, inspects accessibility-tree output, and saves evidence for human review.
 
-## What it checks
+## Checks
 
 - Keyboard navigation and focus
 - Accessible names, roles, and states

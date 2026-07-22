@@ -1,132 +1,14 @@
-# Sample Accessibility Task Report
+# Sample Report
 
-This is a fictional sample report. It reflects the kind of static HTML findings
-the current prototype can begin to produce, but it is not a complete audit.
+A report should answer four questions quickly:
 
-A generated Markdown example is available at `reports/sample_form_report.md`.
-Batch sample output is generated under `reports/batch_sample/`.
-The batch sample includes `index.csv` for spreadsheet-based evaluation tracking.
+- What was tested?
+- Which checks ran?
+- Which findings are strong?
+- What evidence should a reviewer inspect?
 
-URL reports include source metadata such as source type, final URL, status code,
-and content type when that information is available.
+A typical finding includes a title, severity, confidence label, URL, selector, evidence snippet, WCAG mapping, impact, reproduction notes, and a suggested fix.
 
-## Site
+Generated report files can include JSON, Markdown, HTML, CSV, SARIF, JUnit, screenshots, focus overlays, and video evidence depending on the selected options.
 
-Riverside Learning Portal
-
-## Tested Task
-
-Submit a scholarship application form.
-
-## Task Context
-
-Student profile: Keyboard-only student.
-
-Required actions:
-
-- Read the page purpose.
-- Enter name.
-- Enter email.
-- Choose school.
-- Describe accommodation request.
-- Submit the form.
-
-## Agents Used
-
-- Keyboard-only student.
-- Low-vision student.
-- Dyslexia/reading-difficulty student.
-- Hearing-impaired student.
-
-## Issues Found
-
-### 1. Form Field Has No Visible Label
-
-Severity: High
-
-Agent: Keyboard-only student
-
-Evidence: The "Guardian income" input is announced only as "edit field" in the placeholder test notes. A keyboard user may not know what information is required.
-
-HTML evidence:
-
-```json
-{
-  "tag": "input",
-  "type": "text",
-  "name": "student_name",
-  "line": 36,
-  "snippet": "<input type=\"text\" name=\"student_name\">",
-  "reason": "Form control has no accessible label."
-}
-```
-
-Suggested fix: Add a visible text label connected to the input with the `for` and `id` attributes.
-
-### 2. Focus Indicator Is Hard To See
-
-Severity: Medium
-
-Agent: Keyboard-only student
-
-Evidence: The current focus outline is faint and difficult to see on the application form buttons.
-
-Suggested fix: Add a strong visible focus style with enough contrast around links, buttons, and form controls.
-
-### 3. Instructions Are Too Dense
-
-Severity: Medium
-
-Agent: Dyslexia/reading-difficulty student
-
-Evidence: Scholarship eligibility instructions are written as one long paragraph with several conditions.
-
-Suggested fix: Break instructions into short sections, use bullet points, and add a plain-language summary.
-
-### 4. Intro Video Has No Transcript
-
-Severity: High
-
-Agent: Hearing-impaired student
-
-Evidence: The application page includes an intro video, but no captions or transcript are linked near the video.
-
-Suggested fix: Add synchronized captions and a text transcript that includes all spoken instructions.
-
-### 5. Link Text Is Too Generic
-
-Severity: Medium
-
-Agent: Page Analyzer
-
-Evidence: A help link uses the text "click here", which does not explain the destination when read out of context.
-
-HTML evidence:
-
-```json
-{
-  "tag": "a",
-  "href": "/scholarships/help",
-  "text": "click here",
-  "line": 21,
-  "snippet": "<a href=\"/scholarships/help\">click here</a>",
-  "reason": "Link text is generic and does not explain the destination or action."
-}
-```
-
-Suggested fix: Use descriptive link text such as "Read scholarship application help".
-
-## Likely Task Blockers
-
-- Form control may be hard to understand or complete because it has no accessible label.
-- Student may not be able to identify what an unlabeled button does.
-- Link text may not clearly explain the destination or action.
-
-## Retest Checklist
-
-- Confirm all form inputs have visible labels.
-- Confirm every interactive element has a visible keyboard focus state.
-- Confirm instructions are split into short, clear steps.
-- Confirm video captions are available.
-- Confirm a transcript is available next to the video.
-- Rerun the same scholarship application task with all agents.
+Do not treat a clean report as proof of WCAG conformance. It only means the selected checks did not report findings in that run.
