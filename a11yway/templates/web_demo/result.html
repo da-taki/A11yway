@@ -2,15 +2,15 @@
 {% block title %}A11yway result{% endblock %}
 {% block content %}
 <section class="result-hero">
-  <div class="section-inner result-head">
+  <div class="section-inner result-head tabbed-head">
     <div>
-      <p class="eyebrow">Audit results</p>
+      <p class="eyebrow">Report</p>
       <h1>{{ run.target_name }}</h1>
       <p class="target-line"><svg aria-hidden="true"><use href="#icon-link"></use></svg><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
     </div>
     <div class="result-actions">
       <span class="status-pill {{ run.status }}">{{ run.status }}</span>
-      <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another page</a>
+      <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another URL</a>
     </div>
   </div>
 </section>
@@ -25,35 +25,32 @@
 
   <section class="dashboard summary-dashboard" aria-labelledby="summary-heading">
     <div class="card-title-row">
-      <div>
-        <p class="eyebrow">Reviewer snapshot</p>
-        <h2 id="summary-heading">Executive summary</h2>
-      </div>
+      <h2 id="summary-heading">Summary</h2>
       <span class="mini-metric">{{ run.review_type }}</span>
     </div>
     <div class="metrics">
-      <div><span>Total findings</span><strong>{{ run.total_issues }}</strong></div>
-      <div><span>WCAG criteria represented</span><strong>{{ run.wcag_criteria_count }}</strong></div>
-      <div><span>Audit duration</span><strong>{{ run.duration_seconds }}s</strong></div>
-      <div><span>AI Scout</span><strong>{{ run.ai_scout.get('status', 'not run') }}</strong></div>
+      <div><span>Findings</span><strong>{{ run.total_issues }}</strong></div>
+      <div><span>WCAG</span><strong>{{ run.wcag_criteria_count }}</strong></div>
+      <div><span>Seconds</span><strong>{{ run.duration_seconds }}s</strong></div>
+      <div><span>Browser</span><strong>{% if run.browser_used %}yes{% elif run.browser_requested %}no{% else %}off{% endif %}</strong></div>
     </div>
     <dl class="detail-list compact">
-      <div><dt>Audit date</dt><dd>{{ run.created_at }}</dd></div>
+      <div><dt>Date</dt><dd>{{ run.created_at }}</dd></div>
       <div><dt>Classification</dt><dd>{{ run.classification or run.score.get('classification', 'Not scored') }}</dd></div>
-      <div><dt>Modules completed</dt><dd>{{ run.module_statuses | selectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
-      <div><dt>Skipped, failed, or unavailable</dt><dd>{{ run.module_statuses | rejectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
-      <div><dt>Browser evidence</dt><dd>{% if run.browser_used %}Captured{% elif run.browser_requested %}Requested but unavailable{% else %}Not requested{% endif %}</dd></div>
-      <div><dt>Selected modules</dt><dd>{{ run.selected_modules | join(', ') }}</dd></div>
+      <div><dt>Completed</dt><dd>{{ run.module_statuses | selectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
+      <div><dt>Skipped or failed</dt><dd>{{ run.module_statuses | rejectattr('status', 'equalto', 'complete') | list | length }}</dd></div>
+      <div><dt>Checks</dt><dd>{{ run.selected_modules | join(', ') }}</dd></div>
     </dl>
+    <p class="review-note single-note">Findings may require human review. A11yway does not certify WCAG conformance.</p>
   </section>
 
   <section class="dashboard severity-dashboard" aria-labelledby="severity-heading">
     <div class="card-title-row">
-      <h2 id="severity-heading">Severity overview</h2>
-      <span class="mini-metric">Numbers include text labels, not color alone.</span>
+      <h2 id="severity-heading">Strong findings</h2>
+      <span class="mini-metric">severity counts</span>
     </div>
     <div class="severity-grid">
-      {% for label, key in [('Critical', 'critical'), ('Serious', 'serious'), ('Moderate', 'moderate'), ('Minor', 'minor'), ('Review required', 'review_required')] %}
+      {% for label, key in [('Critical', 'critical'), ('Serious', 'serious'), ('Moderate', 'moderate'), ('Minor', 'minor'), ('Needs review', 'review_required')] %}
         <div class="severity-card {{ key }}"><span class="severity-symbol" aria-hidden="true">!</span><strong>{{ run.severity_overview.get(key, 0) }}</strong><p>{{ label }}</p></div>
       {% endfor %}
     </div>
@@ -61,14 +58,11 @@
 
   <section class="dashboard review-lanes" aria-labelledby="lanes-heading">
     <div class="card-title-row">
-      <div>
-        <p class="eyebrow">Triage lanes</p>
-        <h2 id="lanes-heading">Strongest findings and review calls</h2>
-      </div>
+      <h2 id="lanes-heading">Needs review</h2>
       <span class="mini-metric">{{ run.top_findings | length }} highlighted</span>
     </div>
     {% if run.top_findings %}
-      <div class="lane-grid">
+      <div class="lane-grid compact-lanes">
         {% for finding in run.top_findings[:4] %}
           <article class="lane-card {{ finding.display_severity | lower | replace(' ', '_') }}">
             <span class="badge">{{ finding.display_severity }}</span>
@@ -82,14 +76,14 @@
         {% endfor %}
       </div>
     {% else %}
-      <p class="empty-state compact">No highlighted findings were generated for this run.</p>
+      <p class="empty-state compact">No strong findings.</p>
     {% endif %}
   </section>
 
   <section class="dashboard" aria-labelledby="modules-heading">
     <div class="card-title-row">
-      <h2 id="modules-heading">Module status</h2>
-      <span class="mini-metric">{{ run.module_statuses | length }} tracked</span>
+      <h2 id="modules-heading">Checks</h2>
+      <span class="mini-metric">{{ run.module_statuses | length }}</span>
     </div>
     <ul class="module-status-list">
       {% for module in run.module_statuses %}
@@ -100,23 +94,20 @@
 
   <section class="dashboard findings-dashboard" aria-labelledby="filters-heading">
     <div class="card-title-row">
-      <div>
-        <p class="eyebrow">Engineering issues</p>
-        <h2 id="filters-heading">Findings</h2>
-      </div>
-      <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} findings shown.</p>
+      <h2 id="filters-heading">Findings</h2>
+      <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} shown.</p>
     </div>
 
     <details class="filter-panel" open>
-      <summary><svg aria-hidden="true"><use href="#icon-filter"></use></svg> Filter findings</summary>
+      <summary><svg aria-hidden="true"><use href="#icon-filter"></use></svg> Filter</summary>
       <div class="filters">
-        <label>Search findings <input id="finding-search" type="search" autocomplete="off"></label>
+        <label>Search <input id="finding-search" type="search" autocomplete="off"></label>
         <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
-        <label>WCAG criterion <select id="wcag-filter"><option value="">All</option></select></label>
+        <label>WCAG <select id="wcag-filter"><option value="">All</option></select></label>
         <label>Module <select id="module-filter"><option value="">All</option></select></label>
         <label>Page <select id="page-filter"><option value="">All</option></select></label>
-        <label>Issue category <select id="category-filter"><option value="">All</option></select></label>
-        <button id="clear-filters" class="download-button filter-clear" type="button">Clear filters</button>
+        <label>Category <select id="category-filter"><option value="">All</option></select></label>
+        <button id="clear-filters" class="download-button filter-clear" type="button">Clear</button>
       </div>
     </details>
 
@@ -130,101 +121,74 @@
                 <h3>{{ finding.title }}</h3>
               </div>
               <dl class="finding-quick-meta">
-                <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
-                <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
                 <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
+                <div><dt>URL</dt><dd>{{ finding.affected_url }}</dd></div>
+                {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
               </dl>
             </div>
             <details open>
-              <summary>Evidence details</summary>
+              <summary>Evidence</summary>
               <div class="evidence-grid">
                 <div class="evidence-panel">
-                  <h4>Confirmed deterministic evidence</h4>
+                  <h4>Evidence</h4>
                   <dl class="finding-meta">
-                    <div><dt>Affected URL</dt><dd>{{ finding.affected_url }}</dd></div>
                     <div><dt>WCAG</dt><dd>{{ finding.wcag_label }}</dd></div>
                     <div><dt>Module</dt><dd>{{ finding.source_module }}</dd></div>
-                    <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
                     <div><dt>Category</dt><dd><code>{{ finding.issue_type }}</code></dd></div>
-                    {% if finding.selector %}<div><dt>Selector</dt><dd><code>{{ finding.selector }}</code></dd></div>{% endif %}
+                    <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
                   </dl>
+                  {% if finding.browser_observation %}<p>{{ finding.browser_observation }}</p>{% endif %}
                 </div>
-                {% if finding.browser_observation %}
-                  <div class="evidence-panel">
-                    <h4>Browser observation</h4>
-                    <p>{{ finding.browser_observation }}</p>
-                  </div>
-                {% endif %}
                 {% if finding.suggested_fix %}
                   <div class="evidence-panel">
-                    <h4>Suggested remediation</h4>
+                    <h4>Fix</h4>
                     <p>{{ finding.suggested_fix }}</p>
                   </div>
                 {% endif %}
               </div>
               {% if finding.snippet %}
                 <div class="code-panel">
-                  <div class="code-panel-head"><strong>Relevant HTML</strong><button class="copy-button" type="button" data-copy-target="snippet-{{ loop.index }}">Copy</button></div>
+                  <div class="code-panel-head"><strong>Reproduce</strong><button class="copy-button" type="button" data-copy-target="snippet-{{ loop.index }}">Copy</button></div>
                   <pre id="snippet-{{ loop.index }}"><code>{{ finding.snippet }}</code></pre>
                 </div>
               {% endif %}
-              <p class="review-note">Human review required before any legal, procurement, or compliance conclusion.</p>
             </details>
           </article>
         {% endfor %}
       </div>
-      <p id="empty-filter-state" class="empty-state" hidden>No findings match the current filters.</p>
+      <p id="empty-filter-state" class="empty-state" hidden>Nothing matched.</p>
     {% else %}
-      <p class="empty-state">No findings were reported by the selected checks. Keep human review in the loop for critical public services.</p>
+      <p class="empty-state">No findings.</p>
     {% endif %}
   </section>
 
   {% if run.ai_scout %}
   <section class="dashboard ai-panel" aria-labelledby="ai-heading">
     <div class="card-title-row">
-      <div>
-        <p class="eyebrow">Suggest-only review</p>
-        <h2 id="ai-heading">AI Scout review of deterministic findings</h2>
-      </div>
+      <h2 id="ai-heading">Scout</h2>
       <span class="status-pill {{ run.ai_scout.get('status', '') }}">{{ run.ai_scout.get('status', '') }}</span>
     </div>
     <p class="ai-summary">{{ run.ai_scout.get('summary', '') }}</p>
     {% if run.ai_scout.get('ai_suggested_observations') %}
       <ol class="process-list">
         {% for item in run.ai_scout.get('ai_suggested_observations', []) %}
-          <li><strong>{{ item.get('observation', '') }}</strong> {{ item.get('why_it_may_matter', '') }} <span class="muted">Evidence: {{ item.get('related_deterministic_evidence', '') }}. Human review required.</span></li>
+          <li><strong>{{ item.get('observation', '') }}</strong> {{ item.get('why_it_may_matter', '') }} <span class="muted">Evidence: {{ item.get('related_deterministic_evidence', '') }}.</span></li>
         {% endfor %}
       </ol>
     {% endif %}
-    <p class="review-note">AI Scout organises existing evidence. It does not independently establish an accessibility failure.</p>
   </section>
   {% endif %}
 
   <section class="dashboard downloads-panel" aria-labelledby="downloads-heading">
     <div class="card-title-row">
-      <div>
-        <p class="eyebrow">Exports</p>
-        <h2 id="downloads-heading">Report downloads</h2>
-      </div>
-      <span class="mini-metric">{{ run.reports | length }} generated</span>
+      <h2 id="downloads-heading">Downloads</h2>
+      <span class="mini-metric">{{ run.reports | length }}</span>
     </div>
-    <div class="download-grid">
+    <div class="download-grid compact-downloads">
       {% for label, href in run.reports.items() %}
         <article class="download-card">
           <svg aria-hidden="true"><use href="#icon-download"></use></svg>
-          <div>
-            <h3>{{ label }}</h3>
-            <p>
-              {% if label == 'HTML' %}Reviewer-ready web report.
-              {% elif label == 'Markdown' %}Readable handoff notes.
-              {% elif label == 'JSON' %}Structured machine data.
-              {% elif label == 'CSV' %}Spreadsheet triage.
-              {% elif label == 'SARIF' %}Code-scanning integration.
-              {% elif label == 'JUnit' %}CI test reporting.
-              {% else %}Generated supporting artifact.
-              {% endif %}
-            </p>
-          </div>
+          <h3>{{ label }}</h3>
           <a class="download-button" href="{{ href }}?download=1">Download</a>
         </article>
       {% endfor %}
@@ -233,23 +197,23 @@
 
   <section class="dashboard evidence-gallery" aria-labelledby="evidence-heading">
     <div class="card-title-row">
-      <h2 id="evidence-heading">Evidence gallery</h2>
+      <h2 id="evidence-heading">Evidence</h2>
       <span class="mini-metric">visual proof</span>
     </div>
     {% if run.visual_proof.screenshot_link or run.visual_proof.focus_overlay_link or run.visual_proof.video_link %}
-      <div class="gallery-grid">
+      <div class="gallery-grid compact-gallery">
         {% if run.visual_proof.screenshot_link %}
-          <article><h3>Screenshot</h3><p>Full-page captured evidence.</p><a class="download-button" href="{{ run.visual_proof.screenshot_link }}">Open full size</a></article>
+          <article><h3>Screenshot</h3><a class="download-button" href="{{ run.visual_proof.screenshot_link }}">Open</a></article>
         {% endif %}
         {% if run.visual_proof.focus_overlay_link %}
-          <article><h3>Focus-path overlay</h3><p>Keyboard traversal evidence for the affected page.</p><a class="download-button" href="{{ run.visual_proof.focus_overlay_link }}">Open overlay</a></article>
+          <article><h3>Focus path</h3><a class="download-button" href="{{ run.visual_proof.focus_overlay_link }}">Open</a></article>
         {% endif %}
         {% if run.visual_proof.video_link %}
-          <article><h3>Video proof</h3><p>Recorded browser evidence.</p><a class="download-button" href="{{ run.visual_proof.video_link }}">Open video</a></article>
+          <article><h3>Video</h3><a class="download-button" href="{{ run.visual_proof.video_link }}">Open</a></article>
         {% endif %}
       </div>
     {% else %}
-      <p class="empty-state">No visual evidence was generated for this run. Browser-dependent modules may have been unavailable or not selected.</p>
+      <p class="empty-state">No visual evidence.</p>
     {% endif %}
   </section>
 
@@ -257,7 +221,7 @@
     <h2 id="rerun-heading">Run again</h2>
     <div class="actions">
       <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another URL</a>
-      <a class="download-button" href="{{ url_for('home') }}#audit">Change selected modules</a>
+      <a class="download-button" href="{{ url_for('home') }}#audit">Change checks</a>
     </div>
   </section>
 </div>
@@ -298,7 +262,7 @@ function applyFilters() {
     card.hidden = !matches;
     if (matches) visibleCount += 1;
   });
-  document.getElementById('finding-count').textContent = `${visibleCount} findings shown.`;
+  document.getElementById('finding-count').textContent = `${visibleCount} shown.`;
   const empty = document.getElementById('empty-filter-state');
   if (empty) empty.hidden = visibleCount !== 0;
 }
