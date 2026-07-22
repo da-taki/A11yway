@@ -1,44 +1,25 @@
 ---
 name: Bug report
-about: Something in A11yway did not work as documented
-title: "[Bug] "
-labels: bug
+about: Report behavior that looks wrong
 ---
 
-## Command run
+# Bug Report
 
-The exact command, for example:
+## What happened
 
-```
-python -m a11yway.main examples/sample_form.html --json reports/out.json
-```
+Describe the problem and what you expected instead.
 
-## Source type
+## Command or page
 
-- [ ] Local HTML file
-- [ ] Public URL
-- [ ] Batch config
-- [ ] Browser mode (`--browser`)
+Include the command, URL, or web route involved. Do not include credentials or private URLs.
 
-## Expected behavior
+## Evidence
 
-What you expected to happen.
-
-## Actual behavior
-
-What actually happened.
-
-## Error output
-
-Paste the full console output or traceback:
-
-```
-(paste here)
-```
+Paste the shortest useful error, report excerpt, or traceback.
 
 ## Environment
 
 - Operating system:
-- Python version (`python --version`):
-- Playwright installed? (yes/no, and `playwright --version` if yes):
-- A11yway commit or version:
+- Python version:
+- Browser mode used: yes/no
+- A11yway version or commit:

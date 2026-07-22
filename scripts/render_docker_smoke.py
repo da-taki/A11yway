@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import tempfile
+from html.parser import HTMLParser
 from importlib.metadata import version
 from pathlib import Path
 
@@ -18,6 +19,75 @@ import a11yway.web_app as web_app
 def _assert(condition: bool, message: str) -> None:
     if not condition:
         raise AssertionError(message)
+
+
+class _LandingFormParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.forms: list[dict[str, str]] = []
+        self.form_controls: list[list[tuple[str, dict[str, str]]]] = []
+        self._current_form: list[tuple[str, dict[str, str]]] | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attributes = {name.lower(): value or "" for name, value in attrs}
+        if tag == "form":
+            self.forms.append(attributes)
+            self.form_controls.append([])
+            self._current_form = self.form_controls[-1]
+            return
+        if self._current_form is not None and tag in {"input", "button"}:
+            self._current_form.append((tag, attributes))
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "form":
+            self._current_form = None
+
+
+def _has_required(attributes: dict[str, str]) -> bool:
+    return "required" in attributes
+
+
+def _assert_landing_form(html: str) -> None:
+    lowered = html.lower()
+    _assert("templatesyntaxerror" not in lowered, "landing rendered a template error")
+    _assert("traceback" not in lowered, "landing rendered a traceback")
+    _assert("internal server error" not in lowered, "landing rendered a server error")
+
+    parser = _LandingFormParser()
+    parser.feed(html)
+
+    audit_forms = []
+    for index, form in enumerate(parser.forms):
+        method = form.get("method", "").lower()
+        action = form.get("action", "")
+        if method == "post" and action in {"/audit", "audit"}:
+            audit_forms.append((form, parser.form_controls[index]))
+
+    _assert(audit_forms, "audit form with post method and /audit action missing")
+
+    for _form, controls in audit_forms:
+        has_url_input = any(
+            tag == "input"
+            and attrs.get("name") == "url"
+            and attrs.get("type", "text").lower() == "url"
+            for tag, attrs in controls
+        )
+        has_permission = any(
+            tag == "input"
+            and attrs.get("name") == "permission"
+            and attrs.get("type", "").lower() == "checkbox"
+            and _has_required(attrs)
+            for tag, attrs in controls
+        )
+        has_submit = any(
+            (tag == "button" and attrs.get("type", "submit").lower() == "submit")
+            or (tag == "input" and attrs.get("type", "").lower() == "submit")
+            for tag, attrs in controls
+        )
+        if has_url_input and has_permission and has_submit:
+            return
+
+    raise AssertionError("audit form is missing the URL input, permission checkbox, or submit control")
 
 
 def _assert_report_downloads(summary: dict, client) -> None:
@@ -89,7 +159,7 @@ def main() -> int:
 
         landing = client.get("/")
         _assert(landing.status_code == 200, f"landing returned {landing.status_code}")
-        _assert(b"Run accessibility audit" in landing.data, "landing form did not render")
+        _assert_landing_form(landing.data.decode("utf-8"))
 
         quick = _run_review("render quick smoke", ["static", "indic"], client)
         browser_summary = _run_review(

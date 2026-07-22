@@ -1,42 +1,22 @@
 ---
 name: Evaluation feedback
-about: Feedback from reviewing an A11yway report against a real page
-title: "[Evaluation] "
-labels: evaluation-feedback
+about: Share review feedback on A11yway findings
 ---
 
-## Organization / page reviewed
+# Evaluation Feedback
 
-Which page or site was audited? (Use a public URL or a general
-description — do not include private information.)
+## Source reviewed
 
-## Report path or version
+Name the public or permitted page, fixture, or report.
 
-Which report was reviewed (file path, batch output directory, or attach
-the Markdown report)?
+## Finding
 
-## Useful findings
+Include the issue type, selector, and confidence label if available.
 
-Which findings were correct and worth fixing?
+## Reviewer result
 
-## False positives
+Mark the finding as confirmed, not reproducible, false positive, or needs more context.
 
-Which findings were wrong or misleading? What did the tool misread?
+## Notes
 
-## Missed issues
-
-Which real barriers did the report not mention?
-
-## Clarity rating
-
-How clear was the report for a non-developer reviewer? (1 = confusing,
-5 = very clear)
-
-Rating:
-
-What was hardest to understand?
-
-## Permission to quote
-
-May we quote parts of this feedback (anonymized) in project
-documentation or evaluation write-ups? (yes/no)
+Explain the shortest useful reason. Do not include private user data.

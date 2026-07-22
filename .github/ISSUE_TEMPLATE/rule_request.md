@@ -1,35 +1,22 @@
 ---
 name: Rule request
-about: Propose a new accessibility check for the rule registry
-title: "[Rule] "
-labels: rule-request
+about: Request or adjust an accessibility check
 ---
 
-## Barrier type
+# Rule Request
 
-What accessibility barrier should A11yway detect? Describe it in plain
-language.
+## Problem
 
-## Who it affects
+Describe the barrier or review need.
 
-Which students hit this barrier (for example: keyboard-only users,
-screen reader users, low-vision students, deaf or hard-of-hearing
-students, students with reading difficulty)?
+## Evidence source
 
-## Example HTML or page
+Say whether the rule would use static HTML, rendered DOM, keyboard interaction, accessibility-tree output, media metadata, or manual review.
 
-A minimal HTML snippet or a public example page showing the barrier:
+## Expected output
 
-```html
-(paste here)
-```
+Describe the finding, confidence, and limitation text that would help reviewers.
 
-## Expected finding
+## WCAG link
 
-What should the report say when this rule fires? Suggested issue type,
-severity, and message.
-
-## Possible false positives
-
-When might this check flag something that is actually fine? Conservative
-heuristics matter — reviewer trust is easy to lose.
+Name the related WCAG 2.2 A or AA criterion if one applies.
