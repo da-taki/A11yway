@@ -4,6 +4,8 @@ An open-source accessibility stress-testing toolkit for essential public web wor
 
 A11yway audits rendered websites, follows keyboard workflows, checks zoom and reflow, inspects accessibility-tree output, and saves evidence for human review.
 
+Demo: https://a11yway-soq0.onrender.com
+
 ## Checks
 
 - Keyboard navigation and focus
