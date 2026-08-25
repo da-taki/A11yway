@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -32,6 +33,12 @@ def _patch_web_runtime(monkeypatch, tmp_path: Path, html: str | None = None) -> 
             "error": None,
         },
     )
+
+
+def _attr_for(body: str, name: str) -> str:
+    match = re.search(rf'<input[^>]*name="{name}"[^>]*>', body)
+    assert match, f"missing input {name}"
+    return match.group(0)
 
 
 @pytest.mark.parametrize(
@@ -77,6 +84,10 @@ def test_landing_page_renders_accessible_form_controls() -> None:
     assert "Mode" in body
     assert "Checks" in body
     assert 'role="status" aria-live="polite"' in body
+    assert '<main id="main" tabindex="-1">' in body
+    assert 'aria-describedby="advanced-help"' in body
+    assert 'Run passive security review' in body
+    assert 'aria-invalid="true"' not in body
 
 
 def test_selected_modules_from_form_forces_static_and_dedupes() -> None:
@@ -85,14 +96,58 @@ def test_selected_modules_from_form_forces_static_and_dedupes() -> None:
     assert selected == ["forms", "ai_scout", "static"]
 
 
-def test_invalid_audit_request_shows_validation_error() -> None:
+def test_missing_permission_marks_only_permission_invalid() -> None:
     app = web_app.create_app()
     client = app.test_client()
 
     response = client.post("/audit", data={"url": "https://example.org", "modules": ["static"]})
 
     assert response.status_code == 400
-    assert "Please confirm" in response.get_data(as_text=True)
+    body = response.get_data(as_text=True)
+    assert "Please confirm" in body
+    assert 'id="form-error"' in body
+    assert 'tabindex="-1"' in body
+    url_input = _attr_for(body, "url")
+    permission_input = _attr_for(body, "permission")
+    assert 'aria-invalid="true"' not in url_input
+    assert 'form-error' not in url_input
+    assert 'aria-invalid="true"' in permission_input
+    assert 'form-error' in permission_input
+
+
+def test_invalid_url_marks_only_url_invalid() -> None:
+    app = web_app.create_app()
+    client = app.test_client()
+
+    response = client.post("/audit", data={"url": "ftp://example.org", "modules": ["static"], "permission": "on"})
+
+    assert response.status_code == 400
+    body = response.get_data(as_text=True)
+    assert "Only http:// and https:// URLs are allowed." in body
+    url_input = _attr_for(body, "url")
+    permission_input = _attr_for(body, "permission")
+    assert 'aria-invalid="true"' in url_input
+    assert 'form-error' in url_input
+    assert 'aria-invalid="true"' not in permission_input
+    assert 'form-error' not in permission_input
+
+
+def test_redirect_validation_error_marks_url_invalid(monkeypatch) -> None:
+    app = web_app.create_app()
+    client = app.test_client()
+    monkeypatch.setattr(web_app, "validate_redirect_chain", lambda url: {"ok": False, "error": "Redirect target is not allowed.", "url": url})
+
+    response = client.post("/audit", data={"url": "https://example.org", "modules": ["static"], "permission": "on"})
+
+    assert response.status_code == 400
+    body = response.get_data(as_text=True)
+    assert "Redirect target is not allowed." in body
+    url_input = _attr_for(body, "url")
+    permission_input = _attr_for(body, "permission")
+    assert 'aria-invalid="true"' in url_input
+    assert 'form-error' in url_input
+    assert 'aria-invalid="true"' not in permission_input
+    assert 'form-error' not in permission_input
 
 
 def test_audit_request_status_result_and_download(tmp_path: Path, monkeypatch) -> None:
@@ -119,13 +174,25 @@ def test_audit_request_status_result_and_download(tmp_path: Path, monkeypatch) -
     assert status_response.status_code == 200
     assert status_response.get_json()["status"] == "complete"
 
+    progress_response = client.get(f"/audits/{run_id}/progress")
+    progress_body = progress_response.get_data(as_text=True)
+    assert progress_response.status_code == 200
+    assert "window.location.href" not in progress_body
+    assert "Audit complete. View report." in progress_body
+    assert 'id="result-link"' in progress_body
+
     result_response = client.get(f"/runs/{run_id}")
     result_body = result_response.get_data(as_text=True)
     assert result_response.status_code == 200
     assert "Summary" in result_body
     assert "Downloads" in result_body
     assert 'id="page-filter"' in result_body
+    assert 'for="finding-search"' in result_body
+    assert 'id="filter-help"' in result_body
     assert 'id="clear-filters"' in result_body
+    assert 'id="copy-status"' in result_body
+    assert 'Code copied.' in result_body
+    assert 'Copy reproduction snippet' in result_body
     assert "<details open>" in result_body
 
     summary = web_app.load_run_summary(run_id)

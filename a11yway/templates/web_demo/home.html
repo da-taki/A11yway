@@ -14,18 +14,19 @@
       </div>
 
       {% if error %}
-        <div class="alert" role="alert">{{ error }}</div>
+        <div id="form-error" class="alert" role="alert" tabindex="-1">{{ error }}</div>
       {% endif %}
 
       <div class="field-grid url-first">
         <div class="field-grow">
           <label for="url">Audit a URL</label>
-          <input id="url" name="url" type="url" required autocomplete="url" inputmode="url" placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}" aria-describedby="url-help">
+          <input id="url" name="url" type="url" required autocomplete="url" inputmode="url" placeholder="https://example.org/page" value="{{ submitted.get('url', '') }}" aria-describedby="url-help{% if error_field == 'url' %} form-error{% endif %}" {% if error_field == 'url' %}aria-invalid="true"{% endif %}>
           <p id="url-help" class="field-help">Public pages only. Private hosts, unsafe redirects, and credentials are blocked.</p>
         </div>
         <div>
           <label for="label">Label</label>
-          <input id="label" name="label" type="text" maxlength="80" autocomplete="off" placeholder="Example page" value="{{ submitted.get('label', '') }}">
+          <input id="label" name="label" type="text" maxlength="80" autocomplete="off" placeholder="Example page" value="{{ submitted.get('label', '') }}" aria-describedby="label-help">
+          <p id="label-help" class="field-help">Optional name used in reports and past runs.</p>
         </div>
       </div>
 
@@ -59,7 +60,8 @@
       </fieldset>
 
       <details class="advanced-panel">
-        <summary><span>Advanced</span><span class="summary-hint" id="module-summary">Checks selected</span></summary>
+        <summary aria-describedby="advanced-help"><span>Advanced checks</span><span class="summary-hint" id="module-summary" aria-hidden="true">Checks selected</span></summary>
+        <p id="advanced-help" class="field-help">Optional browser evidence and specialized review checks. Changing these options updates the selected check count visually.</p>
         <div class="module-groups">
           <section class="module-group" aria-labelledby="group-rendered">
             <h2 id="group-rendered">Rendered Evidence</h2>
@@ -95,12 +97,12 @@
         </div>
         <label class="switch-row">
           <input name="passive_security" type="checkbox" {% if submitted.get('passive_security') %}checked{% endif %}>
-          <span>Run</span>
+          <span>Run passive security review</span>
         </label>
       </section>
 
       <label class="check-row">
-        <input name="permission" type="checkbox" required aria-describedby="permission-help">
+        <input name="permission" type="checkbox" required aria-describedby="permission-help{% if error_field == 'permission' %} form-error{% endif %}" {% if error_field == 'permission' %}aria-invalid="true"{% endif %}>
         <span>I confirm this is a public page or I have permission to review it. No logins, payments, scraping, exploitation, or form submissions.</span>
       </label>
       <p id="permission-help" class="field-help permission-help">Required. A11yway does not submit public forms.</p>
@@ -202,6 +204,10 @@
 const presets = {{ presets | tojson }};
 const moduleInputs = Array.from(document.querySelectorAll('[data-module]'));
 const moduleSummary = document.getElementById('module-summary');
+const formError = document.getElementById('form-error');
+if (formError) {
+  formError.focus();
+}
 function updateModuleSummary() {
   const selected = moduleInputs.filter((box) => box.checked || box.type === 'hidden');
   const browserCount = selected.filter((box) => (box.dataset.purpose || '').includes('Browser')).length;

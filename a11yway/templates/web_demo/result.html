@@ -1,5 +1,5 @@
 {% extends "web_demo/base.html" %}
-{% block title %}A11yway result{% endblock %}
+{% block title %}Report for {{ run.target_name }} - A11yway{% endblock %}
 {% block content %}
 <section class="result-hero">
   <div class="section-inner result-head tabbed-head">
@@ -9,13 +9,14 @@
       <p class="target-line"><svg aria-hidden="true"><use href="#icon-link"></use></svg><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></p>
     </div>
     <div class="result-actions">
-      <span class="status-pill {{ run.status }}">{{ run.status }}</span>
+      <span class="status-pill {{ run.status }}">Status: {{ run.status }}</span>
       <a class="primary-button secondary-link" href="{{ url_for('home') }}?url={{ run.target_url | urlencode }}">Audit another URL</a>
     </div>
   </div>
 </section>
 
 <div class="section-inner result-shell">
+  <div id="copy-status" class="visually-hidden" role="status" aria-live="polite"></div>
   {% if run.fallback_notice %}
     <div class="alert">{{ run.fallback_notice }}</div>
   {% endif %}
@@ -95,18 +96,20 @@
   <section class="dashboard findings-dashboard" aria-labelledby="filters-heading">
     <div class="card-title-row">
       <h2 id="filters-heading">Findings</h2>
-      <p id="finding-count" class="muted" aria-live="polite">{{ run.findings | length }} shown.</p>
+      <p id="finding-count" class="muted" aria-live="polite" tabindex="-1">{{ run.findings | length }} shown.</p>
     </div>
+
+    <p id="filter-help" class="field-help">Use filters to hide findings without moving keyboard focus. The shown count is announced after changes.</p>
 
     <details class="filter-panel" open>
       <summary><svg aria-hidden="true"><use href="#icon-filter"></use></svg> Filter</summary>
       <div class="filters">
-        <label>Search <input id="finding-search" type="search" autocomplete="off"></label>
-        <label>Severity <select id="severity-filter"><option value="">All</option></select></label>
-        <label>WCAG <select id="wcag-filter"><option value="">All</option></select></label>
-        <label>Module <select id="module-filter"><option value="">All</option></select></label>
-        <label>Page <select id="page-filter"><option value="">All</option></select></label>
-        <label>Category <select id="category-filter"><option value="">All</option></select></label>
+        <div class="filter-field"><label for="finding-search">Search</label><input id="finding-search" type="search" autocomplete="off" aria-describedby="filter-help"></div>
+        <div class="filter-field"><label for="severity-filter">Severity</label><select id="severity-filter" aria-describedby="filter-help"><option value="">All severities</option></select></div>
+        <div class="filter-field"><label for="wcag-filter">WCAG</label><select id="wcag-filter" aria-describedby="filter-help"><option value="">All WCAG criteria</option></select></div>
+        <div class="filter-field"><label for="module-filter">Module</label><select id="module-filter" aria-describedby="filter-help"><option value="">All modules</option></select></div>
+        <div class="filter-field"><label for="page-filter">Page</label><select id="page-filter" aria-describedby="filter-help"><option value="">All pages</option></select></div>
+        <div class="filter-field"><label for="category-filter">Category</label><select id="category-filter" aria-describedby="filter-help"><option value="">All categories</option></select></div>
         <button id="clear-filters" class="download-button filter-clear" type="button">Clear</button>
       </div>
     </details>
@@ -114,11 +117,11 @@
     {% if run.findings %}
       <div id="findings-list" class="finding-list">
         {% for finding in run.findings %}
-          <article class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}" data-page="{{ finding.affected_url }}">
+          <article id="finding-{{ loop.index }}" class="finding-card" data-severity="{{ finding.display_severity }}" data-module="{{ finding.source_module }}" data-category="{{ finding.issue_type }}" data-wcag="{{ finding.wcag_label }}" data-page="{{ finding.affected_url }}">
             <div class="finding-head">
               <div>
                 <span class="badge">{{ finding.display_severity }}</span>
-                <h3>{{ finding.title }}</h3>
+                <h3 id="finding-heading-{{ loop.index }}">{{ finding.title }}</h3>
               </div>
               <dl class="finding-quick-meta">
                 <div><dt>Confidence</dt><dd>{{ finding.confidence or 'Not stated' }}</dd></div>
@@ -127,7 +130,7 @@
               </dl>
             </div>
             <details open>
-              <summary>Evidence</summary>
+              <summary>Evidence for finding {{ loop.index }}</summary>
               <div class="evidence-grid">
                 <div class="evidence-panel">
                   <h4>Evidence</h4>
@@ -148,7 +151,7 @@
               </div>
               {% if finding.snippet %}
                 <div class="code-panel">
-                  <div class="code-panel-head"><strong>Reproduce</strong><button class="copy-button" type="button" data-copy-target="snippet-{{ loop.index }}">Copy</button></div>
+                  <div class="code-panel-head"><strong>Reproduce</strong><button class="copy-button" type="button" data-copy-target="snippet-{{ loop.index }}">Copy reproduction snippet</button></div>
                   <pre id="snippet-{{ loop.index }}"><code>{{ finding.snippet }}</code></pre>
                 </div>
               {% endif %}
@@ -189,7 +192,7 @@
         <article class="download-card">
           <svg aria-hidden="true"><use href="#icon-download"></use></svg>
           <h3>{{ label }}</h3>
-          <a class="download-button" href="{{ href }}?download=1">Download</a>
+          <a class="download-button" href="{{ href }}?download=1">Download {{ label }} report</a>
         </article>
       {% endfor %}
     </div>
@@ -203,13 +206,13 @@
     {% if run.visual_proof.screenshot_link or run.visual_proof.focus_overlay_link or run.visual_proof.video_link %}
       <div class="gallery-grid compact-gallery">
         {% if run.visual_proof.screenshot_link %}
-          <article><h3>Screenshot</h3><a class="download-button" href="{{ run.visual_proof.screenshot_link }}">Open</a></article>
+          <article><h3>Screenshot</h3><a class="download-button" href="{{ run.visual_proof.screenshot_link }}">Open screenshot evidence</a></article>
         {% endif %}
         {% if run.visual_proof.focus_overlay_link %}
-          <article><h3>Focus path</h3><a class="download-button" href="{{ run.visual_proof.focus_overlay_link }}">Open</a></article>
+          <article><h3>Focus path</h3><a class="download-button" href="{{ run.visual_proof.focus_overlay_link }}">Open focus path evidence</a></article>
         {% endif %}
         {% if run.visual_proof.video_link %}
-          <article><h3>Video</h3><a class="download-button" href="{{ run.visual_proof.video_link }}">Open</a></article>
+          <article><h3>Video</h3><a class="download-button" href="{{ run.visual_proof.video_link }}">Open video evidence</a></article>
         {% endif %}
       </div>
     {% else %}
@@ -230,6 +233,7 @@
 {% block scripts %}
 <script>
 const cards = Array.from(document.querySelectorAll('.finding-card'));
+const copyStatus = document.getElementById('copy-status');
 function fillOptions(id, values) {
   const select = document.getElementById(id);
   [...new Set(values.filter(Boolean))].sort().forEach((value) => {
@@ -265,6 +269,9 @@ function applyFilters() {
   document.getElementById('finding-count').textContent = `${visibleCount} shown.`;
   const empty = document.getElementById('empty-filter-state');
   if (empty) empty.hidden = visibleCount !== 0;
+  if (document.activeElement && document.activeElement.closest('.finding-card[hidden]')) {
+    document.getElementById('finding-count').focus();
+  }
 }
 document.querySelectorAll('#finding-search, #severity-filter, #wcag-filter, #module-filter, #page-filter, #category-filter').forEach((control) => {
   control.addEventListener('input', applyFilters);
@@ -279,10 +286,18 @@ document.getElementById('clear-filters').addEventListener('click', () => {
 document.querySelectorAll('[data-copy-target]').forEach((button) => {
   button.addEventListener('click', async () => {
     const target = document.getElementById(button.dataset.copyTarget);
-    if (!target || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(target.textContent || '');
-    button.textContent = 'Copied';
-    window.setTimeout(() => { button.textContent = 'Copy'; }, 1400);
+    if (!target || !navigator.clipboard) {
+      copyStatus.textContent = 'Copy failed. Clipboard is unavailable.';
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(target.textContent || '');
+      copyStatus.textContent = 'Code copied.';
+      button.textContent = 'Copied';
+      window.setTimeout(() => { button.textContent = 'Copy reproduction snippet'; }, 1400);
+    } catch (error) {
+      copyStatus.textContent = 'Copy failed. Select and copy the code manually.';
+    }
   });
 });
 </script>

@@ -76,6 +76,19 @@ svg {
   overflow: hidden;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
 :focus-visible {
   outline: 4px solid var(--white);
   outline-offset: 4px;
@@ -1212,10 +1225,19 @@ fieldset {
 
 .filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1.3fr) repeat(5, minmax(132px, 1fr)) auto;
+  grid-template-columns: repeat(6, minmax(132px, 1fr)) auto;
   gap: 12px;
   margin-top: 14px;
   align-items: end;
+}
+
+.filter-field {
+  display: grid;
+  gap: 4px;
+}
+
+.filters label {
+  align-self: end;
 }
 
 .filter-clear {

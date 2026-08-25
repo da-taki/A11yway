@@ -16,15 +16,16 @@
       <section class="progress-card status-panel" aria-labelledby="progress-heading">
         <div class="card-title-row">
           <h2 id="progress-heading">Active stage</h2>
-          <span class="status-pill {{ run.status }}">{{ run.status }}</span>
+          <span id="overall-status" class="status-pill {{ run.status }}">{{ run.status }}</span>
         </div>
+        <p class="field-help">Audit running. This page updates stage changes automatically; elapsed time and log refreshes are not announced.</p>
         <p id="live-status" class="live-status" role="status" aria-live="polite">{{ run.current_module }}</p>
         <dl class="detail-list compact">
           <div><dt>Elapsed</dt><dd id="elapsed">{{ run.elapsed_seconds }} seconds</dd></div>
           <div><dt>Checks</dt><dd>{{ run.modules | length }}</dd></div>
           <div><dt>Started</dt><dd>{{ run.started_at or 'Queued' }}</dd></div>
         </dl>
-        <div id="error-box" class="alert" role="alert" hidden></div>
+        <div id="error-box" class="alert" role="alert" tabindex="-1" hidden></div>
         <div class="actions">
           <a id="result-link" class="primary-button secondary-link" href="{{ url_for('result', run_id=run.run_id) }}" hidden>View report</a>
           <a class="download-button" href="{{ url_for('home') }}#audit">New audit</a>
@@ -41,7 +42,7 @@
             <li data-module-row="{{ module.key }}">
               <span class="status-dot {{ module.status }}" aria-hidden="true"></span>
               <strong>{{ module.label }}</strong>
-              <span>{{ module.status }}</span>
+              <span class="module-state">{{ module.status }}</span>
               <small>{{ module.message or '' }}</small>
             </li>
           {% endfor %}
@@ -72,9 +73,20 @@ const elapsed = document.getElementById('elapsed');
 const messageList = document.getElementById('message-list');
 const resultLink = document.getElementById('result-link');
 const errorBox = document.getElementById('error-box');
+const overallStatus = document.getElementById('overall-status');
+let lastAnnouncedStage = live.textContent.trim();
+let terminalAnnounced = false;
 
 function renderStatus(data) {
-  live.textContent = data.current_module || data.status;
+  const nextStage = data.current_module || data.status;
+  if (nextStage && nextStage !== lastAnnouncedStage && data.status !== 'complete' && data.status !== 'failed') {
+    live.textContent = nextStage;
+    lastAnnouncedStage = nextStage;
+  }
+  if (overallStatus) {
+    overallStatus.textContent = data.status;
+    overallStatus.className = `status-pill ${data.status}`;
+  }
   elapsed.textContent = `${data.elapsed_seconds || 0} seconds`;
   messageList.innerHTML = '';
   (data.messages || []).slice(-6).forEach((message) => {
@@ -87,18 +99,27 @@ function renderStatus(data) {
     if (!row) return;
     const dot = row.querySelector('.status-dot');
     dot.className = `status-dot ${module.status}`;
-    row.querySelector('span:nth-of-type(2)').textContent = module.status;
+    row.querySelector('.module-state').textContent = module.status;
     row.querySelector('small').textContent = module.message || '';
   });
   if (data.status === 'failed') {
     errorBox.hidden = false;
     errorBox.textContent = data.error_id ? `${data.error} Error ID: ${data.error_id}` : data.error;
+    if (!terminalAnnounced) {
+      live.textContent = 'Audit failed.';
+      errorBox.focus();
+      terminalAnnounced = true;
+    }
     resultLink.hidden = true;
     return true;
   }
   if (data.status === 'complete') {
     resultLink.hidden = false;
-    window.setTimeout(() => { window.location.href = resultUrl; }, 700);
+    if (!terminalAnnounced) {
+      live.textContent = 'Audit complete. View report.';
+      resultLink.focus();
+      terminalAnnounced = true;
+    }
     return true;
   }
   return false;

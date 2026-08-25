@@ -205,15 +205,15 @@ def create_app() -> Flask:
             "passive_security": form.get("passive_security") == "on",
         }
         if form.get("permission") != "on":
-            return render_home_error("Please confirm this is a public page or that you have permission to review it.", submitted, 400)
+            return render_home_error("Please confirm this is a public page or that you have permission to review it.", submitted, 400, error_field="permission")
 
         validation = validate_public_url(submitted["url"])
         if not validation["ok"]:
-            return render_home_error(validation["error"], submitted, 400)
+            return render_home_error(validation["error"], submitted, 400, error_field="url")
 
         redirect_validation = validate_redirect_chain(validation["url"])
         if not redirect_validation["ok"]:
-            return render_home_error(redirect_validation["error"], submitted, 400)
+            return render_home_error(redirect_validation["error"], submitted, 400, error_field="url")
 
         selected_modules = selected_modules_from_form(submitted["modules"], submitted["preset"])
         run_id = make_run_id(validation["url"], submitted["label"])
@@ -288,7 +288,7 @@ def create_app() -> Flask:
     return app
 
 
-def render_home_error(error: str, submitted: dict[str, Any], status_code: int):
+def render_home_error(error: str, submitted: dict[str, Any], status_code: int, *, error_field: str):
     return (
         render_template(
             "web_demo/home.html",
@@ -299,6 +299,7 @@ def render_home_error(error: str, submitted: dict[str, Any], status_code: int):
             browser_available=is_playwright_available(),
             submitted=submitted,
             error=error,
+            error_field=error_field,
         ),
         status_code,
     )

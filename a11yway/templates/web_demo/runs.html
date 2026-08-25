@@ -22,14 +22,14 @@
           <tbody>
             {% for run in runs %}
               <tr>
-                <td><a href="{{ url_for('result', run_id=run.run_id) }}">{{ run.target_name }}</a></td>
-                <td><a href="{{ run.target_url }}" rel="noreferrer">{{ run.target_url }}</a></td>
+                <td><a href="{{ url_for('result', run_id=run.run_id) }}">Open report for {{ run.target_name }}</a></td>
+                <td><a href="{{ run.target_url }}" rel="noreferrer">Open audited page: {{ run.target_url }}</a></td>
                 <td>{{ run.created_at }}</td>
                 <td>{{ run.total_issues or run.score.get('total_issues', 0) }}</td>
                 <td>{{ run.classification or run.score.get('classification', '') }}</td>
                 <td>
                   {% for label, href in run.reports.items() %}
-                    <a href="{{ href }}">{{ label }}</a>{% if not loop.last %}, {% endif %}
+                    <a href="{{ href }}">Open {{ label }} report for {{ run.target_name }}</a>{% if not loop.last %}, {% endif %}
                   {% endfor %}
                 </td>
               </tr>
